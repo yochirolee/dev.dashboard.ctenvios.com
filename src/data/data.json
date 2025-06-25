@@ -1,0 +1,68 @@
+{
+	"id": 1,
+	"name": "Caribe Travel Express",
+	"description": "Agencia de viajes",
+	"services": [
+		{
+			"id": 1,
+			"name": "Transcargo",
+			"description": "Maritimo",
+			"agency_rates": [
+				{
+					"id": 1,
+					"agency_id": 1,
+					"name": "Comida/Aseo/Medicinas",
+					"min_weight": 0,
+					"max_weight": 200,
+					"public_price": 1.99,
+					"is_sale_by_pounds": true,
+					"categories": [
+						{
+							"id": 1,
+							"name": "Comida/Aseo/Medicinas",
+							"customs_categories": [{ "id": 1, "name": "Alimentos", "customs_fee": 0 }]
+						}
+					]
+				},
+				{
+					"id": 2,
+					"agency_id": 1,
+					"name": "Duraderos",
+					"min_weight": 0,
+					"max_weight": 500,
+					"public_price": 2.99,
+					"is_sale_by_pounds": true,
+					"categories": [
+						{
+							"id": 2,
+							"name": "Duraderos",
+							"customs_categories": [{ "id": "2", "name": "Duraderos", "customs_fee": 50 }]
+						}
+					]
+				}
+			]
+		},
+		{
+			"id": 2,
+			"name": "Transcargo",
+			"description": "Aereo",
+			"agency_rates": [
+				{
+					"id": 1,
+					"name": "Comida/Aseo/Medicinas",
+					"min_weight": 0,
+					"max_weight": 100,
+					"public_price": 2.99,
+					"is_sale_by_pounds": true,
+					"categories": [
+						{
+							"id": 1,
+							"name": "Comida/Aseo/Medicinas",
+							"customs_categories": [{ "id": 1, "name": "Alimentos", "custom_fee": 0 }]
+						}
+					]
+				}
+			]
+		}
+	]
+}

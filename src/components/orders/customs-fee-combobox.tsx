@@ -1,0 +1,82 @@
+import * as React from "react";
+import { Check, ChevronsUpDown } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import {
+	Command,
+	CommandEmpty,
+	CommandGroup,
+	CommandInput,
+	CommandItem,
+	CommandList,
+} from "@/components/ui/command";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { useFormContext } from "react-hook-form";
+import { FormField } from "../ui/form";
+import { useCustoms } from "@/hooks/use-customs";
+import type { Customs } from "@/data/types";
+
+
+const CustomsFeeCombobox = React.memo(function CustomsFeeCombobox({ index }: { index: number }) {
+	const { control } = useFormContext();
+	const [open, setOpen] = React.useState(false);
+	const { data: customs } = useCustoms.get();
+
+	return (
+		<FormField
+			control={control}
+			name={`items.${index}.customs`}
+			render={({ field }) => (
+				<Popover open={open} onOpenChange={setOpen}>
+					<PopoverTrigger asChild>
+						<Button
+							id={`customs-fee-combobox-${index}`}
+							variant="outline"
+							role="combobox"
+							aria-expanded={open}
+							aria-controls={`customs-fee-combobox-${index}`}
+							className={cn("w-[200px] justify-between", !field.value && "text-muted-foreground")}
+						>
+							{customs?.find((custom: Customs) => custom.name === field.value?.name)?.name
+								? field.value.name.length > 20
+									? `${field.value.name.substring(0, 20)}...`
+									: field.value.name
+								: "Seleccionar Arancel"}
+							<ChevronsUpDown className="opacity-50" />
+						</Button>
+					</PopoverTrigger>
+					<PopoverContent className="w-[200px] p-0">
+						<Command>
+							<CommandInput placeholder="Buscar Arancel..." />
+							<CommandList>
+								<CommandEmpty>No se encontraron Aranceles.</CommandEmpty>
+								<CommandGroup>
+									{customs?.map((custom: Customs) => (
+										<CommandItem
+											key={custom?.id}
+											value={custom?.name}
+											onSelect={() => {
+												field.onChange(custom);
+												setOpen(false);
+											}}
+										>
+											{custom.name}
+											<Check
+												className={cn(
+													"ml-auto",
+													field?.value?.name === custom?.name ? "opacity-100" : "opacity-0",
+												)}
+											/>
+										</CommandItem>
+									))}
+								</CommandGroup>
+							</CommandList>
+						</Command>
+					</PopoverContent>
+				</Popover>
+			)}
+		/>
+	);
+});
+
+export default CustomsFeeCombobox;
