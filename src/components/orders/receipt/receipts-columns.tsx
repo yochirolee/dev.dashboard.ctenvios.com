@@ -1,19 +1,9 @@
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Checkbox } from "@/components/ui/checkbox";
 import { type ColumnDef } from "@tanstack/react-table";
+import { type Receipt } from "@/data/types";
 
-// This type is used to define the shape of our data.
-// You can use a Zod schema here if you want.
-export type Payment = {
-	first_name: string;
-	second_name: string;
-	last_name: string;
-	second_last_name: string;
-	phone: string;
-	email: string;
-	address: string;
-};
-
-export const receiptsColumns: ColumnDef<Payment>[] = [
+export const receiptsColumns: ColumnDef<Receipt>[] = [
 	{
 		id: "select",
 		header: ({ table }) => (
@@ -37,13 +27,19 @@ export const receiptsColumns: ColumnDef<Payment>[] = [
 	},
 
 	{
-		accessorKey: "full_name",
+		accessorKey: "first_name",
 		header: "Nombre",
 		cell: ({ row }) => {
 			return (
-				<div>
-					{row.original.first_name} {row.original.second_name} {row.original.last_name}{" "}
-					{row.original.second_last_name}{" "}
+				<div className="flex items-center gap-2">
+					<Avatar>
+						<AvatarFallback>
+							{row.original.first_name.charAt(0)}
+							{row.original.last_name.charAt(0)}
+						</AvatarFallback>
+					</Avatar>
+					{row.original.first_name} {row.original.middle_name} {row.original.middle_name}
+					{row.original.last_name} {row.original.second_last_name}
 				</div>
 			);
 		},

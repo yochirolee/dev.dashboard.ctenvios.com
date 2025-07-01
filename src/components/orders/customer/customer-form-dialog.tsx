@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
 	Dialog,
@@ -20,29 +20,78 @@ import {
 	FormMessage,
 } from "@/components/ui/form";
 import { useForm } from "react-hook-form";
-import { UserRoundPlus } from "lucide-react";
+import { UserRoundPenIcon, UserRoundPlus } from "lucide-react";
 import { z } from "zod";
-import { useCreateCustomer } from "@/hooks/use-customers";
-import { type Customer, customerSchema } from "@/data/types";
+import { useCreateCustomer, useUpdateCustomer } from "@/hooks/use-customers";
+import { type Customer } from "@/data/types";
 import { toast } from "sonner";
 import { useInvoiceStore } from "@/stores/invoice-store";
+import { useShallow } from "zustand/react/shallow";
+
+const customerFormSchema = z.object({
+	first_name: z.string().min(1, "El nombre es requerido"),
+	middle_name: z.string().optional(),
+	last_name: z.string().min(1, "El apellido es requerido"),
+	second_last_name: z.string().optional(),
+	mobile: z
+		.string()
+		.min(10, "El movil debe tener 10 dígitos")
+		.max(10, "El movil debe tener 10 dígitos"),
+	identity_document: z.string().optional(),
+	email: z.string().email("El correo electrónico no es válido").optional(),
+	address: z.string().optional(),
+});
+
+type FormData = z.infer<typeof customerFormSchema>;
 
 export const CustomerFormDialog = React.memo(function CustomerFormDialog() {
-	// Only get setValue, don't subscribe to form changes
 	const [isOpen, setIsOpen] = useState(false);
 	const [formError, setFormError] = useState("");
+	const { selectedCustomer } = useInvoiceStore(
+		useShallow((state) => ({
+			selectedCustomer: state.selectedCustomer,
+		})),
+	);
 
-	const form = useForm<z.infer<typeof customerSchema>>({
-		resolver: zodResolver(customerSchema),
+	const form = useForm<FormData>({
+		resolver: zodResolver(customerFormSchema),
 		defaultValues: {
 			first_name: "",
-			second_name: undefined,
+			email: undefined,
+			mobile: undefined,
+			middle_name: "",
 			last_name: "",
 			second_last_name: "",
 			identity_document: undefined,
-			email: undefined,
-			phone: "",
 			address: undefined,
+		},
+	});
+
+	useEffect(() => {
+		if (selectedCustomer) {
+			form.reset({
+				first_name: selectedCustomer.first_name,
+				email: selectedCustomer.email ? selectedCustomer.email : undefined,
+				mobile: selectedCustomer.mobile ? selectedCustomer.mobile : undefined,
+				middle_name: selectedCustomer.middle_name ? selectedCustomer.middle_name : undefined,
+				last_name: selectedCustomer.last_name ? selectedCustomer.last_name : undefined,
+				second_last_name: selectedCustomer.second_last_name,
+				identity_document: selectedCustomer.identity_document
+					? selectedCustomer.identity_document
+					: undefined,
+				address: selectedCustomer.address ? selectedCustomer.address : undefined,
+			});
+		}
+	}, [selectedCustomer, form]);
+
+	const { mutate: updateCustomer, isPending: isUpdating } = useUpdateCustomer({
+		onSuccess: (data: Customer) => {
+			console.log(data, "data in onSuccess");
+			setIsOpen(false);
+			toast.success("Cliente actualizado correctamente");
+			form.reset();
+			setFormError("");
+			useInvoiceStore.setState({ selectedCustomer: data });
 		},
 	});
 
@@ -55,16 +104,16 @@ export const CustomerFormDialog = React.memo(function CustomerFormDialog() {
 			useInvoiceStore.setState({ selectedCustomer: data });
 		},
 		onError: (error) => {
-			console.log("Error creating customer:", error);
-			setFormError(error.message);
+			setFormError(error.response.data.message);
 		},
 	});
 
-	const onSubmit = (data: z.infer<typeof customerSchema>) => {
-		if (data?.email === "") {
-			data.email = undefined;
+	const onSubmit = (data: FormData) => {
+		if (selectedCustomer) {
+			updateCustomer({ id: selectedCustomer.id, data: data as Customer });
+		} else {
+			createCustomer(data as Customer);
 		}
-		createCustomer(data as Customer);
 	};
 
 	const onError = (errors: any) => {
@@ -75,32 +124,37 @@ export const CustomerFormDialog = React.memo(function CustomerFormDialog() {
 		<Dialog open={isOpen} onOpenChange={setIsOpen}>
 			<DialogTrigger asChild>
 				<Button variant="outline">
-					<UserRoundPlus />
+					{selectedCustomer ? <UserRoundPenIcon /> : <UserRoundPlus />}
 				</Button>
 			</DialogTrigger>
 			<DialogContent className="sm:max-xl-[425px] ">
 				<Form {...form}>
 					<form onSubmit={form.handleSubmit(onSubmit, onError)}>
 						<DialogHeader>
-							<DialogTitle>Nuevo Cliente</DialogTitle>
+							<DialogTitle>
+								{selectedCustomer ? "Editar Cliente" : "Nuevo Cliente"}
+							</DialogTitle>
 							<DialogDescription>
-								Agrega un nuevo cliente para que puedas usarlo en tus pedidos.
+								{selectedCustomer
+									? "Edita los datos del cliente para que puedas usarlo en tus pedidos."
+									: "Agrega un nuevo cliente para que puedas usarlo en tus pedidos."}
 							</DialogDescription>
 						</DialogHeader>
 						<div className="space-y-6 mt-4">
 							<FormField
 								control={form.control}
-								name="phone"
+								name="mobile"
 								render={({ field }) => (
 									<FormItem>
-										<FormLabel>Teléfono</FormLabel>
+										<FormLabel>Movil</FormLabel>
 										<FormControl>
-											<Input id="phone" {...field} />
+											<Input id="mobile" {...field} />
 										</FormControl>
 										<FormMessage />
 									</FormItem>
 								)}
 							/>
+
 							<div className="grid grid-cols-2 justify-center  gap-4">
 								<FormField
 									control={form.control}
@@ -118,12 +172,12 @@ export const CustomerFormDialog = React.memo(function CustomerFormDialog() {
 								/>
 								<FormField
 									control={form.control}
-									name="second_name"
+									name="middle_name"
 									render={({ field }) => (
 										<FormItem>
 											<FormLabel>Segundo Nombre (Opcional)</FormLabel>
 											<FormControl>
-												<Input id="second_name" {...field} />
+												<Input id="middle_name" {...field} />
 											</FormControl>
 											<FormMessage />
 										</FormItem>
@@ -205,8 +259,8 @@ export const CustomerFormDialog = React.memo(function CustomerFormDialog() {
 						</div>
 
 						<DialogFooter className="flex mt-8 justify-center">
-							<Button type="submit" disabled={isPending}>
-								{isPending ? "Guardando..." : "Guardar"}
+							<Button type="submit" disabled={isPending || isUpdating}>
+								{isPending || isUpdating ? "Guardando..." : selectedCustomer ? "Actualizar" : "Guardar"}
 							</Button>
 							<Button
 								type="button"

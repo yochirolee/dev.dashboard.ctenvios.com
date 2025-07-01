@@ -22,8 +22,8 @@ import { useShallow } from "zustand/react/shallow";
 export const CustomerCombobox = React.memo(function CustomerCombobox() {
 	const [open, setOpen] = React.useState(false);
 	const [searchQuery, setSearchQuery] = React.useState("");
-	const inputRef = React.useRef<HTMLInputElement>(null);
 	const [debouncedSearchQuery] = useDebounce(searchQuery, 500);
+	
 
 	const { data: customers, isLoading } = useSearchCustomers(debouncedSearchQuery);
 	const { selectedCustomer, setSelectedCustomer } = useInvoiceStore(
@@ -47,6 +47,8 @@ export const CustomerCombobox = React.memo(function CustomerCombobox() {
 		setOpen(false);
 	}, []);
 
+	console.log(selectedCustomer, "selectedCustomer");
+
 	return (
 		<Popover open={open} onOpenChange={setOpen}>
 			<PopoverTrigger asChild>
@@ -57,7 +59,9 @@ export const CustomerCombobox = React.memo(function CustomerCombobox() {
 					className="flex-1 justify-between"
 				>
 					{selectedCustomer?.id
-						? `${selectedCustomer.first_name} ${selectedCustomer.last_name} ${selectedCustomer.second_last_name} - ${selectedCustomer.phone}`
+						? `${selectedCustomer.first_name} ${selectedCustomer.middle_name || ""} ${
+								selectedCustomer.last_name
+						  } ${selectedCustomer.second_last_name || ""} - ${selectedCustomer.mobile}`
 						: "Seleccionar cliente..."}
 					<ChevronsUpDown className="opacity-50" />
 				</Button>
@@ -68,7 +72,7 @@ export const CustomerCombobox = React.memo(function CustomerCombobox() {
 						placeholder="Buscar cliente..."
 						onValueChange={handleSearchChange}
 						className="h-9"
-						ref={inputRef}
+					
 					/>
 					<CommandList>
 						{isLoading ? (
@@ -88,13 +92,9 @@ export const CustomerCombobox = React.memo(function CustomerCombobox() {
 										handlePopoverClose();
 									}}
 								>
-									{customer?.first_name +
-										" " +
-										customer?.last_name +
-										" " +
-										customer?.second_last_name +
-										" - " +
-										customer?.phone}
+									{customer?.first_name} {customer?.middle_name || ""} {customer?.last_name}{" "}
+									{customer?.second_last_name || ""} -{" "}
+									{customer?.mobile ? customer?.mobile : customer?.phone}
 									<Check
 										className={cn(
 											"ml-auto",

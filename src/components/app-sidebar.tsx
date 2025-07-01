@@ -78,6 +78,10 @@ const data = {
 			icon: Settings2,
 			items: [
 				{
+					title: "Providers",
+					url: "/settings/providers",
+				},
+				{
 					title: "Agencies",
 					url: "/settings/agencies",
 				},
@@ -96,10 +100,6 @@ const data = {
 				{
 					title: "Usuarios",
 					url: "/settings/users",
-				},
-				{
-					title: "Limits",
-					url: "#",
 				},
 			],
 		},
@@ -131,7 +131,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 			<SidebarHeader>
 				<TeamSwitcher teams={data.teams} />
 			</SidebarHeader>
-			<SidebarContent>
+			<SidebarContent className="[scrollbar-color:--alpha(var(--foreground)/20%)_transparent] [scrollbar-width:thin]">
 				<Link to="/" className="mx-2">
 					<Button
 						variant={location.pathname === "/" ? "secondary" : "ghost"}
@@ -142,10 +142,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 					</Button>
 				</Link>
 				<NavMain items={data.navMain} />
-				<NavProjects projects={data.projects} />
 			</SidebarContent>
 			<SidebarFooter>
-				<NavUser user={data.user} />
+				<NavUser />
 			</SidebarFooter>
 			<SidebarRail />
 		</Sidebar>

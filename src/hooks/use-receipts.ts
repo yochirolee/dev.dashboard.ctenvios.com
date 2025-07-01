@@ -9,7 +9,6 @@ export const useGetReceipts = (customerId?: string, search?: string) => {
 			queryFn: () => {
 				return api.receipts.search(search, 1, 50);
 			},
-			enabled: !!search,
 		});
 	}
 

@@ -13,8 +13,8 @@ export const CustomersPage = () => {
 	const { data: customers, isLoading } = useSearchCustomers(debouncedSearchQuery);
 
 	return (
-		<div className="flex flex-col gap-4">
-			<div className="flex items-center w-sm relative justify-start">
+		<div className="flex flex-col gap-4 ">
+			<div className="flex items-center space-x-2 w-sm relative justify-start">
 				{isLoading ? (
 					<Loader2 className="w-4 h-4 animate-spin absolute left-4" />
 				) : (

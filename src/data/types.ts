@@ -3,32 +3,30 @@ import { isValidCubanCI } from "@/lib/utils";
 
 export const customerSchema = z.object({
 	id: z.number().optional(),
-	first_name: z
-		.string()
-		.min(3, { message: "First name must be at least 3 characters long" })
-		.regex(/^[a-zA-Z\s]+$/, "Only letters and spaces are allowed"),
-	second_name: z.string().optional(),
-	identity_document: z.string().optional(),
-	last_name: z
-		.string()
-		.min(1)
-		.regex(/^[a-zA-Z\s]+$/, "Only letters and spaces are allowed"),
-	second_last_name: z
-		.string()
-		.min(1)
-		.regex(/^[a-zA-Z\s]+$/, "Only letters and spaces are allowed"),
+	first_name: z.string().min(2, { message: "Full name must be at least 2 characters long" }),
+	middle_name: z.string().optional(),
+	last_name: z.string().min(2, { message: "Full name must be at least 2 characters long" }),
+	second_last_name: z.string().optional(),
 	email: z.string().email().optional().or(z.literal("")),
-	phone: z
+	identity_document: z.string().optional().or(z.literal("")),
+	mobile: z
 		.string()
 		.regex(/^[\+]?[1-9][\d]{0,15}$/, "Invalid phone number format")
 		.min(10, "Phone number must be at least 10 digits long")
-		.max(10, "Phone number must be less than 10 digits long"),
+		.max(10, "Phone number must be less than 10 digits long")
+		.optional(),
+	phone: z
+		.string()
+		.regex(/^[\+]?[1-9][\d]{0,15}$/, "Invalid phone number format")
+		.min(8, "Phone number must be at least 10 digits long")
+		.max(8, "Phone number must be less than 10 digits long")
+		.optional(),
 	address: z.string().optional(),
 });
 export const receiptShema = z.object({
 	id: z.number().optional(),
 	first_name: z.string().min(2, { message: "First name must be at least 2 characters long" }),
-	second_name: z.string().optional(),
+	middle_name: z.string().optional(),
 	last_name: z.string().min(2, { message: "Last name must be at least 2 characters long" }),
 	second_last_name: z
 		.string()
@@ -97,7 +95,39 @@ export const customsSchema = z.object({
 	fee: z.number().min(0, "El fee es requerido"),
 	max_quantity: z.number().optional(),
 });
+export const agencySchema = z.object({
+	id: z.number().optional(),
+	name: z.string().min(1, "El nombre es requerido"),
+	address: z.string().min(1, "La dirección es requerida"),
+	phone: z.string().min(10, "El teléfono debe tener al menos 10 dígitos"),
+	email: z.string().email().optional(),
+	website: z.string().url().optional(),
+	logo: z.string().url().optional(),
+	parent_agency_id: z.number().optional(),
+});
 
+export const providerSchema = z.object({
+	id: z.number().optional(),
+	name: z.string().min(1, "El nombre es requerido"),
+	address: z.string().min(1, "La dirección es requerida"),
+	phone: z.string().min(10, "El teléfono debe tener al menos 10 dígitos"),
+	email: z.string().email().optional(),
+	website: z.string().url().optional(),
+	logo: z.string().url().optional(),
+});
+
+export const serviceSchema = z.object({
+	id: z.number().optional(),
+	name: z.string().min(1, "El nombre es requerido"),
+	description: z.string().min(1, "La descripción es requerida"),
+	service_type: z.enum(["MARITIME", "AIR"]),
+	is_active: z.boolean().default(true),
+	provider_id: z.number().min(1, "El proveedor es requerido"),
+	forwarder_id: z.number().min(1, "El forwarder es requerido"),
+});
+
+export type Agency = z.infer<typeof agencySchema>;
+export type Provider = z.infer<typeof providerSchema>;
 export type Receipt = z.infer<typeof receiptShema>;
 export type Customer =
 	| (z.infer<typeof customerSchema> & {
@@ -107,6 +137,7 @@ export type Customer =
 	| null;
 export type Item = z.infer<typeof itemsSchema>;
 export type Invoice = z.infer<typeof invoiceSchema>;
+export type Service = z.infer<typeof serviceSchema>;
 
 export interface Province {
 	id: number;

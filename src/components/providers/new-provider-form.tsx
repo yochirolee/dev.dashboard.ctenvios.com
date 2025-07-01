@@ -4,12 +4,12 @@ import { z } from "zod";
 import { Form, FormControl, FormItem, FormLabel, FormField, FormMessage } from "../ui/form";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
-import { useAgencies } from "@/hooks/use-agencies";
+import { useProviders } from "@/hooks/use-providers";
 import { toast } from "sonner";
-import { Loader2, X } from "lucide-react";
+import { Loader2 } from "lucide-react";
 
-const formNewAgencySchema = z.object({
-	name: z.string().min(1, { message: "El nombre de la agencia es requerido" }),
+const formNewProviderSchema = z.object({
+	name: z.string().min(1, { message: "El nombre del proveedor es requerido" }),
 	address: z.string().min(1, { message: "La dirección es requerida" }),
 	phone: z.string().min(10, { message: "El teléfono debe tener al menos 10 dígitos" }),
 	contact: z.string().min(1),
@@ -18,11 +18,11 @@ const formNewAgencySchema = z.object({
 	forwarder_id: z.number().optional(),
 });
 
-type FormNewAgencySchema = z.infer<typeof formNewAgencySchema>;
+type FormNewProviderSchema = z.infer<typeof formNewProviderSchema>;
 
-export const NewAgencyForm = ({ setOpen }: { setOpen: (open: boolean) => void }) => {
-	const form = useForm<FormNewAgencySchema>({
-		resolver: zodResolver(formNewAgencySchema),
+export const NewProviderForm = ({ setOpen }: { setOpen: (open: boolean) => void }) => {
+	const form = useForm<FormNewProviderSchema>({
+		resolver: zodResolver(formNewProviderSchema),
 		defaultValues: {
 			name: "",
 			address: "",
@@ -33,18 +33,18 @@ export const NewAgencyForm = ({ setOpen }: { setOpen: (open: boolean) => void })
 			forwarder_id: 1,
 		},
 	});
-	const { mutate: createAgency, isPending } = useAgencies.create({
+	const { mutate: createProvider, isPending } = useProviders.create({
 		onSuccess: () => {
-			toast.success("Agencia creada correctamente");
-			setOpen(false);
 			form.reset();
+			toast.success("Proveedor creado correctamente");
+			setOpen(false);
 		},
 		onError: (error) => {
 			toast.error(error.response.data.message);
 		},
 	});
-	const onSubmit = (data: FormNewAgencySchema) => {
-		createAgency(data);
+	const onSubmit = (data: FormNewProviderSchema) => {
+		createProvider(data);
 	};
 
 	return (
@@ -57,7 +57,7 @@ export const NewAgencyForm = ({ setOpen }: { setOpen: (open: boolean) => void })
 						<FormItem>
 							<FormLabel>Nombre</FormLabel>
 							<FormControl>
-								<Input {...field} placeholder="Nombre de la agencia" />
+								<Input {...field} placeholder="Nombre del proveedor" />
 							</FormControl>
 						</FormItem>
 					)}
@@ -69,7 +69,7 @@ export const NewAgencyForm = ({ setOpen }: { setOpen: (open: boolean) => void })
 						<FormItem>
 							<FormLabel>Dirección</FormLabel>
 							<FormControl>
-								<Input {...field} placeholder="Dirección de la agencia" />
+								<Input {...field} placeholder="Dirección del proveedor" />
 							</FormControl>
 						</FormItem>
 					)}
@@ -81,7 +81,7 @@ export const NewAgencyForm = ({ setOpen }: { setOpen: (open: boolean) => void })
 						<FormItem>
 							<FormLabel>Teléfono</FormLabel>
 							<FormControl>
-								<Input {...field} placeholder="Teléfono de la agencia" type="tel" />
+								<Input {...field} placeholder="Teléfono del proveedor" type="tel" />
 							</FormControl>
 							<FormMessage />
 						</FormItem>
@@ -94,7 +94,7 @@ export const NewAgencyForm = ({ setOpen }: { setOpen: (open: boolean) => void })
 						<FormItem>
 							<FormLabel>Contacto</FormLabel>
 							<FormControl>
-								<Input {...field} placeholder="Contacto de la agencia" />
+								<Input {...field} placeholder="Contacto del proveedor" />
 							</FormControl>
 						</FormItem>
 					)}
@@ -119,28 +119,22 @@ export const NewAgencyForm = ({ setOpen }: { setOpen: (open: boolean) => void })
 						<FormItem>
 							<FormLabel>Website</FormLabel>
 							<FormControl>
-								<Input {...field} placeholder="Website de la agencia" />
+								<Input {...field} placeholder="Website del proveedor" />
 							</FormControl>
 						</FormItem>
 					)}
 				/>
 
-				<div className="flex justify-end gap-2">
-					<Button type="submit" disabled={isPending}>
-						{isPending ? (
-							<>
-								<Loader2 className="w-4 h-4 animate-spin" />
-								Guardando...
-							</>
-						) : (
-							"Crear Agencia"
-						)}
-					</Button>
-					<Button variant="outline" onClick={() => setOpen(false)}>
-						<X className="w-4 h-4" />
-						Cerrar
-					</Button>
-				</div>
+				<Button type="submit" disabled={isPending}>
+					{isPending ? (
+						<>
+							<Loader2 className="w-4 h-4 animate-spin" />
+							Guardando...
+						</>
+					) : (
+						"Crear Proveedor"
+					)}
+				</Button>
 			</form>
 		</Form>
 	);

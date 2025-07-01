@@ -18,12 +18,13 @@ import InvoicesPage from "@/pages/orders/invoices-page";
 import { UserPage } from "@/pages/settings/user-page";
 import InvoiceDetailsPage from "@/pages/orders/invoice-details-page";
 import { CustomsPage } from "@/pages/settings/customs-page";
+import ProvidersServicesPage from "@/pages/settings/providers-services-page";
+import { NewInvoicePage } from "@/pages/invoices/new_invoice_page";
 
 export const AppRouter = () => {
 	return (
 		<Routes>
 			<Route path="/login" element={<LoginPage />} />
-
 			<Route path="/register" element={<RegisterPage />} />
 			{/* Protected routes */}
 			<Route element={<ProtectedRoute />}>
@@ -33,12 +34,14 @@ export const AppRouter = () => {
 					<Route path="about" element={<About />} />
 					<Route path="orders" element={<InvoicesPage />} />
 					<Route path="orders/new" element={<NewOrderPage />} />
+					<Route path="invoices/new" element={<NewInvoicePage />} />
 					<Route path="orders/:invoiceId" element={<InvoiceDetailsPage />} />
 					<Route path="zustand" element={<ZustandPage />} />
 					<Route path="settings">
+						<Route path="providers" element={<ProvidersServicesPage />} />
+						<Route path="agencies" element={<AgenciesPage />} />
 						<Route path="customers" element={<CustomersPage />} />
 						<Route path="receipts" element={<ReceiptsPage />} />
-						<Route path="agencies" element={<AgenciesPage />} />
 						<Route path="users" element={<UserPage />} />
 						<Route path="customs" element={<CustomsPage />} />
 					</Route>

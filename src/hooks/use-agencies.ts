@@ -1,14 +1,43 @@
 //user agencies hooks
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import api from "@/api/api";
+import type { Agency } from "@/data/types";
+import { queryClient } from "@/lib/query-client";
 export const useAgencies = {
 	get: () => {
-		return useQuery({ queryKey: ["get-agencies-names"], queryFn: api.agencies.get });
+		return useQuery({ queryKey: ["get-agencies"], queryFn: api.agencies.get });
 	},
 	getServices: (id: number) => {
 		return useQuery({
 			queryKey: ["get-services", id],
 			queryFn: () => api.agencies.getServices(id),
+			enabled: !!id,
+		});
+	},
+	create: (options?: { onSuccess?: () => void; onError?: (error: any) => void }) => {
+		return useMutation({
+			mutationFn: (data: Agency) => api.agencies.create(data),
+			onSuccess: () => {
+				queryClient.invalidateQueries({ queryKey: ["get-agencies"] });
+				options?.onSuccess?.();
+			},
+			onError: (error) => {
+				options?.onError?.(error);
+			},
+		});
+	},
+	getById: (id: number) => {
+		return useQuery({
+			queryKey: ["get-agency", id],
+			queryFn: () => api.agencies.getById(id),
+			enabled: !!id,
+		});
+	},
+	getUsers: (id: number) => {
+		return useQuery({
+			queryKey: ["get-agency-users", id],
+			queryFn: () => api.agencies.getUsers(id),
+			enabled: !!id,
 		});
 	},
 };

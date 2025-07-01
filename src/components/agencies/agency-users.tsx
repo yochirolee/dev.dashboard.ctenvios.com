@@ -1,0 +1,78 @@
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { MoreVertical, Trash2, UserPlus } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { useAgencies } from "@/hooks/use-agencies";
+import { Separator } from "@/components/ui/separator";
+import {
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuItem,
+	DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Skeleton } from "../ui/skeleton";
+
+export default function AgencyUsers({ agencyId }: { agencyId: number }) {
+	const { data: users, isLoading } = useAgencies.getUsers(agencyId);
+	if (isLoading) return <Skeleton className="h-[400px] w-full" />;
+	return (
+		<Card>
+			<CardHeader>
+				<div className="flex items-center gap-2">
+					<CardTitle className=" flex flex-col">
+						<p>Usuarios de la agencia</p>
+						<p className="text-sm text-muted-foreground">
+							Aquí puedes ver los usuarios de la agencia y agregar nuevos.
+						</p>
+					</CardTitle>
+
+					<Button variant="outline" className="ml-auto">
+						<UserPlus className="mr-2 h-4 w-4" /> Agregar usuario
+					</Button>
+				</div>
+			</CardHeader>
+			<Separator />
+			<CardContent className="grid gap-8">
+				{users?.map((user: any) => (
+					<div className="flex items-center gap-4">
+						<Avatar className="hidden h-9 w-9 sm:flex">
+							<AvatarImage src={user.avatar} alt="Avatar" />
+							<AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
+						</Avatar>
+						<div className="grid gap-1">
+							<p className="text-sm font-medium leading-none">{user.name}</p>
+							<p className="text-sm text-muted-foreground">{user.email}</p>
+						</div>
+						<div className="ml-auto font-medium flex items-center gap-4">
+							<div>
+								{user.role === "ROOT" ? (
+									<Badge variant="outline">ROOT</Badge>
+								) : user.role === "ADMIN" ? (
+									<Badge variant="outline">ADMIN</Badge>
+								) : user.role === "USER" ? (
+									<Badge variant="outline">USER</Badge>
+								) : null}
+							</div>
+							<div>
+								<DropdownMenu>
+									<DropdownMenuTrigger asChild>
+										<Button variant="outline">
+											<MoreVertical className="h-4 w-4" />
+										</Button>
+									</DropdownMenuTrigger>
+									<DropdownMenuContent>
+										<DropdownMenuItem>
+											<Trash2 className="h-4 w-4" />
+											Eliminar usuario
+										</DropdownMenuItem>
+									</DropdownMenuContent>
+								</DropdownMenu>
+							</div>
+						</div>
+					</div>
+				))}
+			</CardContent>
+		</Card>
+	);
+}

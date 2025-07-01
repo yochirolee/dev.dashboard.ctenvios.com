@@ -64,12 +64,11 @@ export function UserRegisterForm() {
 	const onSubmit = async (data: z.infer<typeof FormSchema>) => {
 		console.log(data, "data in onSubmit");
 		registerUser.mutate(data, {
-				onSuccess: () => {
-					setOpen(false);
-					form.reset();
-				},
+			onSuccess: () => {
+				setOpen(false);
+				form.reset();
 			},
-		);
+		});
 	};
 
 	return (
@@ -144,7 +143,11 @@ export function UserRegisterForm() {
 							)}
 						/>
 
-						<AgenciesCombobox control={form.control} />
+						<FormField
+							control={form.control}
+							name="agency_id"
+							render={({ field }) => <AgenciesCombobox field={field} />}
+						/>
 
 						<div className="flex flex-col w-full gap-2">
 							<Label htmlFor="role">Rol</Label>

@@ -1,119 +1,123 @@
-import { PlusCircle } from "lucide-react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { Form, FormControl, FormItem, FormLabel, FormField, FormMessage } from "../ui/form";
+import { Input } from "../ui/input";
+import { Button } from "../ui/button";
 
-import { Button } from "@/components/ui/button";
-import {
-	Card,
-	CardContent,
-	CardDescription,
-	CardFooter,
-	CardHeader,
-	CardTitle,
-} from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import {
-	Table,
-	TableBody,
-	TableCell,
-	TableHead,
-	TableHeader,
-	TableRow,
-} from "@/components/ui/table";
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { Loader2, X } from "lucide-react";
+import { useRates } from "@/hooks/use-rates";
+import type { Rate } from "@/data/types";
+import { toast } from "sonner";
 
-export default function AgenciesRatesForm() {
+const agenciesRatesSchema = z
+	.object({
+		rate_id: z.number(),
+		agency_id: z.number(),
+		agency_rate: z.number().min(0, { message: "El precio de la agencia debe ser mayor a 0" }),
+		public_rate: z.number().min(0, { message: "El precio público debe ser mayor a 0" }),
+	})
+	.refine((data) => data.public_rate >= data.agency_rate, {
+		message: "El precio público debe ser mayor o igual al precio de la agencia",
+		path: ["public_rate"],
+	});
+
+type AgenciesRatesSchema = z.infer<typeof agenciesRatesSchema>;
+
+export const AgenciesRatesForm = ({
+	rate,
+	setOpen,
+}: {
+	rate: any;
+	setOpen: (open: boolean) => void;
+}) => {
+	const form = useForm<AgenciesRatesSchema>({
+		resolver: zodResolver(agenciesRatesSchema),
+		defaultValues: {
+			rate_id: rate.id,
+			agency_id: rate.agency_id,
+			agency_rate: rate.agency_rate,
+			public_rate: rate.public_rate,
+		},
+	});
+	const { mutate: updateRate, isPending } = useRates.update();
+	const onSubmit = (data: AgenciesRatesSchema) => {
+		updateRate({ id: rate.id, data: data as unknown as Rate });
+		toast.success("Tarifa actualizada correctamente");
+		form.reset();
+		setOpen(false);
+	};
+
 	return (
-		<Card>
-			<CardHeader>
-				<CardTitle>Transcargo</CardTitle>
-				<CardDescription>Transcargo Maritimo</CardDescription>
-			</CardHeader>
-			<CardContent>
-				<Table>
-					<TableHeader>
-						<TableRow>
-							<TableHead className="w-[100px]">SKU</TableHead>
-							<TableHead>Stock</TableHead>
-							<TableHead>Precio de Venta</TableHead>
-							<TableHead className="w-[100px]">Size</TableHead>
-						</TableRow>
-					</TableHeader>
-					<TableBody>
-						<TableRow>
-							<TableCell className="font-semibold">GGPC-001</TableCell>
-							<TableCell>
-								<Label htmlFor="stock-1" className="sr-only">
-									Stock
-								</Label>
-								<Input id="stock-1" type="number" defaultValue="100" />
-							</TableCell>
-							<TableCell>
-								<Label htmlFor="price-1" className="sr-only">
-									Price
-								</Label>
-								<Input id="price-1" type="number" defaultValue="99.99" />
-							</TableCell>
-							<TableCell>
-								<ToggleGroup type="single" defaultValue="s" variant="outline">
-									<ToggleGroupItem value="s">S</ToggleGroupItem>
-									<ToggleGroupItem value="m">M</ToggleGroupItem>
-									<ToggleGroupItem value="l">L</ToggleGroupItem>
-								</ToggleGroup>
-							</TableCell>
-						</TableRow>
-						<TableRow>
-							<TableCell className="font-semibold">GGPC-002</TableCell>
-							<TableCell>
-								<Label htmlFor="stock-2" className="sr-only">
-									Stock
-								</Label>
-								<Input id="stock-2" type="number" defaultValue="143" />
-							</TableCell>
-							<TableCell>
-								<Label htmlFor="price-2" className="sr-only">
-									Price
-								</Label>
-								<Input id="price-2" type="number" defaultValue="99.99" />
-							</TableCell>
-							<TableCell>
-								<ToggleGroup type="single" defaultValue="m" variant="outline">
-									<ToggleGroupItem value="s">S</ToggleGroupItem>
-									<ToggleGroupItem value="m">M</ToggleGroupItem>
-									<ToggleGroupItem value="l">L</ToggleGroupItem>
-								</ToggleGroup>
-							</TableCell>
-						</TableRow>
-						<TableRow>
-							<TableCell className="font-semibold">GGPC-003</TableCell>
-							<TableCell>
-								<Label htmlFor="stock-3" className="sr-only">
-									Stock
-								</Label>
-								<Input id="stock-3" type="number" defaultValue="32" />
-							</TableCell>
-							<TableCell>
-								<Label htmlFor="price-3" className="sr-only">
-									Stock
-								</Label>
-								<Input id="price-3" type="number" defaultValue="99.99" />
-							</TableCell>
-							<TableCell>
-								<ToggleGroup type="single" defaultValue="s" variant="outline">
-									<ToggleGroupItem value="s">S</ToggleGroupItem>
-									<ToggleGroupItem value="m">M</ToggleGroupItem>
-									<ToggleGroupItem value="l">L</ToggleGroupItem>
-								</ToggleGroup>
-							</TableCell>
-						</TableRow>
-					</TableBody>
-				</Table>
-			</CardContent>
-			<CardFooter className="justify-center border-t p-4">
-				<Button size="sm" variant="ghost" className="gap-1">
-					<PlusCircle className="h-3.5 w-3.5" />
-					Add Variant
-				</Button>
-			</CardFooter>
-		</Card>
+		<Form {...form}>
+			<form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+				<FormField
+					control={form.control}
+					name="agency_rate"
+					render={({ field }) => (
+						<FormItem>
+							<FormLabel>Precio Agencia</FormLabel>
+							<FormControl>
+								<Input
+									type="number"
+									{...field}
+									onChange={(e) => {
+										field.onChange(e);
+										form.setValue("agency_rate", parseFloat(e.target.value));
+									}}
+									placeholder="Precio Agencia"
+								/>
+							</FormControl>
+							<FormMessage />
+						</FormItem>
+					)}
+				/>
+				<FormField
+					control={form.control}
+					name="public_rate"
+					render={({ field }) => (
+						<FormItem>
+							<FormLabel>Precio Público</FormLabel>
+							<FormControl>
+								<Input
+									type="number"
+									{...field}
+									onChange={(e) => {
+										field.onChange(e);
+										form.setValue("public_rate", parseFloat(e.target.value));
+									}}
+									placeholder="Precio Público"
+								/>
+							</FormControl>
+							<FormMessage />
+						</FormItem>
+					)}
+				/>
+
+				<div className="flex justify-end gap-2">
+					<Button type="submit" disabled={isPending}>
+						{isPending ? (
+							<>
+								<Loader2 className="w-4 h-4 animate-spin" />
+								Guardando...
+							</>
+						) : (
+							"Guardar"
+						)}
+					</Button>
+					<Button
+						type="button"
+						variant="outline"
+						onClick={() => {
+							form.reset();
+							setOpen(false);
+						}}
+					>
+						<X className="w-4 h-4" />
+						Cerrar
+					</Button>
+				</div>
+			</form>
+		</Form>
 	);
-}
+};

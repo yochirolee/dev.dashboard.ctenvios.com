@@ -43,8 +43,8 @@ export function ServiceSelector() {
 							selectedService?.id === service.id ? "ring" : "opacity-50"
 						} h-25 flex flex-col items-center justify-center`}
 					>
-						<span>{service.name}</span>
-						<span className="text-sm text-muted-foreground">{service.description}</span>
+						<h2>{service?.provider?.name}</h2>
+						<span className="text-sm text-muted-foreground">{service.service_type}</span>
 					</Button>
 				))}
 			</CardContent>

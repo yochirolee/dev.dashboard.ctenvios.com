@@ -28,3 +28,23 @@ export const useCreateCustomer = (options?: {
 		},
 	});
 };
+
+export const useUpdateCustomer = (options?: {
+	onSuccess?: (data: Customer) => void;
+	onError?: (error: any) => void;
+}) => {
+	const queryClient = useQueryClient();
+	return useMutation({
+		mutationFn: ({ id, data }: { id: number; data: Customer }) => {
+			console.log(id, data, "data in useUpdateCustomer");
+			return api.customer.update(id, data);
+		},
+		onSuccess: (data: Customer) => {
+			queryClient.invalidateQueries({ queryKey: ["customers"] });
+			options?.onSuccess?.(data);
+		},
+		onError: (error) => {
+			options?.onError?.(error);
+		},
+	});
+};

@@ -17,6 +17,7 @@ import { z } from "zod";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import { authClient } from "@/lib/auth-client";
+import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
 
 const TableHeaderSection = React.memo(function TableHeaderSection({
 	itemCount,
@@ -50,9 +51,38 @@ const TableHeaderSection = React.memo(function TableHeaderSection({
 	);
 });
 
+const formSchema = z.object({
+	agency_id: z.string(),
+	user_id: z.string(),
+	customer_id: z.string(),
+	receipt_id: z.string(),
+	total: z.number(),
+	currency: z.number(),
+	payment_method: z.string(),
+	payment_status: z.string(),
+	payment_date: z.date(),
+	payment_amount: z.number(),
+	service_id: z.string(),
+	rate: z.number(),
+	items: z.array(
+		z.object({
+			id: z.number(),
+			description: z.string().min(1, { message: "Description is required" }),
+			weight: z.number().min(0.01, { message: "Weight must be greater than 0.01" }),
+			rate: z.number().min(0, { message: "Rate must be greater than 0" }),
+			subtotal: z.number().min(0, { message: "Subtotal must be greater than 0" }),
+			customs: z.object({
+				description: z.string(),
+				fee: z.number().min(0, { message: "Fee must be greater than 0" }),
+			}),
+		}),
+	),
+});
+
 export function TableItemsInOrder() {
 	const navigate = useNavigate();
 	const { data: session } = authClient.useSession();
+
 	const { customer_id, receipt_id, selectedRate } = useInvoiceStore(
 		useShallow((state) => ({
 			customer_id: state.selectedCustomer?.id,
@@ -61,26 +91,20 @@ export function TableItemsInOrder() {
 		})),
 	);
 
-	const user = session?.user;
-
-	console.log("session", session);
-
-	const formSchema = z.object({
-		items: z.array(
-			z.object({
-				id: z.number(),
-				description: z.string(),
-				weight: z.number(),
-				rate: z.number(),
-				subtotal: z.number(),
-			}),
-		),
-	});
-
-	console.log("user", user);
-
 	const methods = useForm<z.infer<typeof formSchema>>({
 		defaultValues: {
+			agency_id: session?.user?.agency_id || "",
+			user_id: session?.user?.id,
+			customer_id: customer_id || "",
+			receipt_id: receipt_id || "",
+			service_id: selectedRate?.service_id || "",
+			rate: selectedRate?.public_rate || 0,
+			total: 0,
+			currency: 0,
+			payment_method: "",
+			payment_status: "",
+			payment_date: new Date(),
+			payment_amount: 0,
 			items: [
 				{
 					id: 1,
@@ -88,6 +112,10 @@ export function TableItemsInOrder() {
 					weight: 0,
 					rate: 0,
 					subtotal: 0,
+					customs: {
+						description: "",
+						fee: 0,
+					},
 				},
 			],
 		},
@@ -104,8 +132,11 @@ export function TableItemsInOrder() {
 			id: fields.length + 1,
 			description: "",
 			weight: 0.0,
-			rate: 0,
 			subtotal: 0,
+			customs: {
+				description: "",
+				fee: 0,
+			},
 		});
 	};
 
@@ -121,17 +152,10 @@ export function TableItemsInOrder() {
 	// Watch only the items array for total calculation
 
 	const onSubmit = async (data: any) => {
-		data.agency_id = user?.agency_id;
-		data.user_id = user?.id;
-		data.customer_id = customer_id;
-		data.receipt_id = receipt_id;
-		data.service_id = selectedRate?.service_id;
-		data.rate = selectedRate?.public_rate;
-
 		console.log("data", data);
 
-		const response = await axios.post("http://localhost:3000/api/v1/invoices", data);
-		navigate(`/orders/${response.data.id}`);
+		/* const response = await axios.post("http://localhost:3000/api/v1/invoices", data);
+		navigate(`/orders/${response.data.id}`); */
 		toast.success("Orden creada correctamente");
 	};
 
@@ -162,36 +186,6 @@ export function TableItemsInOrder() {
 							<TableBody>
 								{deferedFields?.map((field, index) => (
 									<ItemRow key={field.id} index={index} rate={selectedRate?.public_rate || 0} />
-									/* 		<TableRow key={field.id}>
-										<TableCell className="font-medium">{index + 1}</TableCell>
-										<TableCell className="w-40">
-											<CustomsFeeCombobox index={index} />
-										</TableCell>
-										<TableCell className="w-full gap-2">
-											<Input
-												{...methods.register(`items.${index}.description` as any)}
-												placeholder="Description"
-												className="w-full"
-											/>
-										</TableCell>
-										<TableCell className="text-right w-20">${0}</TableCell>
-										<TableCell>
-											<Input
-												{...methods.register(`items.${index}.weight` as any)}
-												placeholder="Weight"
-												className="w-[80px] text-end"
-											/>
-										</TableCell>
-										<TableCell className="text-right w-20">
-											${selectedRate?.public_price || 0}
-										</TableCell>
-										<TableCell className="text-right w-20">${0 }</TableCell>
-										<TableCell className="w-10 justify-end">
-											<Button className="hover:text-red-500/60" variant="ghost" type="button">
-												<Trash />
-											</Button>
-										</TableCell>
-									</TableRow> */
 								))}
 							</TableBody>
 						</Table>
@@ -209,24 +203,26 @@ export function TableItemsInOrder() {
 }
 
 const ItemRow = React.memo(function ItemRow({ index, rate }: { index: number; rate: number }) {
-	const { control, setValue, register } = useFormContext();
+	const { control, setValue } = useFormContext();
 
 	// Only watch the specific fields needed for this row
 	const itemWeight = useWatch({ control, name: `items.${index}.weight` }) || 0;
 	const customsFee = useWatch({ control, name: `items.${index}.customs.fee` }) || 0;
+	const customsDescription =
+		useWatch({ control, name: `items.${index}.customs.description` }) || "";
+	const subtotal = useWatch({ control, name: `items.${index}.subtotal` }) || 0;
 
 	// Memoize subtotal calculation and update form when dependencies change
-	const subtotal = useMemo(() => {
+	useMemo(() => {
 		const calculatedSubtotal =
 			parseFloat(rate.toString()) * parseFloat(itemWeight.toString()) +
 			parseFloat(customsFee || "0");
 
 		// Update the form value when subtotal changes
-		setValue(`items.${index}.subtotal`, calculatedSubtotal, { shouldValidate: false });
-		setValue(`items.${index}.rate`, rate, { shouldValidate: false });
-		setValue(`items.${index}.customs.fee`, customsFee, { shouldValidate: false });
-
-		return calculatedSubtotal;
+		setValue(`items.${index}.subtotal`, calculatedSubtotal, { shouldValidate: true });
+		setValue(`items.${index}.rate`, rate, { shouldValidate: true });
+		setValue(`items.${index}.customs.fee`, customsFee, { shouldValidate: true });
+		setValue(`items.${index}.description`, customsDescription, { shouldValidate: true });
 	}, [rate, itemWeight, customsFee]);
 
 	// Memoize the remove handler
@@ -242,27 +238,43 @@ const ItemRow = React.memo(function ItemRow({ index, rate }: { index: number; ra
 				<CustomsFeeCombobox index={index} />
 			</TableCell>
 			<TableCell className="w-full gap-2">
-				<Input
-					{...register(`items.${index}.description` as any)}
-					placeholder="Description"
-					disabled={!rate}
-					className="w-full"
+				<FormField
+					control={control}
+					name={`items.${index}.description` as string}
+					render={({ field }) => (
+						<FormItem>
+							<FormControl>
+								<Input {...field} placeholder="Description" />
+							</FormControl>
+							<FormMessage />
+						</FormItem>
+					)}
 				/>
 			</TableCell>
 			<TableCell className="text-right w-20">${parseFloat(customsFee || "0").toFixed(2)}</TableCell>
 			<TableCell>
-				<Input
-					{...register(`items.${index}.weight` as any)}
-					placeholder="0"
-					type="number"
-					min={0}
-					step="0.01"
-					disabled={!customsFee || !rate}
-					className="w-20 text-right [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none [-moz-appearance:textfield]"
+				<FormField
+					control={control}
+					name={`items.${index}.weight` as string}
+					render={({ field }) => (
+						<FormItem>
+							<FormControl>
+								<Input
+									placeholder="0.0"
+									type="number"
+									step="0.01"
+									disabled={!customsFee}
+									className="w-20 text-right [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none [-moz-appearance:textfield]"
+									{...field}
+								/>
+							</FormControl>
+							<FormMessage />
+						</FormItem>
+					)}
 				/>
 			</TableCell>
 			<TableCell className="text-right w-20">${rate || 0}</TableCell>
-			<TableCell className="text-right w-20">${subtotal.toFixed(2)}</TableCell>
+			<TableCell className="text-right w-20">${control.wat || 0}</TableCell>
 			<TableCell className="w-10 justify-end">
 				<Button
 					className="hover:text-red-500/60"
@@ -278,8 +290,9 @@ const ItemRow = React.memo(function ItemRow({ index, rate }: { index: number; ra
 });
 
 const TotalSection = React.memo(function TotalSection() {
-	const { control } = useFormContext();
+	const { control, watch } = useFormContext();
 	const items = useWatch({ control, name: "items" });
+
 	const total = parseFloat(
 		items.reduce((sum: number, item: any) => sum + (item.subtotal || 0), 0).toFixed(2),
 	);
@@ -298,6 +311,9 @@ const TotalSection = React.memo(function TotalSection() {
 			<div className="flex gap-4 items-center">
 				<span className="font-medium">Total:</span>
 				<span className="font-bold text-lg">${total}</span>
+			</div>
+			<div className="flex gap-4 items-center">
+				<pre className="text-xs">{JSON.stringify(watch(), null, 2)}</pre>
 			</div>
 		</div>
 	);

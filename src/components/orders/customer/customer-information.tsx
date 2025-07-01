@@ -1,14 +1,7 @@
-import { EllipsisVertical } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import {
-	DropdownMenu,
-	DropdownMenuContent,
-	DropdownMenuItem,
-	DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-
 import { useInvoiceStore } from "@/stores/invoice-store";
 import { useShallow } from "zustand/react/shallow";
+import { Separator } from "@/components/ui/separator";
+import { Button } from "@/components/ui/button";
 
 export function CustomerInformation() {
 	const { selectedCustomer, setSelectedCustomer } = useInvoiceStore(
@@ -17,38 +10,23 @@ export function CustomerInformation() {
 			setSelectedCustomer: state.setSelectedCustomer,
 		})),
 	);
-	console.log("selectedCustomer", selectedCustomer);
+
 	return (
 		<>
 			{selectedCustomer && (
 				<div className="grid gap-3 mt-2 text-sm p-4 bg-muted rounded-lg">
-					<div className="flex justify-between">
-						<div className="">Customer Information</div>
-						<div className="flex items-center gap-2">
-							<DropdownMenu>
-								<DropdownMenuTrigger asChild>
-									<Button variant="ghost" size="icon">
-										<EllipsisVertical />
-									</Button>
-								</DropdownMenuTrigger>
-								<DropdownMenuContent>
-									<DropdownMenuItem>Editar</DropdownMenuItem>
-									<DropdownMenuItem
-										onClick={() => {
-											setSelectedCustomer(null);
-										}}
-									>
-										Cancelar
-									</DropdownMenuItem>
-								</DropdownMenuContent>
-							</DropdownMenu>
-						</div>
+					<div className="flex items-center justify-between">
+						<div className="">Datos del cliente</div>
+						<Button variant="outline" onClick={() => setSelectedCustomer(null)}>
+							Cancelar
+						</Button>
 					</div>
+					<Separator orientation="horizontal" />
 					<dl className="grid gap-3">
 						<div className="flex items-center justify-between">
 							<dt className="text-muted-foreground">Customer</dt>
 							<dd>
-								{selectedCustomer?.first_name} {selectedCustomer?.second_name}{" "}
+								{selectedCustomer?.first_name} {selectedCustomer?.middle_name || ""}{" "}
 								{selectedCustomer?.last_name} {selectedCustomer?.second_last_name}
 							</dd>
 						</div>
@@ -59,8 +37,9 @@ export function CustomerInformation() {
 							</dd>
 						</div>
 						<div className="flex items-center justify-between">
-							<dt className="text-muted-foreground">Phone</dt>
+							<dt className="text-muted-foreground">Mobile/Phone</dt>
 							<dd>
+								<a href={`tel:${selectedCustomer?.mobile}`}>{selectedCustomer?.mobile}</a>
 								<a href={`tel:${selectedCustomer?.phone}`}>{selectedCustomer?.phone}</a>
 							</dd>
 						</div>

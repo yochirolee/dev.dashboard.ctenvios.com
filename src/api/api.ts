@@ -1,5 +1,5 @@
 import axios from "axios";
-import type { Customer, Receipt, Customs } from "@/data/types";
+import type { Customer, Receipt, Customs, Agency, Provider, Service, Rate } from "@/data/types";
 import type { User } from "better-auth/types";
 
 const config = {
@@ -60,6 +60,10 @@ const api = {
 			const response = await axiosInstance.post("/customers", data);
 			return response.data;
 		},
+		update: async (id: number, data: Customer) => {
+			const response = await axiosInstance.put(`/customers/${id}`, data);
+			return response.data;
+		},
 	},
 	provinces: {
 		get: async () => {
@@ -79,6 +83,7 @@ const api = {
 		},
 		search: async (query: string, page: number | 1, limit: number | 50) => {
 			if (query === "" || query === undefined) {
+				console.log("query is empty");
 				const response = await axiosInstance.get("/receipts", {
 					params: {
 						page,
@@ -97,7 +102,6 @@ const api = {
 			return response.data;
 		},
 		create: async (data: Receipt, customerId?: number) => {
-			console.log(customerId, "customerId in Api");
 			const response = await axiosInstance.post("/receipts", data, {
 				params: {
 					customerId,
@@ -143,9 +147,31 @@ const api = {
 			return response.data;
 		},
 	},
+	providers: {
+		get: async () => {
+			const response = await axiosInstance.get("/providers");
+			return response.data;
+		},
+		getById: async (id: number) => {
+			const response = await axiosInstance.get(`/providers/${id}`);
+			return response.data;
+		},
+		create: async (data: Provider) => {
+			const response = await axiosInstance.post("/providers", data);
+			return response.data;
+		},
+	},
 	agencies: {
 		get: async () => {
 			const response = await axiosInstance.get("/agencies");
+			return response.data;
+		},
+		getById: async (id: number) => {
+			const response = await axiosInstance.get(`/agencies/${id}`);
+			return response.data;
+		},
+		getUsers: async (id: number) => {
+			const response = await axiosInstance.get(`/agencies/${id}/users`);
 			return response.data;
 		},
 		search: async (query: string, page: number | 1, limit: number | 50) => {
@@ -156,6 +182,10 @@ const api = {
 					limit,
 				},
 			});
+			return response.data;
+		},
+		create: async (data: Agency) => {
+			const response = await axiosInstance.post("/agencies", data);
 			return response.data;
 		},
 		getServices: async (id: number) => {
@@ -178,6 +208,18 @@ const api = {
 		},
 		delete: async (id: number) => {
 			const response = await axiosInstance.delete(`/customs-rates/${id}`);
+			return response.data;
+		},
+	},
+	services: {
+		create: async (data: Service) => {
+			const response = await axiosInstance.post("/services", data);
+			return response.data;
+		},
+	},
+	rates: {
+		update: async (id: number, data: Rate) => {
+			const response = await axiosInstance.put(`/rates/${id}`, data);
 			return response.data;
 		},
 	},

@@ -13,12 +13,18 @@ import {
 } from "@/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useAgencies } from "@/hooks/use-agencies";
+import { useProviders } from "@/hooks/use-providers";
 
-export const AgenciesCombobox = ({ selectedAgencyId, setSelectedAgencyId }: { selectedAgencyId: number, setSelectedAgencyId: (id: number) => void }) => {
+export const ProvidersCombobox = ({
+	selectedProvider,
+	setSelectedProvider,
+}: {
+	selectedProvider: number;
+	setSelectedProvider: (provider: number) => void;
+}) => {
 	const [open, setOpen] = useState(false);
 
-	const { data: agencies = [], isLoading, error } = useAgencies.get();
+	const { data: providers = [], isLoading, error } = useProviders.get();
 
 	if (error) {
 		return <div>Error loading agencies</div>;
@@ -36,36 +42,38 @@ export const AgenciesCombobox = ({ selectedAgencyId, setSelectedAgencyId }: { se
 					>
 						{isLoading ? (
 							<Skeleton className="h-4 w-full" />
-						) : selectedAgencyId ? (
-							agencies.find((agency: any) => agency.id === selectedAgencyId)?.name + " - " + selectedAgencyId
+						) : selectedProvider ? (
+							providers.find((provider: any) => provider.id === selectedProvider)?.name +
+							" - " +
+							selectedProvider
 						) : (
-							"Agencias..."
+							"Proveedores..."
 						)}
 						<ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
 					</Button>
 				</PopoverTrigger>
 				<PopoverContent className="w-full p-0">
 					<Command className="w-[300px]">
-						<CommandInput placeholder="Search Agency..." />
+						<CommandInput placeholder="Search Provider..." />
 						<CommandList>
-							<CommandEmpty>No agencies found.</CommandEmpty>
+							<CommandEmpty>No providers found.</CommandEmpty>
 							<CommandGroup>
-								{agencies.map((agency: any) => (
+								{providers.map((provider: any) => (
 									<CommandItem
-										key={agency.id}
-										value={agency.id}
+										key={provider.id}
+										value={provider.id}
 										onSelect={() => {
-											setSelectedAgencyId(agency.id);
+											setSelectedProvider(provider.id);
 											setOpen(false);
 										}}
 									>
 										<Check
 											className={cn(
 												"mr-2 h-4 w-4",
-												setSelectedAgencyId === agency.id ? "opacity-100" : "opacity-0",
+												selectedProvider === provider.id ? "opacity-100" : "opacity-0",
 											)}
 										/>
-										{agency.name + " - " + agency.id}
+										{provider.name + " - " + provider.id}
 									</CommandItem>
 								))}
 							</CommandGroup>

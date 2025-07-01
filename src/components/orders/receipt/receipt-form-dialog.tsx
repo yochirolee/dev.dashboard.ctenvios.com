@@ -24,7 +24,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm, useFormContext } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { UserRoundPlus } from "lucide-react";
 import { useCreateReceipt } from "@/hooks/use-receipts";
 import { type Province, type City, type Receipt, receiptShema } from "@/data/types";
@@ -64,7 +64,7 @@ export function ReceiptFormDialog({ expand = false }: { expand?: boolean }) {
 		resolver: zodResolver(receiptShema),
 		defaultValues: {
 			first_name: "",
-			second_name: "",
+			middle_name: "",
 			last_name: "",
 			second_last_name: "",
 			ci: "",
@@ -185,7 +185,7 @@ export function ReceiptFormDialog({ expand = false }: { expand?: boolean }) {
 										<FormItem>
 											<FormLabel>Correo Electrónico</FormLabel>
 											<FormControl>
-												<Input id="email" {...field} />
+												<Input id="email" {...field}  />
 											</FormControl>
 											<FormMessage />
 										</FormItem>
@@ -210,12 +210,12 @@ export function ReceiptFormDialog({ expand = false }: { expand?: boolean }) {
 
 									<FormField
 										control={form.control}
-										name="second_name"
+										name="middle_name"
 										render={({ field }) => (
 											<FormItem>
 												<FormLabel>Segundo Nombre (Opcional)</FormLabel>
 												<FormControl>
-													<Input id="second_name" {...field} />
+													<Input id="middle_name" {...field} />
 												</FormControl>
 												<FormMessage />
 											</FormItem>

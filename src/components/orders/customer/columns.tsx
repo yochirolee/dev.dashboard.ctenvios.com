@@ -1,19 +1,16 @@
 import { Checkbox } from "@/components/ui/checkbox";
 import { type ColumnDef } from "@tanstack/react-table";
 
-// This type is used to define the shape of our data.
-// You can use a Zod schema here if you want.
-export type Customer = {
-	id: string;
-	first_name: string;
-	second_name: string;
-	last_name: string;
-	second_last_name: string;
-	identity_document: string;
-	email: string;
-	phone: string;
-	address: string;
-};
+import { type Customer } from "@/data/types";
+import { Button } from "@/components/ui/button";
+import { MoreHorizontal, MoreVertical, Pencil, Trash } from "lucide-react";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import {
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuItem,
+	DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 export const columns: ColumnDef<Customer>[] = [
 	{
@@ -42,16 +39,24 @@ export const columns: ColumnDef<Customer>[] = [
 		header: "Nombre",
 		cell: ({ row }) => {
 			return (
-				<div>
-					{row.original?.first_name} {row.original?.second_name} {row.original?.last_name}{" "}
-					{row.original?.second_last_name}
+				<div className="flex items-center gap-2">
+					<Avatar>
+						<AvatarFallback>
+							{row?.original?.first_name?.charAt(0)}
+							{row?.original?.last_name?.charAt(0)}
+						</AvatarFallback>
+					</Avatar>
+					<div>
+						{row?.original?.first_name} {row?.original?.middle_name}
+						{row?.original?.last_name} {row?.original?.second_last_name}
+					</div>
 				</div>
 			);
 		},
 	},
 	{
-		accessorKey: "phone",
-		header: "Telefono",
+		accessorKey: "mobile",
+		header: "Movil",
 	},
 	{
 		accessorKey: "identity_document",

@@ -1,7 +1,7 @@
 import { createAuthClient } from "better-auth/react";
 
 export const authClient = createAuthClient({
-	baseURL: import.meta.env.API_URL,
+	baseURL: import.meta.env.VITE_AUTH_URL || "http://localhost:3000",
 	session: {
 		cookieCache: {
 			enabled: true,
@@ -10,6 +10,5 @@ export const authClient = createAuthClient({
 	},
 	fetchOptions: {
 		credentials: "include",
-		baseURL: import.meta.env.VITE_AUTH_URL,
 	},
 });

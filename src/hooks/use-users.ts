@@ -46,23 +46,4 @@ export const useRegister = () => {
 	});
 };
 
-export const useUpdateUser = () => {
-	const queryClient = useQueryClient();
-	return useMutation({
-		mutationFn: (params: { userId: string; user: Partial<User> }) =>
-			api.users.update(params.userId, params.user),
-		onSuccess: () => {
-			queryClient.invalidateQueries({ queryKey: ["getUsers"] });
-		},
-	});
-};
 
-export const useLogin = () => {
-	return useMutation({
-		mutationFn: (params: { email: string; password: string }) => api.users.login(params),
-
-		onError: (error) => {
-			console.error("Login failed:", error);
-		},
-	});
-};
