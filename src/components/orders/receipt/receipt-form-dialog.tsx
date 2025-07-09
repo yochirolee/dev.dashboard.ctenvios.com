@@ -185,7 +185,7 @@ export function ReceiptFormDialog({ expand = false }: { expand?: boolean }) {
 										<FormItem>
 											<FormLabel>Correo Electrónico</FormLabel>
 											<FormControl>
-												<Input id="email" {...field}  />
+												<Input 	{...field} />
 											</FormControl>
 											<FormMessage />
 										</FormItem>
@@ -201,7 +201,7 @@ export function ReceiptFormDialog({ expand = false }: { expand?: boolean }) {
 											<FormItem>
 												<FormLabel>Nombre</FormLabel>
 												<FormControl>
-													<Input id="first_name" {...field} />
+													<Input  {...field} />
 												</FormControl>
 												<FormMessage />
 											</FormItem>
@@ -215,7 +215,7 @@ export function ReceiptFormDialog({ expand = false }: { expand?: boolean }) {
 											<FormItem>
 												<FormLabel>Segundo Nombre (Opcional)</FormLabel>
 												<FormControl>
-													<Input id="middle_name" {...field} />
+													<Input  {...field} />
 												</FormControl>
 												<FormMessage />
 											</FormItem>
@@ -230,7 +230,7 @@ export function ReceiptFormDialog({ expand = false }: { expand?: boolean }) {
 											<FormItem>
 												<FormLabel>Apellido</FormLabel>
 												<FormControl>
-													<Input id="last_name" {...field} />
+													<Input  {...field} />
 												</FormControl>
 												<FormMessage />
 											</FormItem>
@@ -244,7 +244,7 @@ export function ReceiptFormDialog({ expand = false }: { expand?: boolean }) {
 											<FormItem>
 												<FormLabel>2 Apellido</FormLabel>
 												<FormControl>
-													<Input id="second_last_name" {...field} />
+													<Input  {...field} />
 												</FormControl>
 												<FormMessage />
 											</FormItem>

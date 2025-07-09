@@ -24,18 +24,18 @@ export type Invoice = {
 	customer: {
 		id: number;
 		first_name: string;
-		second_name: string;
+		middle_name: string;
 		last_name: string;
 		second_last_name: string;
-		phone: string;
+		mobile: string;
 	};
 	receipt: {
 		id: number;
 		first_name: string;
-		second_name: string;
+		middle_name: string;
 		last_name: string;
 		second_last_name: string;
-		phone: string;
+		mobile: string;
 	};
 	service: {
 		id: number;
@@ -45,6 +45,7 @@ export type Invoice = {
 	subtotal: number;
 	created_at: string;
 	updated_at: string;
+	total: number;
 	items: {}[];
 };
 
@@ -87,6 +88,13 @@ export const orderColumns: ColumnDef<Invoice>[] = [
 		},
 	},
 	{
+		accessorKey: "service",
+		header: "Servicio",
+		cell: ({ row }) => {
+			return <Badge variant="secondary">{row.original?.service?.name}</Badge>;
+		},
+	},
+	{
 		accessorKey: "created_at",
 		header: "Fecha",
 		cell: ({ row }) => {
@@ -107,7 +115,7 @@ export const orderColumns: ColumnDef<Invoice>[] = [
 						</AvatarFallback>
 					</Avatar>
 					<div className="truncate">
-						{row.original?.customer?.first_name} {row.original?.customer?.second_name}{" "}
+						{row.original?.customer?.first_name} {row.original?.customer?.middle_name}{" "}
 						{row.original?.customer?.last_name} {row.original?.customer?.second_last_name}
 					</div>
 				</div>
@@ -127,20 +135,14 @@ export const orderColumns: ColumnDef<Invoice>[] = [
 						</AvatarFallback>
 					</Avatar>
 					<div className="truncate">
-						{row.original?.receipt?.first_name} {row.original?.receipt?.second_name}{" "}
+						{row.original?.receipt?.first_name} {row.original?.receipt?.middle_name}{" "}
 						{row.original?.receipt?.last_name} {row.original?.receipt?.second_last_name}
 					</div>
 				</div>
 			);
 		},
 	},
-	{
-		accessorKey: "service",
-		header: "Servicio",
-		cell: ({ row }) => {
-			return <div>{row.original?.service?.name}</div>;
-		},
-	},
+
 	{
 		accessorKey: "payment_status",
 		header: "Payment Status",
@@ -153,7 +155,11 @@ export const orderColumns: ColumnDef<Invoice>[] = [
 		accessorKey: "subtotal",
 		header: "Total",
 		cell: ({ row }) => {
-			return <div>{row.original?.subtotal}</div>;
+			return (
+				<div className="text-right w-14 ">
+					{parseFloat(row.original?.total.toString()).toFixed(2)}
+				</div>
+			);
 		},
 	},
 	{
@@ -161,29 +167,31 @@ export const orderColumns: ColumnDef<Invoice>[] = [
 		header: "",
 		cell: ({ row }) => {
 			return (
-				<DropdownMenu>
-					<DropdownMenuTrigger asChild>
-						<Button variant="ghost" size="icon">
-							<EllipsisVertical className="w-4 h-4" />
-						</Button>
-					</DropdownMenuTrigger>
-					<DropdownMenuContent>
-						<Link to={`/orders/${row.original.id}`}>
+				<div className="flex justify-end w-6 ">
+					<DropdownMenu>
+						<DropdownMenuTrigger asChild>
+							<Button variant="ghost" size="icon">
+								<EllipsisVertical className="w-4 h-4" />
+							</Button>
+						</DropdownMenuTrigger>
+						<DropdownMenuContent>
+							<Link to={`/orders/${row.original.id}`}>
+								<DropdownMenuItem>
+									<Printer className="w-4 h-4" />
+									Print
+								</DropdownMenuItem>
+							</Link>
 							<DropdownMenuItem>
-								<Printer className="w-4 h-4" />
-								Print
+								<Pencil className="w-4 h-4" />
+								Editar
 							</DropdownMenuItem>
-						</Link>
-						<DropdownMenuItem>
-							<Pencil className="w-4 h-4" />
-							Editar
-						</DropdownMenuItem>
-						<DropdownMenuItem>
-							<Trash className="w-4 h-4" />
-							Eliminar
-						</DropdownMenuItem>
-					</DropdownMenuContent>
-				</DropdownMenu>
+							<DropdownMenuItem>
+								<Trash className="w-4 h-4" />
+								Eliminar
+							</DropdownMenuItem>
+						</DropdownMenuContent>
+					</DropdownMenu>
+				</div>
 			);
 		},
 	},

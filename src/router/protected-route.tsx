@@ -6,6 +6,8 @@ import { CogIcon } from "lucide-react";
 const ProtectedRoute = () => {
 	const { data: session, isPending, error } = authClient.useSession();
 
+	console.log(session);
+
 	// Show loading spinner while checking authentication
 	if (isPending) {
 		return (

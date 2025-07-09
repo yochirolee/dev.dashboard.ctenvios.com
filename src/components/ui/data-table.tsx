@@ -1,4 +1,10 @@
-import { type ColumnDef, flexRender, getCoreRowModel, useReactTable } from "@tanstack/react-table";
+import {
+	type ColumnDef,
+	flexRender,
+	getCoreRowModel,
+	getPaginationRowModel,
+	useReactTable,
+} from "@tanstack/react-table";
 
 import {
 	Table,
@@ -19,6 +25,8 @@ export function DataTable<TData, TValue>({ columns, data }: DataTableProps<TData
 		data,
 		columns,
 		getCoreRowModel: getCoreRowModel(),
+		getPaginationRowModel: getPaginationRowModel(),
+		manualPagination: true,
 	});
 
 	return (

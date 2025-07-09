@@ -2,25 +2,17 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/com
 import { Button } from "@/components/ui/button";
 import { useInvoiceStore } from "@/stores/invoice-store";
 import { useShallow } from "zustand/react/shallow";
-import { useAgencies } from "@/hooks/use-agencies";
 import { type Rate } from "@/data/types";
-
-interface Service {
-	id: number;
-	name: string;
-	description: string;
-	service_type: string;
-	rates: Rate[];
-}
+import { useRates } from "@/hooks/use-rates";
 
 export function ServiceSelector() {
-	const { data: services } = useAgencies.getServices(1);
+	const { data: rates } = useRates.getByAgencyId(1);
 
-	console.log("services", services);
-	const { selectedService, setSelectedService } = useInvoiceStore(
+	console.log(rates, "rates");
+
+	const { setSelectedRate, selectedRate } = useInvoiceStore(
 		useShallow((state) => ({
-			selectedService: state.selectedService,
-			setSelectedService: state.setSelectedService,
+			setSelectedRate: state.setSelectedRate,
 			selectedRate: state.selectedRate,
 		})),
 	);
@@ -29,22 +21,27 @@ export function ServiceSelector() {
 	return (
 		<Card>
 			<CardHeader>
-				<CardTitle>Seleccionar Servicio</CardTitle>
-				<CardDescription>Selecciona el servicio que deseas agregar a tu orden.</CardDescription>
+				<CardTitle>Seleccionar Servicio Tarifa</CardTitle>
+				<CardDescription>
+					Selecciona el servicio y tarifa que deseas usar en tu orden.
+				</CardDescription>
 			</CardHeader>
-			<CardContent className="grid grid-cols-6 gap-4 items-center">
-				{services?.map((service: Service) => (
+			<CardContent className="flex gap-4">
+				{rates?.map((rate: Rate) => (
 					<Button
-						key={service.id}
+						key={rate.id}
 						type="button"
-						variant="outline"
-						onClick={() => setSelectedService(service)}
 						className={`${
-							selectedService?.id === service.id ? "ring" : "opacity-50"
-						} h-25 flex flex-col items-center justify-center`}
+							selectedRate?.id === rate.id ? "ring" : "opacity-50"
+						} h-40 w-40 flex flex-col items-center justify-center`}
+						variant="outline"
+						onClick={() => setSelectedRate(rate)}
 					>
-						<h2>{service?.provider?.name}</h2>
-						<span className="text-sm text-muted-foreground">{service.service_type}</span>
+						<div className="flex flex-col items-center justify-center">
+							<h2 className=" text-muted-foreground text-lg">{rate?.name}</h2>
+							<h2 className="text-sm text-muted-foreground">{rate?.service?.provider.name}</h2>
+							<span className="text-sm text-muted-foreground">{rate.public_rate} USD</span>
+						</div>
 					</Button>
 				))}
 			</CardContent>

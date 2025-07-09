@@ -19,6 +19,7 @@ interface InvoiceStore {
 	setSelectedCustomer: (selectedCustomer: Customer | null) => void;
 	setSelectedReceipt: (selectedReceipt: Receipt | null) => void;
 	setSelectedService: (selectedService: Service | null) => void;
+	setSelectedRate: (selectedRate: Rate | null) => void;
 }
 
 export const useInvoiceStore = create<InvoiceStore>((set) => ({
@@ -26,7 +27,7 @@ export const useInvoiceStore = create<InvoiceStore>((set) => ({
 	selectedReceipt: null,
 	selectedService: null,
 	selectedRate: null,
-
+	setSelectedRate: (selectedRate: Rate | null) => set({ selectedRate }),
 	items: [],
 	setSelectedCustomer: (selectedCustomer: Customer | null) => set({ selectedCustomer }),
 	setSelectedReceipt: (selectedReceipt: Receipt | null) => {
@@ -34,10 +35,6 @@ export const useInvoiceStore = create<InvoiceStore>((set) => ({
 	},
 	setSelectedService: (selectedService: Service | null) => {
 		set({ selectedService });
-		set({
-			selectedRate:
-				selectedService?.rates.find((rate) => rate.service_id === selectedService?.id) || null,
-		});
 	},
 
 	/* setTotalAmount: (total_amount: number) => set({ total_amount }),

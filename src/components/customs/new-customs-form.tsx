@@ -27,28 +27,23 @@ import { PlusCircle } from "lucide-react";
 import { useCustoms } from "@/hooks/use-customs";
 import { customsSchema } from "@/data/types";
 
-export const description =
-	"A login form with email and password. There's an option to login with Google and a link to sign up if you don't have an account.";
-
-const FormSchema = customsSchema;
-
 const CUSTOMS_FEE_TYPES = ["UNIT", "WEIGHT", "VALUE"] as const;
 
-type FormValues = z.infer<typeof FormSchema>;
+type FormValues = z.infer<typeof customsSchema>;
 
 export function NewCustomsForm() {
 	const [open, setOpen] = useState(false);
 
 	const form = useForm<FormValues>({
-		resolver: zodResolver(FormSchema),
+		resolver: zodResolver(customsSchema),
 		defaultValues: {
 			name: "",
 			description: "",
 			country_id: 1,
 			chapter: "",
 			fee_type: "UNIT",
-			fee: 0,
-			max_quantity: 0,
+			fee: undefined,
+			max_quantity: undefined,
 		},
 	});
 
@@ -165,16 +160,14 @@ export function NewCustomsForm() {
 											<Label htmlFor="fee">Fee</Label>
 											<FormControl>
 												<Input
+													className="[&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none [-moz-appearance:textfield] text-right"
 													{...field}
-													id="fee"
-													placeholder="Fee del Arancel"
+													onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
+													placeholder="0.00"
 													type="number"
-													required
-													onChange={(e) => {
-														const value = e.target.value;
-														field.onChange(value === "" ? 0 : parseFloat(value));
-													}}
-													value={field.value || ""}
+													min={0.01}
+													step={0.01}
+													autoComplete="off"
 												/>
 											</FormControl>
 										</div>

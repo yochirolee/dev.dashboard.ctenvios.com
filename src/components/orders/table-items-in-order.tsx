@@ -1,10 +1,10 @@
-import React, { useMemo, useCallback, useDeferredValue } from "react";
+import React, { useCallback, useDeferredValue, useEffect } from "react";
 import { Table, TableCell, TableRow } from "@/components/ui/table";
 import { TableCaption, TableHead, TableHeader } from "@/components/ui/table";
 import { TableBody } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { PackagePlus, Trash } from "lucide-react";
+import { MoreVertical, PackagePlus, ShieldCheckIcon, ShieldXIcon, Trash } from "lucide-react";
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card";
 import { Badge } from "../ui/badge";
 import { FormProvider, useFieldArray, useForm, useFormContext, useWatch } from "react-hook-form";
@@ -16,8 +16,38 @@ import axios from "axios";
 import { z } from "zod";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
-import { authClient } from "@/lib/auth-client";
-import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
+import { FormField, FormItem, FormControl } from "@/components/ui/form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import {
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuItem,
+	DropdownMenuTrigger,
+} from "../ui/dropdown-menu";
+
+const formSchema = z.object({
+	agency_id: z.number(),
+	user_id: z.string(),
+	customer_id: z.number(),
+	receipt_id: z.number(),
+	weight: z.number(),
+	total: z.number(),
+	service_id: z.number(),
+	rate: z.number(),
+	items: z.array(
+		z.object({
+			id: z.number(),
+			description: z.string().min(1, { message: "Description is required" }),
+			weight: z.string().min(0.01, { message: "Weight must be greater than 0.01" }),
+			rate: z.number().min(0, { message: "Rate must be greater than 0" }),
+			subtotal: z.number().min(0, { message: "Subtotal must be greater than 0" }),
+			customs: z.object({
+				description: z.string().min(1, { message: "Description is required" }),
+				fee: z.number().min(0, { message: "Fee must be greater than 0" }),
+			}),
+		}),
+	),
+});
 
 const TableHeaderSection = React.memo(function TableHeaderSection({
 	itemCount,
@@ -51,37 +81,8 @@ const TableHeaderSection = React.memo(function TableHeaderSection({
 	);
 });
 
-const formSchema = z.object({
-	agency_id: z.string(),
-	user_id: z.string(),
-	customer_id: z.string(),
-	receipt_id: z.string(),
-	total: z.number(),
-	currency: z.number(),
-	payment_method: z.string(),
-	payment_status: z.string(),
-	payment_date: z.date(),
-	payment_amount: z.number(),
-	service_id: z.string(),
-	rate: z.number(),
-	items: z.array(
-		z.object({
-			id: z.number(),
-			description: z.string().min(1, { message: "Description is required" }),
-			weight: z.number().min(0.01, { message: "Weight must be greater than 0.01" }),
-			rate: z.number().min(0, { message: "Rate must be greater than 0" }),
-			subtotal: z.number().min(0, { message: "Subtotal must be greater than 0" }),
-			customs: z.object({
-				description: z.string(),
-				fee: z.number().min(0, { message: "Fee must be greater than 0" }),
-			}),
-		}),
-	),
-});
-
 export function TableItemsInOrder() {
 	const navigate = useNavigate();
-	const { data: session } = authClient.useSession();
 
 	const { customer_id, receipt_id, selectedRate } = useInvoiceStore(
 		useShallow((state) => ({
@@ -91,26 +92,24 @@ export function TableItemsInOrder() {
 		})),
 	);
 
+	console.log("re-render on TableItemsInOrder");
+
 	const methods = useForm<z.infer<typeof formSchema>>({
+		resolver: zodResolver(formSchema),
 		defaultValues: {
-			agency_id: session?.user?.agency_id || "",
-			user_id: session?.user?.id,
-			customer_id: customer_id || "",
-			receipt_id: receipt_id || "",
-			service_id: selectedRate?.service_id || "",
+			customer_id: customer_id || 0,
+			receipt_id: receipt_id || 0,
+			service_id: selectedRate?.service_id || 0,
 			rate: selectedRate?.public_rate || 0,
 			total: 0,
-			currency: 0,
-			payment_method: "",
-			payment_status: "",
-			payment_date: new Date(),
-			payment_amount: 0,
+			weight: 0,
 			items: [
 				{
 					id: 1,
 					description: "",
-					weight: 0,
-					rate: 0,
+					weight: undefined,
+
+					rate: selectedRate?.public_rate || 0,
 					subtotal: 0,
 					customs: {
 						description: "",
@@ -125,37 +124,45 @@ export function TableItemsInOrder() {
 		control: methods.control,
 		name: "items",
 	});
-	const deferedFields = useDeferredValue(fields);
+
 	// Memoize handlers to prevent re-creation on every render
-	const handleAddItem = () => {
+	const handleAddItem = useCallback(() => {
 		append({
 			id: fields.length + 1,
 			description: "",
-			weight: 0.0,
+			weight: "",
+			rate: 0,
 			subtotal: 0,
 			customs: {
 				description: "",
 				fee: 0,
 			},
 		});
-	};
+	}, [append, fields.length]);
 
 	const handleRemoveAllItems = useCallback(() => {
-		fields.forEach((field) => {
-			remove(field.id);
-		});
-		deferedFields.forEach((field) => {
-			remove(field.id);
+		fields.forEach((_, index) => {
+			remove(index);
 		});
 	}, [fields, remove]);
+
+	const handleRemoveItem = useCallback((id: number) => {
+		console.log("id", id);
+		remove(id);
+	}, []);
 
 	// Watch only the items array for total calculation
 
 	const onSubmit = async (data: any) => {
-		console.log("data", data);
+		data.customer_id = customer_id;
+		data.receipt_id = receipt_id;
+		data.service_id = selectedRate?.service_id;
+		data.rate = selectedRate?.public_rate;
 
-		/* const response = await axios.post("http://localhost:3000/api/v1/invoices", data);
-		navigate(`/orders/${response.data.id}`); */
+		console.log("data on Submit", data);
+
+		const response = await axios.post("http://localhost:3000/api/v1/invoices", data);
+		navigate(`/orders/${response.data.id}`);
 		toast.success("Orden creada correctamente");
 	};
 
@@ -184,8 +191,13 @@ export function TableItemsInOrder() {
 								</TableRow>
 							</TableHeader>
 							<TableBody>
-								{deferedFields?.map((field, index) => (
-									<ItemRow key={field.id} index={index} rate={selectedRate?.public_rate || 0} />
+								{fields?.map((field, index) => (
+									<ItemRow
+										key={field.id}
+										index={index}
+										rate={selectedRate?.public_rate || 0}
+										remove={() => handleRemoveItem(field.id)}
+									/>
 								))}
 							</TableBody>
 						</Table>
@@ -202,96 +214,118 @@ export function TableItemsInOrder() {
 	);
 }
 
-const ItemRow = React.memo(function ItemRow({ index, rate }: { index: number; rate: number }) {
+//ITEM ROW
+const ItemRow = React.memo(function ItemRow({
+	index,
+	rate,
+	remove,
+}: {
+	index: number;
+	rate: number;
+	remove: (index: number) => void;
+}) {
 	const { control, setValue } = useFormContext();
 
-	// Only watch the specific fields needed for this row
-	const itemWeight = useWatch({ control, name: `items.${index}.weight` }) || 0;
-	const customsFee = useWatch({ control, name: `items.${index}.customs.fee` }) || 0;
-	const customsDescription =
-		useWatch({ control, name: `items.${index}.customs.description` }) || "";
-	const subtotal = useWatch({ control, name: `items.${index}.subtotal` }) || 0;
+	// Solo un watch para reducir renders innecesarios
+	const item = useWatch({ control, name: `items.${index}` });
 
-	// Memoize subtotal calculation and update form when dependencies change
-	useMemo(() => {
-		const calculatedSubtotal =
-			parseFloat(rate.toString()) * parseFloat(itemWeight.toString()) +
-			parseFloat(customsFee || "0");
+	const weight = parseFloat(item?.weight || "0");
+	const customsFee = parseFloat(item?.customs?.fee || "0");
+	const subtotal = parseFloat(item?.subtotal || "0");
 
-		// Update the form value when subtotal changes
+	// Actualiza subtotal solo cuando cambian dependencias reales
+	useEffect(() => {
+		const calculatedSubtotal = rate * weight + customsFee;
 		setValue(`items.${index}.subtotal`, calculatedSubtotal, { shouldValidate: true });
-		setValue(`items.${index}.rate`, rate, { shouldValidate: true });
-		setValue(`items.${index}.customs.fee`, customsFee, { shouldValidate: true });
-		setValue(`items.${index}.description`, customsDescription, { shouldValidate: true });
-	}, [rate, itemWeight, customsFee]);
-
-	// Memoize the remove handler
-	const handleRemove = useCallback(() => {
-		// Implementation for removing individual item would go here
-		console.log(`Remove item at index ${index}`);
-	}, [index]);
+	}, [weight, customsFee, index]);
 
 	return (
 		<TableRow>
 			<TableCell className="font-medium">{index + 1}</TableCell>
+
 			<TableCell className="w-40">
 				<CustomsFeeCombobox index={index} />
 			</TableCell>
+
 			<TableCell className="w-full gap-2">
 				<FormField
 					control={control}
-					name={`items.${index}.description` as string}
+					name={`items.${index}.description`}
 					render={({ field }) => (
 						<FormItem>
 							<FormControl>
-								<Input {...field} placeholder="Description" />
+								<div className="flex relative items-center gap-2">
+									<Input {...field} placeholder="Description" />
+									<div className="flex gap-2 items-center absolute right-2">
+										<ShieldCheckIcon className="w-4 h-4" />
+										{item?.customs?.max_quantity && (
+											<Badge variant="secondary" className="text-xs text-muted-foreground  right-2">
+												{item?.customs?.max_quantity}
+											</Badge>
+										)}
+									</div>
+								</div>
 							</FormControl>
-							<FormMessage />
 						</FormItem>
 					)}
 				/>
 			</TableCell>
-			<TableCell className="text-right w-20">${parseFloat(customsFee || "0").toFixed(2)}</TableCell>
+
+			<TableCell className="text-right w-20">${customsFee.toFixed(2)}</TableCell>
+
 			<TableCell>
 				<FormField
 					control={control}
-					name={`items.${index}.weight` as string}
+					name={`items.${index}.weight`}
 					render={({ field }) => (
 						<FormItem>
 							<FormControl>
 								<Input
-									placeholder="0.0"
-									type="number"
-									step="0.01"
-									disabled={!customsFee}
+									{...field}
+									placeholder="0"
+									type="text"
+									disabled={!customsFee || !rate}
 									className="w-20 text-right [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none [-moz-appearance:textfield]"
 									{...field}
 								/>
 							</FormControl>
-							<FormMessage />
 						</FormItem>
 					)}
 				/>
 			</TableCell>
-			<TableCell className="text-right w-20">${rate || 0}</TableCell>
-			<TableCell className="text-right w-20">${control.wat || 0}</TableCell>
+
+			<TableCell className="text-right w-20">${rate.toFixed(2)}</TableCell>
+
+			<TableCell className="text-right w-20">${subtotal.toFixed(2)}</TableCell>
+
 			<TableCell className="w-10 justify-end">
-				<Button
-					className="hover:text-red-500/60"
-					variant="ghost"
-					onClick={handleRemove}
-					type="button"
-				>
-					<Trash />
-				</Button>
+				<DropdownMenu>
+					<DropdownMenuTrigger asChild>
+						<Button variant="ghost" className="hover:text-red-500/60">
+							<MoreVertical />
+						</Button>
+					</DropdownMenuTrigger>
+					<DropdownMenuContent align="end">
+						<DropdownMenuItem>
+							<ShieldXIcon />
+							No Asegurado
+						</DropdownMenuItem>
+						<DropdownMenuItem onClick={() => remove(index)} className="flex items-center gap-2">
+							<Trash />
+							Eliminar
+						</DropdownMenuItem>
+					</DropdownMenuContent>
+				</DropdownMenu>
 			</TableCell>
 		</TableRow>
 	);
 });
 
+//TOTAL SECTION
 const TotalSection = React.memo(function TotalSection() {
-	const { control, watch } = useFormContext();
+	const { control, watch, setValue, getValues, formState } = useFormContext();
 	const items = useWatch({ control, name: "items" });
+	console.log("items", items);
 
 	const total = parseFloat(
 		items.reduce((sum: number, item: any) => sum + (item.subtotal || 0), 0).toFixed(2),
@@ -302,18 +336,24 @@ const TotalSection = React.memo(function TotalSection() {
 			.toFixed(2),
 	);
 
+	useEffect(() => {
+		setValue("total", total);
+		setValue("weight", totalWeight);
+	}, [items.length, total, totalWeight]);
+
 	return (
 		<div className="flex flex-col gap-4 items-end">
 			<div className="flex gap-4 items-center">
 				<span className="">Total Weight:</span>
-				<span className=" ">{totalWeight} Lbs</span>
+				<span className=" ">{getValues("weight")} Lbs</span>
 			</div>
 			<div className="flex gap-4 items-center">
 				<span className="font-medium">Total:</span>
-				<span className="font-bold text-lg">${total}</span>
+				<span className="font-bold text-lg">${getValues("total")}</span>
 			</div>
 			<div className="flex gap-4 items-center">
 				<pre className="text-xs">{JSON.stringify(watch(), null, 2)}</pre>
+				<pre className="text-xs">{JSON.stringify(formState.errors, null, 2)}</pre>
 			</div>
 		</div>
 	);

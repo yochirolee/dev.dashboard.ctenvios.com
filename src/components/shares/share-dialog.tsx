@@ -13,7 +13,7 @@ export const ShareDialog = ({
 	children,
 	title,
 	description,
-	action,
+	mode,
 	open,
 	setOpen,
 	expanded,
@@ -21,17 +21,20 @@ export const ShareDialog = ({
 	children: React.ReactNode;
 	title: string;
 	description: string;
-	action: string;
+	mode: "create" | "update";
 	open: boolean;
 	setOpen: (open: boolean) => void;
 	expanded?: boolean;
 }) => {
+	console.log(mode, "mode");
 	return (
 		<Dialog open={open} onOpenChange={setOpen}>
 			<DialogTrigger asChild>
 				<Button variant="outline">
 					<PlusCircle className="w-4 h-4" />
-					<span className={`${expanded ? "block" : "hidden"} lg:block`}>{action}</span>
+					<span className={`${expanded ? "block" : "hidden"} lg:block`}>
+						{mode === "create" ? "Crear" : "Editar"}
+					</span>
 				</Button>
 			</DialogTrigger>
 			<DialogContent>

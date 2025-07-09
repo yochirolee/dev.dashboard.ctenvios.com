@@ -10,7 +10,7 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { ModeToggle } from "@/components/mode-toggle";
-import { Outlet, useLocation } from "react-router-dom";
+import { Link, Outlet, useLocation } from "react-router-dom";
 import { Toaster } from "sonner";
 export const DashboardLayout = () => {
 	const pathname = useLocation();
@@ -28,11 +28,17 @@ export const DashboardLayout = () => {
 							<Breadcrumb>
 								<BreadcrumbList>
 									<BreadcrumbItem className="hidden md:block">
-										<BreadcrumbLink href={`/${breadcrumb[0]}`}>{breadcrumb[0]}</BreadcrumbLink>
+										<BreadcrumbLink>
+											<Link to={`/${breadcrumb[0]}`}>
+												{breadcrumb[0]?.charAt(0).toUpperCase() + breadcrumb[0]?.slice(1)}
+											</Link>
+										</BreadcrumbLink>
 									</BreadcrumbItem>
-									<BreadcrumbSeparator className="hidden md:block" />
+									<BreadcrumbSeparator className="hidden mt-1 md:block" />
 									<BreadcrumbItem>
-										<BreadcrumbPage>{breadcrumb[1]}</BreadcrumbPage>
+										<BreadcrumbPage>
+											{breadcrumb[1]?.charAt(0).toUpperCase() + breadcrumb[1]?.slice(1) || ""}
+										</BreadcrumbPage>
 									</BreadcrumbItem>
 								</BreadcrumbList>
 							</Breadcrumb>

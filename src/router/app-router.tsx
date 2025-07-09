@@ -9,7 +9,6 @@ import { SectionCards } from "@/components/cards/section-cards";
 import { NewOrderPage } from "@/pages/orders/new-order-page";
 
 import { InteractiveChart } from "@/components/charts/interactive-chart";
-import { ZustandPage } from "@/pages/orders/zustand";
 import { CustomersPage } from "@/pages/settings/customers-page";
 import { AgenciesPage } from "@/pages/settings/agencies-page";
 import { ReceiptsPage } from "@/pages/settings/receipts-page";
@@ -36,7 +35,6 @@ export const AppRouter = () => {
 					<Route path="orders/new" element={<NewOrderPage />} />
 					<Route path="invoices/new" element={<NewInvoicePage />} />
 					<Route path="orders/:invoiceId" element={<InvoiceDetailsPage />} />
-					<Route path="zustand" element={<ZustandPage />} />
 					<Route path="settings">
 						<Route path="providers" element={<ProvidersServicesPage />} />
 						<Route path="agencies" element={<AgenciesPage />} />

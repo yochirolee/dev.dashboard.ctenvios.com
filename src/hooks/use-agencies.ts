@@ -11,9 +11,12 @@ export const useAgencies = {
 		return useQuery({
 			queryKey: ["get-services", id],
 			queryFn: () => api.agencies.getServices(id),
+			refetchOnWindowFocus: false,
+			staleTime: 1000 * 60 * 5,
 			enabled: !!id,
 		});
 	},
+
 	create: (options?: { onSuccess?: () => void; onError?: (error: any) => void }) => {
 		return useMutation({
 			mutationFn: (data: Agency) => api.agencies.create(data),

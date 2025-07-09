@@ -1,6 +1,16 @@
 import axios from "axios";
-import type { Customer, Receipt, Customs, Agency, Provider, Service, Rate } from "@/data/types";
+import type {
+	Customer,
+	Receipt,
+	Customs,
+	Agency,
+	Provider,
+	Service,
+	Rate,
+	Invoice,
+} from "@/data/types";
 import type { User } from "better-auth/types";
+import { authClient } from "@/lib/auth-client";
 
 const config = {
 	baseURL: import.meta.env.VITE_API_URL || "http://localhost:3000/api/v1",
@@ -8,15 +18,47 @@ const config = {
 	headers: {
 		"Content-Type": "application/json",
 	},
+	// Include credentials (cookies) in all requests
+	withCredentials: true,
 };
 
 export const axiosInstance = axios.create(config);
+
+// Add request interceptor to include session token in headers
+axiosInstance.interceptors.request.use(
+	async (config) => {
+		try {
+			// Get the current session from BetterAuth
+			const session = await authClient.getSession();
+			console.log(session, "session in Api");
+
+			// If we have a session, include the session token in the headers
+			if (session?.data?.session?.token) {
+				config.headers.Authorization = `Bearer ${session.data.session.token}`;
+			}
+		} catch (error) {
+			console.log(error, "error in Api");
+			// If there's an error getting the session, continue without the token
+			console.log("Failed to get session for API request:", error);
+		}
+
+		return config;
+	},
+	(error) => {
+		return Promise.reject(error);
+	},
+);
 
 // Add response interceptor for better error handling with React Query
 axiosInstance.interceptors.response.use(
 	(response) => response,
 
 	(error) => {
+		// Handle 401 Unauthorized responses
+		if (error.response?.status === 401) {
+			window.location.href = "/login";
+		}
+
 		// Let React Query handle the error
 		return Promise.reject(error);
 	},
@@ -111,14 +153,19 @@ const api = {
 		},
 	},
 	invoices: {
-		get: async (page: number | 1, limit: number | 50) => {
+		get: async (page: number | 1, limit: number | 25) => {
 			const response = await axiosInstance.get("/invoices", {
 				params: {
 					page,
 					limit,
 				},
 			});
-			console.log(response.data, "response.data in Api");
+			return response.data;
+		},
+		getByAgencyId: async (agency_id: number, page: number | 1, limit: number | 25) => {
+			const response = await axiosInstance.get(`/invoices/agency/${agency_id}`, {
+				params: { page, limit },
+			});
 			return response.data;
 		},
 		search: async (search: string, page: number | 1, limit: number | 50) => {
@@ -133,6 +180,10 @@ const api = {
 		},
 		getById: async (id: number) => {
 			const response = await axiosInstance.get(`/invoices/${id}`);
+			return response.data;
+		},
+		create: async (data: Invoice) => {
+			const response = await axiosInstance.post("/invoices", data);
 			return response.data;
 		},
 	},
@@ -192,6 +243,7 @@ const api = {
 			const response = await axiosInstance.get(`/agencies/${id}/services`);
 			return response.data;
 		},
+		
 	},
 	customs: {
 		get: async () => {
@@ -218,8 +270,17 @@ const api = {
 		},
 	},
 	rates: {
+		create: async (data: Rate) => {
+			const response = await axiosInstance.post("/rates", data);
+			return response.data;
+		},
 		update: async (id: number, data: Rate) => {
+			console.log(data, "Rates data in Api");
 			const response = await axiosInstance.put(`/rates/${id}`, data);
+			return response.data;
+		},
+		getByAgencyId: async (agency_id: number) => {
+			const response = await axiosInstance.get(`/rates/agency/${agency_id}`);
 			return response.data;
 		},
 	},

@@ -12,10 +12,12 @@ import { toast } from "sonner";
 
 const agenciesRatesSchema = z
 	.object({
-		rate_id: z.number(),
-		agency_id: z.number(),
+		name: z.string().min(1, { message: "El nombre es requerido" }),
+		rate_id: z.number().optional(),
+		agency_id: z.number().optional(),
 		agency_rate: z.number().min(0, { message: "El precio de la agencia debe ser mayor a 0" }),
 		public_rate: z.number().min(0, { message: "El precio público debe ser mayor a 0" }),
+		service_id: z.number().optional(),
 	})
 	.refine((data) => data.public_rate >= data.agency_rate, {
 		message: "El precio público debe ser mayor o igual al precio de la agencia",
@@ -27,32 +29,64 @@ type AgenciesRatesSchema = z.infer<typeof agenciesRatesSchema>;
 export const AgenciesRatesForm = ({
 	rate,
 	setOpen,
+	mode,
 }: {
 	rate: any;
 	setOpen: (open: boolean) => void;
+	mode: "create" | "update";
 }) => {
 	const form = useForm<AgenciesRatesSchema>({
 		resolver: zodResolver(agenciesRatesSchema),
-		defaultValues: {
-			rate_id: rate.id,
-			agency_id: rate.agency_id,
-			agency_rate: rate.agency_rate,
-			public_rate: rate.public_rate,
-		},
+
+		defaultValues:
+			mode === "create"
+				? {
+						name: "",
+						agency_id: rate.agency_id,
+						agency_rate: rate.agency_rate,
+						public_rate: rate.public_rate,
+						service_id: rate.service_id,
+				  }
+				: {
+						name: rate.name,
+						rate_id: rate.id,
+						agency_id: rate.agency_id,
+						agency_rate: rate.agency_rate,
+						public_rate: rate.public_rate,
+				  },
 	});
-	const { mutate: updateRate, isPending } = useRates.update();
+	console.log(rate, "rate");
+	const { mutate: updateRate, isPending: isUpdating } = useRates.update();
+	const { mutate: createRate, isPending: isCreating } = useRates.create();
+	const isPending = isUpdating || isCreating;
 	const onSubmit = (data: AgenciesRatesSchema) => {
-		updateRate({ id: rate.id, data: data as unknown as Rate });
+		console.log(data, "data");
+		mode === "update"
+			? updateRate({ id: rate.id, data: data as unknown as Rate })
+			: createRate(data as unknown as Rate);
 		toast.success("Tarifa actualizada correctamente");
 		form.reset();
 		setOpen(false);
 	};
+	console.log(form.formState.errors, "errors");
 
 	return (
 		<Form {...form}>
 			<form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
 				<FormField
 					control={form.control}
+					name="name"
+					render={({ field }) => (
+						<FormItem>
+							<FormLabel>Nombre</FormLabel>
+							<FormControl>
+								<Input {...field} placeholder="Nombre" />
+							</FormControl>
+							<FormMessage />
+						</FormItem>
+					)}
+				/>
+				<FormField
 					name="agency_rate"
 					render={({ field }) => (
 						<FormItem>
@@ -99,10 +133,12 @@ export const AgenciesRatesForm = ({
 						{isPending ? (
 							<>
 								<Loader2 className="w-4 h-4 animate-spin" />
-								Guardando...
+								{mode === "create" ? "Creando..." : "Actualizando..."}
 							</>
+						) : mode === "create" ? (
+							"Crear"
 						) : (
-							"Guardar"
+							"Actualizar"
 						)}
 					</Button>
 					<Button

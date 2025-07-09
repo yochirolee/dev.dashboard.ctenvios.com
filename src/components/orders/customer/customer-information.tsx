@@ -4,10 +4,11 @@ import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 
 export function CustomerInformation() {
-	const { selectedCustomer, setSelectedCustomer } = useInvoiceStore(
+	const { selectedCustomer, setSelectedCustomer, setSelectedReceipt } = useInvoiceStore(
 		useShallow((state) => ({
 			selectedCustomer: state.selectedCustomer,
 			setSelectedCustomer: state.setSelectedCustomer,
+			setSelectedReceipt: state.setSelectedReceipt,
 		})),
 	);
 
@@ -17,14 +18,20 @@ export function CustomerInformation() {
 				<div className="grid gap-3 mt-2 text-sm p-4 bg-muted rounded-lg">
 					<div className="flex items-center justify-between">
 						<div className="">Datos del cliente</div>
-						<Button variant="outline" onClick={() => setSelectedCustomer(null)}>
+						<Button
+							variant="outline"
+							onClick={() => {
+								setSelectedCustomer(null);
+								setSelectedReceipt(null);
+							}}
+						>
 							Cancelar
 						</Button>
 					</div>
 					<Separator orientation="horizontal" />
 					<dl className="grid gap-3">
 						<div className="flex items-center justify-between">
-							<dt className="text-muted-foreground">Customer</dt>
+							<dt className="text-muted-foreground">Nombre</dt>
 							<dd>
 								{selectedCustomer?.first_name} {selectedCustomer?.middle_name || ""}{" "}
 								{selectedCustomer?.last_name} {selectedCustomer?.second_last_name}
@@ -37,7 +44,7 @@ export function CustomerInformation() {
 							</dd>
 						</div>
 						<div className="flex items-center justify-between">
-							<dt className="text-muted-foreground">Mobile/Phone</dt>
+							<dt className="text-muted-foreground">Movil/Telefono</dt>
 							<dd>
 								<a href={`tel:${selectedCustomer?.mobile}`}>{selectedCustomer?.mobile}</a>
 								<a href={`tel:${selectedCustomer?.phone}`}>{selectedCustomer?.phone}</a>

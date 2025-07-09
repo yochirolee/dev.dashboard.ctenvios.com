@@ -66,29 +66,25 @@ export const rateSchema = z.object({
 });
 
 export const itemsSchema = z.object({
-	id: z.number(),
-	description: z.string().min(1, "La descripción es requerida"),
-	price: z.number(),
-	quantity: z.number(),
-	weight: z.number().min(1, "El peso es requerido"),
-	subtotal: z.number(),
-	custom_fee: z.number(),
+	description: z.string().min(1),
+	weight: z.number().min(0).optional(),
+	fee: z.number().min(0),
+	rate: z.number().min(0),
 });
 export const invoiceSchema = z.object({
 	id: z.number().optional(),
-	customer: customerSchema,
-	receipt: receiptShema,
-	serviceId: z.number().min(1, "El servicio es requerido"),
-	agencyId: z.number().min(1, "La agencia es requerida"),
-	rate: rateSchema,
+	customer_id: z.number().min(0),
+	receipt_id: z.number().min(0),
+	agency_id: z.number().min(0),
+	user_id: z.string().min(0),
+	service_id: z.number().min(0),
 	items: z.array(itemsSchema),
-	total_amount: z.number(),
 });
 
 export const customsSchema = z.object({
 	id: z.number().optional(),
 	name: z.string().min(1, "El nombre es requerido"),
-	description: z.string().optional(),
+	description: z.string().min(1, "La descripción es requerida"),
 	country_id: z.number().min(1, "El país es requerido").default(1),
 	chapter: z.string().optional(),
 	fee_type: z.enum(["UNIT", "WEIGHT", "VALUE"]).default("UNIT"),

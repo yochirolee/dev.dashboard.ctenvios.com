@@ -26,7 +26,8 @@ export function NavUser() {
 
 	const handleLogout = async () => {
 		try {
-			await authClient.signOut();
+			const response = await authClient.signOut();
+			console.log(response, "response in handleLogout");
 			navigate("/login", { replace: true });
 		} catch (error) {
 			console.error("Logout error:", error);

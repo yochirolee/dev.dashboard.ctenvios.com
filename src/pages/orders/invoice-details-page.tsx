@@ -18,22 +18,22 @@ export default function InvoiceDetailsPage() {
 
 	const { data: invoice, isLoading } = useGetInvoiceById(invoiceId);
 
+	console.log(invoice);
+
 	const handlePrint = () => {
 		window.print();
 	};
+
+	const total = parseFloat(
+		invoice?.items
+			.reduce((acc: number, item: any) => acc + item?.rate * item?.weight + item?.customs_fee, 0)
+			.toFixed(2),
+	);
 
 	if (isLoading) return <div>Loading...</div>;
 	return (
 		<div className="space-y-10 xl:min-w-[1024px] 2xl:min-w-[1280px] mx-auto print:w-full">
 			<div className="flex justify-end gap-2">
-				<Button variant="outline" onClick={handlePrint} className="print:hidden">
-					<Printer className="mr-2 h-4 w-4" /> Print Invoice
-				</Button>
-				<Link to={`/orders/${invoiceId}/labels`}>
-					<Button variant="outline" className="print:hidden">
-						<Printer className="mr-2 h-4 w-4" /> Print Labels HTML
-					</Button>
-				</Link>
 				<Link target="_blank" to={`http://localhost:3000/api/v1/invoices/${invoiceId}/pdf`}>
 					<Button className="print:hidden bg-blue-600 hover:bg-blue-700 text-white">
 						<FileText className="mr-2 h-4 w-4" />
@@ -76,26 +76,20 @@ export default function InvoiceDetailsPage() {
 						<h2 className=" mb-2">Envia:</h2>
 						<p className="flex items-center gap-2">
 							<User className="text-gray-500" size={16} />
-							{invoice?.customer?.first_name +
-								" " +
-								invoice?.customer?.last_name +
-								" " +
-								invoice?.customer?.second_last_name}
+							{invoice?.customer?.first_name} {invoice?.customer?.middle_name}{" "}
+							{invoice?.customer?.last_name} {invoice?.customer?.second_last_name}
 						</p>
 						<p className="flex items-center gap-2">
 							<Phone className="text-gray-500" size={16} />
-							{invoice?.customer?.phone}
+							{invoice?.customer?.mobile}
 						</p>
 					</div>
 					<div>
 						<h2 className=" mb-2">Recibe:</h2>
 						<p className="flex items-center gap-2">
 							<User className="text-gray-500" size={16} />
-							{invoice?.receipt?.first_name +
-								" " +
-								invoice?.receipt?.last_name +
-								" " +
-								invoice?.receipt?.second_last_name}
+							{invoice?.receipt?.first_name} {invoice?.receipt?.middle_name}{" "}
+							{invoice?.receipt?.last_name} {invoice?.receipt?.second_last_name}
 						</p>
 						<p className="flex items-center gap-2">
 							<Phone className="text-gray-500" size={16} />
@@ -115,6 +109,7 @@ export default function InvoiceDetailsPage() {
 							<TableHead>Descripción</TableHead>
 							<TableHead className="text-right">Precio</TableHead>
 							<TableHead className="text-right">Peso</TableHead>
+							<TableHead className="text-right">Arancel</TableHead>
 							<TableHead className="text-right">Subtotal</TableHead>
 						</TableRow>
 					</TableHeader>
@@ -124,16 +119,19 @@ export default function InvoiceDetailsPage() {
 								<TableCell className="">{item?.hbl}</TableCell>
 								<TableCell className="">{item?.description}</TableCell>
 								<TableCell className="text-right">${parseFloat(item?.rate).toFixed(2)}</TableCell>
-								<TableCell className="text-right">{item?.weight}</TableCell>
+								<TableCell className="text-right">{item?.weight.toFixed(2)}</TableCell>
 								<TableCell className="text-right">
-									${parseFloat((item?.rate * item?.weight).toFixed(2))}
+									${parseFloat(item?.customs_fee).toFixed(2)}
+								</TableCell>
+								<TableCell className="text-right">
+									${parseFloat((item?.rate * item?.weight + item?.customs_fee).toFixed(2))}
 								</TableCell>
 							</TableRow>
 						))}
 					</TableBody>
 				</Table>
 				<div className="mt-8 text-right">
-					<p className="text-lg font-semibold">Total: ${invoice?.total?.toFixed(2)}</p>
+					<p className="text-lg font-semibold">Total: ${total.toFixed(2)}</p>
 				</div>
 				<div className="mt-8 text-gray-500 text-sm">
 					<p>Thank you for your business!</p>

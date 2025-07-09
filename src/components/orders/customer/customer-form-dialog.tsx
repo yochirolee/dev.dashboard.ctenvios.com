@@ -68,7 +68,18 @@ export const CustomerFormDialog = React.memo(function CustomerFormDialog() {
 	});
 
 	useEffect(() => {
-		if (selectedCustomer) {
+		if (selectedCustomer == null) {
+			form.reset({
+				first_name: "",
+				email: undefined,
+				mobile: undefined,
+				middle_name: "",
+				last_name: "",
+				second_last_name: "",
+				identity_document: undefined,
+				address: undefined,
+			});
+		} else {
 			form.reset({
 				first_name: selectedCustomer.first_name,
 				email: selectedCustomer.email ? selectedCustomer.email : undefined,
@@ -86,7 +97,6 @@ export const CustomerFormDialog = React.memo(function CustomerFormDialog() {
 
 	const { mutate: updateCustomer, isPending: isUpdating } = useUpdateCustomer({
 		onSuccess: (data: Customer) => {
-			console.log(data, "data in onSuccess");
 			setIsOpen(false);
 			toast.success("Cliente actualizado correctamente");
 			form.reset();
@@ -109,7 +119,7 @@ export const CustomerFormDialog = React.memo(function CustomerFormDialog() {
 	});
 
 	const onSubmit = (data: FormData) => {
-		if (selectedCustomer) {
+		if (selectedCustomer !== null) {
 			updateCustomer({ id: selectedCustomer.id, data: data as Customer });
 		} else {
 			createCustomer(data as Customer);
@@ -131,9 +141,7 @@ export const CustomerFormDialog = React.memo(function CustomerFormDialog() {
 				<Form {...form}>
 					<form onSubmit={form.handleSubmit(onSubmit, onError)}>
 						<DialogHeader>
-							<DialogTitle>
-								{selectedCustomer ? "Editar Cliente" : "Nuevo Cliente"}
-							</DialogTitle>
+							<DialogTitle>{selectedCustomer ? "Editar Cliente" : "Nuevo Cliente"}</DialogTitle>
 							<DialogDescription>
 								{selectedCustomer
 									? "Edita los datos del cliente para que puedas usarlo en tus pedidos."
@@ -260,7 +268,11 @@ export const CustomerFormDialog = React.memo(function CustomerFormDialog() {
 
 						<DialogFooter className="flex mt-8 justify-center">
 							<Button type="submit" disabled={isPending || isUpdating}>
-								{isPending || isUpdating ? "Guardando..." : selectedCustomer ? "Actualizar" : "Guardar"}
+								{isPending || isUpdating
+									? "Guardando..."
+									: selectedCustomer
+									? "Actualizar"
+									: "Guardar"}
 							</Button>
 							<Button
 								type="button"

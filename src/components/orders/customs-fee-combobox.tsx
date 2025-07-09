@@ -11,20 +11,24 @@ import {
 	CommandList,
 } from "@/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { useFormContext } from "react-hook-form";
 import { FormField } from "../ui/form";
 import { useCustoms } from "@/hooks/use-customs";
 import type { Customs } from "@/data/types";
+import { Skeleton } from "../ui/skeleton";
 
-
-const CustomsFeeCombobox = React.memo(function CustomsFeeCombobox({ index }: { index: number }) {
-	const { control } = useFormContext();
+const CustomsFeeCombobox = React.memo(function CustomsFeeCombobox({
+	index,
+	form,
+}: {
+	index: number;
+	form: any;
+}) {
 	const [open, setOpen] = React.useState(false);
-	const { data: customs } = useCustoms.get();
+	const { data: customs, isLoading } = useCustoms.get();
 
 	return (
 		<FormField
-			control={control}
+			control={form.control}
 			name={`items.${index}.customs`}
 			render={({ field }) => (
 				<Popover open={open} onOpenChange={setOpen}>
@@ -37,11 +41,17 @@ const CustomsFeeCombobox = React.memo(function CustomsFeeCombobox({ index }: { i
 							aria-controls={`customs-fee-combobox-${index}`}
 							className={cn("w-[200px] justify-between", !field.value && "text-muted-foreground")}
 						>
-							{customs?.find((custom: Customs) => custom.name === field.value?.name)?.name
-								? field.value.name.length > 20
-									? `${field.value.name.substring(0, 20)}...`
-									: field.value.name
-								: "Seleccionar Arancel"}
+							{isLoading ? (
+								<Skeleton className="w-full h-4" />
+							) : customs?.find((custom: Customs) => custom.name === field.value?.name)?.name ? (
+								field.value.name.length > 20 ? (
+									`${field.value.name.substring(0, 20)}...`
+								) : (
+									field.value.name
+								)
+							) : (
+								"Seleccionar Arancel"
+							)}
 							<ChevronsUpDown className="opacity-50" />
 						</Button>
 					</PopoverTrigger>
