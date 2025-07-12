@@ -12,10 +12,10 @@ import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/s
 import { ModeToggle } from "@/components/mode-toggle";
 import { Link, Outlet, useLocation } from "react-router-dom";
 import { Toaster } from "sonner";
+
 export const DashboardLayout = () => {
 	const pathname = useLocation();
 	const breadcrumb = pathname.pathname.split("/").filter(Boolean);
-
 	return (
 		<SidebarProvider>
 			<AppSidebar />

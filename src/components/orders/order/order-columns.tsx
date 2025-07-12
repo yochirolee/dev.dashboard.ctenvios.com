@@ -3,7 +3,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { type ColumnDef } from "@tanstack/react-table";
 import { format } from "date-fns";
-import { EllipsisVertical, Pencil, Printer, Trash } from "lucide-react";
+import { EllipsisVertical, FileText, Pencil, Printer, TagIcon, Trash } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
 	DropdownMenu,
@@ -42,12 +42,16 @@ export type Invoice = {
 		name: string;
 	};
 	payment_status: boolean;
-	subtotal: number;
+	status: string;
 	created_at: string;
 	updated_at: string;
-	total: number;
-	items: {}[];
+	total_amount: number;
+	_count: {
+		items: number;
+	};
 };
+
+const baseUrl = import.meta.env.VITE_API_URL;
 
 export const orderColumns: ColumnDef<Invoice>[] = [
 	{
@@ -74,9 +78,32 @@ export const orderColumns: ColumnDef<Invoice>[] = [
 
 	{
 		accessorKey: "id",
-		header: "No",
+		header: "Factura",
 		cell: ({ row }) => {
-			return <div>{row.original.id}</div>;
+			return (
+				<Link className="flex items-center gap-2" to={`/orders/${row.original?.id}`}>
+					<FileText size={16} />
+					{row.original?.id}
+				</Link>
+			);
+		},
+	},
+	{
+		accessorKey: "_count",
+		header: "Labels",
+		cell: ({ row }) => {
+			return (
+				<Badge variant="secondary" className="flex items-center gap-2">
+					<Link
+						className="flex items-center gap-2"
+						target="_blank"
+						to={`${baseUrl}/invoices/${row.original?.id}/labels`}
+					>
+						<span className="">{row?.original?._count.items}</span>
+						<TagIcon size={16} />
+					</Link>
+				</Badge>
+			);
 		},
 	},
 
@@ -87,6 +114,7 @@ export const orderColumns: ColumnDef<Invoice>[] = [
 			return <div>{row.original?.agency?.name}</div>;
 		},
 	},
+
 	{
 		accessorKey: "service",
 		header: "Servicio",
@@ -142,10 +170,17 @@ export const orderColumns: ColumnDef<Invoice>[] = [
 			);
 		},
 	},
+	{
+		accessorKey: "status",
+		header: "Status",
+		cell: ({ row }) => {
+			return <Badge variant="secondary">{row.original?.status}</Badge>;
+		},
+	},
 
 	{
 		accessorKey: "payment_status",
-		header: "Payment Status",
+		header: "Payment",
 		cell: ({ row }) => {
 			return <Badge variant="outline">{row.original?.payment_status ? "Pending" : "Paid"}</Badge>;
 		},
@@ -156,18 +191,17 @@ export const orderColumns: ColumnDef<Invoice>[] = [
 		header: "Total",
 		cell: ({ row }) => {
 			return (
-				<div className="text-right w-14 ">
-					{parseFloat(row.original?.total.toString()).toFixed(2)}
+				<div className="text-right w-14  ">
+					{parseFloat(row.original?.total_amount.toString()).toFixed(2)}
 				</div>
 			);
 		},
 	},
 	{
-		accessorKey: "actions",
-		header: "",
+		header: "Actions",
 		cell: ({ row }) => {
 			return (
-				<div className="flex justify-end w-6 ">
+				<div className="flex justify-center max-w-6  ">
 					<DropdownMenu>
 						<DropdownMenuTrigger asChild>
 							<Button variant="ghost" size="icon">
@@ -181,10 +215,12 @@ export const orderColumns: ColumnDef<Invoice>[] = [
 									Print
 								</DropdownMenuItem>
 							</Link>
-							<DropdownMenuItem>
-								<Pencil className="w-4 h-4" />
-								Editar
-							</DropdownMenuItem>
+							<Link to={`/orders/${row.original.id}/edit`}>
+								<DropdownMenuItem>
+									<Pencil className="w-4 h-4" />
+									Editar
+								</DropdownMenuItem>
+							</Link>
 							<DropdownMenuItem>
 								<Trash className="w-4 h-4" />
 								Eliminar

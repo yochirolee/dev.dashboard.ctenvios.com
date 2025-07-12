@@ -24,7 +24,9 @@ const CustomsFeeCombobox = React.memo(function CustomsFeeCombobox({
 	form: any;
 }) {
 	const [open, setOpen] = React.useState(false);
-	const { data: customs, isLoading } = useCustoms.get();
+	const { data, isLoading } = useCustoms.get(0, 100);
+
+	console.log(data, "customs");
 
 	return (
 		<FormField
@@ -43,7 +45,7 @@ const CustomsFeeCombobox = React.memo(function CustomsFeeCombobox({
 						>
 							{isLoading ? (
 								<Skeleton className="w-full h-4" />
-							) : customs?.find((custom: Customs) => custom.name === field.value?.name)?.name ? (
+							) : data?.rows?.find((custom: Customs) => custom.name === field.value?.name)?.name ? (
 								field.value.name.length > 20 ? (
 									`${field.value.name.substring(0, 20)}...`
 								) : (
@@ -61,12 +63,13 @@ const CustomsFeeCombobox = React.memo(function CustomsFeeCombobox({
 							<CommandList>
 								<CommandEmpty>No se encontraron Aranceles.</CommandEmpty>
 								<CommandGroup>
-									{customs?.map((custom: Customs) => (
+									{data?.rows?.map((custom: Customs) => (
 										<CommandItem
 											key={custom?.id}
 											value={custom?.name}
 											onSelect={() => {
 												field.onChange(custom);
+												form.setValue(`items.${index}.customs_rate_id`, custom.id);
 												setOpen(false);
 											}}
 										>

@@ -1,7 +1,7 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { MoreVertical, Trash2, UserPlus } from "lucide-react";
+import { KeyRound, MoreVertical, Pencil, Trash2, UserPlus } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { useAgencies } from "@/hooks/use-agencies";
 import { Separator } from "@/components/ui/separator";
@@ -45,23 +45,23 @@ export default function AgencyUsers({ agencyId }: { agencyId: number }) {
 							<p className="text-sm text-muted-foreground">{user.email}</p>
 						</div>
 						<div className="ml-auto font-medium flex items-center gap-4">
-							<div>
-								{user.role === "ROOT" ? (
-									<Badge variant="outline">ROOT</Badge>
-								) : user.role === "ADMIN" ? (
-									<Badge variant="outline">ADMIN</Badge>
-								) : user.role === "USER" ? (
-									<Badge variant="outline">USER</Badge>
-								) : null}
-							</div>
+							<Badge variant="secondary">{user.role}</Badge>
 							<div>
 								<DropdownMenu>
 									<DropdownMenuTrigger asChild>
-										<Button variant="outline">
+										<Button variant="ghost">
 											<MoreVertical className="h-4 w-4" />
 										</Button>
 									</DropdownMenuTrigger>
-									<DropdownMenuContent>
+									<DropdownMenuContent align="end">
+										<DropdownMenuItem>
+											<Pencil className="h-4 w-4" />
+											Editar usuario
+										</DropdownMenuItem>
+										<DropdownMenuItem>
+											<KeyRound className="h-4 w-4" />
+											Reset Password
+										</DropdownMenuItem>
 										<DropdownMenuItem>
 											<Trash2 className="h-4 w-4" />
 											Eliminar usuario

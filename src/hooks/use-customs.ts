@@ -3,10 +3,10 @@ import api from "@/api/api";
 import type { Customs } from "@/data/types";
 
 export const useCustoms = {
-	get: () => {
+	get: (page: number, limit: number) => {
 		return useQuery({
-			queryKey: ["customs"],
-			queryFn: api.customs.get,
+			queryKey: ["customs", page, limit],
+			queryFn: () => api.customs.get(page, limit),
 			refetchOnWindowFocus: false,
 			staleTime: 1000 * 60 * 5,
 		});

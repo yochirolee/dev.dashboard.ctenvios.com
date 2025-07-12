@@ -12,11 +12,11 @@ import {
 	CommandList,
 } from "@/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { useGetReceipts } from "@/hooks/use-receipts";
+import { useReceipts } from "@/hooks/use-receipts";
 import type { Receipt } from "@/data/types";
 import { useDebounce } from "use-debounce";
 import { useInvoiceStore } from "@/stores/invoice-store";
-import { useShallow } from "zustand/react/shallow";	
+import { useShallow } from "zustand/react/shallow";
 
 export function RecipientCombobox() {
 	const [open, setOpen] = React.useState(false);
@@ -31,15 +31,18 @@ export function RecipientCombobox() {
 		})),
 	);
 
-	const {
-		data: receipts,
-		isLoading,
-		isError,
-	} = useGetReceipts(selectedCustomer?.id, debouncedSearchQuery);
+	const { data, isLoading, isError } = useReceipts.get(
+		selectedCustomer?.id,
+		debouncedSearchQuery,
+		0,
+		100,
+	);
 
 	if (isError) {
 		return <div>Error loading receipts</div>;
 	}
+
+	const receipts = data?.rows;
 
 	return (
 		<Popover open={open} onOpenChange={setOpen}>

@@ -22,7 +22,7 @@ import {
 import { useForm } from "react-hook-form";
 import { UserRoundPenIcon, UserRoundPlus } from "lucide-react";
 import { z } from "zod";
-import { useCreateCustomer, useUpdateCustomer } from "@/hooks/use-customers";
+import { useCustomers } from "@/hooks/use-customers";
 import { type Customer } from "@/data/types";
 import { toast } from "sonner";
 import { useInvoiceStore } from "@/stores/invoice-store";
@@ -95,7 +95,7 @@ export const CustomerFormDialog = React.memo(function CustomerFormDialog() {
 		}
 	}, [selectedCustomer, form]);
 
-	const { mutate: updateCustomer, isPending: isUpdating } = useUpdateCustomer({
+	const { mutate: updateCustomer, isPending: isUpdating } = useCustomers.update({
 		onSuccess: (data: Customer) => {
 			setIsOpen(false);
 			toast.success("Cliente actualizado correctamente");
@@ -105,7 +105,7 @@ export const CustomerFormDialog = React.memo(function CustomerFormDialog() {
 		},
 	});
 
-	const { mutate: createCustomer, isPending } = useCreateCustomer({
+	const { mutate: createCustomer, isPending } = useCustomers.create({
 		onSuccess: (data: Customer) => {
 			setIsOpen(false);
 			toast.success("Cliente creado correctamente");

@@ -24,9 +24,9 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { UserRoundPlus } from "lucide-react";
-import { useCreateReceipt } from "@/hooks/use-receipts";
+import { useReceipts } from "@/hooks/use-receipts";
 import { type Province, type City, type Receipt, receiptShema } from "@/data/types";
 import { isValidCubanCI } from "@/lib/utils";
 import { Separator } from "@/components/ui/separator";
@@ -83,7 +83,7 @@ export function ReceiptFormDialog({ expand = false }: { expand?: boolean }) {
 			?.cities;
 	}, [form.getValues().province_id, provinces]);
 
-	const { mutate: createReceipt, isPending } = useCreateReceipt(selectedCustomer?.id || 0, {
+	const { mutate: createReceipt, isPending } = useReceipts.create(selectedCustomer?.id || 0, {
 		onSuccess: (data: Receipt) => {
 			setIsOpen(false);
 			form.reset();
@@ -106,6 +106,10 @@ export function ReceiptFormDialog({ expand = false }: { expand?: boolean }) {
 	const onError = (errors: any) => {
 		console.log("Form validation errors:", errors);
 	};
+
+
+	
+
 
 	return (
 		<Dialog open={isOpen} onOpenChange={setIsOpen}>

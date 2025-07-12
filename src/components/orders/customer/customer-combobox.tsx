@@ -12,7 +12,7 @@ import {
 	CommandList,
 } from "@/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { useSearchCustomers } from "@/hooks/use-customers";
+import { useCustomers } from "@/hooks/use-customers";
 import { useDebounce } from "use-debounce";
 import type { Customer } from "@/data/types";
 
@@ -23,16 +23,15 @@ export const CustomerCombobox = React.memo(function CustomerCombobox() {
 	const [open, setOpen] = React.useState(false);
 	const [searchQuery, setSearchQuery] = React.useState("");
 	const [debouncedSearchQuery] = useDebounce(searchQuery, 500);
-	
 
-	const { data: customers, isLoading } = useSearchCustomers(debouncedSearchQuery);
+	const { data, isLoading } = useCustomers.search(debouncedSearchQuery, 0, 100);
 	const { selectedCustomer, setSelectedCustomer } = useInvoiceStore(
 		useShallow((state) => ({
 			selectedCustomer: state.selectedCustomer,
 			setSelectedCustomer: state.setSelectedCustomer,
 		})),
 	);
-	console.log("render customer combobox");
+	const customers = data?.rows;
 
 	// Memoize the customer selection handler
 
@@ -46,8 +45,6 @@ export const CustomerCombobox = React.memo(function CustomerCombobox() {
 		setSearchQuery("");
 		setOpen(false);
 	}, []);
-
-	console.log(selectedCustomer, "selectedCustomer");
 
 	return (
 		<Popover open={open} onOpenChange={setOpen}>
@@ -72,7 +69,6 @@ export const CustomerCombobox = React.memo(function CustomerCombobox() {
 						placeholder="Buscar cliente..."
 						onValueChange={handleSearchChange}
 						className="h-9"
-					
 					/>
 					<CommandList>
 						{isLoading ? (

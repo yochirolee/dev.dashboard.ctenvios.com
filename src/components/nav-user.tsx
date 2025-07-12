@@ -18,23 +18,25 @@ import {
 } from "@/components/ui/sidebar";
 import { authClient } from "@/lib/auth-client";
 import { useNavigate } from "react-router-dom";
+import { useAppStore } from "@/stores/app-store";
 
 export function NavUser() {
 	const { isMobile } = useSidebar();
-	const { data, isPending, error } = authClient.useSession();
+	const { session, clearSession } = useAppStore();
 	const navigate = useNavigate();
 
 	const handleLogout = async () => {
 		try {
 			const response = await authClient.signOut();
 			console.log(response, "response in handleLogout");
+			clearSession();
 			navigate("/login", { replace: true });
 		} catch (error) {
 			console.error("Logout error:", error);
 		}
 	};
 
-	if (isPending) {
+	if (!session) {
 		return (
 			<SidebarMenu>
 				<SidebarMenuItem>
@@ -51,7 +53,7 @@ export function NavUser() {
 		);
 	}
 
-	if (error || !data?.user) {
+	if (!session) {
 		return null;
 	}
 
@@ -65,14 +67,14 @@ export function NavUser() {
 							className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
 						>
 							<Avatar className="h-8 w-8 rounded-lg">
-								<AvatarImage src={data?.user?.image || ""} alt={data?.user?.name || ""} />
+								<AvatarImage src={session?.user?.image || ""} alt={session?.user?.name || ""} />
 								<AvatarFallback className="rounded-lg">
-									{data?.user?.name?.charAt(0)?.toUpperCase() || "U"}
+									{session?.user?.name?.charAt(0)?.toUpperCase() || "U"}
 								</AvatarFallback>
 							</Avatar>
 							<div className="grid flex-1 text-left text-sm leading-tight">
-								<span className="truncate font-medium">{data?.user?.name || "User"}</span>
-								<span className="truncate text-xs">{data?.user?.email || ""}</span>
+								<span className="truncate font-medium">{session?.user?.name || "User"}</span>
+								<span className="truncate text-xs">{session?.user?.email || ""}</span>
 							</div>
 							<ChevronsUpDown className="ml-auto size-4" />
 						</SidebarMenuButton>
@@ -86,22 +88,22 @@ export function NavUser() {
 						<DropdownMenuLabel className="p-0 font-normal">
 							<div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
 								<Avatar className="h-8 w-8 rounded-lg">
-									<AvatarImage src={data?.user?.image || ""} alt={data?.user?.name || ""} />
+									<AvatarImage src={session?.user?.image || ""} alt={session?.user?.name || ""} />
 									<AvatarFallback className="rounded-lg">
-										{data?.user?.name?.charAt(0)?.toUpperCase() || "U"}
+										{session?.user?.name?.charAt(0)?.toUpperCase() || "U"}
 									</AvatarFallback>
 								</Avatar>
 								<div className="grid flex-1 text-left text-sm leading-tight">
-									<span className="truncate font-medium">{data?.user?.name || "User"}</span>
-									<span className="truncate text-xs">{data?.user?.email || ""}</span>
+									<span className="truncate font-medium">{session?.user?.name || "User"}</span>
+									<span className="truncate text-xs">{session?.user?.email || ""}</span>
 								</div>
 							</div>
 						</DropdownMenuLabel>
 						<DropdownMenuSeparator />
 						<DropdownMenuGroup>
 							<DropdownMenuItem>
-								<Shield	 />
-								{data?.user?.role}
+								<Shield />
+								{session?.user?.role}
 							</DropdownMenuItem>
 						</DropdownMenuGroup>
 						<DropdownMenuSeparator />

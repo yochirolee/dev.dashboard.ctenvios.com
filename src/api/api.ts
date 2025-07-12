@@ -10,7 +10,6 @@ import type {
 	Invoice,
 } from "@/data/types";
 import type { User } from "better-auth/types";
-import { authClient } from "@/lib/auth-client";
 
 const config = {
 	baseURL: import.meta.env.VITE_API_URL || "http://localhost:3000/api/v1",
@@ -25,16 +24,14 @@ const config = {
 export const axiosInstance = axios.create(config);
 
 // Add request interceptor to include session token in headers
-axiosInstance.interceptors.request.use(
+/* axiosInstance.interceptors.request.use(
 	async (config) => {
 		try {
 			// Get the current session from BetterAuth
-			const session = await authClient.getSession();
-			console.log(session, "session in Api");
-
+			const token = localStorage.getItem("token");
 			// If we have a session, include the session token in the headers
-			if (session?.data?.session?.token) {
-				config.headers.Authorization = `Bearer ${session.data.session.token}`;
+			if (token) {
+				config.headers.Authorization = `Bearer ${token}`;
 			}
 		} catch (error) {
 			console.log(error, "error in Api");
@@ -47,7 +44,7 @@ axiosInstance.interceptors.request.use(
 	(error) => {
 		return Promise.reject(error);
 	},
-);
+); */
 
 // Add response interceptor for better error handling with React Query
 axiosInstance.interceptors.response.use(
@@ -56,6 +53,7 @@ axiosInstance.interceptors.response.use(
 	(error) => {
 		// Handle 401 Unauthorized responses
 		if (error.response?.status === 401) {
+			localStorage.removeItem("app-store");
 			window.location.href = "/login";
 		}
 
@@ -66,25 +64,30 @@ axiosInstance.interceptors.response.use(
 
 const api = {
 	customer: {
-		get: async (page: number | 1, limit: number | 50) => {
+		get: async (page: number | 0, limit: number | 50) => {
 			const response = await axiosInstance.get("/customers", {
 				params: {
-					page,
-					limit,
+					page: page + 1,
+					limit: limit,
 				},
 			});
 			return response.data;
 		},
-		getReceipts: async (customerId: string) => {
-			const response = await axiosInstance.get(`/customers/${customerId}/receipts`);
+		getReceipts: async (customerId: number, page: number | 0, limit: number | 50) => {
+			const response = await axiosInstance.get(`/customers/${customerId}/receipts`, {
+				params: {
+					page: page + 1,
+					limit: limit,
+				},
+			});
 			return response.data;
 		},
-		search: async (query: string, page: number | 1, limit: number | 50) => {
+		search: async (query: string, page: number | 0, limit: number | 50) => {
 			if (query === "" || query === undefined) {
 				const response = await axiosInstance.get("/customers", {
 					params: {
-						page,
-						limit,
+						page: page + 1,
+						limit: limit,
 					},
 				});
 				return response.data;
@@ -92,8 +95,8 @@ const api = {
 			const response = await axiosInstance.get("/customers/search", {
 				params: {
 					query,
-					page,
-					limit,
+					page: page + 1,
+					limit: limit,
 				},
 			});
 			return response.data;
@@ -114,7 +117,7 @@ const api = {
 		},
 	},
 	receipts: {
-		get: async (page: number | 1, limit: number | 50) => {
+		get: async (page: number | 0, limit: number | 50) => {
 			const response = await axiosInstance.get("/receipts", {
 				params: {
 					page,
@@ -123,13 +126,12 @@ const api = {
 			});
 			return response.data;
 		},
-		search: async (query: string, page: number | 1, limit: number | 50) => {
+		search: async (query: string, page: number | 0, limit: number | 50) => {
 			if (query === "" || query === undefined) {
-				console.log("query is empty");
 				const response = await axiosInstance.get("/receipts", {
 					params: {
-						page,
-						limit,
+						page: page + 1,
+						limit: limit,
 					},
 				});
 				return response.data;
@@ -137,8 +139,8 @@ const api = {
 			const response = await axiosInstance.get("/receipts/search", {
 				params: {
 					query,
-					page,
-					limit,
+					page: page + 1,
+					limit: limit,
 				},
 			});
 			return response.data;
@@ -156,15 +158,15 @@ const api = {
 		get: async (page: number | 1, limit: number | 25) => {
 			const response = await axiosInstance.get("/invoices", {
 				params: {
-					page,
-					limit,
+					page: page + 1,
+					limit: limit,
 				},
 			});
 			return response.data;
 		},
 		getByAgencyId: async (agency_id: number, page: number | 1, limit: number | 25) => {
 			const response = await axiosInstance.get(`/invoices/agency/${agency_id}`, {
-				params: { page, limit },
+				params: { page: page + 1, limit: limit },
 			});
 			return response.data;
 		},
@@ -172,8 +174,8 @@ const api = {
 			const response = await axiosInstance.get("/invoices/search", {
 				params: {
 					search,
-					page,
-					limit,
+					page: page + 1,
+					limit: limit	,
 				},
 			});
 			return response.data;
@@ -188,8 +190,13 @@ const api = {
 		},
 	},
 	users: {
-		get: async () => {
-			const response = await axiosInstance.get("/users");
+		get: async (page: number | 1, limit: number | 25) => {
+			const response = await axiosInstance.get("/users", {
+				params: {
+					page: page + 1,
+					limit: limit,
+				},
+			});
 			return response.data;
 		},
 		create: async (data: User) => {
@@ -243,11 +250,15 @@ const api = {
 			const response = await axiosInstance.get(`/agencies/${id}/services`);
 			return response.data;
 		},
-		
 	},
 	customs: {
-		get: async () => {
-			const response = await axiosInstance.get("/customs-rates");
+		get: async (page: number | 1, limit: number | 25) => {
+			const response = await axiosInstance.get("/customs-rates", {
+				params: {
+					page: page + 1,
+					limit: limit,
+				},
+			});
 			return response.data;
 		},
 		create: async (data: Customs) => {
@@ -281,6 +292,10 @@ const api = {
 		},
 		getByAgencyId: async (agency_id: number) => {
 			const response = await axiosInstance.get(`/rates/agency/${agency_id}`);
+			return response.data;
+		},
+		delete: async (id: number) => {
+			const response = await axiosInstance.delete(`/rates/${id}`);
 			return response.data;
 		},
 	},

@@ -47,8 +47,9 @@ export const columns: ColumnDef<Customer>[] = [
 						</AvatarFallback>
 					</Avatar>
 					<div>
-						{row?.original?.first_name} {row?.original?.middle_name}
-						{row?.original?.last_name} {row?.original?.second_last_name}
+						{`${row?.original?.first_name} ${row?.original?.middle_name || ""} ${
+							row?.original?.last_name
+						} ${row?.original?.second_last_name || ""}`}
 					</div>
 				</div>
 			);

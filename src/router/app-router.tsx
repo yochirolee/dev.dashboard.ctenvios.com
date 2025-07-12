@@ -18,7 +18,7 @@ import { UserPage } from "@/pages/settings/user-page";
 import InvoiceDetailsPage from "@/pages/orders/invoice-details-page";
 import { CustomsPage } from "@/pages/settings/customs-page";
 import ProvidersServicesPage from "@/pages/settings/providers-services-page";
-import { NewInvoicePage } from "@/pages/invoices/new_invoice_page";
+import { EditOrderPage } from "@/pages/orders/edit-order-page";
 
 export const AppRouter = () => {
 	return (
@@ -33,7 +33,7 @@ export const AppRouter = () => {
 					<Route path="about" element={<About />} />
 					<Route path="orders" element={<InvoicesPage />} />
 					<Route path="orders/new" element={<NewOrderPage />} />
-					<Route path="invoices/new" element={<NewInvoicePage />} />
+					<Route path="orders/:invoiceId/edit" element={<EditOrderPage />} />
 					<Route path="orders/:invoiceId" element={<InvoiceDetailsPage />} />
 					<Route path="settings">
 						<Route path="providers" element={<ProvidersServicesPage />} />

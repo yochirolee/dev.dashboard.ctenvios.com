@@ -8,7 +8,7 @@ import { Button } from "../ui/button";
 import { Loader2, X } from "lucide-react";
 import { useRates } from "@/hooks/use-rates";
 import type { Rate } from "@/data/types";
-import { toast } from "sonner";
+import { useAppStore } from "@/stores/app-store";
 
 const agenciesRatesSchema = z
 	.object({
@@ -55,20 +55,18 @@ export const AgenciesRatesForm = ({
 						public_rate: rate.public_rate,
 				  },
 	});
-	console.log(rate, "rate");
 	const { mutate: updateRate, isPending: isUpdating } = useRates.update();
 	const { mutate: createRate, isPending: isCreating } = useRates.create();
 	const isPending = isUpdating || isCreating;
 	const onSubmit = (data: AgenciesRatesSchema) => {
-		console.log(data, "data");
 		mode === "update"
 			? updateRate({ id: rate.id, data: data as unknown as Rate })
 			: createRate(data as unknown as Rate);
-		toast.success("Tarifa actualizada correctamente");
 		form.reset();
 		setOpen(false);
 	};
-	console.log(form.formState.errors, "errors");
+
+	const { session } = useAppStore();
 
 	return (
 		<Form {...form}>
@@ -93,6 +91,9 @@ export const AgenciesRatesForm = ({
 							<FormLabel>Precio Agencia</FormLabel>
 							<FormControl>
 								<Input
+									disabled={
+										session?.user?.role !== "ROOT" && session?.user?.role !== "ADMINISTRATOR"
+									}
 									type="number"
 									{...field}
 									onChange={(e) => {

@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "../ui/form";
 import { Input } from "@/components/ui/input";
-import { Link, useNavigate, useLocation } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Loader2 } from "lucide-react";
 import { Separator } from "../ui/separator";
 import { authClient } from "@/lib/auth-client";
@@ -12,16 +12,24 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect } from "react";
+import { useAppStore } from "@/stores/app-store";
 
 const useLoginMutation = () => {
+	const navigate = useNavigate();
 	return useMutation({
 		mutationFn: async ({ email, password }: { email: string; password: string }) => {
 			const result = await authClient.signIn.email({ email, password });
-			console.log(result);
 			if (result.error) {
 				throw new Error(result.error.message || "Login failed");
 			}
+
 			return result;
+		},
+		onSuccess: () => {
+			navigate("/", { replace: true });
+		},
+		onError: (error) => {
+			console.error(error);
 		},
 	});
 };
@@ -33,16 +41,8 @@ const formSchema = z.object({
 
 export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRef<"div">) {
 	const { mutate: login, isPending, isError } = useLoginMutation();
-	const { data: session } = authClient.useSession();
+	const { session } = useAppStore();
 	const navigate = useNavigate();
-
-	// Redirect if already logged in
-	useEffect(() => {
-		if (session?.user) {
-			navigate("/", { replace: true });
-		}
-	}, [session, navigate]);
-
 	const form = useForm<z.infer<typeof formSchema>>({
 		resolver: zodResolver(formSchema),
 		defaultValues: {
@@ -50,9 +50,16 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
 			password: "",
 		},
 	});
+	//if user is already logged in, redirect to home
+	useEffect(() => {
+		if (session?.user) {
+			navigate("/", { replace: true });
+		}
+	}, [session]);
 
 	const handleSubmit = async (values: z.infer<typeof formSchema>) => {
 		login(values);
+		
 	};
 
 	return (

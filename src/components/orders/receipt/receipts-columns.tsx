@@ -38,8 +38,8 @@ export const receiptsColumns: ColumnDef<Receipt>[] = [
 							{row.original.last_name.charAt(0)}
 						</AvatarFallback>
 					</Avatar>
-					{row.original.first_name} {row.original.middle_name} {row.original.middle_name}
-					{row.original.last_name} {row.original.second_last_name}
+					{row.original.first_name} {row.original.middle_name || ""}
+					{row.original.last_name} {row.original.second_last_name || ""}
 				</div>
 			);
 		},

@@ -1,16 +1,25 @@
-import React from "react";
+import React, { useState } from "react";
 import { columns } from "@/components/orders/customer/columns";
 import { DataTable } from "@/components/ui/data-table";
-import { useSearchCustomers } from "@/hooks/use-customers";
+import { useCustomers } from "@/hooks/use-customers";
 import { useDebounce } from "use-debounce";
 import { Input } from "@/components/ui/input";
 import { Loader2, Search } from "lucide-react";
 import { CustomerFormDialog } from "@/components/orders/customer/customer-form-dialog";
+import type { PaginationState } from "@tanstack/react-table";
 
 export const CustomersPage = () => {
 	const [searchQuery, setSearchQuery] = React.useState("");
 	const [debouncedSearchQuery] = useDebounce(searchQuery, 500);
-	const { data: customers, isLoading } = useSearchCustomers(debouncedSearchQuery);
+	const [pagination, setPagination] = useState<PaginationState>({
+		pageIndex: 0,
+		pageSize: 25,
+	});
+	const { data, isLoading } = useCustomers.search(
+		debouncedSearchQuery,
+		pagination.pageIndex,
+		pagination.pageSize,
+	);
 
 	return (
 		<div className="flex flex-col gap-4 ">
@@ -23,7 +32,13 @@ export const CustomersPage = () => {
 				<Input type="search" className="pl-10" onChange={(e) => setSearchQuery(e.target.value)} />
 				<CustomerFormDialog />
 			</div>
-			{customers && <DataTable columns={columns} data={customers} />}
+			<DataTable
+				pagination={pagination}
+				setPagination={setPagination}
+				columns={columns}
+				data={data}
+				isLoading={isLoading}
+			/>
 		</div>
 	);
 };

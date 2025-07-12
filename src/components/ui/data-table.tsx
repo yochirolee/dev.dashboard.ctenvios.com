@@ -3,6 +3,7 @@ import {
 	flexRender,
 	getCoreRowModel,
 	getPaginationRowModel,
+	type PaginationState,
 	useReactTable,
 } from "@tanstack/react-table";
 
@@ -15,18 +16,43 @@ import {
 	TableRow,
 } from "@/components/ui/table";
 import { DataTablePagination } from "@/components/ui/data-table-pagination";
+import { TableRowSkeleton } from "@/components/ui/table-row-skeleton";
+
 interface DataTableProps<TData, TValue> {
 	columns: ColumnDef<TData, TValue>[];
-	data: TData[];
+	data: { rows: TData[]; total: number };
+	pagination: PaginationState;
+	setPagination: (pagination: PaginationState) => void;
+	isLoading?: boolean;
 }
 
-export function DataTable<TData, TValue>({ columns, data }: DataTableProps<TData, TValue>) {
+export function DataTable<TData, TValue>({
+	columns,
+	data,
+	pagination,
+
+	setPagination,
+	isLoading = false,
+}: DataTableProps<TData, TValue>) {
 	const table = useReactTable({
-		data,
+		data: data?.rows ?? [],
 		columns,
+		rowCount: data?.total ?? 0, // new in v8.13.0 - alternatively, just pass in `pageCount` directly
+		state: {
+			pagination,
+		},
+		onPaginationChange: (updaterOrValue) => {
+			if (typeof updaterOrValue === "function") {
+				setPagination(updaterOrValue(pagination));
+			} else {
+				setPagination(updaterOrValue);
+			}
+		},
+
 		getCoreRowModel: getCoreRowModel(),
-		getPaginationRowModel: getPaginationRowModel(),
-		manualPagination: true,
+		manualPagination: true, //we're doing manual "server-side" pagination
+		// getPaginationRowModel: getPaginationRowModel(), // If only doing manual pagination, you don't need this
+		debugTable: true,
 	});
 
 	return (
@@ -49,7 +75,9 @@ export function DataTable<TData, TValue>({ columns, data }: DataTableProps<TData
 						))}
 					</TableHeader>
 					<TableBody>
-						{table.getRowModel().rows?.length ? (
+						{isLoading ? (
+							<TableRowSkeleton rowCount={pagination.pageSize} />
+						) : table.getRowModel().rows?.length ? (
 							table.getRowModel().rows.map((row) => (
 								<TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
 									{row.getVisibleCells().map((cell) => (

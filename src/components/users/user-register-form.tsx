@@ -39,13 +39,14 @@ const FormSchema = z.object({
 	password: z.string().min(8),
 	role: z.string(),
 	name: z.string().min(8),
-	agency_id: z.number(),
+	agency_id: z.number().optional(),
 });
 
 type FormValues = z.infer<typeof FormSchema>;
 
 export function UserRegisterForm() {
 	const [open, setOpen] = useState(false);
+	const [selectedAgencyId, setSelectedAgencyId] = useState<number>(1);
 
 	const { data: user } = authClient.useSession();
 
@@ -56,12 +57,13 @@ export function UserRegisterForm() {
 			password: "",
 			role: undefined,
 			name: "",
-			agency_id: undefined,
+			agency_id: 1,
 		},
 	});
 
 	const registerUser = useRegister();
 	const onSubmit = async (data: z.infer<typeof FormSchema>) => {
+		data.agency_id = selectedAgencyId;
 		console.log(data, "data in onSubmit");
 		registerUser.mutate(data, {
 			onSuccess: () => {
@@ -146,7 +148,12 @@ export function UserRegisterForm() {
 						<FormField
 							control={form.control}
 							name="agency_id"
-							render={({ field }) => <AgenciesCombobox field={field} />}
+							render={() => (
+								<AgenciesCombobox
+									selectedAgencyId={selectedAgencyId}
+									setSelectedAgencyId={setSelectedAgencyId}
+								/>
+							)}
 						/>
 
 						<div className="flex flex-col w-full gap-2">

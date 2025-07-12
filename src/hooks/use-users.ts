@@ -12,10 +12,10 @@ interface RegisterUserData {
 	role: string;
 }
 
-export const useGetUsers = () => {
+export const useGetUsers = (page: number | 1, limit: number | 25) => {
 	return useQuery({
-		queryKey: ["getUsers"],
-		queryFn: api.users.get,
+		queryKey: ["getUsers", page, limit],
+		queryFn: () => api.users.get(page, limit),
 	});
 };
 

@@ -1,18 +1,29 @@
-import { useGetInvoices, useSearchInvoices } from "@/hooks/use-invoices";
-import { FilePlus2, Printer } from "lucide-react";
+import { useSearchInvoices } from "@/hooks/use-invoices";
+import { FilePlus2, Loader2, Printer, Search } from "lucide-react";
 import { useState } from "react";
 import { DataTable } from "@/components/ui/data-table";
 import { Badge } from "@/components/ui/badge";
 import { orderColumns } from "@/components/orders/order/order-columns";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { SearchInvoiceForm } from "@/components/orders/order/search-invoice-form";
 import type { PaginationState } from "@tanstack/react-table";
+import { useDebounce } from "use-debounce";
+import { Input } from "@/components/ui/input";
+
 export default function InvoicesPage() {
 	const navigate = useNavigate();
 	const [searchQuery, setSearchQuery] = useState("");
-	const [pagination, setPagination] = useState<PaginationState>({ pageIndex: 0, pageSize: 40 });
-	const { data: invoices, isLoading } = useGetInvoices(pagination);
+	const [debouncedSearchQuery] = useDebounce(searchQuery, 500);
+	const [pagination, setPagination] = useState<PaginationState>({
+		pageIndex: 0,
+		pageSize: 20,
+	});
+
+	const { data, isLoading, isFetching } = useSearchInvoices(
+		debouncedSearchQuery,
+		pagination.pageIndex,
+		pagination.pageSize,
+	);
 
 	return (
 		<div className="space-y-4 ">
@@ -37,10 +48,21 @@ export default function InvoicesPage() {
 			</div>
 
 			<div className="flex flex-col gap-4">
-				<div className="flex items-center justify-between">
-					<SearchInvoiceForm setSearchQuery={setSearchQuery} isLoading={isLoading} />
+				<div className="flex items-center space-x-2 w-sm relative justify-start">
+					{isLoading ? (
+						<Loader2 className="w-4 h-4 animate-spin absolute left-4" />
+					) : (
+						<Search className="w-4 h-4 absolute left-4" />
+					)}
+					<Input type="search" className="pl-10" onChange={(e) => setSearchQuery(e.target.value)} />
 				</div>
-				<DataTable columns={orderColumns} data={invoices || []} />
+				<DataTable
+					columns={orderColumns}
+					data={data}
+					pagination={pagination}
+					setPagination={setPagination}
+					isLoading={isLoading || isFetching}
+				/>
 			</div>
 		</div>
 	);

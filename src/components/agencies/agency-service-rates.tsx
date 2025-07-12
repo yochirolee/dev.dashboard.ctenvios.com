@@ -7,6 +7,7 @@ import { Skeleton } from "../ui/skeleton";
 import { AgenciesRatesForm } from "./agencies-rates-form";
 import { ShareDialog } from "../shares/share-dialog";
 import { useState } from "react";
+import { Table, TableBody, TableHead, TableHeader, TableRow } from "../ui/table";
 
 export default function AgencyServiceRates({ agencyId }: { agencyId: number }) {
 	const { data: services, isLoading } = useAgencies.getServices(agencyId);
@@ -66,11 +67,24 @@ export default function AgencyServiceRates({ agencyId }: { agencyId: number }) {
 								/>
 							</ShareDialog>
 						</div>
-						<div>
-							{service?.rates?.map((rate: any) => (
-								<AgencyRates key={rate.id} rate={rate} />
-							))}
-						</div>
+						{service?.rates?.length > 0 && (
+							<Table>
+								<TableHeader>
+									<TableRow>
+										<TableHead>Nombre</TableHead>
+										<TableHead>Costo Agencia</TableHead>
+										<TableHead>Venta al Público</TableHead>
+										<TableHead>Profit</TableHead>
+										<TableHead className="w-10 text-right"></TableHead>
+									</TableRow>
+								</TableHeader>
+								<TableBody>
+									{service?.rates?.map((rate: any) => (
+										<AgencyRates key={rate.id} rate={rate} />
+									))}
+								</TableBody>
+							</Table>
+						)}
 					</div>
 				))}
 			</CardContent>

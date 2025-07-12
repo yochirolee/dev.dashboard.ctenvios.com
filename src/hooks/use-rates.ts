@@ -2,6 +2,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { useQueryClient } from "@tanstack/react-query";
 import type { Rate } from "@/data/types";
 import api from "@/api/api";
+import { toast } from "sonner";
 
 export const useRates = {
 	create: () => {
@@ -12,6 +13,7 @@ export const useRates = {
 			},
 			onSuccess: () => {
 				queryClient.invalidateQueries({ queryKey: ["get-services"] });
+				toast.success("Tarifa creada correctamente");
 			},
 		});
 	},
@@ -24,6 +26,7 @@ export const useRates = {
 			},
 			onSuccess: () => {
 				queryClient.invalidateQueries({ queryKey: ["get-services"] });
+				toast.success("Tarifa actualizada correctamente");
 			},
 		});
 	},
@@ -32,6 +35,24 @@ export const useRates = {
 			queryKey: ["get-rates-by-agency-id", agency_id],
 			queryFn: () => api.rates.getByAgencyId(agency_id),
 			enabled: !!agency_id,
+		});
+	},
+	delete: () => {
+		const queryClient = useQueryClient();
+
+		return useMutation({
+			mutationFn: (id: number) => {
+				console.log("delete rate", id);
+				return api.rates.delete(id);
+			},
+			onSuccess: () => {
+				queryClient.invalidateQueries({ queryKey: ["get-services"] });
+				queryClient.invalidateQueries({ queryKey: ["get-rates-by-agency-id"] });
+				toast.success("Tarifa eliminada correctamente");
+			},
+			onError: (error) => {
+				toast.error(error.message);
+			},
 		});
 	},
 };

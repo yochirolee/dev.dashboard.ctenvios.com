@@ -4,9 +4,15 @@ import { Input } from "@/components/ui/input";
 import { customsColumns } from "@/components/customs/customs-columns";
 import { useCustoms } from "@/hooks/use-customs";
 import { NewCustomsForm } from "@/components/customs/new-customs-form";
+import { useState } from "react";
+import type { PaginationState } from "@tanstack/react-table";
 
 export const CustomsPage = () => {
-	const { data: customs, isLoading } = useCustoms.get();
+	const [pagination, setPagination] = useState<PaginationState>({
+		pageIndex: 0,
+		pageSize: 25,
+	});
+	const { data, isLoading } = useCustoms.get(pagination);
 
 	return (
 		<div className="flex flex-col gap-4">
@@ -27,7 +33,14 @@ export const CustomsPage = () => {
 					</div>
 					<NewCustomsForm />
 				</div>
-				{customs && <DataTable columns={customsColumns()} data={customs} />}
+
+				<DataTable
+					columns={customsColumns()}
+					data={data}
+					pagination={pagination}
+					setPagination={setPagination}
+					isLoading={isLoading}
+				/>
 			</div>
 		</div>
 	);

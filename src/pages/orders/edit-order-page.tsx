@@ -7,23 +7,34 @@ import { ReceiptInformation } from "@/components/orders/receipt/receipt-informat
 import { ReceiptFormDialog } from "@/components/orders/receipt/receipt-form-dialog";
 import { CustomerFormDialog } from "@/components/orders/customer/customer-form-dialog";
 import { TestFieldArray } from "@/components/orders/test-field-array";
+import { useParams } from "react-router-dom";
+import { useGetInvoiceById } from "@/hooks/use-invoices";
 import { useInvoiceStore } from "@/stores/invoice-store";
 import { useEffect } from "react";
 
-export function NewOrderPage() {
-	const { setSelectedCustomer, setSelectedRate, setSelectedService, setSelectedReceipt } =
-		useInvoiceStore();
+export function EditOrderPage() {
+	const params = useParams();
+	const orderId = Number(params.invoiceId);
+	console.log(orderId);
+	const { data, isLoading } = useGetInvoiceById(orderId);
+	const invoice = data?.rows[0];
+	const { setSelectedCustomer, setSelectedRate, setSelectedService, setSelectedReceipt } = useInvoiceStore();
+
 	useEffect(() => {
-		setSelectedCustomer(null);
-		setSelectedRate(null);
-		setSelectedService(null);
-		setSelectedReceipt(null as any);
-	}, []);
+		setSelectedCustomer(invoice?.customer);
+		setSelectedService(invoice?.service);
+		setSelectedRate(invoice?.service?.rate);
+		setSelectedReceipt(invoice?.receipt);
+	}, [orderId, data]);
+
+	if (isLoading) return <div>Loading...</div>;
+	console.log(invoice);
+
 	return (
 		<div className="space-y-4 ">
 			<div className="flex flex-col">
-				<h3 className=" font-bold">Crear Orden</h3>
-				<p className="text-sm text-gray-500 ">Orden de Envio, Destinatario, Servicio</p>
+				<h3 className=" font-bold">Editar Orden</h3>
+				<p className="text-sm text-gray-500 ">Editar la Orden de Envio, Destinatario, Servicio</p>
 			</div>
 			<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 				<Card>

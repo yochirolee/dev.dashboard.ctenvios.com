@@ -12,7 +12,12 @@ export const AgencyDetails = ({ agencyId }: { agencyId: number }) => {
 		<Card>
 			<CardContent>
 				<div className="flex flex-col lg:flex-row items-center gap-4">
-					<div className=" bg-muted min-h-24 min-w-24 object-cover rounded-full"></div>
+					{agency?.logo ? (
+						<img src={agency?.logo} alt={agency?.name} className="w-20 h-20  object-center object-scale-down rounded-full border  " />
+					) : (
+						<div className=" bg-muted min-h-20 min-w-20 object-cover rounded-full border"></div>
+					)}
+
 					<div className="flex flex-col gap-2 w-full">
 						<h1 className="text-2xl font-bold">{agency?.name}</h1>
 						<p className="text-sm text-muted-foreground">{agency?.address}</p>

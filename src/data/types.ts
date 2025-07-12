@@ -70,6 +70,7 @@ export const itemsSchema = z.object({
 	weight: z.number().min(0).optional(),
 	fee: z.number().min(0),
 	rate: z.number().min(0),
+	subtotal: z.number().min(0),
 });
 export const invoiceSchema = z.object({
 	id: z.number().optional(),
@@ -78,7 +79,10 @@ export const invoiceSchema = z.object({
 	agency_id: z.number().min(0),
 	user_id: z.string().min(0),
 	service_id: z.number().min(0),
-	items: z.array(itemsSchema),
+	items: z.array(itemsSchema).min(1, "La factura debe tener al menos 1 item"),
+	total_amount: z.number().min(0),
+	total_weight: z.number().min(0),
+	payment_status: z.boolean().default(false),
 });
 
 export const customsSchema = z.object({

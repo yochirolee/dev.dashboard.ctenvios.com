@@ -5,9 +5,15 @@ import { userColumns } from "@/components/users/users-columns";
 import { useGetUsers } from "@/hooks/use-users";
 import { toast } from "sonner";
 import { UserRegisterForm } from "@/components/users/user-register-form";
+import { useState } from "react";
+import type { PaginationState } from "@tanstack/react-table";
 
 export const UserPage = () => {
-	const { data: users, isLoading } = useGetUsers();
+	const [pagination, setPagination] = useState<PaginationState>({
+		pageIndex: 0,
+		pageSize: 25,
+	});
+	const { data: users, isLoading } = useGetUsers(pagination.pageIndex, pagination.pageSize);
 	const handleDeleteUser = (id: string) => {
 		toast.success("User deleted successfully");
 	};
@@ -31,7 +37,14 @@ export const UserPage = () => {
 					</div>
 					<UserRegisterForm />
 				</div>
-				{users && <DataTable columns={userColumns(handleDeleteUser)} data={users} />}
+
+				<DataTable
+					pagination={pagination}
+					setPagination={setPagination}
+					columns={userColumns(handleDeleteUser)}
+					data={users}
+					isLoading={isLoading}
+				/>
 			</div>
 		</div>
 	);
