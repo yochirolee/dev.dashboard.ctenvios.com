@@ -8,7 +8,7 @@ interface ImportMeta {
 	readonly env: ImportMetaEnv;
 }
 
-// Extend better-auth types
+/* // Extend better-auth types
 declare module "better-auth/react" {
 	interface AuthClient {
 		signUp: {
@@ -24,4 +24,4 @@ declare module "better-auth/react" {
 			}) => Promise<any>;
 		};
 	}
-}
+} */
