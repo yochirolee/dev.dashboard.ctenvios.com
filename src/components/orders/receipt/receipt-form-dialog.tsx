@@ -24,7 +24,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm, useWatch } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { UserRoundPlus } from "lucide-react";
 import { useReceipts } from "@/hooks/use-receipts";
 import { type Province, type City, type Receipt, receiptShema } from "@/data/types";
@@ -76,8 +76,7 @@ export function ReceiptFormDialog({ expand = false }: { expand?: boolean }) {
 			passport: undefined,
 		},
 	});
-	console.log("re Render at ReceiptFormDialog");
-
+	
 	const cities = useMemo(() => {
 		return provinces?.find((province: Province) => province.id === form.getValues().province_id)
 			?.cities;
@@ -106,10 +105,6 @@ export function ReceiptFormDialog({ expand = false }: { expand?: boolean }) {
 	const onError = (errors: any) => {
 		console.log("Form validation errors:", errors);
 	};
-
-
-	
-
 
 	return (
 		<Dialog open={isOpen} onOpenChange={setIsOpen}>
@@ -189,7 +184,7 @@ export function ReceiptFormDialog({ expand = false }: { expand?: boolean }) {
 										<FormItem>
 											<FormLabel>Correo Electrónico</FormLabel>
 											<FormControl>
-												<Input 	{...field} />
+												<Input {...field} value={field.value || ""} />
 											</FormControl>
 											<FormMessage />
 										</FormItem>
@@ -205,7 +200,7 @@ export function ReceiptFormDialog({ expand = false }: { expand?: boolean }) {
 											<FormItem>
 												<FormLabel>Nombre</FormLabel>
 												<FormControl>
-													<Input  {...field} />
+													<Input {...field} />
 												</FormControl>
 												<FormMessage />
 											</FormItem>
@@ -219,7 +214,7 @@ export function ReceiptFormDialog({ expand = false }: { expand?: boolean }) {
 											<FormItem>
 												<FormLabel>Segundo Nombre (Opcional)</FormLabel>
 												<FormControl>
-													<Input  {...field} />
+													<Input {...field} />
 												</FormControl>
 												<FormMessage />
 											</FormItem>
@@ -234,7 +229,7 @@ export function ReceiptFormDialog({ expand = false }: { expand?: boolean }) {
 											<FormItem>
 												<FormLabel>Apellido</FormLabel>
 												<FormControl>
-													<Input  {...field} />
+													<Input {...field} />
 												</FormControl>
 												<FormMessage />
 											</FormItem>
@@ -248,7 +243,7 @@ export function ReceiptFormDialog({ expand = false }: { expand?: boolean }) {
 											<FormItem>
 												<FormLabel>2 Apellido</FormLabel>
 												<FormControl>
-													<Input  {...field} />
+													<Input {...field} />
 												</FormControl>
 												<FormMessage />
 											</FormItem>

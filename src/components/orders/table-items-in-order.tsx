@@ -1,4 +1,4 @@
-import React, { useCallback, useDeferredValue, useEffect } from "react";
+import React, { useCallback, useEffect } from "react";
 import { Table, TableCell, TableRow } from "@/components/ui/table";
 import { TableCaption, TableHead, TableHeader } from "@/components/ui/table";
 import { TableBody } from "@/components/ui/table";

@@ -48,7 +48,7 @@ export const customsColumns = (): ColumnDef<Customs>[] => [
 	{
 		accessorKey: "actions",
 		header: "Actions",
-		cell: ({ row }) => (
+		cell: () => (
 			<Button asChild size="icon" variant="ghost">
 				<DropdownMenu>
 					<DropdownMenuTrigger asChild>

@@ -1,7 +1,6 @@
 import { Navigate, Route, Routes } from "react-router-dom";
 import LoginPage from "@/pages/login-page";
 import { DashboardLayout } from "@/layout/dashboard-layout";
-import RegisterPage from "@/pages/register-page";
 import { DashboardBarChart } from "@/components/charts/bar-chart";
 import { DashboardAreaChart } from "@/components/charts/area-chart";
 import { DashboardPieChart } from "@/components/charts/pie-chart";
@@ -24,7 +23,6 @@ export const AppRouter = () => {
 	return (
 		<Routes>
 			<Route path="/login" element={<LoginPage />} />
-			<Route path="/register" element={<RegisterPage />} />
 			{/* Protected routes */}
 			<Route element={<ProtectedRoute />}>
 				<Route path="/" element={<DashboardLayout />}>

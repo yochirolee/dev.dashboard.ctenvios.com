@@ -2,14 +2,10 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { TableCell, TableRow } from "@/components/ui/table";
 
 interface TableRowSkeletonProps {
-	columnCount?: number;
 	rowCount?: number;
 }
 
-export function TableRowSkeleton({
-	columnCount = 10,
-	rowCount = 5,
-}: TableRowSkeletonProps): JSX.Element {
+export function TableRowSkeleton({ rowCount = 5 }: TableRowSkeletonProps) {
 	return (
 		<>
 			{Array.from({ length: rowCount }, (_, rowIndex) => (

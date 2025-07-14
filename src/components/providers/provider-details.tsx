@@ -1,4 +1,4 @@
-import { Card, CardContent, CardFooter, CardTitle, CardHeader } from "../ui/card";
+import { Card, CardContent, CardTitle, CardHeader } from "../ui/card";
 import { Button } from "../ui/button";
 import { Separator } from "../ui/separator";
 import { Switch } from "../ui/switch";
@@ -55,7 +55,7 @@ export const ProviderDetails = ({ providerId }: { providerId: number }) => {
 						expanded={true}
 						title="Agregar Servicio"
 						description={`Agrega un nuevo servicio para  ${provider?.name}`}
-						action="Agregar"
+						mode="create"
 						children={<NewServiceForm setOpen={setOpen} provider={provider} />}
 					/>
 				</CardHeader>

@@ -93,7 +93,7 @@ export const customsSchema = z.object({
 	chapter: z.string().optional(),
 	fee_type: z.enum(["UNIT", "WEIGHT", "VALUE"]).default("UNIT"),
 	fee: z.number().min(0, "El fee es requerido"),
-	max_quantity: z.number().optional(),
+	max_quantity: z.number().optional().default(0),
 });
 export const agencySchema = z.object({
 	id: z.number().optional(),

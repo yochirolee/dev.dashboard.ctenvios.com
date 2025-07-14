@@ -25,33 +25,43 @@ import {
 import { useState } from "react";
 import { PlusCircle } from "lucide-react";
 import { useCustoms } from "@/hooks/use-customs";
-import { customsSchema } from "@/data/types";
+import type { Customs } from "@/data/types";
 
 const CUSTOMS_FEE_TYPES = ["UNIT", "WEIGHT", "VALUE"] as const;
 
-type FormValues = z.infer<typeof customsSchema>;
+// Create a form-specific schema that matches expected input
+const formSchema = z.object({
+	name: z.string().min(1, "El nombre es requerido"),
+	description: z.string().min(1, "La descripción es requerida"),
+	country_id: z.number().min(1, "El país es requerido"),
+	chapter: z.string().optional(),
+	fee_type: z.enum(["UNIT", "WEIGHT", "VALUE"]),
+	fee: z.number().min(0, "El fee es requerido"),
+	max_quantity: z.number().optional(),
+});
+
+type FormData = z.infer<typeof formSchema>;
 
 export function NewCustomsForm() {
 	const [open, setOpen] = useState(false);
 
-	const form = useForm<FormValues>({
-		resolver: zodResolver(customsSchema),
+	const form = useForm<FormData>({
+		resolver: zodResolver(formSchema),
 		defaultValues: {
 			name: "",
 			description: "",
 			country_id: 1,
 			chapter: "",
-			fee_type: "UNIT",
-			fee: undefined,
+			fee_type: "UNIT" as const,
+			fee: 0,
 			max_quantity: undefined,
 		},
 	});
 
 	const createCustomsMutation = useCustoms.create();
 
-	const onSubmit = async (data: FormValues) => {
-		console.log(data, "data in onSubmit");
-		createCustomsMutation.mutate(data, {
+	const onSubmit = async (data: FormData) => {
+		createCustomsMutation.mutate(data as Customs, {
 			onSuccess: () => {
 				setOpen(false);
 				form.reset();
@@ -193,7 +203,7 @@ export function NewCustomsForm() {
 													required
 													onChange={(e) => {
 														const value = e.target.value;
-														field.onChange(value === "" ? 0 : parseFloat(value));
+														field.onChange(value === "" ? undefined : parseFloat(value));
 													}}
 													value={field.value || ""}
 												/>

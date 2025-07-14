@@ -1,16 +1,7 @@
 import { Checkbox } from "@/components/ui/checkbox";
 import { type ColumnDef } from "@tanstack/react-table";
-
 import { type Customer } from "@/data/types";
-import { Button } from "@/components/ui/button";
-import { MoreHorizontal, MoreVertical, Pencil, Trash } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import {
-	DropdownMenu,
-	DropdownMenuContent,
-	DropdownMenuItem,
-	DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 
 export const columns: ColumnDef<Customer>[] = [
 	{
