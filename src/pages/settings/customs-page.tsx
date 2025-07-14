@@ -12,7 +12,7 @@ export const CustomsPage = () => {
 		pageIndex: 0,
 		pageSize: 25,
 	});
-	const { data, isLoading } = useCustoms.get(pagination);
+	const { data, isLoading } = useCustoms.get(pagination.pageIndex, pagination.pageSize);
 
 	return (
 		<div className="flex flex-col gap-4">

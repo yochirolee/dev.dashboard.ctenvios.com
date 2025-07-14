@@ -14,8 +14,10 @@ export const UserPage = () => {
 		pageSize: 25,
 	});
 	const { data: users, isLoading } = useGetUsers(pagination.pageIndex, pagination.pageSize);
-	const handleDeleteUser = (id: string) => {
-		toast.success("User deleted successfully");
+	const handleDeleteUser = () => {
+		toast.success("Usuario eliminado correctamente", {
+			description: "El usuario ha sido eliminado correctamente",
+		});
 	};
 
 	return (

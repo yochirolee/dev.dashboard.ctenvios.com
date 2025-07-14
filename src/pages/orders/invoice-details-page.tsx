@@ -1,7 +1,6 @@
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useGetInvoiceById } from "@/hooks/use-invoices";
 import {
-	Building2,
 	MapPin,
 	Phone,
 	User,
@@ -41,7 +40,7 @@ export default function InvoiceDetailsPage() {
 	const params = useParams();
 	const invoiceId = params.invoiceId as string;
 	const navigate = useNavigate();
-	const { data, isLoading } = useGetInvoiceById(invoiceId);
+	const { data, isLoading } = useGetInvoiceById(parseInt(invoiceId));
 	const invoice = data?.rows[0];
 
 	const total = parseFloat(

@@ -1,7 +1,6 @@
 import api from "@/api/api";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import type { User } from "better-auth/types";
 import { authClient } from "@/lib/auth-client";
 
 interface RegisterUserData {
@@ -27,8 +26,8 @@ export const useRegister = () => {
 				email: userData.email,
 				password: userData.password,
 				name: userData.name,
-				role: userData.role,
-				agency_id: parseInt(userData.agency_id),
+				role: userData.role as "ROOT" | "ADMINISTRATOR" | "AGENCY_ADMIN" | "AGENCY_SALES",
+				agency_id: userData.agency_id,
 				image: "",
 				callbackURL: "",
 				fetchOptions: {
@@ -40,10 +39,8 @@ export const useRegister = () => {
 			queryClient.invalidateQueries({ queryKey: ["getUsers"] });
 			toast.success("Usuario registrado correctamente");
 		},
-		onError: (error) => {
+		onError: () => {
 			toast.error("El usuario no ha sido registrado correctamente");
 		},
 	});
 };
-
-
