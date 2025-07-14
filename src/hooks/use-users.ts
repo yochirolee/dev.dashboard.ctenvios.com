@@ -22,7 +22,7 @@ export const useRegister = () => {
 	const queryClient = useQueryClient();
 	return useMutation({
 		mutationFn: (userData: RegisterUserData) =>
-			authClient.signUp.email({
+			(authClient.signUp.email as any)({
 				email: userData.email,
 				password: userData.password,
 				name: userData.name,

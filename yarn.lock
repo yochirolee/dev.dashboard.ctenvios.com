@@ -1776,10 +1776,10 @@ balanced-match@^1.0.0:
   resolved "https://registry.yarnpkg.com/balanced-match/-/balanced-match-1.0.2.tgz#e83e3a7e3f300b34cb9d87f615fa0cbf357690ee"
   integrity sha512-3oSeUO0TMV67hN1AmbXsK4yaqU7tjiHlbxRDZOpH0KW9+CeX4bRAaX0Anxt0tx2MrpRpWwQaPwIlISEJhYU5Pw==
 
-better-auth@^1.2.8:
-  version "1.2.9"
-  resolved "https://registry.yarnpkg.com/better-auth/-/better-auth-1.2.9.tgz#e0728ecd2c3c21975d166ece2ea412a6ff1fd09a"
-  integrity sha512-WLqBXDzuaCQetQctLGC5oTfGmL32zUvxnM4Y+LZkhwseMaZWq5EKI+c/ZATgz2YkFt7726q659PF8CfB9P1VuA==
+better-auth@^1.2.12:
+  version "1.2.12"
+  resolved "https://registry.yarnpkg.com/better-auth/-/better-auth-1.2.12.tgz#b152e072dce70473a306cff9678b3f718ef72b01"
+  integrity sha512-YicCyjQ+lxb7YnnaCewrVOjj3nPVa0xcfrOJK7k5MLMX9Mt9UnJ8GYaVQNHOHLyVxl92qc3C758X1ihqAUzm4w==
   dependencies:
     "@better-auth/utils" "0.2.5"
     "@better-fetch/fetch" "^1.1.18"
@@ -1789,7 +1789,7 @@ better-auth@^1.2.8:
     "@simplewebauthn/server" "^13.0.0"
     better-call "^1.0.8"
     defu "^6.1.4"
-    jose "^5.9.6"
+    jose "^6.0.11"
     kysely "^0.28.2"
     nanostores "^0.11.3"
     zod "^3.24.1"
@@ -2559,10 +2559,10 @@ jiti@^2.4.2:
   resolved "https://registry.yarnpkg.com/jiti/-/jiti-2.4.2.tgz#d19b7732ebb6116b06e2038da74a55366faef560"
   integrity sha512-rg9zJN+G4n2nfJl5MW3BMygZX56zKPNVEYYqq7adpmMh4Jn2QNEwhvQlFy6jPVdcod7txZtKHWnyZiA3a0zP7A==
 
-jose@^5.9.6:
-  version "5.10.0"
-  resolved "https://registry.yarnpkg.com/jose/-/jose-5.10.0.tgz#c37346a099d6467c401351a9a0c2161e0f52c4be"
-  integrity sha512-s+3Al/p9g32Iq+oqXxkW//7jk2Vig6FF1CFqzVXoTUXt2qz89YWbL+OwS17NFYEvxC35n0FKeGO2LGYSxeM2Gg==
+jose@^6.0.11:
+  version "6.0.11"
+  resolved "https://registry.yarnpkg.com/jose/-/jose-6.0.11.tgz#0b7ea8b3b21a1bda5e00255a044c3a0e43270882"
+  integrity sha512-QxG7EaliDARm1O1S8BGakqncGT9s25bKL1WSf6/oa17Tkqwi8D2ZNglqCF+DsYF88/rV66Q/Q2mFAy697E1DUg==
 
 "js-tokens@^3.0.0 || ^4.0.0", js-tokens@^4.0.0:
   version "4.0.0"
