@@ -32,6 +32,7 @@ export default function App() {
 	}
 
 	if (error) {
+		console.log(error, "error on app");
 		return (
 			<div className="flex items-center justify-center min-h-screen">
 				<AlertCircleIcon className="h-6 w-6 mr-2" />
