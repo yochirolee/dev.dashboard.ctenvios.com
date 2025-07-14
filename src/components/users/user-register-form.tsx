@@ -23,16 +23,12 @@ import {
 	DialogTrigger,
 } from "@/components/ui/dialog";
 import { useState } from "react";
-import { getRolesWithEqualOrLowerHierarchy, roles } from "@/data/data";
 import { useRegister } from "@/hooks/use-users";
 import { UserPlus } from "lucide-react";
 import { AgenciesCombobox } from "../agencies/agencies-combobox";
-import { authClient } from "@/lib/auth-client";
 export const description =
 	"A login form with email and password. There's an option to login with Google and a link to sign up if you don't have an account.";
-
 // Create a type from the roles object values
-export type Role = (typeof roles)[keyof typeof roles];
 
 const FormSchema = z.object({
 	email: z.string().email(),
@@ -47,8 +43,6 @@ type FormValues = z.infer<typeof FormSchema>;
 export function UserRegisterForm() {
 	const [open, setOpen] = useState(false);
 	const [selectedAgencyId, setSelectedAgencyId] = useState<number>(1);
-
-	const { data: user } = authClient.useSession();
 
 	const form = useForm<FormValues>({
 		resolver: zodResolver(FormSchema),
@@ -172,11 +166,9 @@ export function UserRegisterForm() {
 											</SelectTrigger>
 											<SelectContent>
 												<SelectGroup>
-													{getRolesWithEqualOrLowerHierarchy(user?.role).map((role: Role) => (
-														<SelectItem key={role} value={role}>
-															{roles[role]}
-														</SelectItem>
-													))}
+													<SelectItem key="AGENCY_SALES" value="AGENCY_SALES">
+														Agencia de ventas
+													</SelectItem>
 												</SelectGroup>
 											</SelectContent>
 										</Select>
