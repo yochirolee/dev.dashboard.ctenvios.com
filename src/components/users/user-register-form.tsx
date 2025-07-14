@@ -172,7 +172,7 @@ export function UserRegisterForm() {
 											</SelectTrigger>
 											<SelectContent>
 												<SelectGroup>
-													{getRolesWithEqualOrLowerHierarchy(user?.role).map((role: any) => (
+													{getRolesWithEqualOrLowerHierarchy(user?.role).map((role: Role) => (
 														<SelectItem key={role} value={role}>
 															{roles[role]}
 														</SelectItem>

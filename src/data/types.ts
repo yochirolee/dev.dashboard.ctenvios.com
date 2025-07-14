@@ -167,10 +167,10 @@ export type User = {
 	email: string;
 	role: string;
 	agency_id: number;
-	agency: string;
+	agency: Agency;
 	name: string;
-	created_at: string;
-	updated_at: string;
+	createdAt: string;
+	updatedAt: string;
 	image: string;
 	emailVerified: boolean;
 };
