@@ -14,9 +14,9 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 import { Switch } from "../ui/switch";
-import type { User } from "better-auth/types";
+import type { User } from "@/data/types";
 
-export const userColumns = (handleDeleteUser: (id: string) => void): ColumnDef<User>[] => [
+export const userColumns = (handleDeleteUser: (id: number) => void): ColumnDef<User>[] => [
 	{
 		accessorKey: "name",
 		header: "Name",

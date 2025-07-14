@@ -161,3 +161,11 @@ export interface Rate {
 }
 
 export type Customs = z.infer<typeof customsSchema>;
+
+export type User = {
+	id: number;
+	email: string;
+	role: string;
+	agency_id: number;
+	name: string;
+};

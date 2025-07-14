@@ -5,7 +5,7 @@ import { ShareDialog } from "@/components/shares/share-dialog";
 import { useState } from "react";
 
 export default function ProvidersServicesPage() {
-	const [selectedProviderId, setSelectedProviderId] = useState<number >(1);
+	const [selectedProviderId, setSelectedProviderId] = useState<number>(1);
 	const [open, setOpen] = useState(false);
 
 	console.log(selectedProviderId);
@@ -22,7 +22,7 @@ export default function ProvidersServicesPage() {
 					children={<NewProviderForm setOpen={setOpen} />}
 					title="Crear Proveedor"
 					description="Crea un nuevo proveedor para tus servicios"
-					action="Crear Proveedor"
+					mode="create"
 				/>
 			</div>
 			<div className="">

@@ -18,7 +18,8 @@ export function EditOrderPage() {
 	console.log(orderId);
 	const { data, isLoading } = useGetInvoiceById(orderId);
 	const invoice = data?.rows[0];
-	const { setSelectedCustomer, setSelectedRate, setSelectedService, setSelectedReceipt } = useInvoiceStore();
+	const { setSelectedCustomer, setSelectedRate, setSelectedService, setSelectedReceipt } =
+		useInvoiceStore();
 
 	useEffect(() => {
 		setSelectedCustomer(invoice?.customer);
@@ -67,20 +68,6 @@ export function EditOrderPage() {
 
 			<ServiceSelector />
 			<TestFieldArray />
-		</div>
-	);
-}
-
-// Separate component for the preview to avoid re-renders in main component
-function InvoicePreview() {
-	/* const methods = useFormContext();
-	 */
-	return (
-		<div className="space-y-3">
-			<h3 className="font-semibold text-lg border-b border-gray-800 pb-2">API Payload Preview</h3>
-			<pre className="bg-gray-950 p-4 rounded-md overflow-x-auto text-xs">
-				{/* 	{JSON.stringify(methods.watch(), null, 2)} */}
-			</pre>
 		</div>
 	);
 }
