@@ -39,7 +39,7 @@ const FormSchema = z.object({
 	password: z.string().min(8),
 	role: z.string(),
 	name: z.string().min(8),
-	agency_id: z.number().optional(),
+	agency_id: z.number(),
 });
 
 type FormValues = z.infer<typeof FormSchema>;
@@ -55,7 +55,7 @@ export function UserRegisterForm() {
 		defaultValues: {
 			email: "",
 			password: "",
-			role: undefined,
+			role: "AGENCY_SALES",
 			name: "",
 			agency_id: 1,
 		},

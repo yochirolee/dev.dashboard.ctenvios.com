@@ -94,7 +94,7 @@ export function TableItemsInOrder() {
 
 	console.log("re-render on TableItemsInOrder");
 
-	const methods = useForm<z.infer<typeof formSchema>>({
+	const form = useForm<z.infer<typeof formSchema>>({
 		resolver: zodResolver(formSchema),
 		defaultValues: {
 			customer_id: customer_id || 0,
@@ -121,7 +121,7 @@ export function TableItemsInOrder() {
 	});
 
 	const { fields, append, remove } = useFieldArray({
-		control: methods.control,
+		control: form.control,
 		name: "items",
 	});
 
@@ -167,8 +167,8 @@ export function TableItemsInOrder() {
 	};
 
 	return (
-		<FormProvider {...methods}>
-			<form onSubmit={methods.handleSubmit(onSubmit)}>
+		<FormProvider {...form}>
+			<form onSubmit={form.handleSubmit(onSubmit)}>
 				<Card>
 					<TableHeaderSection
 						itemCount={fields.length}

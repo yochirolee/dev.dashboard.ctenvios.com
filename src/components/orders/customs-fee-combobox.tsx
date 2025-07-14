@@ -15,22 +15,25 @@ import { FormField } from "../ui/form";
 import { useCustoms } from "@/hooks/use-customs";
 import type { Customs } from "@/data/types";
 import { Skeleton } from "../ui/skeleton";
+import { useFormContext, type UseFormReturn } from "react-hook-form";
 
 const CustomsFeeCombobox = React.memo(function CustomsFeeCombobox({
 	index,
 	form,
 }: {
 	index: number;
-	form: any;
+	form?: UseFormReturn<any>;
 }) {
 	const [open, setOpen] = React.useState(false);
 	const { data, isLoading } = useCustoms.get(0, 100);
 
-	console.log(data, "customs");
+	// Use form prop if provided, otherwise use form context
+	const formContext = form || useFormContext();
+	const { control, setValue } = formContext;
 
 	return (
 		<FormField
-			control={form.control}
+			control={control}
 			name={`items.${index}.customs`}
 			render={({ field }) => (
 				<Popover open={open} onOpenChange={setOpen}>
@@ -69,7 +72,7 @@ const CustomsFeeCombobox = React.memo(function CustomsFeeCombobox({
 											value={custom?.name}
 											onSelect={() => {
 												field.onChange(custom);
-												form.setValue(`items.${index}.customs_rate_id`, custom.id);
+												setValue(`items.${index}.customs_rate_id`, custom.id);
 												setOpen(false);
 											}}
 										>
