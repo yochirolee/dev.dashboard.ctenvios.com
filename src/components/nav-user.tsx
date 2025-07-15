@@ -16,9 +16,9 @@ import {
 	SidebarMenuItem,
 	useSidebar,
 } from "@/components/ui/sidebar";
-import { authClient } from "@/lib/auth-client";
 import { useNavigate } from "react-router-dom";
 import { useAppStore } from "@/stores/app-store";
+import { authClient } from "@/lib/auth-client";
 
 export function NavUser() {
 	const { isMobile } = useSidebar();
@@ -27,12 +27,13 @@ export function NavUser() {
 
 	const handleLogout = async () => {
 		try {
-			const response = await authClient.signOut();
-			console.log(response, "response in handleLogout");
+			authClient.signOut();
 			clearSession();
+			localStorage.removeItem("authToken");
 			navigate("/login", { replace: true });
 		} catch (error) {
 			console.error("Logout error:", error);
+			navigate("/login", { replace: true });
 		}
 	};
 

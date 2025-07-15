@@ -6,30 +6,19 @@ import { Input } from "@/components/ui/input";
 import { Link, useNavigate } from "react-router-dom";
 import { Loader2 } from "lucide-react";
 import { Separator } from "../ui/separator";
-import { authClient } from "@/lib/auth-client";
 import { useMutation } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect } from "react";
 import { useAppStore } from "@/stores/app-store";
+import api from "@/api/api";
 
 const useLoginMutation = () => {
-	const navigate = useNavigate();
 	return useMutation({
 		mutationFn: async ({ email, password }: { email: string; password: string }) => {
-			const result = await authClient.signIn.email({ email, password });
-			if (result.error) {
-				throw new Error(result.error.message || "Login failed");
-			}
-
+			const result = await api.users.signIn(email, password);
 			return result;
-		},
-		onSuccess: () => {
-			navigate("/", { replace: true });
-		},
-		onError: (error) => {
-			console.error(error);
 		},
 	});
 };
@@ -59,7 +48,6 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
 
 	const handleSubmit = async (values: z.infer<typeof formSchema>) => {
 		login(values);
-		
 	};
 
 	return (

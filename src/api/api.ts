@@ -10,15 +10,15 @@ import type {
 	Invoice,
 } from "@/data/types";
 import type { User } from "better-auth/types";
+import { useAppStore } from "@/stores/app-store";
 
 const config = {
 	baseURL: import.meta.env.VITE_API_URL || "http://localhost:3000/api/v1",
 	timeout: 10000,
 	headers: {
 		"Content-Type": "application/json",
+		Authorization: `Bearer ${localStorage.getItem("authToken")}`,
 	},
-	// Include credentials (cookies) in all requests
-	withCredentials: true,
 };
 
 export const axiosInstance = axios.create(config);
@@ -53,7 +53,7 @@ axiosInstance.interceptors.response.use(
 	(error) => {
 		// Handle 401 Unauthorized responses
 		if (error.response?.status === 401) {
-			localStorage.removeItem("app-store");
+			localStorage.removeItem("authToken");
 			window.location.href = "/login";
 		}
 
@@ -71,6 +71,7 @@ const api = {
 					limit: limit,
 				},
 			});
+			console.log(response, "response");
 			return response.data;
 		},
 		getReceipts: async (customerId: number, page: number | 0, limit: number | 50) => {
@@ -175,7 +176,7 @@ const api = {
 				params: {
 					search,
 					page: page + 1,
-					limit: limit	,
+					limit: limit,
 				},
 			});
 			return response.data;
@@ -202,6 +203,29 @@ const api = {
 		create: async (data: User) => {
 			console.log(data, "data in Api");
 			const response = await axiosInstance.post("/users/sign-up/email", data);
+			return response.data;
+		},
+		getSession: async () => {
+			const response = await axiosInstance.get("/users/get-session");
+
+			return response.data;
+		},
+		signIn: async (email: string, password: string) => {
+			const response = await axiosInstance.post("/users/sign-in/email", {
+				email,
+				password,
+			});
+			if (response.status === 200) {
+				localStorage.setItem("authToken", response.data.token);
+				const session = await api.users.getSession();
+				useAppStore.setState({ session: session });
+			}
+			
+
+			return response.data;
+		},
+		signOut: async () => {
+			const response = await axiosInstance.post("/users/sign-out");
 			return response.data;
 		},
 	},

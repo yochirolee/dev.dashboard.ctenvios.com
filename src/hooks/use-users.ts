@@ -18,6 +18,13 @@ export const useGetUsers = (page: number | 1, limit: number | 25) => {
 	});
 };
 
+export const useGetSession = () => {
+	return useQuery({
+		queryKey: ["getSession"],
+		queryFn: () => api.users.getSession(),
+	});
+};
+
 export const useRegister = () => {
 	const queryClient = useQueryClient();
 	return useMutation({

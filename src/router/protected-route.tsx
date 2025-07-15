@@ -6,7 +6,7 @@ const ProtectedRoute = () => {
 	const { session } = useAppStore();
 
 	// Redirect to login if not authenticated
-	if (!session?.user) {
+	if (!session) {
 		return <Navigate to="/login" replace />;
 	}
 

@@ -18,8 +18,7 @@ export const useSearchInvoices = (searchQuery: string, page: number, limit: numb
 
 export const useGetInvoices = (page: number, limit: number) => {
 	const { session } = useAppStore();
-	const user = session?.user;
-	if (user?.role == "ROOT") {
+	if (session?.user?.role == "ROOT") {
 		return useQuery({
 			queryKey: ["get-invoices", page, limit],
 			queryFn: () => api.invoices.get(page, limit),
@@ -27,8 +26,8 @@ export const useGetInvoices = (page: number, limit: number) => {
 		});
 	}
 	return useQuery({
-		queryKey: ["get-invoices", user?.agency_id, page, limit],
-		queryFn: () => api.invoices.getByAgencyId(Number(user?.agency_id), page, limit),
+		queryKey: ["get-invoices", session?.user?.agency_id, page, limit],
+		queryFn: () => api.invoices.getByAgencyId(Number(session?.user?.agency_id), page, limit),
 		placeholderData: keepPreviousData,
 	});
 };
