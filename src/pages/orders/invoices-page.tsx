@@ -26,7 +26,7 @@ export default function InvoicesPage() {
 	);
 
 	return (
-		<div className="space-y-4 ">
+		<div>
 			<div className="flex items-center p-2 md:p-0 justify-between">
 				<div className="flex flex-col">
 					<h3 className=" font-bold">Facturas</h3>
