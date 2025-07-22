@@ -1,6 +1,5 @@
 import { z } from "zod";
 import { isValidCubanCI } from "@/lib/utils";
-import { BookHeart } from "lucide-react";
 
 export const customerSchema = z.object({
 	id: z.number().optional(),

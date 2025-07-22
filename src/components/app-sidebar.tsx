@@ -3,11 +3,8 @@ import {
 	AudioWaveform,
 	Command,
 	FileBox,
-	Frame,
 	GalleryVerticalEnd,
 	HomeIcon,
-	Map,
-	PieChart,
 	Settings2,
 } from "lucide-react";
 
