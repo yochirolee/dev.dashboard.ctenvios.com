@@ -6,22 +6,12 @@ import { Input } from "@/components/ui/input";
 import { Link, useNavigate } from "react-router-dom";
 import { Loader2 } from "lucide-react";
 import { Separator } from "../ui/separator";
-import { useMutation } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect } from "react";
 import { useAppStore } from "@/stores/app-store";
-import api from "@/api/api";
-
-const useLoginMutation = () => {
-	return useMutation({
-		mutationFn: async ({ email, password }: { email: string; password: string }) => {
-			const result = await api.users.signIn(email, password);
-			return result;
-		},
-	});
-};
+import { useLoginMutation } from "@/hooks/use-users";
 
 const formSchema = z.object({
 	email: z.string().email("Please enter a valid email address"),

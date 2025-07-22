@@ -12,6 +12,8 @@ import {
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Link } from "react-router-dom";
+import { queryClient } from "@/lib/query-client";
+import api from "@/api/api";
 
 // This type is used to define the shape of our data.
 // You can use a Zod schema here if you want.
@@ -80,8 +82,20 @@ export const orderColumns: ColumnDef<Invoice>[] = [
 		accessorKey: "id",
 		header: "Factura",
 		cell: ({ row }) => {
+			const invoiceId = row.original?.id;
+			const handleFocus = () => {
+				console.log("Prefetching data for invoice:", invoiceId);
+				queryClient.prefetchQuery({
+					queryKey: ["get-invoice", invoiceId],
+					queryFn: () => api.invoices.getById(invoiceId),
+				});
+			};
 			return (
-				<Link className="flex items-center gap-2" to={`/orders/${row.original?.id}`}>
+				<Link
+					onMouseEnter={handleFocus}
+					className="flex items-center gap-2"
+					to={`/orders/${row.original?.id}`}
+				>
 					<FileText size={16} />
 					{row.original?.id}
 				</Link>

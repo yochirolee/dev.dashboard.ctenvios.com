@@ -6,7 +6,6 @@ import { DashboardAreaChart } from "@/components/charts/area-chart";
 import { DashboardPieChart } from "@/components/charts/pie-chart";
 import { SectionCards } from "@/components/cards/section-cards";
 import { NewOrderPage } from "@/pages/orders/new-order-page";
-
 import { InteractiveChart } from "@/components/charts/interactive-chart";
 import { CustomersPage } from "@/pages/settings/customers-page";
 import { AgenciesPage } from "@/pages/settings/agencies-page";
@@ -18,8 +17,44 @@ import InvoiceDetailsPage from "@/pages/orders/invoice-details-page";
 import { CustomsPage } from "@/pages/settings/customs-page";
 import ProvidersServicesPage from "@/pages/settings/providers-services-page";
 import { EditOrderPage } from "@/pages/orders/edit-order-page";
+import { queryClient } from "@/lib/query-client";
+import api from "@/api/api";
+import { useAppStore } from "@/stores/app-store";
+
+const useLoadInitialData = () => {
+	const session = useAppStore((state) => state.session);
+
+	queryClient.ensureQueryData({
+		queryKey: ["get-invoices", 0, 20],
+		queryFn: () => api.invoices.get(0, 20),
+		staleTime: 1000 * 60 * 60 * 24 * 30,
+		gcTime: 1000 * 60 * 60 * 24 * 30,
+	});
+	if (session?.user) {
+		queryClient.ensureQueryData({
+			queryKey: ["get-agencies", 0, 20],
+			queryFn: () => api.agencies.get(),
+			staleTime: 1000 * 60 * 60 * 24 * 30,
+			gcTime: 1000 * 60 * 60 * 24 * 30,
+		});
+		queryClient.ensureQueryData({
+			queryKey: ["get-customers", 0, 20],
+			queryFn: () => api.customer.get(0, 20),
+			staleTime: 1000 * 60 * 60 * 24 * 30,
+			gcTime: 1000 * 60 * 60 * 24 * 30,
+		});
+		queryClient.ensureQueryData({
+			queryKey: ["get-rates"],
+			queryFn: () => api.rates.getByAgencyId(session?.user?.agency_id),
+			staleTime: 1000 * 60 * 60 * 24 * 30,
+			gcTime: 1000 * 60 * 60 * 24 * 30,
+		});
+	}
+};
 
 export const AppRouter = () => {
+	useLoadInitialData();
+
 	return (
 		<Routes>
 			<Route path="/login" element={<LoginPage />} />
@@ -28,12 +63,15 @@ export const AppRouter = () => {
 				<Route path="/" element={<DashboardLayout />}>
 					{/* These are relative to /dashboard */}
 					<Route index element={<Home />} />
-					<Route path="about" element={<About />} />
-					<Route path="orders" element={<InvoicesPage />} />
-					<Route path="orders/new" element={<NewOrderPage />} />
-					<Route path="orders/:invoiceId/edit" element={<EditOrderPage />} />
-					<Route path="orders/:invoiceId" element={<InvoiceDetailsPage />} />
+					<Route path="orders">
+						<Route index element={<Navigate to="list" replace />} />
+						<Route path="list" element={<InvoicesPage />} />
+						<Route path="new" element={<NewOrderPage />} />
+						<Route path=":invoiceId/edit" element={<EditOrderPage />} />
+						<Route path=":invoiceId" element={<InvoiceDetailsPage />} />
+					</Route>
 					<Route path="settings">
+						<Route index element={<Navigate to="providers" replace />} />
 						<Route path="providers" element={<ProvidersServicesPage />} />
 						<Route path="agencies" element={<AgenciesPage />} />
 						<Route path="customers" element={<CustomersPage />} />
@@ -47,10 +85,6 @@ export const AppRouter = () => {
 			<Route path="*" element={<Navigate to="/login" replace />} />
 		</Routes>
 	);
-};
-
-const About = () => {
-	return <div>About</div>;
 };
 
 const Home = () => {

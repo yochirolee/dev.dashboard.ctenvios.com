@@ -70,13 +70,14 @@ export function ReceiptFormDialog({ expand = false }: { expand?: boolean }) {
 			ci: "",
 			email: undefined,
 			phone: "",
+			mobile: "",
 			address: "",
 			province_id: undefined,
 			city_id: undefined,
 			passport: undefined,
 		},
 	});
-	
+
 	const cities = useMemo(() => {
 		return provinces?.find((province: Province) => province.id === form.getValues().province_id)
 			?.cities;
@@ -99,12 +100,16 @@ export function ReceiptFormDialog({ expand = false }: { expand?: boolean }) {
 		if (data?.email === "") {
 			data.email = undefined;
 		}
+		data.phone = data.mobile ? `53${data.mobile}` : undefined;
+		
 		createReceipt(data as Receipt);
 	};
 
 	const onError = (errors: any) => {
 		console.log("Form validation errors:", errors);
 	};
+
+	console.log(form.formState.errors);
 
 	return (
 		<Dialog open={isOpen} onOpenChange={setIsOpen}>
@@ -161,22 +166,71 @@ export function ReceiptFormDialog({ expand = false }: { expand?: boolean }) {
 										</FormItem>
 									)}
 								/>
+								<div className="grid grid-cols-2 gap-4">
+									<FormField
+										control={form.control}
+										name="mobile"
+										render={({ field }) => (
+											<FormItem>
+												<FormLabel>Teléfono Celular</FormLabel>
+												<FormControl>
+													<div className="flex">
+														<span className="inline-flex items-center px-3 text-sm border  border-r-0  rounded-l-md">
+															+53
+														</span>
+														<Input
+															id="mobile"
+															{...field}
+															type="tel"
+															maxLength={8}
+															pattern="[0-9]{8}"
+															className="rounded-l-none"
+															placeholder="12345678"
+															onChange={(e) => {
+																// Only allow digits and limit to 8 characters
+																const value = e.target.value.replace(/\D/g, "").slice(0, 8);
+																field.onChange(value);
+															}}
+														/>
+													</div>
+												</FormControl>
+												<FormMessage />
+											</FormItem>
+										)}
+									/>
 
-								<FormField
-									control={form.control}
-									name="phone"
-									render={({ field }) => (
-										<FormItem>
-											<FormLabel>
-												Teléfono <span className="text-destructive">*</span>{" "}
-											</FormLabel>
-											<FormControl>
-												<Input id="phone" {...field} />
-											</FormControl>
-											<FormMessage />
-										</FormItem>
-									)}
-								/>
+									<FormField
+										control={form.control}
+										name="phone"
+										render={({ field }) => (
+											<FormItem>
+												<FormLabel>Teléfono</FormLabel>
+												<FormControl>
+													<div className="flex">
+														<span className="inline-flex items-center px-3 text-sm border  border-r-0  rounded-l-md">
+															+53
+														</span>
+														<Input
+															id="phone"
+															{...field}
+															type="tel"
+															maxLength={8}
+															pattern="[0-9]{8}"
+															className="rounded-l-none"
+															placeholder="12345678"
+															onChange={(e) => {
+																// Only allow digits and limit to 8 characters
+																const value = e.target.value.replace(/\D/g, "").slice(0, 8);
+																field.onChange(value);
+															}}
+														/>
+													</div>
+												</FormControl>
+												<FormMessage />
+											</FormItem>
+										)}
+									/>
+								</div>
 								<FormField
 									control={form.control}
 									name="email"

@@ -35,7 +35,7 @@ export default function AgencyUsers({ agencyId }: { agencyId: number }) {
 			<Separator />
 			<CardContent className="grid gap-8">
 				{users?.map((user: any) => (
-					<div className="flex items-center gap-4">
+					<div key={user.id} className="flex items-center gap-4">
 						<Avatar className="hidden h-9 w-9 sm:flex">
 							<AvatarImage src={user.avatar} alt="Avatar" />
 							<AvatarFallback>{user.name.charAt(0)}</AvatarFallback>

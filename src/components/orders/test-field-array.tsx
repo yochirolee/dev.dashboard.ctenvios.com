@@ -15,10 +15,11 @@ import { invoiceSchema } from "@/data/types";
 import { useCreateInvoice } from "@/hooks/use-invoices";
 import { Input } from "../ui/input";
 import { useAppStore } from "@/stores/app-store";
+import { Separator } from "../ui/separator";
 
 type FormValues = z.infer<typeof invoiceSchema>;
 
-export function TestFieldArray( ) {
+export function TestFieldArray() {
 	const session = useAppStore((state) => state.session);
 	const [items_count, setItemsCount] = useState(1);
 	const navigate = useNavigate();
@@ -55,15 +56,15 @@ export function TestFieldArray( ) {
 				{
 					description: "",
 					weight: undefined,
-					fee: 0.0,
+					customs_fee: 0.0,
+					delivery_fee: 0.0,
+					insurance_fee: 0.0,
 					rate: selectedRate?.public_rate || 0,
 					subtotal: 0,
 				},
 			],
 		},
 	});
-
-	
 
 	const { fields, append, remove } = useFieldArray({
 		control: form.control,
@@ -82,7 +83,9 @@ export function TestFieldArray( ) {
 		const items = Array.from({ length: items_count - 1 }, () => ({
 			description: "",
 			weight: undefined,
-			fee: 0.0,
+			customs_fee: 0,
+			delivery_fee: 0,
+			insurance_fee: 0,
 			rate: selectedRate?.public_rate || 0,
 			subtotal: 0,
 		}));
@@ -176,13 +179,27 @@ export function TestFieldArray( ) {
 						</TableBody>
 					</Table>
 				</CardContent>
+				<div className="mt-8 flex justify-end pr-6">
+					<ul className="grid gap-3 w-1/6 ">
+						<li className="flex items-center justify-between">
+							<span className="text-muted-foreground">Subtotal</span>
+							<span>${form.getValues("total_amount")}</span>
+						</li>
 
-				<CardContent className="flex  border-t justify-end my-10">
-					<div className="flex flex-col">
-						<p className="text-lg font-bold">Peso: {form.getValues("total_weight")?.toFixed(2)}</p>
-						<p className="text-lg font-bold">Total: {useWatch({ control: form.control, name: "total_amount" })?.toFixed(2)}</p>
-					</div>
-				</CardContent>
+						<li className="flex items-center justify-between">
+							<span className="text-muted-foreground">Discount</span>
+							<span>${form.getValues("discount")?.toFixed(2) ?? 0.0}</span>
+						</li>
+						<li className="flex items-center justify-between font-semibold">
+							<span className="text-muted-foreground">Total</span>
+							<span>${useWatch({ control: form.control, name: "total_amount" })}</span>
+						</li>
+					</ul>
+				</div>
+
+				<div className="flex justify-end m-10">
+					<Separator />
+				</div>
 				<div className="flex justify-end m-10">
 					<Button className="w-1/2 mt-4 mx-auto" type="submit" disabled={isCreatingInvoice}>
 						{isCreatingInvoice ? (

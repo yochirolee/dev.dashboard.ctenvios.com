@@ -37,17 +37,23 @@ import {
 const baseUrl = import.meta.env.VITE_API_URL;
 
 export default function InvoiceDetailsPage() {
-	const params = useParams();
-	const invoiceId = params.invoiceId as string;
+	const { invoiceId } = useParams();
 	const navigate = useNavigate();
-	const { data, isLoading } = useGetInvoiceById(parseInt(invoiceId));
+	const { data, isLoading } = useGetInvoiceById(Number(invoiceId));
 	const invoice = data?.rows[0];
 
 	const total = parseFloat(
-		invoice?.items
-			.reduce((acc: number, item: any) => acc + item?.rate * item?.weight + item?.customs_fee, 0)
-			.toFixed(2),
+		invoice?.items.reduce(
+			(acc: number, item: any) =>
+				acc +
+				item?.rate * item?.weight +
+				item?.customs_fee +
+				item?.delivery_fee +
+				item?.insurance_fee,
+			0,
+		),
 	);
+	console.log(total, "total");
 
 	console.log(invoice);
 
@@ -188,7 +194,7 @@ export default function InvoiceDetailsPage() {
 									<span className="text-muted-foreground">
 										<Phone size={16} />
 									</span>
-									<span>{invoice?.receipt?.phone}</span>
+									<span>{invoice?.receipt?.phone || invoice?.receipt?.mobile}</span>
 								</li>
 								<li className="flex items-center gap-2 justify-start">
 									<span className="text-muted-foreground">
@@ -205,6 +211,8 @@ export default function InvoiceDetailsPage() {
 							<TableRow>
 								<TableHead className="w-20">HBL</TableHead>
 								<TableHead className="w-full">Descripción</TableHead>
+								<TableHead className="text-right w-14">Seguro</TableHead>
+								<TableHead className="text-right w-14">Delivery</TableHead>
 								<TableHead className="text-right w-14">Arancel</TableHead>
 								<TableHead className="text-right w-14">Precio</TableHead>
 								<TableHead className="text-right w-14">Peso</TableHead>
@@ -218,12 +226,24 @@ export default function InvoiceDetailsPage() {
 									<TableCell className="">{item?.hbl}</TableCell>
 									<TableCell className="">{item?.description}</TableCell>
 									<TableCell className="text-right">
+										${parseFloat(item?.insurance_fee).toFixed(2)}
+									</TableCell>
+									<TableCell className="text-right">
+										${parseFloat(item?.delivery_fee).toFixed(2)}
+									</TableCell>
+									<TableCell className="text-right">
 										${parseFloat(item?.customs_fee).toFixed(2)}
 									</TableCell>
 									<TableCell className="text-right">${parseFloat(item?.rate).toFixed(2)}</TableCell>
 									<TableCell className="text-right">{item?.weight.toFixed(2)}</TableCell>
 									<TableCell className="text-right">
-										${parseFloat((item?.rate * item?.weight + item?.customs_fee).toFixed(2))}
+										$
+										{parseFloat(
+											(parseFloat(item?.rate) * item?.weight) +
+												parseFloat(item?.customs_fee) +
+												parseFloat(item?.delivery_fee) +
+												parseFloat(item?.insurance_fee),
+										).toFixed(2)}
 									</TableCell>
 									<TableCell className="text-right">
 										<DropdownMenu>
@@ -265,12 +285,12 @@ export default function InvoiceDetailsPage() {
 								<span>${invoice?.tax?.toFixed(2) ?? 0.0}</span>
 							</li>
 							<li className="flex items-center justify-between">
-								<span className="text-muted-foreground">Discount</span>
-								<span>${invoice?.discount?.toFixed(2) ?? 0.0}</span>
+								<span className="text-muted-foreground">Verify</span>
+								<span>${total.toFixed(2)}</span>
 							</li>
 							<li className="flex items-center justify-between font-semibold">
 								<span className="text-muted-foreground">Total</span>
-								<span>${total.toFixed(2)}</span>
+								<span>${invoice?.total_amount.toFixed(2)} </span>
 							</li>
 						</ul>
 					</div>

@@ -2,6 +2,7 @@ import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tansta
 import api from "@/api/api";
 import type { Invoice } from "@/data/types";
 import { useAppStore } from "@/stores/app-store";
+import { useLoaderData } from "react-router-dom";
 
 export const useSearchInvoices = (searchQuery: string, page: number, limit: number) => {
 	if (searchQuery.length > 2) {
@@ -22,22 +23,24 @@ export const useGetInvoices = (page: number, limit: number) => {
 		return useQuery({
 			queryKey: ["get-invoices", page, limit],
 			queryFn: () => api.invoices.get(page, limit),
-			placeholderData: keepPreviousData,
+			initialData: keepPreviousData,
 		});
 	}
 	return useQuery({
 		queryKey: ["get-invoices", session?.user?.agency_id, page, limit],
 		queryFn: () => api.invoices.getByAgencyId(Number(session?.user?.agency_id), page, limit),
-		placeholderData: keepPreviousData,
+		initialData: keepPreviousData,
 	});
 };
 
 export const useGetInvoiceById = (id: number) => {
 	return useQuery({
-		queryKey: ["invoice", id],
+		queryKey: ["get-invoice", id],
 		queryFn: () => api.invoices.getById(Number(id)),
 		enabled: !!id,
+		initialData: keepPreviousData,
 	});
+	useLoaderData;
 };
 
 export const useCreateInvoice = (options?: {

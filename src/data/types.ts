@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { isValidCubanCI } from "@/lib/utils";
+import { BookHeart } from "lucide-react";
 
 export const customerSchema = z.object({
 	id: z.number().optional(),
@@ -11,49 +12,57 @@ export const customerSchema = z.object({
 	identity_document: z.string().optional().or(z.literal("")),
 	mobile: z
 		.string()
-		.regex(/^[\+]?[1-9][\d]{0,15}$/, "Invalid phone number format")
-		.min(10, "Phone number must be at least 10 digits long")
-		.max(10, "Phone number must be less than 10 digits long")
+		.regex(/^(\+53)?[5-9]\d{7}$/, "Formato inválido. Use +53 seguido de 8 dígitos")
+		.or(z.literal(""))
 		.optional(),
 	phone: z
 		.string()
-		.regex(/^[\+]?[1-9][\d]{0,15}$/, "Invalid phone number format")
-		.min(8, "Phone number must be at least 10 digits long")
-		.max(8, "Phone number must be less than 10 digits long")
+		.regex(/^(\+53)?[5-9]\d{7}$/, "Formato inválido. Use +53 seguido de 8 dígitos")
+		.or(z.literal(""))
 		.optional(),
 	address: z.string().optional(),
 });
-export const receiptShema = z.object({
-	id: z.number().optional(),
-	first_name: z.string().min(2, { message: "First name must be at least 2 characters long" }),
-	middle_name: z.string().optional(),
-	last_name: z.string().min(2, { message: "Last name must be at least 2 characters long" }),
-	second_last_name: z
-		.string()
-		.min(2, { message: "Last name must be at least 2 characters long" })
-		.regex(/^[a-zA-Z]+$/, "Only letters are allowed"),
-	email: z.string().email().optional().nullable(),
-	phone: z
-		.string()
-		.regex(/^[\+]?[1-9][\d]{0,15}$/, "Invalid phone number format")
-		.min(10, "Phone number must be at least 10 digits long")
-		.max(10, "Phone number must be less than 10 digits long"),
-	address: z.string().min(3, "La dirección debe tener al menos 3 caracteres"),
-	ci: z
-		.string()
-		.length(11, "El CI debe tener exactamente 11 dígitos")
-		.refine((ci) => /^[0-9]+$/.test(ci), {
-			message: "El CI solo puede contener números",
-		})
-		.refine(isValidCubanCI, {
-			message: "El CI no es válido según su fecha o dígito de control",
-		}),
-	province_id: z.number(),
-	passport: z.string().nullable().optional(),
-	city_id: z.number(),
-	city: z.string().optional(),
-	province: z.string().optional(),
-});
+export const receiptShema = z
+	.object({
+		id: z.number().optional(),
+		first_name: z.string().min(2, { message: "First name must be at least 2 characters long" }),
+		middle_name: z.string().optional(),
+		last_name: z.string().min(2, { message: "Last name must be at least 2 characters long" }),
+		second_last_name: z
+			.string()
+			.min(2, { message: "Last name must be at least 2 characters long" })
+			.regex(/^[a-zA-Z]+$/, "Only letters are allowed"),
+		email: z.string().email().or(z.literal("")).optional().nullable(),
+		phone: z
+			.string()
+			.regex(/^(\+53)?[5-9]\d{7}$/, "Formato inválido. Use +53 seguido de 8 dígitos")
+			.or(z.literal(""))
+			.optional(),
+		mobile: z
+			.string()
+			.regex(/^(\+53)?[5-9]\d{7}$/, "Formato inválido. Use +53 seguido de 8 dígitos")
+			.or(z.literal(""))
+			.optional(),
+		address: z.string().min(3, "La dirección debe tener al menos 3 caracteres"),
+		ci: z
+			.string()
+			.length(11, "El CI debe tener exactamente 11 dígitos")
+			.refine((ci) => /^[0-9]+$/.test(ci), {
+				message: "El CI solo puede contener números",
+			})
+			.refine(isValidCubanCI, {
+				message: "El CI no es válido según su fecha o dígito de control",
+			}),
+		province_id: z.number(),
+		passport: z.string().nullable().optional(),
+		city_id: z.number(),
+		city: z.string().optional(),
+		province: z.string().optional(),
+	})
+	.refine((data) => data.phone || data.mobile, {
+		message: "El teléfono o el celular es requerido",
+		path: ["phone", "mobile"],
+	});
 
 export const rateSchema = z.object({
 	id: z.number(),
@@ -68,7 +77,9 @@ export const rateSchema = z.object({
 export const itemsSchema = z.object({
 	description: z.string().min(1),
 	weight: z.number().min(0).optional(),
-	fee: z.number().min(0),
+	customs_fee: z.number().min(0).optional(),
+	delivery_fee: z.number().min(0).optional(),
+	insurance_fee: z.number().min(0).optional(),
 	rate: z.number().min(0),
 	subtotal: z.number().min(0),
 });

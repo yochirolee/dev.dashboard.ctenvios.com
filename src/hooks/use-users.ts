@@ -2,6 +2,7 @@ import api from "@/api/api";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { authClient } from "@/lib/auth-client";
+import { useAppStore } from "@/stores/app-store";
 
 interface RegisterUserData {
 	email: string;
@@ -22,6 +23,7 @@ export const useGetSession = () => {
 	return useQuery({
 		queryKey: ["getSession"],
 		queryFn: () => api.users.getSession(),
+		staleTime: 0,
 	});
 };
 
@@ -48,6 +50,21 @@ export const useRegister = () => {
 		},
 		onError: () => {
 			toast.error("El usuario no ha sido registrado correctamente");
+		},
+	});
+};
+
+export const useLoginMutation = () => {
+	return useMutation({
+		mutationFn: async ({ email, password }: { email: string; password: string }) => {
+			const session = await api.users.signIn(email, password);
+			return session;
+		},
+		onSuccess: (session) => {
+			console.log(session.session.token, "session on login mutation");
+			localStorage.setItem("authToken", session.session.token);
+			useAppStore.setState({ session: session });
+			
 		},
 	});
 };

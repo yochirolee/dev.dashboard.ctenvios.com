@@ -62,11 +62,7 @@ const data = {
 				},
 				{
 					title: "Ordenes",
-					url: "/orders",
-				},
-				{
-					title: "Reportes",
-					url: "#",
+					url: "/orders/list",
 				},
 			],
 		},
@@ -101,23 +97,6 @@ const data = {
 					url: "/settings/users",
 				},
 			],
-		},
-	],
-	projects: [
-		{
-			name: "Design Engineering",
-			url: "#",
-			icon: Frame,
-		},
-		{
-			name: "Sales & Marketing",
-			url: "#",
-			icon: PieChart,
-		},
-		{
-			name: "Travel",
-			url: "#",
-			icon: Map,
 		},
 	],
 };

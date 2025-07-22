@@ -12,23 +12,34 @@ import type {
 import type { User } from "better-auth/types";
 import { useAppStore } from "@/stores/app-store";
 
+const getApiUrl = () => {
+	// Use environment variable if set
+	if (import.meta.env.VITE_API_URL) {
+		return import.meta.env.VITE_API_URL;
+	}
+	
+	// Check if in production
+	if (import.meta.env.PROD) {
+		return "https://api-ctenvios-com.vercel.app/api/v1";
+	}
+	
+	// Default to localhost for development
+	return "http://localhost:3000/api/v1";
+};
+
 const config = {
-	baseURL: import.meta.env.VITE_API_URL || "http://localhost:3000/api/v1",
+	baseURL: getApiUrl(),
 	timeout: 10000,
-	headers: {
-		"Content-Type": "application/json",
-		Authorization: `Bearer ${localStorage.getItem("authToken")}`,
-	},
 };
 
 export const axiosInstance = axios.create(config);
 
 // Add request interceptor to include session token in headers
-/* axiosInstance.interceptors.request.use(
+axiosInstance.interceptors.request.use(
 	async (config) => {
 		try {
 			// Get the current session from BetterAuth
-			const token = localStorage.getItem("token");
+			const token = localStorage.getItem("authToken");
 			// If we have a session, include the session token in the headers
 			if (token) {
 				config.headers.Authorization = `Bearer ${token}`;
@@ -44,7 +55,7 @@ export const axiosInstance = axios.create(config);
 	(error) => {
 		return Promise.reject(error);
 	},
-); */
+);
 
 // Add response interceptor for better error handling with React Query
 axiosInstance.interceptors.response.use(
@@ -54,6 +65,7 @@ axiosInstance.interceptors.response.use(
 		// Handle 401 Unauthorized responses
 		if (error.response?.status === 401) {
 			localStorage.removeItem("authToken");
+			useAppStore.setState({ session: null });
 			window.location.href = "/login";
 		}
 
@@ -205,9 +217,9 @@ const api = {
 			const response = await axiosInstance.post("/users/sign-up/email", data);
 			return response.data;
 		},
+
 		getSession: async () => {
 			const response = await axiosInstance.get("/users/get-session");
-
 			return response.data;
 		},
 		signIn: async (email: string, password: string) => {
@@ -215,13 +227,6 @@ const api = {
 				email,
 				password,
 			});
-			if (response.status === 200) {
-				localStorage.setItem("authToken", response.data.token);
-				const session = await api.users.getSession();
-				useAppStore.setState({ session: session });
-			}
-			
-
 			return response.data;
 		},
 		signOut: async () => {
