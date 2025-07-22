@@ -17,6 +17,8 @@ const config = {
 	timeout: 10000,
 };
 
+console.log(config.baseURL, "config");
+
 export const axiosInstance = axios.create(config);
 
 // Add request interceptor to include session token in headers
