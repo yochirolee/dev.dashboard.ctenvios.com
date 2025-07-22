@@ -27,28 +27,25 @@ export default function InvoicesPage() {
 
 	return (
 		<div className="space-y-4 ">
-			<div className="flex items-center justify-between">
+			<div className="flex items-center p-2 md:p-0 justify-between">
 				<div className="flex flex-col">
 					<h3 className=" font-bold">Facturas</h3>
 					<p className="text-sm text-gray-500 "> Listado de Facturas</p>
 				</div>
 				<div className="flex items-center gap-2">
 					<Button onClick={() => navigate("/orders/new")} variant="outline">
-						<FilePlus2 className="w-4 h-4" />
+						<FilePlus2 size={16} />
 						<span className="hidden md:block">Nueva Orden</span>
 					</Button>
 					<Button disabled={true} onClick={() => navigate("/orders/new")} variant="outline">
-						<Printer className="w-4 h-4" />
+						<Printer size={16} />
 						<span className="hidden md:block">Imprimir</span>
-						<Badge variant="outline" className=" md:ml-2 border-none">
-							0
-						</Badge>
 					</Button>
 				</div>
 			</div>
 
 			<div className="flex flex-col gap-4">
-				<div className="flex items-center space-x-2 w-sm relative justify-start">
+				<div className="flex items-center lg:w-sm relative justify-start">
 					{isLoading ? (
 						<Loader2 className="w-4 h-4 animate-spin absolute left-4" />
 					) : (

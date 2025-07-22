@@ -98,7 +98,7 @@ const Home = () => {
 			</div>
 			<div className="flex flex-col gap-4 py-4">
 				<div className="flex flex-col gap-2">
-					<div className="bg-muted p-4 rounded-lg">
+					<div className="bg-muted py-2 md:p-4 rounded-lg">
 						<SectionCards />
 					</div>
 				</div>

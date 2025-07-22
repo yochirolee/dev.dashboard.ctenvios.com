@@ -12,23 +12,8 @@ import type {
 import type { User } from "better-auth/types";
 import { useAppStore } from "@/stores/app-store";
 
-const getApiUrl = () => {
-	// Use environment variable if set
-	if (import.meta.env.VITE_API_URL) {
-		return import.meta.env.VITE_API_URL;
-	}
-	
-	// Check if in production
-	if (import.meta.env.PROD) {
-		return "https://api-ctenvios-com.vercel.app/api/v1";
-	}
-	
-	// Default to localhost for development
-	return "http://localhost:3000/api/v1";
-};
-
 const config = {
-	baseURL: getApiUrl(),
+	baseURL: import.meta.env.VITE_API_URL || "http://localhost:3000/api/v1",
 	timeout: 10000,
 };
 
