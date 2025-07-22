@@ -2,7 +2,6 @@ import { useSearchInvoices } from "@/hooks/use-invoices";
 import { FilePlus2, Loader2, Printer, Search } from "lucide-react";
 import { useState } from "react";
 import { DataTable } from "@/components/ui/data-table";
-import { Badge } from "@/components/ui/badge";
 import { orderColumns } from "@/components/orders/order/order-columns";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
