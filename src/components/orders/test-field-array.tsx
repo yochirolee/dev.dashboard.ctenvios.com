@@ -188,7 +188,7 @@ export function TestFieldArray() {
 
 						<li className="flex items-center justify-between">
 							<span className="text-muted-foreground">Discount</span>
-							<span>${form.getValues("discount")?.toFixed(2) ?? 0.0}</span>
+							<span>${0.0}</span>
 						</li>
 						<li className="flex items-center justify-between font-semibold">
 							<span className="text-muted-foreground">Total</span>
