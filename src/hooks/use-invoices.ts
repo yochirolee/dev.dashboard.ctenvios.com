@@ -4,17 +4,13 @@ import type { Invoice } from "@/data/types";
 import { useAppStore } from "@/stores/app-store";
 import { useLoaderData } from "react-router-dom";
 
-export const useSearchInvoices = (searchQuery: string, page: number, limit: number) => {
-	if (searchQuery.length > 2) {
-		return useQuery({
-			queryKey: ["get-invoices", "search", searchQuery, page, limit],
-			queryFn: () => api.invoices.search(searchQuery, page, limit),
-			staleTime: 1000 * 60 * 5,
-			initialData: keepPreviousData,
-			enabled: searchQuery.length > 2,
-		});
-	}
-	return useGetInvoices(page, limit);
+export const useSearchInvoices = (searchQuery: string, page: number, limit: number, startDate: string, endDate: string) => {
+	return useQuery({
+		queryKey: ["get-invoices", "search", searchQuery, page, limit, startDate, endDate],
+		queryFn: () => api.invoices.search(searchQuery, page, limit, startDate, endDate),
+		staleTime: 1000 * 60 * 5,
+		initialData: keepPreviousData,
+	});
 };
 
 export const useGetInvoices = (page: number, limit: number) => {

@@ -1,5 +1,5 @@
 import { useSearchInvoices } from "@/hooks/use-invoices";
-import { FilePlus2, Loader2, Printer, Search } from "lucide-react";
+import { FilePlus2, Loader2, Printer, Search, X } from "lucide-react";
 import { useState } from "react";
 import { DataTable } from "@/components/ui/data-table";
 import { orderColumns } from "@/components/orders/order/order-columns";
@@ -8,11 +8,13 @@ import { Button } from "@/components/ui/button";
 import type { PaginationState } from "@tanstack/react-table";
 import { useDebounce } from "use-debounce";
 import { Input } from "@/components/ui/input";
+import { DatePickerWithRange } from "@/components/dates/data-range-picker";
 
 export default function InvoicesPage() {
 	const navigate = useNavigate();
 	const [searchQuery, setSearchQuery] = useState("");
 	const [debouncedSearchQuery] = useDebounce(searchQuery, 500);
+	const [date, setDate] = useState<Date | undefined>(undefined);
 	const [pagination, setPagination] = useState<PaginationState>({
 		pageIndex: 0,
 		pageSize: 20,
@@ -22,7 +24,14 @@ export default function InvoicesPage() {
 		debouncedSearchQuery,
 		pagination.pageIndex,
 		pagination.pageSize,
+		date?.toISOString() || "",
+		date?.toISOString() || "",
 	);
+
+	const handleClearFilters = () => {
+		setSearchQuery("");
+		setDate(undefined);
+	};
 
 	return (
 		<div>
@@ -42,15 +51,25 @@ export default function InvoicesPage() {
 					</Button>
 				</div>
 			</div>
-
 			<div className="flex flex-col gap-4">
-				<div className="flex items-center lg:w-sm relative justify-start">
-					{isLoading ? (
-						<Loader2 className="w-4 h-4 animate-spin absolute left-4" />
-					) : (
+				<div className="flex items-center gap-2">
+					<div className="flex items-center lg:w-sm relative justify-start">
 						<Search className="w-4 h-4 absolute left-4" />
+
+						<Input
+							type="search"
+							className="pl-10"
+							value={searchQuery}
+							onChange={(e) => setSearchQuery(e.target.value)}
+						/>
+					</div>
+					<DatePickerWithRange date={date} setDate={setDate} />
+					{(date || searchQuery) && (
+						<Button variant="ghost" onClick={handleClearFilters}>
+							Reset
+							<X className="w-4 h-4" />
+						</Button>
 					)}
-					<Input type="search" className="pl-10" onChange={(e) => setSearchQuery(e.target.value)} />
 				</div>
 				<DataTable
 					columns={orderColumns}

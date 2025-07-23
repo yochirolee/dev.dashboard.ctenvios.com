@@ -13,8 +13,15 @@ import type { User } from "better-auth/types";
 import { useAppStore } from "@/stores/app-store";
 
 const config = {
-	baseURL: import.meta.env.VITE_API_URL || "http://localhost:3000/api/v1",
+	baseURL:
+		import.meta.env.VITE_API_URL ||
+		(import.meta.env.DEV
+			? "http://localhost:3000/api/v1"
+			: "https://api-ctenvios-com.vercel.app/api/v1"),
 	timeout: 10000,
+	headers: {
+		"Content-Type": "application/json",
+	},
 };
 
 console.log(config.baseURL, "config");
@@ -70,7 +77,6 @@ const api = {
 					limit: limit,
 				},
 			});
-			console.log(response, "response");
 			return response.data;
 		},
 		getReceipts: async (customerId: number, page: number | 0, limit: number | 50) => {
@@ -170,14 +176,18 @@ const api = {
 			});
 			return response.data;
 		},
-		search: async (search: string, page: number | 1, limit: number | 50) => {
+		search: async (search: string, page: number | 1, limit: number | 50, startDate: string, endDate: string) => {
+			
 			const response = await axiosInstance.get("/invoices/search", {
 				params: {
 					search,
 					page: page + 1,
 					limit: limit,
+					startDate: startDate,
+					endDate: endDate,
 				},
 			});
+			console.log(response, "response");
 			return response.data;
 		},
 		getById: async (id: number) => {
