@@ -1,5 +1,5 @@
 import { useSearchInvoices } from "@/hooks/use-invoices";
-import { FilePlus2, Loader2, Printer, Search, X } from "lucide-react";
+import { FilePlus2, Printer, Search, X } from "lucide-react";
 import { useState } from "react";
 import { DataTable } from "@/components/ui/data-table";
 import { orderColumns } from "@/components/orders/order/order-columns";
