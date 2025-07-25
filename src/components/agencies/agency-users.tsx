@@ -1,7 +1,7 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { KeyRound, MoreVertical, Pencil, Trash2, UserPlus } from "lucide-react";
+import { KeyRound, MoreVertical, Pencil, Trash2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { useAgencies } from "@/hooks/use-agencies";
 import { Separator } from "@/components/ui/separator";

@@ -37,7 +37,6 @@ export const UserPage = () => {
 
 						<Input type="search" className="pl-10" />
 					</div>
-					<UserRegisterForm />
 				</div>
 
 				<DataTable

@@ -14,7 +14,23 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 import { Switch } from "../ui/switch";
-import type { User } from "@/data/types";
+import { z } from "zod";
+
+const userSchemaColumns = z.object({
+	id: z.number(),
+	name: z.string(),
+	email: z.string(),
+	agency: z.object({
+		id: z.number(),
+		name: z.string(),
+	}),
+	role: z.string(),
+	isActive: z.boolean(),
+	createdAt: z.string(),
+});
+
+type User = z.infer<typeof userSchemaColumns>;
+
 
 export const userColumns = (handleDeleteUser: (id: number) => void): ColumnDef<User>[] => [
 	{
