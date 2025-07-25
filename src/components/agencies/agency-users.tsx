@@ -12,6 +12,7 @@ import {
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Skeleton } from "../ui/skeleton";
+import { UserRegisterForm } from "../users/user-register-form";
 
 export default function AgencyUsers({ agencyId }: { agencyId: number }) {
 	const { data: users, isLoading } = useAgencies.getUsers(agencyId);
@@ -19,7 +20,7 @@ export default function AgencyUsers({ agencyId }: { agencyId: number }) {
 	return (
 		<Card>
 			<CardHeader>
-				<div className="flex items-center gap-2">
+				<div className="flex justify-between items-center gap-2">
 					<CardTitle className=" flex flex-col">
 						<p>Usuarios de la agencia</p>
 						<p className="text-sm text-muted-foreground">
@@ -27,9 +28,7 @@ export default function AgencyUsers({ agencyId }: { agencyId: number }) {
 						</p>
 					</CardTitle>
 
-					<Button variant="outline" className="ml-auto">
-						<UserPlus className="mr-2 h-4 w-4" /> Agregar usuario
-					</Button>
+					<UserRegisterForm agencyId={agencyId} />
 				</div>
 			</CardHeader>
 			<Separator />

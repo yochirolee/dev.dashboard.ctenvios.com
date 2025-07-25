@@ -24,7 +24,6 @@ export const useReceipts = {
 				queryFn: () => {
 					return api.receipts.search(search, page, limit);
 				},
-				
 			});
 		}
 
@@ -59,6 +58,16 @@ export const useReceipts = {
 			onError: (error) => {
 				options?.onError?.(error);
 			},
+		});
+	},
+	getByCI: (ci: string) => {
+		return useQuery({
+			queryKey: ["receipts", ci],
+			queryFn: () => {
+				return api.receipts.getByCI(ci);
+			},
+			enabled: ci.length === 11,
+			retry: false,
 		});
 	},
 };

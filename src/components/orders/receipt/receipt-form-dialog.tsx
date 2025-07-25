@@ -96,12 +96,22 @@ export function ReceiptFormDialog({ expand = false }: { expand?: boolean }) {
 		},
 	});
 
+	const { data: receipt } = useReceipts.getByCI(
+		form.watch("ci")?.length === 11 ? form.watch("ci") : "",
+	);
+	if (receipt) {
+		setSelectedReceipt(receipt);
+		setIsOpen(false);
+		form.reset();
+		setFormError("");
+	}
+
 	const onSubmit = (data: Receipt) => {
 		if (data?.email === "") {
 			data.email = undefined;
 		}
 		data.phone = data.mobile ? `53${data.mobile}` : undefined;
-		
+
 		createReceipt(data as Receipt);
 	};
 

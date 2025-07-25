@@ -135,6 +135,14 @@ export const serviceSchema = z.object({
 	provider_id: z.number().min(1, "El proveedor es requerido"),
 	forwarder_id: z.number().min(1, "El forwarder es requerido"),
 });
+export const userSchema = z.object({
+	id: z.number().optional(),
+	email: z.string().email("Email inválido"),
+	password: z.string().min(8, "La contraseña debe tener al menos 8 caracteres"),
+	role: z.string().min(1, "El rol es requerido"),
+	name: z.string().min(2, "El nombre debe tener al menos 2 caracteres"),
+	agency_id: z.number().min(1, "El ID de la agencia es requerido"),
+});
 
 export type Agency = z.infer<typeof agencySchema>;
 export type Provider = z.infer<typeof providerSchema>;
@@ -172,15 +180,4 @@ export interface Rate {
 
 export type Customs = z.infer<typeof customsSchema>;
 
-export type User = {
-	id: number;
-	email: string;
-	role: string;
-	agency_id: number;
-	agency: Agency;
-	name: string;
-	createdAt: string;
-	updatedAt: string;
-	image: string;
-	emailVerified: boolean;
-};
+export type User = z.infer<typeof userSchema>;

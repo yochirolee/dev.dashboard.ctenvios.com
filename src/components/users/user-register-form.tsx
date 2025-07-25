@@ -25,44 +25,37 @@ import {
 import { useState } from "react";
 import { useRegister } from "@/hooks/use-users";
 import { UserPlus } from "lucide-react";
-import { AgenciesCombobox } from "../agencies/agencies-combobox";
-export const description =
-	"A login form with email and password. There's an option to login with Google and a link to sign up if you don't have an account.";
-// Create a type from the roles object values
+import { userSchema } from "@/data/types";
+import { toast } from "sonner";
 
-const FormSchema = z.object({
-	email: z.string().email(),
-	password: z.string().min(8),
-	role: z.string(),
-	name: z.string().min(8),
-	agency_id: z.number(),
-});
+type FormValues = z.infer<typeof userSchema>;
 
-type FormValues = z.infer<typeof FormSchema>;
-
-export function UserRegisterForm() {
+export function UserRegisterForm({ agencyId }: { agencyId: number }) {
 	const [open, setOpen] = useState(false);
-	const [selectedAgencyId, setSelectedAgencyId] = useState<number>(1);
 
+	
 	const form = useForm<FormValues>({
-		resolver: zodResolver(FormSchema),
+		resolver: zodResolver(userSchema),
 		defaultValues: {
 			email: "",
 			password: "",
 			role: "AGENCY_SALES",
 			name: "",
-			agency_id: 1,
+			agency_id: agencyId,
 		},
 	});
 
 	const registerUser = useRegister();
-	const onSubmit = async (data: z.infer<typeof FormSchema>) => {
-		data.agency_id = selectedAgencyId;
-		console.log(data, "data in onSubmit");
-		registerUser.mutate(data, {
+	const onSubmit = (data: FormValues) => {
+		// Create updated data object with the correct agency_id
+		const userData = { ...data, agency_id: agencyId };
+		registerUser.mutate(userData, {
 			onSuccess: () => {
 				setOpen(false);
 				form.reset();
+			},
+			onError: (error) => {
+				toast.error(error.message);
 			},
 		});
 	};
@@ -136,17 +129,6 @@ export function UserRegisterForm() {
 									</div>
 									<FormMessage />
 								</FormItem>
-							)}
-						/>
-
-						<FormField
-							control={form.control}
-							name="agency_id"
-							render={() => (
-								<AgenciesCombobox
-									selectedAgencyId={selectedAgencyId}
-									setSelectedAgencyId={setSelectedAgencyId}
-								/>
 							)}
 						/>
 

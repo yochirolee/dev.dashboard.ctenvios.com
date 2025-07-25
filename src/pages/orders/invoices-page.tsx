@@ -63,6 +63,7 @@ export default function InvoicesPage() {
 							onChange={(e) => setSearchQuery(e.target.value)}
 						/>
 					</div>
+					
 					<DatePickerWithRange date={date} setDate={setDate} />
 					{(date || searchQuery) && (
 						<Button variant="ghost" onClick={handleClearFilters}>

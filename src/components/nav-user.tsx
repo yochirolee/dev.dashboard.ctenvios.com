@@ -18,19 +18,17 @@ import {
 } from "@/components/ui/sidebar";
 import { useNavigate } from "react-router-dom";
 import { useAppStore } from "@/stores/app-store";
-import { authClient } from "@/lib/auth-client";
+import { useLogOut } from "@/hooks/use-users";
 
 export function NavUser() {
 	const { isMobile } = useSidebar();
-	const { session, clearSession } = useAppStore();
+	const { session } = useAppStore();
 	const navigate = useNavigate();
+	const logOut = useLogOut();
 
 	const handleLogout = async () => {
 		try {
-			authClient.signOut();
-			clearSession();
-			localStorage.removeItem("authToken");
-			navigate("/login", { replace: true });
+			logOut.mutate();
 		} catch (error) {
 			console.error("Logout error:", error);
 			navigate("/login", { replace: true });

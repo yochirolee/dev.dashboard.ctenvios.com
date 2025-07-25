@@ -31,7 +31,7 @@ export const AgenciesPage = () => {
 					</NewAgencyDialog>
 				</div>
 			</div>
-			<div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+			<div className="grid grid-cols-1 lg:grid-cols-2  gap-4">
 				<div className="col-span-1 space-y-4">
 					<AgencyDetails agencyId={selectedAgencyId} />
 					<AgencyServiceRates agencyId={selectedAgencyId} />

@@ -9,8 +9,9 @@ import type {
 	Rate,
 	Invoice,
 } from "@/data/types";
-import type { User } from "better-auth/types";
+import type { User } from "@/data/types";
 import { useAppStore } from "@/stores/app-store";
+import { toast } from "sonner";
 
 const config = {
 	baseURL:
@@ -23,8 +24,6 @@ const config = {
 		"Content-Type": "application/json",
 	},
 };
-
-console.log(config.baseURL, "config");
 
 export const axiosInstance = axios.create(config);
 
@@ -39,9 +38,7 @@ axiosInstance.interceptors.request.use(
 				config.headers.Authorization = `Bearer ${token}`;
 			}
 		} catch (error) {
-			console.log(error, "error in Api");
-			// If there's an error getting the session, continue without the token
-			console.log("Failed to get session for API request:", error);
+			toast.error("Error al obtener la sesión");
 		}
 
 		return config;
@@ -132,6 +129,10 @@ const api = {
 			});
 			return response.data;
 		},
+		getByCI: async (ci: string) => {
+			const response = await axiosInstance.get(`/receipts/ci/${ci}`);
+			return response.data;
+		},
 		search: async (query: string, page: number | 0, limit: number | 50) => {
 			if (query === "" || query === undefined) {
 				const response = await axiosInstance.get("/receipts", {
@@ -176,8 +177,13 @@ const api = {
 			});
 			return response.data;
 		},
-		search: async (search: string, page: number | 1, limit: number | 50, startDate: string, endDate: string) => {
-			
+		search: async (
+			search: string,
+			page: number | 1,
+			limit: number | 50,
+			startDate: string,
+			endDate: string,
+		) => {
 			const response = await axiosInstance.get("/invoices/search", {
 				params: {
 					search,
@@ -187,7 +193,6 @@ const api = {
 					endDate: endDate,
 				},
 			});
-			console.log(response, "response");
 			return response.data;
 		},
 		getById: async (id: number) => {
@@ -210,7 +215,6 @@ const api = {
 			return response.data;
 		},
 		create: async (data: User) => {
-			console.log(data, "data in Api");
 			const response = await axiosInstance.post("/users/sign-up/email", data);
 			return response.data;
 		},
@@ -312,7 +316,6 @@ const api = {
 			return response.data;
 		},
 		update: async (id: number, data: Rate) => {
-			console.log(data, "Rates data in Api");
 			const response = await axiosInstance.put(`/rates/${id}`, data);
 			return response.data;
 		},

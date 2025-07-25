@@ -1,16 +1,9 @@
 import api from "@/api/api";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { authClient } from "@/lib/auth-client";
 import { useAppStore } from "@/stores/app-store";
-
-interface RegisterUserData {
-	email: string;
-	password: string;
-	name: string;
-	agency_id: number;
-	role: string;
-}
+import type { User } from "@/data/types";
+import { useNavigate } from "react-router-dom";
 
 export const useGetUsers = (page: number | 1, limit: number | 25) => {
 	return useQuery({
@@ -30,22 +23,9 @@ export const useGetSession = () => {
 export const useRegister = () => {
 	const queryClient = useQueryClient();
 	return useMutation({
-		mutationFn: (userData: RegisterUserData) =>
-			(authClient.signUp.email as any)({
-				email: userData.email,
-				password: userData.password,
-				name: userData.name,
-				role: userData.role as "ROOT" | "ADMINISTRATOR" | "AGENCY_ADMIN" | "AGENCY_SALES",
-				agency_id: userData.agency_id,
-				image: "",
-				callbackURL: "",
-				fetchOptions: {
-					cache: "no-store",
-					credentials: "include",
-				},
-			}),
-		onSuccess: () => {
-			queryClient.invalidateQueries({ queryKey: ["getUsers"] });
+		mutationFn: (userData: User) => api.users.create(userData),
+		onSuccess: (_, userData) => {
+			queryClient.invalidateQueries({ queryKey: ["get-agency-users", userData.agency_id] });
 			toast.success("Usuario registrado correctamente");
 		},
 		onError: () => {
@@ -61,10 +41,20 @@ export const useLoginMutation = () => {
 			return session;
 		},
 		onSuccess: (session) => {
-			console.log(session.session.token, "session on login mutation");
 			localStorage.setItem("authToken", session.session.token);
 			useAppStore.setState({ session: session });
-			
+		},
+	});
+};
+
+export const useLogOut = () => {
+	const navigate = useNavigate();
+	return useMutation({
+		mutationFn: () => api.users.signOut(),
+		onSuccess: () => {
+			useAppStore.setState({ session: null });
+			localStorage.removeItem("authToken");
+			navigate("/login", { replace: true });
 		},
 	});
 };
