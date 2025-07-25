@@ -4,7 +4,6 @@ import { Input } from "@/components/ui/input";
 import { userColumns } from "@/components/users/users-columns";
 import { useGetUsers } from "@/hooks/use-users";
 import { toast } from "sonner";
-import { UserRegisterForm } from "@/components/users/user-register-form";
 import { useState } from "react";
 import type { PaginationState } from "@tanstack/react-table";
 

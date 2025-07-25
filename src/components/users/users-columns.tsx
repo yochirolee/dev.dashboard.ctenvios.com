@@ -63,11 +63,7 @@ export const userColumns = (handleDeleteUser: (id: number) => void): ColumnDef<U
 		header: "Role",
 		cell: ({ row }) => <Badge variant="secondary">{row.getValue("role")}</Badge>,
 	},
-	{
-		accessorKey: "isActive",
-		header: "Status",
-		cell: ({ row }) => <Switch checked={row.original?.emailVerified ?? false} />,
-	},
+	
 	{
 		accessorKey: "createdAt",
 		header: "Created At",
@@ -78,13 +74,7 @@ export const userColumns = (handleDeleteUser: (id: number) => void): ColumnDef<U
 		),
 	},
 
-	{
-		accessorKey: "lastLogin",
-		header: "Last Active",
-		cell: ({ row }) => {
-			return <div>{formatDistance(new Date(row.original?.updatedAt), new Date())}</div>;
-		},
-	},
+	
 	// TODO: Add actions
 	{
 		accessorKey: "actions",
