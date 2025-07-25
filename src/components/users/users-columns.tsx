@@ -13,7 +13,6 @@ import {
 	DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 
-import { Switch } from "../ui/switch";
 import { z } from "zod";
 
 const userSchemaColumns = z.object({
@@ -30,7 +29,6 @@ const userSchemaColumns = z.object({
 });
 
 type User = z.infer<typeof userSchemaColumns>;
-
 
 export const userColumns = (handleDeleteUser: (id: number) => void): ColumnDef<User>[] => [
 	{
@@ -63,18 +61,13 @@ export const userColumns = (handleDeleteUser: (id: number) => void): ColumnDef<U
 		header: "Role",
 		cell: ({ row }) => <Badge variant="secondary">{row.getValue("role")}</Badge>,
 	},
-	
+
 	{
 		accessorKey: "createdAt",
 		header: "Created At",
-		cell: ({ row }) => (
-			<div>
-				{formatDistance(new Date(row.original?.createdAt), new Date())}
-			</div>
-		),
+		cell: ({ row }) => <div>{formatDistance(new Date(row.original?.createdAt), new Date())}</div>,
 	},
 
-	
 	// TODO: Add actions
 	{
 		accessorKey: "actions",
