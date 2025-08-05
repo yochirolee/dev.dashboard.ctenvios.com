@@ -12,26 +12,26 @@ import {
 	CommandList,
 } from "@/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { useReceipts } from "@/hooks/use-receipts";
-import type { Receipt } from "@/data/types";
+import { useReceivers } from "@/hooks/use-receivers";
+import type { Receiver } from "@/data/types";
 import { useDebounce } from "use-debounce";
 import { useInvoiceStore } from "@/stores/invoice-store";
 import { useShallow } from "zustand/react/shallow";
 
-export function RecipientCombobox() {
+export function ReceiverCombobox() {
 	const [open, setOpen] = React.useState(false);
 	const [searchQuery, setSearchQuery] = React.useState("");
 	const [debouncedSearchQuery] = useDebounce(searchQuery, 500);
 
-	const { selectedReceipt, selectedCustomer, setSelectedReceipt } = useInvoiceStore(
+	const { selectedReceiver, selectedCustomer, setSelectedReceiver } = useInvoiceStore(
 		useShallow((state) => ({
-			selectedReceipt: state.selectedReceipt,
+			selectedReceiver: state.selectedReceiver,
 			selectedCustomer: state.selectedCustomer,
-			setSelectedReceipt: state.setSelectedReceipt,
+			setSelectedReceiver: state.setSelectedReceiver,
 		})),
 	);
 
-	const { data, isLoading, isError } = useReceipts.get(
+	const { data, isLoading, isError } = useReceivers.get(
 		selectedCustomer?.id,
 		debouncedSearchQuery,
 		0,
@@ -42,7 +42,7 @@ export function RecipientCombobox() {
 		return <div>Error loading receipts</div>;
 	}
 
-	const receipts = data?.rows;
+	const receivers = data?.rows;
 
 	return (
 		<Popover open={open} onOpenChange={setOpen}>
@@ -53,14 +53,14 @@ export function RecipientCombobox() {
 					aria-expanded={open}
 					className="flex-1  justify-between"
 				>
-					{selectedReceipt?.id
-						? selectedReceipt.first_name +
+					{selectedReceiver?.id
+						? selectedReceiver.first_name +
 						  " " +
-						  selectedReceipt.last_name +
+						  selectedReceiver.last_name +
 						  " " +
-						  selectedReceipt.second_last_name +
+						  selectedReceiver.second_last_name +
 						  " - " +
-						  selectedReceipt.mobile
+						  selectedReceiver.mobile
 						: "Seleccionar cliente..."}
 					<ChevronsUpDown className="opacity-50" />
 				</Button>
@@ -81,27 +81,27 @@ export function RecipientCombobox() {
 							<CommandEmpty>No se encontraron destinatarios.</CommandEmpty>
 						)}
 						<CommandGroup>
-							{receipts?.map((receipt: Receipt) => (
+							{receivers?.map((receiver: Receiver) => (
 								<CommandItem
-									key={receipt?.id}
-									value={receipt?.id?.toString() || ""}
+									key={receiver?.id}
+									value={receiver?.id?.toString() || ""}
 									onSelect={() => {
-										setSelectedReceipt(receipt);
+										setSelectedReceiver(receiver);
 										setSearchQuery("");
 										setOpen(false);
 									}}
 								>
-									{receipt?.first_name +
+									{receiver?.first_name +
 										" " +
-										receipt?.last_name +
+										receiver?.last_name +
 										" " +
-										receipt?.second_last_name +
+										receiver?.second_last_name +
 										" - " +
-										(receipt?.phone || receipt?.mobile)}
+										(receiver?.phone || receiver?.mobile)}
 									<Check
 										className={cn(
 											"ml-auto",
-											selectedReceipt?.id === receipt?.id ? "opacity-100" : "opacity-0",
+											selectedReceiver?.id === receiver?.id ? "opacity-100" : "opacity-0",
 										)}
 									/>
 								</CommandItem>

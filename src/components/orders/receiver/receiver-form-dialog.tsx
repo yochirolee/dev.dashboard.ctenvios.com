@@ -26,8 +26,8 @@ import { Label } from "@/components/ui/label";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { UserRoundPlus } from "lucide-react";
-import { useReceipts } from "@/hooks/use-receipts";
-import { type Province, type City, type Receipt, receiptShema } from "@/data/types";
+import { useReceivers } from "@/hooks/use-receivers";
+import { type Province, type City, type Receiver, 	receiverSchema } from "@/data/types";
 import { isValidCubanCI } from "@/lib/utils";
 import { Separator } from "@/components/ui/separator";
 
@@ -46,10 +46,10 @@ import { InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
 import { useInvoiceStore } from "@/stores/invoice-store";
 import { useShallow } from "zustand/react/shallow";
 
-export function ReceiptFormDialog({ expand = false }: { expand?: boolean }) {
-	const { setSelectedReceipt, selectedCustomer } = useInvoiceStore(
+export function ReceiverFormDialog({ expand = false }: { expand?: boolean }) {
+	const { setSelectedReceiver, selectedCustomer } = useInvoiceStore(
 		useShallow((state) => ({
-			setSelectedReceipt: state.setSelectedReceipt,
+			setSelectedReceiver: state.setSelectedReceiver,
 			selectedCustomer: state.selectedCustomer,
 		})),
 	);
@@ -60,8 +60,8 @@ export function ReceiptFormDialog({ expand = false }: { expand?: boolean }) {
 	const [formError, setFormError] = useState("");
 	const { data: provinces } = useProvinces();
 
-	const form = useForm<Receipt>({
-		resolver: zodResolver(receiptShema),
+	const form = useForm<Receiver>({
+		resolver: zodResolver(receiverSchema),
 		defaultValues: {
 			first_name: "",
 			middle_name: "",
@@ -83,12 +83,12 @@ export function ReceiptFormDialog({ expand = false }: { expand?: boolean }) {
 			?.cities;
 	}, [form.getValues().province_id, provinces]);
 
-	const { mutate: createReceipt, isPending } = useReceipts.create(selectedCustomer?.id || 0, {
-		onSuccess: (data: Receipt) => {
+	const { mutate: createReceiver, isPending } = useReceivers.create(selectedCustomer?.id || 0, {
+		onSuccess: (data: Receiver) => {
 			setIsOpen(false);
 			form.reset();
 			setFormError("");
-			setSelectedReceipt(data);
+			setSelectedReceiver(data);
 		},
 		onError: (error: any) => {
 			console.log("Error creating receipt:", error);
@@ -96,23 +96,23 @@ export function ReceiptFormDialog({ expand = false }: { expand?: boolean }) {
 		},
 	});
 
-	const { data: receipt } = useReceipts.getByCI(
+	const { data: receiver } = useReceivers.getByCI(
 		form.watch("ci")?.length === 11 ? form.watch("ci") : "",
 	);
-	if (receipt) {
-		setSelectedReceipt(receipt);
+	if (receiver) {
+		setSelectedReceiver(receiver);
 		setIsOpen(false);
 		form.reset();
 		setFormError("");
 	}
 
-	const onSubmit = (data: Receipt) => {
+	const onSubmit = (data: Receiver) => {
 		if (data?.email === "") {
 			data.email = undefined;
 		}
 		data.phone = data.mobile ? `53${data.mobile}` : undefined;
 
-		createReceipt(data as Receipt);
+			createReceiver(data as Receiver);
 	};
 
 	const onError = (errors: any) => {

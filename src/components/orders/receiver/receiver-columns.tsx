@@ -1,9 +1,9 @@
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Checkbox } from "@/components/ui/checkbox";
 import { type ColumnDef } from "@tanstack/react-table";
-import { type Receipt } from "@/data/types";
+import { type Receiver } from "@/data/types";
 
-export const receiptsColumns: ColumnDef<Receipt>[] = [
+export const receiversColumns: ColumnDef<Receiver>[] = [
 	{
 		id: "select",
 		header: ({ table }) => (
@@ -49,7 +49,9 @@ export const receiptsColumns: ColumnDef<Receipt>[] = [
 		header: "Phone",
 		cell: ({ row }) => {
 			return (
-				<div className="flex items-center gap-2 text-muted-foreground">{row.original.phone}</div>
+				<div className="flex items-center gap-2 text-muted-foreground">
+					{row.original.mobile || row.original.phone}
+				</div>
 			);
 		},
 	},

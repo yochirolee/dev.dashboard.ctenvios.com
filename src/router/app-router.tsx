@@ -9,7 +9,6 @@ import { NewOrderPage } from "@/pages/orders/new-order-page";
 import { InteractiveChart } from "@/components/charts/interactive-chart";
 import { CustomersPage } from "@/pages/settings/customers-page";
 import { AgenciesPage } from "@/pages/settings/agencies-page";
-import { ReceiptsPage } from "@/pages/settings/receipts-page";
 import ProtectedRoute from "./protected-route";
 import InvoicesPage from "@/pages/orders/invoices-page";
 import { UserPage } from "@/pages/settings/user-page";
@@ -20,6 +19,7 @@ import { EditOrderPage } from "@/pages/orders/edit-order-page";
 import { queryClient } from "@/lib/query-client";
 import api from "@/api/api";
 import { useAppStore } from "@/stores/app-store";
+import { ReceiversPage } from "@/pages/settings/receiver-page";
 
 const useLoadInitialData = () => {
 	const session = useAppStore((state) => state.session);
@@ -75,7 +75,7 @@ export const AppRouter = () => {
 						<Route path="providers" element={<ProvidersServicesPage />} />
 						<Route path="agencies" element={<AgenciesPage />} />
 						<Route path="customers" element={<CustomersPage />} />
-						<Route path="receipts" element={<ReceiptsPage />} />
+						<Route path="receivers" element={<ReceiversPage />} />
 						<Route path="users" element={<UserPage />} />
 						<Route path="customs" element={<CustomsPage />} />
 					</Route>

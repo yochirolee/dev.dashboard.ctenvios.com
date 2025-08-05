@@ -1,20 +1,20 @@
 import React from "react";
-import { receiptsColumns } from "@/components/orders/receipt/receipts-columns";
+import { receiversColumns } from "@/components/orders/receiver/receiver-columns";
 import { DataTable } from "@/components/ui/data-table";
-import { useReceipts } from "@/hooks/use-receipts";
+import { useReceivers } from "@/hooks/use-receivers";
 import { useDebounce } from "use-debounce";
 import { Input } from "@/components/ui/input";
 import { Loader2, Search } from "lucide-react";
 import type { PaginationState } from "@tanstack/react-table";
 import { useState } from "react";
-export const ReceiptsPage = () => {
+export const ReceiversPage = () => {
 	const [searchQuery, setSearchQuery] = React.useState("");
 	const [debouncedSearchQuery] = useDebounce(searchQuery, 500);
 	const [pagination, setPagination] = useState<PaginationState>({
 		pageIndex: 0,
 		pageSize: 25,
 	});
-	const { data: receipts, isLoading } = useReceipts.search(
+	const { data: receivers, isLoading } = useReceivers.search(
 		debouncedSearchQuery,
 		pagination.pageIndex,
 		pagination.pageSize,
@@ -38,10 +38,10 @@ export const ReceiptsPage = () => {
 						/>
 					</div>
 				</div>
-				{receipts && (
+				{receivers && (
 					<DataTable
-						columns={receiptsColumns}
-						data={receipts}
+						columns={receiversColumns}
+						data={receivers}
 						pagination={pagination}
 						setPagination={setPagination}
 					/>

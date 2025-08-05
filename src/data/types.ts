@@ -21,7 +21,7 @@ export const customerSchema = z.object({
 		.optional(),
 	address: z.string().optional(),
 });
-export const receiptShema = z
+export const receiverSchema = z
 	.object({
 		id: z.number().optional(),
 		first_name: z.string().min(2, { message: "First name must be at least 2 characters long" }),
@@ -85,7 +85,7 @@ export const itemsSchema = z.object({
 export const invoiceSchema = z.object({
 	id: z.number().optional(),
 	customer_id: z.number().min(0),
-	receipt_id: z.number().min(0),
+	receiver_id: z.number().min(0),
 	agency_id: z.number().min(0),
 	user_id: z.string().min(0),
 	service_id: z.number().min(0),
@@ -146,7 +146,7 @@ export const userSchema = z.object({
 
 export type Agency = z.infer<typeof agencySchema>;
 export type Provider = z.infer<typeof providerSchema>;
-export type Receipt = z.infer<typeof receiptShema>;
+export type Receiver = z.infer<typeof receiverSchema>;
 export type Customer =
 	| (z.infer<typeof customerSchema> & {
 			id: string;

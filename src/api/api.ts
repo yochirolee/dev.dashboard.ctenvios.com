@@ -76,8 +76,8 @@ const api = {
 			});
 			return response.data;
 		},
-		getReceipts: async (customerId: number, page: number | 0, limit: number | 50) => {
-			const response = await axiosInstance.get(`/customers/${customerId}/receipts`, {
+		getReceivers: async (customerId: number, page: number | 0, limit: number | 50) => {
+			const response = await axiosInstance.get(`/customers/${customerId}/receivers`, {
 				params: {
 					page: page + 1,
 					limit: limit,
@@ -119,9 +119,9 @@ const api = {
 			return response.data;
 		},
 	},
-	receipts: {
+	receivers: {
 		get: async (page: number | 0, limit: number | 50) => {
-			const response = await axiosInstance.get("/receipts", {
+			const response = await axiosInstance.get("/receivers", {
 				params: {
 					page,
 					limit,
@@ -130,12 +130,12 @@ const api = {
 			return response.data;
 		},
 		getByCI: async (ci: string) => {
-			const response = await axiosInstance.get(`/receipts/ci/${ci}`);
+			const response = await axiosInstance.get(`/receivers/ci/${ci}`);
 			return response.data;
 		},
 		search: async (query: string, page: number | 0, limit: number | 50) => {
 			if (query === "" || query === undefined) {
-				const response = await axiosInstance.get("/receipts", {
+				const response = await axiosInstance.get("/receivers", {
 					params: {
 						page: page + 1,
 						limit: limit,
@@ -143,7 +143,7 @@ const api = {
 				});
 				return response.data;
 			}
-			const response = await axiosInstance.get("/receipts/search", {
+			const response = await axiosInstance.get("/receivers/search", {
 				params: {
 					query,
 					page: page + 1,
@@ -153,7 +153,7 @@ const api = {
 			return response.data;
 		},
 		create: async (data: Receipt, customerId?: number) => {
-			const response = await axiosInstance.post("/receipts", data, {
+			const response = await axiosInstance.post("/receivers", data, {
 				params: {
 					customerId,
 				},

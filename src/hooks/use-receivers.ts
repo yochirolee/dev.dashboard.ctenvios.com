@@ -1,13 +1,13 @@
 import api from "@/api/api";
-import type { Receipt } from "@/data/types";
+import type { Receiver } from "@/data/types";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
-export const useReceipts = {
+export const useReceivers = {
 	search: (query: string, page: number | 0, limit: number | 50) => {
 		return useQuery({
-			queryKey: ["search-receipts", query, page, limit],
+			queryKey: ["search-receivers", query, page, limit],
 			queryFn: () => {
-				return api.receipts.search(query, page, limit);
+				return api.receivers.search(query, page, limit);
 			},
 			staleTime: 1000 * 60 * 5,
 		});
@@ -20,9 +20,9 @@ export const useReceipts = {
 	) => {
 		if (search && search.length > 2) {
 			return useQuery({
-				queryKey: ["search-receipts", search],
+				queryKey: ["search-receivers", search],
 				queryFn: () => {
-					return api.receipts.search(search, page, limit);
+					return api.receivers.search(search, page, limit);
 				},
 			});
 		}
@@ -30,7 +30,7 @@ export const useReceipts = {
 		return useQuery({
 			queryKey: [customerId],
 			queryFn: () => {
-				return api.customer.getReceipts(Number(customerId), page, limit);
+				return api.customer.getReceivers(Number(customerId), page, limit);
 			},
 			enabled: !!customerId,
 		});
@@ -38,7 +38,7 @@ export const useReceipts = {
 	create: (
 		customerId?: number,
 		options?: {
-			onSuccess?: (data: Receipt) => void;
+			onSuccess?: (data: Receiver) => void;
 			onError?: (error: any) => void;
 			customerId?: number;
 			search?: string;
@@ -46,12 +46,12 @@ export const useReceipts = {
 	) => {
 		const queryClient = useQueryClient();
 		return useMutation({
-			mutationFn: (data: Receipt) => {
-				return api.receipts.create(data, customerId);
+				mutationFn: (data: Receiver) => {
+				return api.receivers.create(data, customerId);
 			},
-			onSuccess: (data: Receipt) => {
+			onSuccess: (data: Receiver) => {
 				queryClient.invalidateQueries({
-					queryKey: ["receipts", options?.customerId, options?.search],
+					queryKey: ["receivers", options?.customerId, options?.search],
 				});
 				options?.onSuccess?.(data);
 			},
@@ -62,9 +62,9 @@ export const useReceipts = {
 	},
 	getByCI: (ci: string) => {
 		return useQuery({
-			queryKey: ["receipts", ci],
+			queryKey: ["receivers", ci],
 			queryFn: () => {
-				return api.receipts.getByCI(ci);
+				return api.receivers.getByCI(ci);
 			},
 			enabled: ci.length === 11,
 			retry: false,

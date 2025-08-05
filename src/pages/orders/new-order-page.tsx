@@ -1,10 +1,10 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { CustomerCombobox } from "@/components/orders/customer/customer-combobox";
 import { ServiceSelector } from "@/components/orders/service-selector";
-import { RecipientCombobox } from "@/components/orders/receipt/recipient-combobox";
+import { ReceiverCombobox } from "@/components/orders/receiver/receiver-combobox";
 import { CustomerInformation } from "@/components/orders/customer/customer-information";
-import { ReceiptInformation } from "@/components/orders/receipt/receipt-information";
-import { ReceiptFormDialog } from "@/components/orders/receipt/receipt-form-dialog";
+import { ReceiverInformation } from "@/components/orders/receiver/receiver-information";
+import { ReceiverFormDialog } from "@/components/orders/receiver/receiver-form-dialog";
 import { CustomerFormDialog } from "@/components/orders/customer/customer-form-dialog";
 import { TestFieldArray } from "@/components/orders/test-field-array";
 
@@ -36,10 +36,10 @@ export function NewOrderPage() {
 					</CardHeader>
 					<CardContent className="flex flex-col gap-2">
 						<div className="flex flex-col lg:flex-row gap-2">
-							<RecipientCombobox />
-							<ReceiptFormDialog />
+							<ReceiverCombobox />
+							<ReceiverFormDialog />
 						</div>
-						<ReceiptInformation />
+						<ReceiverInformation />
 					</CardContent>
 				</Card>
 			</div>

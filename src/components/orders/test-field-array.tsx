@@ -27,17 +27,17 @@ export function TestFieldArray() {
 	const {
 		selectedRate,
 		selectedCustomer,
-		selectedReceipt,
+		selectedReceiver,
 		setSelectedCustomer,
-		setSelectedReceipt,
+		setSelectedReceiver,
 		setSelectedService,
 	} = useInvoiceStore(
 		useShallow((state) => ({
 			selectedRate: state.selectedRate,
 			selectedCustomer: state.selectedCustomer,
-			selectedReceipt: state.selectedReceipt,
+			selectedReceiver: state.selectedReceiver,
 			setSelectedCustomer: state.setSelectedCustomer,
-			setSelectedReceipt: state.setSelectedReceipt,
+			setSelectedReceiver: state.setSelectedReceiver,
 			setSelectedService: state.setSelectedService,
 		})),
 	);
@@ -46,7 +46,7 @@ export function TestFieldArray() {
 		resolver: zodResolver(invoiceSchema) as any,
 		defaultValues: {
 			customer_id: selectedCustomer?.id || 0,
-			receipt_id: selectedReceipt?.id || 0,
+			receiver_id: selectedReceiver?.id || 0,
 			agency_id: session?.user?.agency_id || 0,
 			user_id: session?.user?.id || "",
 			service_id: selectedRate?.service_id || 0,
@@ -107,7 +107,7 @@ export function TestFieldArray() {
 		onSuccess: (data) => {
 			form.reset();
 			setSelectedCustomer(null);
-			setSelectedReceipt(null);
+			setSelectedReceiver(null);
 			setSelectedService(null);
 			toast.success("Orden creada correctamente");
 			navigate(`/orders/${data.id}`);
@@ -120,7 +120,7 @@ export function TestFieldArray() {
 		data.agency_id = session?.user?.agency_id || 0;
 		data.user_id = session?.user?.id || "";
 		data.customer_id = selectedCustomer?.id || 0;
-		data.receipt_id = selectedReceipt?.id || 0;
+		data.receiver_id = selectedReceiver?.id || 0;
 		data.items.forEach((item) => {
 			item.rate = selectedRate?.public_rate || 0;
 		});

@@ -46,7 +46,7 @@ export default function InvoiceDetailsPage() {
 		invoice?.items.reduce(
 			(acc: number, item: any) =>
 				acc +
-				item?.rate * item?.weight +
+				(item?.rate / 100) * item?.weight +
 				item?.customs_fee +
 				item?.delivery_fee +
 				item?.insurance_fee,
@@ -186,21 +186,21 @@ export default function InvoiceDetailsPage() {
 										<User size={16} />
 									</span>
 									<span>
-										{invoice?.receipt?.first_name} {invoice?.receipt?.middle_name}{" "}
-										{invoice?.receipt?.last_name} {invoice?.receipt?.second_last_name}
+										{invoice?.receiver?.first_name} {invoice?.receiver?.middle_name}{" "}
+										{invoice?.receiver?.last_name} {invoice?.receiver?.second_last_name}
 									</span>
 								</li>
 								<li className="flex items-center gap-2 justify-start">
 									<span className="text-muted-foreground">
 										<Phone size={16} />
 									</span>
-									<span>{invoice?.receipt?.phone || invoice?.receipt?.mobile}</span>
+									<span>{invoice?.receiver?.phone || invoice?.receiver?.mobile}</span>
 								</li>
 								<li className="flex items-center gap-2 justify-start">
 									<span className="text-muted-foreground">
 										<MapPin size={16} />
 									</span>
-									<span>{invoice?.receipt?.address}</span>
+									<span>{invoice?.receiver?.address}</span>
 								</li>
 							</ul>
 						</div>
@@ -234,14 +234,15 @@ export default function InvoiceDetailsPage() {
 									<TableCell className="text-right">
 										${parseFloat(item?.customs_fee).toFixed(2)}
 									</TableCell>
-									<TableCell className="text-right">${parseFloat(item?.rate).toFixed(2)}</TableCell>
+									<TableCell className="text-right">${(item?.rate / 100).toFixed(2)}</TableCell>
 									<TableCell className="text-right">{item?.weight.toFixed(2)}</TableCell>
 									<TableCell className="text-right">
-										{parseFloat(
-											item?.rate * item?.weight +
-												item?.customs_fee +
-												item?.delivery_fee +
-												item?.insurance_fee,
+										$
+										{(
+											(item?.rate / 100) * item?.weight +
+											item?.customs_fee +
+											item?.delivery_fee +
+											item?.insurance_fee
 										).toFixed(2)}
 									</TableCell>
 									<TableCell className="text-right">
@@ -289,7 +290,7 @@ export default function InvoiceDetailsPage() {
 							</li>
 							<li className="flex items-center justify-between font-semibold">
 								<span className="text-muted-foreground">Total</span>
-								<span>${(invoice?.total_amount/100).toFixed(2)} </span>
+								<span>${(invoice?.total_amount / 100).toFixed(2)} </span>
 							</li>
 						</ul>
 					</div>

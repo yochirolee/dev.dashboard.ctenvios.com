@@ -82,8 +82,8 @@ const data = {
 					url: "/settings/customers",
 				},
 				{
-					title: "Receipts",
-					url: "/settings/receipts",
+					title: "Receivers",
+					url: "/settings/receivers",
 				},
 				{
 					title: "Aranceles",
