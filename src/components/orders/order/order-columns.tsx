@@ -253,7 +253,7 @@ export const orderColumns: ColumnDef<Invoice>[] = [
 		cell: ({ row }) => {
 			return (
 				<div className="text-right font-medium whitespace-nowrap">
-					${row.original?.total_amount / 100}
+					${(row.original?.total_amount / 100).toFixed(2)}
 				</div>
 			);
 		},
