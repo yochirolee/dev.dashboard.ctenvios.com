@@ -18,6 +18,8 @@ type AgencyRatesProps = {
 export const AgencyRates = ({ rate }: AgencyRatesProps) => {
 	const [openDelete, setOpenDelete] = useState(false);
 	const [open, setOpen] = useState(false);
+	const publicRate = parseFloat(rate.public_rate) / 100;
+	const agencyRate = parseFloat(rate.agency_rate) / 100;
 
 	return (
 		<>
@@ -26,16 +28,16 @@ export const AgencyRates = ({ rate }: AgencyRatesProps) => {
 					<p>{rate?.name}</p>
 				</TableCell>
 				<TableCell>
-					<p>{parseFloat(rate.agency_rate).toFixed(2)} USD</p>
+					<p>{agencyRate.toFixed(2)} USD</p>
 				</TableCell>
 				<TableCell>
-					<p>{parseFloat(rate.public_rate).toFixed(2)} USD</p>
+					<p>{publicRate.toFixed(2)} USD</p>
 				</TableCell>
 				<TableCell>
 					<p>
-						{parseFloat(rate.public_rate) - parseFloat(rate.agency_rate) > 0
-							? `+${(parseFloat(rate.public_rate) - parseFloat(rate.agency_rate)).toFixed(2)} USD`
-							: `${(parseFloat(rate.public_rate) - parseFloat(rate.agency_rate)).toFixed(2)} USD`}
+						{publicRate - agencyRate > 0
+							? `+${(publicRate - agencyRate).toFixed(2)} USD`
+							: `${(publicRate - agencyRate).toFixed(2)} USD`}
 					</p>
 				</TableCell>
 				<TableCell className="flex justify-end">

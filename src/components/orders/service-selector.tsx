@@ -27,6 +27,8 @@ export function ServiceSelector() {
 	const agencyId = session?.user?.agency_id;
 	const { data: rates } = useRates.getByAgencyId(agencyId);
 
+	
+
 	const { setSelectedRate, selectedRate } = useInvoiceStore(
 		useShallow((state) => ({
 			setSelectedRate: state.setSelectedRate,

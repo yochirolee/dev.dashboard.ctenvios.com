@@ -7,18 +7,8 @@ import { ReceiptInformation } from "@/components/orders/receipt/receipt-informat
 import { ReceiptFormDialog } from "@/components/orders/receipt/receipt-form-dialog";
 import { CustomerFormDialog } from "@/components/orders/customer/customer-form-dialog";
 import { TestFieldArray } from "@/components/orders/test-field-array";
-import { useInvoiceStore } from "@/stores/invoice-store";
-import { useEffect } from "react";
 
 export function NewOrderPage() {
-	const { setSelectedCustomer, setSelectedRate, setSelectedService, setSelectedReceipt } =
-		useInvoiceStore();
-	useEffect(() => {
-		setSelectedCustomer(null);
-		setSelectedRate(null);
-		setSelectedService(null);
-		setSelectedReceipt(null as any);
-	}, []);
 	return (
 		<div className="space-y-4 ">
 			<div className="flex flex-col">
@@ -59,5 +49,3 @@ export function NewOrderPage() {
 		</div>
 	);
 }
-
-

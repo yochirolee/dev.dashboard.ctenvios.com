@@ -32,9 +32,9 @@ export default function AgencyUsers({ agencyId }: { agencyId: number }) {
 				</div>
 			</CardHeader>
 			<Separator />
-			<CardContent className="grid gap-8">
+			<CardContent className="flex flex-col gap-8">
 				{users?.map((user: any) => (
-					<div key={user.id} className="flex items-center gap-4">
+					<div key={user.id} className="flex flex-wrap items-center gap-4">
 						<Avatar className="hidden h-9 w-9 sm:flex">
 							<AvatarImage src={user.avatar} alt="Avatar" />
 							<AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
@@ -45,29 +45,27 @@ export default function AgencyUsers({ agencyId }: { agencyId: number }) {
 						</div>
 						<div className="ml-auto font-medium flex items-center gap-4">
 							<Badge variant="secondary">{user.role}</Badge>
-							<div>
-								<DropdownMenu>
-									<DropdownMenuTrigger asChild>
-										<Button variant="ghost">
-											<MoreVertical className="h-4 w-4" />
-										</Button>
-									</DropdownMenuTrigger>
-									<DropdownMenuContent align="end">
-										<DropdownMenuItem>
-											<Pencil className="h-4 w-4" />
-											Editar usuario
-										</DropdownMenuItem>
-										<DropdownMenuItem>
-											<KeyRound className="h-4 w-4" />
-											Reset Password
-										</DropdownMenuItem>
-										<DropdownMenuItem>
-											<Trash2 className="h-4 w-4" />
-											Eliminar usuario
-										</DropdownMenuItem>
-									</DropdownMenuContent>
-								</DropdownMenu>
-							</div>
+							<DropdownMenu>
+								<DropdownMenuTrigger asChild>
+									<Button variant="ghost">
+										<MoreVertical className="h-4 w-4" />
+									</Button>
+								</DropdownMenuTrigger>
+								<DropdownMenuContent align="end">
+									<DropdownMenuItem>
+										<Pencil className="h-4 w-4" />
+										Editar usuario
+									</DropdownMenuItem>
+									<DropdownMenuItem>
+										<KeyRound className="h-4 w-4" />
+										Reset Password
+									</DropdownMenuItem>
+									<DropdownMenuItem>
+										<Trash2 className="h-4 w-4" />
+										Eliminar usuario
+									</DropdownMenuItem>
+								</DropdownMenuContent>
+							</DropdownMenu>
 						</div>
 					</div>
 				))}

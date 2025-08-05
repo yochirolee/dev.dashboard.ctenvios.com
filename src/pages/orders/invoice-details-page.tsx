@@ -237,16 +237,13 @@ export default function InvoiceDetailsPage() {
 									<TableCell className="text-right">${parseFloat(item?.rate).toFixed(2)}</TableCell>
 									<TableCell className="text-right">{item?.weight.toFixed(2)}</TableCell>
 									<TableCell className="text-right">
-										${parseFloat(item?.total).toFixed(2)}
-										{/*
 										{parseFloat(
-											(parseFloat(item?.rate) * item?.weight) +
-												parseFloat(item?.customs_fee) +
-												parseFloat(item?.delivery_fee) +
-												parseFloat(item?.insurance_fee),
+											item?.rate * item?.weight +
+												item?.customs_fee +
+												item?.delivery_fee +
+												item?.insurance_fee,
 										).toFixed(2)}
-										*/}
-										</TableCell>
+									</TableCell>
 									<TableCell className="text-right">
 										<DropdownMenu>
 											<DropdownMenuTrigger>
@@ -292,7 +289,7 @@ export default function InvoiceDetailsPage() {
 							</li>
 							<li className="flex items-center justify-between font-semibold">
 								<span className="text-muted-foreground">Total</span>
-								<span>${invoice?.total_amount.toFixed(2)} </span>
+								<span>${(invoice?.total_amount/100).toFixed(2)} </span>
 							</li>
 						</ul>
 					</div>

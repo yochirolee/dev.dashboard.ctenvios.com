@@ -34,8 +34,8 @@ export default function InvoicesPage() {
 	};
 
 	return (
-		<div>
-			<div className="flex items-center p-2 md:p-0 justify-between">
+		<div className="flex flex-col gap-4">
+			<div className="flex flex-row justify-between">
 				<div className="flex flex-col">
 					<h3 className=" font-bold">Facturas</h3>
 					<p className="text-sm text-gray-500 "> Listado de Facturas</p>
@@ -63,7 +63,7 @@ export default function InvoicesPage() {
 							onChange={(e) => setSearchQuery(e.target.value)}
 						/>
 					</div>
-					
+
 					<DatePickerWithRange date={date} setDate={setDate} />
 					{(date || searchQuery) && (
 						<Button variant="ghost" onClick={handleClearFilters}>
@@ -72,6 +72,7 @@ export default function InvoicesPage() {
 						</Button>
 					)}
 				</div>
+
 				<DataTable
 					columns={orderColumns}
 					data={data}

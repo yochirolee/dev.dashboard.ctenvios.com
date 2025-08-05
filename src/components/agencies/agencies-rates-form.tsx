@@ -51,8 +51,8 @@ export const AgenciesRatesForm = ({
 						name: rate.name,
 						rate_id: rate.id,
 						agency_id: rate.agency_id,
-						agency_rate: rate.agency_rate,
-						public_rate: rate.public_rate,
+						agency_rate: rate.agency_rate/100,
+						public_rate: rate.public_rate/100,
 				  },
 	});
 	const { mutate: updateRate, isPending: isUpdating } = useRates.update();

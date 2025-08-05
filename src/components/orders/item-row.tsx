@@ -94,6 +94,10 @@ function ItemRow({
 		}
 	}, [customs?.id, customs?.description, customs?.fee, form, index]);
 
+	const handleRemove = (index: number) => {
+		remove(index);
+	};
+
 	return (
 		<TableRow key={index}>
 			<TableCell>{index + 1}</TableCell>
@@ -158,7 +162,7 @@ function ItemRow({
 			<TableCell className="text-right">{subtotal.toFixed(2)}</TableCell>
 
 			<TableCell className="w-10">
-				<Button variant="ghost" size="icon" onClick={() => remove(index)}>
+				<Button type="button" variant="ghost" size="icon" onClick={() => handleRemove(index)}>
 					<Trash2 />
 				</Button>
 			</TableCell>

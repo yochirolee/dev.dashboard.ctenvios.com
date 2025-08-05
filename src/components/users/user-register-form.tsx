@@ -27,13 +27,13 @@ import { useRegister } from "@/hooks/use-users";
 import { UserPlus } from "lucide-react";
 import { userSchema } from "@/data/types";
 import { toast } from "sonner";
+import { useRoles } from "@/hooks/use-roles";
 
 type FormValues = z.infer<typeof userSchema>;
 
 export function UserRegisterForm({ agencyId }: { agencyId: number }) {
 	const [open, setOpen] = useState(false);
 
-	
 	const form = useForm<FormValues>({
 		resolver: zodResolver(userSchema),
 		defaultValues: {
@@ -44,6 +44,7 @@ export function UserRegisterForm({ agencyId }: { agencyId: number }) {
 			agency_id: agencyId,
 		},
 	});
+	const { data: roles } = useRoles.get();
 
 	const registerUser = useRegister();
 	const onSubmit = (data: FormValues) => {
@@ -148,9 +149,11 @@ export function UserRegisterForm({ agencyId }: { agencyId: number }) {
 											</SelectTrigger>
 											<SelectContent>
 												<SelectGroup>
-													<SelectItem key="AGENCY_SALES" value="AGENCY_SALES">
-														Agencia de ventas
-													</SelectItem>
+													{roles?.map((role: any) => (
+														<SelectItem key={role.id} value={role.name}>
+															{role.name}
+														</SelectItem>
+													))}
 												</SelectGroup>
 											</SelectContent>
 										</Select>

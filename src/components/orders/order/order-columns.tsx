@@ -14,6 +14,7 @@ import {
 import { Link } from "react-router-dom";
 import { queryClient } from "@/lib/query-client";
 import api from "@/api/api";
+import { cn } from "@/lib/utils";
 
 // This type is used to define the shape of our data.
 // You can use a Zod schema here if you want.
@@ -76,6 +77,7 @@ export const orderColumns: ColumnDef<Invoice>[] = [
 		),
 		enableSorting: false,
 		enableHiding: false,
+		size: 50,
 	},
 
 	{
@@ -84,7 +86,6 @@ export const orderColumns: ColumnDef<Invoice>[] = [
 		cell: ({ row }) => {
 			const invoiceId = row.original?.id;
 			const handleFocus = () => {
-				console.log("Prefetching data for invoice:", invoiceId);
 				queryClient.prefetchQuery({
 					queryKey: ["get-invoice", invoiceId],
 					queryFn: () => api.invoices.getById(invoiceId),
@@ -93,111 +94,165 @@ export const orderColumns: ColumnDef<Invoice>[] = [
 			return (
 				<Link
 					onMouseEnter={handleFocus}
-					className="flex items-center gap-2"
+					className="flex items-center gap-2 hover:underline"
 					to={`/orders/${row.original?.id}`}
 				>
-					<FileText size={16} />
-					{row.original?.id}
+					<FileText size={16} className="shrink-0" />
+					<span className="font-medium">{row.original?.id}</span>
 				</Link>
 			);
 		},
+		size: 100,
 	},
 	{
 		accessorKey: "_count",
 		header: "Labels",
 		cell: ({ row }) => {
 			return (
-				<Badge variant="secondary" className="flex items-center gap-2">
+				<Badge variant="secondary" className="flex items-center gap-2 w-fit">
 					<Link
 						className="flex items-center gap-2"
 						target="_blank"
 						to={`${baseUrl}/invoices/${row.original?.id}/labels`}
 					>
-						<span className="">{row?.original?._count.items}</span>
+						<span>{row?.original?._count.items}</span>
 						<TagIcon size={16} />
 					</Link>
 				</Badge>
 			);
 		},
+		size: 80,
 	},
 
 	{
 		accessorKey: "agency.name",
 		header: "Agencia",
 		cell: ({ row }) => {
-			return <div>{row.original?.agency?.name}</div>;
+			return (
+				<div className="max-w-[150px] truncate" title={row.original?.agency?.name}>
+					{row.original?.agency?.name}
+				</div>
+			);
 		},
+		size: 150,
 	},
 
 	{
 		accessorKey: "service",
 		header: "Servicio",
 		cell: ({ row }) => {
-			return <Badge variant="secondary">{row.original?.service?.name}</Badge>;
+			return (
+				<Badge
+					variant="secondary"
+					className="max-w-[120px] truncate"
+					title={row.original?.service?.name}
+				>
+					{row.original?.service?.name}
+				</Badge>
+			);
 		},
+		size: 120,
 	},
 	{
 		accessorKey: "created_at",
 		header: "Fecha",
 		cell: ({ row }) => {
-			return <div>{format(new Date(row.original?.created_at), "dd/MM/yyyy HH:mm a")}</div>;
+			return (
+				<div className="text-sm whitespace-nowrap">
+					{format(new Date(row.original?.created_at), "dd/MM/yyyy HH:mm a")}
+				</div>
+			);
 		},
+		size: 150,
 	},
 
 	{
 		accessorKey: "customer",
 		header: "Envia",
 		cell: ({ row }) => {
+			const customer = row.original?.customer;
+			const fullName = `${customer?.first_name || ""} ${customer?.middle_name || ""} ${
+				customer?.last_name || ""
+			} ${customer?.second_last_name || ""}`.trim();
+
 			return (
-				<div className="flex items-center gap-2">
+				<div className="flex items-center gap-2 min-w-0">
 					<Avatar className="w-8 h-8 shrink-0">
 						<AvatarFallback>
-							{row.original?.customer?.first_name.charAt(0)}
-							{row.original?.customer?.last_name.charAt(0)}
+							{customer?.first_name?.charAt(0) || ""}
+							{customer?.last_name?.charAt(0) || ""}
 						</AvatarFallback>
 					</Avatar>
-					<div className="truncate">
-						{row.original?.customer?.first_name} {row.original?.customer?.middle_name}{" "}
-						{row.original?.customer?.last_name} {row.original?.customer?.second_last_name}
+					<div className="min-w-0">
+						<div className="truncate text-sm font-medium" title={fullName}>
+							{fullName}
+						</div>
+						<div className="text-xs text-muted-foreground truncate" title={customer?.mobile}>
+							{customer?.mobile}
+						</div>
 					</div>
 				</div>
 			);
 		},
+		size: 200,
 	},
 	{
 		accessorKey: "receipt",
 		header: "Recibe",
 		cell: ({ row }) => {
+			const receipt = row.original?.receipt;
+			const fullName = `${receipt?.first_name || ""} ${receipt?.middle_name || ""} ${
+				receipt?.last_name || ""
+			} ${receipt?.second_last_name || ""}`.trim();
+
 			return (
-				<div className="flex items-center gap-2">
+				<div className="flex items-center gap-2 min-w-0">
 					<Avatar className="w-8 h-8 shrink-0">
 						<AvatarFallback>
-							{row.original?.receipt?.first_name.charAt(0)}
-							{row.original?.receipt?.last_name.charAt(0)}
+							{receipt?.first_name?.charAt(0) || ""}
+							{receipt?.last_name?.charAt(0) || ""}
 						</AvatarFallback>
 					</Avatar>
-					<div className="truncate">
-						{row.original?.receipt?.first_name} {row.original?.receipt?.middle_name}{" "}
-						{row.original?.receipt?.last_name} {row.original?.receipt?.second_last_name}
+					<div className="min-w-0 ">
+						<div className="truncate text-sm font-medium" title={fullName}>
+							{fullName}
+						</div>
+						<div className="text-xs text-muted-foreground truncate" title={receipt?.mobile}>
+							{receipt?.mobile}
+						</div>
 					</div>
 				</div>
 			);
 		},
+		size: 200,
 	},
 	{
 		accessorKey: "status",
 		header: "Status",
 		cell: ({ row }) => {
-			return <Badge variant="secondary">{row.original?.status}</Badge>;
+			return (
+				<Badge variant="secondary" className="whitespace-nowrap">
+					{row.original?.status}
+				</Badge>
+			);
 		},
+		size: 100,
 	},
 
 	{
 		accessorKey: "payment_status",
 		header: "Payment",
 		cell: ({ row }) => {
-			return <Badge variant="outline">{row.original?.payment_status ? "Pending" : "Paid"}</Badge>;
+			return (
+				<Badge
+					variant="outline"
+					
+				>
+					{row.original?.payment_status}
+				</Badge>
+			);
 		},
+		size: 100,
 	},
 
 	{
@@ -205,38 +260,39 @@ export const orderColumns: ColumnDef<Invoice>[] = [
 		header: "Total",
 		cell: ({ row }) => {
 			return (
-				<div className="text-right w-14  ">
-					{parseFloat(row.original?.total_amount.toString()).toFixed(2)}
+				<div className="text-right font-medium whitespace-nowrap">
+					${(row.original?.total_amount / 100)}
 				</div>
 			);
 		},
+		size: 100,
 	},
 	{
 		header: "Actions",
 		cell: ({ row }) => {
 			return (
-				<div className="flex justify-center max-w-6  ">
+				<div className="flex justify-center">
 					<DropdownMenu>
 						<DropdownMenuTrigger asChild>
-							<Button variant="ghost" size="icon">
+							<Button variant="ghost" size="icon" className="h-8 w-8">
 								<EllipsisVertical className="w-4 h-4" />
 							</Button>
 						</DropdownMenuTrigger>
-						<DropdownMenuContent>
+						<DropdownMenuContent align="end">
 							<Link to={`/orders/${row.original.id}`}>
 								<DropdownMenuItem>
-									<Printer className="w-4 h-4" />
+									<Printer className="w-4 h-4 mr-2" />
 									Print
 								</DropdownMenuItem>
 							</Link>
 							<Link to={`/orders/${row.original.id}/edit`}>
 								<DropdownMenuItem>
-									<Pencil className="w-4 h-4" />
+									<Pencil className="w-4 h-4 mr-2" />
 									Editar
 								</DropdownMenuItem>
 							</Link>
-							<DropdownMenuItem>
-								<Trash className="w-4 h-4" />
+							<DropdownMenuItem className="text-destructive">
+								<Trash className="w-4 h-4 mr-2" />
 								Eliminar
 							</DropdownMenuItem>
 						</DropdownMenuContent>
@@ -244,5 +300,7 @@ export const orderColumns: ColumnDef<Invoice>[] = [
 				</div>
 			);
 		},
+		size: 60,
+		enableSorting: false,
 	},
 ];

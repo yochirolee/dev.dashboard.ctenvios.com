@@ -38,7 +38,7 @@ export default function AgencyServiceRates({ agencyId }: { agencyId: number }) {
 						key={service?.id}
 						className="flex flex-col p-4 rounded-lg  lg:p-4 my-2 lg:my-4 bg-black/20"
 					>
-						<div className="flex flex-col lg:flex-row justify-between items-center">
+						<div className="flex   justify-between items-center">
 							<div className="flex flex-col">
 								<div className="flex items-center space-x-4">
 									<h1 className="text-lg font-bold">{service?.provider?.name}</h1>

@@ -20,15 +20,15 @@ export const DashboardLayout = () => {
 		<SidebarProvider>
 			<AppSidebar />
 			<SidebarInset>
-				<header className="flex h-10 border-b border-foreground/10 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12">
-					<div className="flex justify-between items-center gap-2 px-4 w-full">
-						<div className="flex items-center gap-2">
+				<header className="flex h-10 md:h-12 border-b  border-foreground/10 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12">
+					<div className="flex justify-between items-center  px-2  w-full">
+						<div className="flex items-center gap-2 ">
 							<SidebarTrigger className="-ml-1" />
-							<Separator orientation="vertical" className="mr-2 h-4" />
+							<Separator orientation="vertical" className="mr-0 h-4" />
 							<Breadcrumb>
 								<BreadcrumbList>
 									<BreadcrumbItem className="hidden md:block">
-										<BreadcrumbLink>
+										<BreadcrumbLink asChild>
 											<Link to={`/${breadcrumb[0]}`}>
 												{breadcrumb[0]?.charAt(0).toUpperCase() + breadcrumb[0]?.slice(1)}
 											</Link>

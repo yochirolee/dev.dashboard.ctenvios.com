@@ -328,6 +328,12 @@ const api = {
 			return response.data;
 		},
 	},
+	roles: {
+		get: async () => {
+			const response = await axiosInstance.get("/roles");
+			return response.data;
+		},
+	},
 };
 
 export default api;

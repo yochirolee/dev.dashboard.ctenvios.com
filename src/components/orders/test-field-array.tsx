@@ -76,20 +76,22 @@ export function TestFieldArray() {
 	}, [fields]);
 
 	const handleAddItem = () => {
-		if (items_count > 1) {
+		// Evita borrar todo si ya hay exactamente los items requeridos
+		if (fields.length !== items_count) {
 			handleRemoveAll();
-		}
 
-		const items = Array.from({ length: items_count - 1 }, () => ({
-			description: "",
-			weight: undefined,
-			customs_fee: 0,
-			delivery_fee: 0,
-			insurance_fee: 0,
-			rate: selectedRate?.public_rate || 0,
-			subtotal: 0,
-		}));
-		items.forEach((item) => append(item));
+			const itemsToAdd = Array.from({ length: items_count - 1 }, () => ({
+				description: "",
+				weight: undefined,
+				customs_fee: 0,
+				delivery_fee: 0,
+				insurance_fee: 0,
+				rate: selectedRate?.public_rate || 0,
+				subtotal: 0,
+			}));
+
+			itemsToAdd.forEach((item) => append(item));
+		}
 	};
 	const handleRemoveAll = () => {
 		// remove all items BUT the first one NOT THE FIRST ONE
@@ -135,11 +137,23 @@ export function TestFieldArray() {
 						<h3>Items in Order</h3>
 						<div className="flex space-x-2 justify-end items-center">
 							<Input
-								className="w-18  "
+								className="w-18"
 								type="number"
-								value={items_count}
-								onChange={(e) => setItemsCount(Number(e.target.value))}
+								min={1}
+								value={items_count === 0 ? "" : items_count}
+								onChange={(e) => {
+									const val = e.target.value;
+									if (val === "") {
+										setItemsCount(0); // Temporarily allow 0 to avoid breaking input
+									} else {
+										const num = Number(val);
+										if (!isNaN(num) && num >= 1) {
+											setItemsCount(num);
+										}
+									}
+								}}
 							/>
+
 							<Button onClick={handleAddItem} variant="ghost" type="button">
 								<PackagePlus />
 								<span className="hidden xl:block">Add Item</span>
