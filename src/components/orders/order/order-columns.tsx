@@ -14,7 +14,6 @@ import {
 import { Link } from "react-router-dom";
 import { queryClient } from "@/lib/query-client";
 import api from "@/api/api";
-import { cn } from "@/lib/utils";
 
 // This type is used to define the shape of our data.
 // You can use a Zod schema here if you want.
@@ -243,14 +242,7 @@ export const orderColumns: ColumnDef<Invoice>[] = [
 		accessorKey: "payment_status",
 		header: "Payment",
 		cell: ({ row }) => {
-			return (
-				<Badge
-					variant="outline"
-					
-				>
-					{row.original?.payment_status}
-				</Badge>
-			);
+			return <Badge variant="outline">{row.original?.payment_status}</Badge>;
 		},
 		size: 100,
 	},
@@ -261,7 +253,7 @@ export const orderColumns: ColumnDef<Invoice>[] = [
 		cell: ({ row }) => {
 			return (
 				<div className="text-right font-medium whitespace-nowrap">
-					${(row.original?.total_amount / 100)}
+					${row.original?.total_amount / 100}
 				</div>
 			);
 		},
