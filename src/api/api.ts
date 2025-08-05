@@ -1,7 +1,7 @@
 import axios from "axios";
 import type {
 	Customer,
-	Receipt,
+	Receiver,
 	Customs,
 	Agency,
 	Provider,
@@ -152,7 +152,7 @@ const api = {
 			});
 			return response.data;
 		},
-		create: async (data: Receipt, customerId?: number) => {
+		create: async (data: Receiver, customerId?: number) => {
 			const response = await axiosInstance.post("/receivers", data, {
 				params: {
 					customerId,

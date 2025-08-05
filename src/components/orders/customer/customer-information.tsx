@@ -4,11 +4,11 @@ import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 
 export function CustomerInformation() {
-	const { selectedCustomer, setSelectedCustomer, setSelectedReceipt } = useInvoiceStore(
+	const { selectedCustomer, setSelectedCustomer, setSelectedReceiver } = useInvoiceStore(
 		useShallow((state) => ({
 			selectedCustomer: state.selectedCustomer,
 			setSelectedCustomer: state.setSelectedCustomer,
-			setSelectedReceipt: state.setSelectedReceipt,
+			setSelectedReceiver: state.setSelectedReceiver,
 		})),
 	);
 
@@ -22,7 +22,7 @@ export function CustomerInformation() {
 							variant="outline"
 							onClick={() => {
 								setSelectedCustomer(null);
-								setSelectedReceipt(null);
+								setSelectedReceiver(null);
 							}}
 						>
 							Cancelar
