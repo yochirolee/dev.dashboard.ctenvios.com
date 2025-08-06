@@ -3,7 +3,17 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { type ColumnDef } from "@tanstack/react-table";
 import { format } from "date-fns";
-import { EllipsisVertical, FileText, Pencil, Printer, TagIcon, Trash } from "lucide-react";
+import {
+	CheckCircle2,
+	Clock,
+	CircleDashed,
+	EllipsisVertical,
+	FileText,
+	Pencil,
+	Printer,
+	TagIcon,
+	Trash,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
 	DropdownMenu,
@@ -31,7 +41,7 @@ export type Invoice = {
 		second_last_name: string;
 		mobile: string;
 	};
-	receipt: {
+	receiver: {
 		id: number;
 		first_name: string;
 		middle_name: string;
@@ -152,18 +162,6 @@ export const orderColumns: ColumnDef<Invoice>[] = [
 		},
 		size: 120,
 	},
-	{
-		accessorKey: "created_at",
-		header: "Fecha",
-		cell: ({ row }) => {
-			return (
-				<div className="text-sm whitespace-nowrap">
-					{format(new Date(row.original?.created_at), "dd/MM/yyyy HH:mm a")}
-				</div>
-			);
-		},
-		size: 150,
-	},
 
 	{
 		accessorKey: "customer",
@@ -196,28 +194,28 @@ export const orderColumns: ColumnDef<Invoice>[] = [
 		size: 200,
 	},
 	{
-		accessorKey: "receipt",
+		accessorKey: "receiver",
 		header: "Recibe",
 		cell: ({ row }) => {
-			const receipt = row.original?.receipt;
-			const fullName = `${receipt?.first_name || ""} ${receipt?.middle_name || ""} ${
-				receipt?.last_name || ""
-			} ${receipt?.second_last_name || ""}`.trim();
+			const receiver = row.original?.receiver;
+			const fullName = `${receiver?.first_name || ""} ${receiver?.middle_name || ""} ${
+				receiver?.last_name || ""
+			} ${receiver?.second_last_name || ""}`.trim();
 
 			return (
 				<div className="flex items-center gap-2 min-w-0">
 					<Avatar className="w-8 h-8 shrink-0">
 						<AvatarFallback>
-							{receipt?.first_name?.charAt(0) || ""}
-							{receipt?.last_name?.charAt(0) || ""}
+							{receiver?.first_name?.charAt(0) || ""}
+							{receiver?.last_name?.charAt(0) || ""}
 						</AvatarFallback>
 					</Avatar>
 					<div className="min-w-0 ">
 						<div className="truncate text-sm font-medium" title={fullName}>
 							{fullName}
 						</div>
-						<div className="text-xs text-muted-foreground truncate" title={receipt?.mobile}>
-							{receipt?.mobile}
+						<div className="text-xs text-muted-foreground truncate" title={receiver?.mobile}>
+							{receiver?.mobile}
 						</div>
 					</div>
 				</div>
@@ -237,12 +235,25 @@ export const orderColumns: ColumnDef<Invoice>[] = [
 		},
 		size: 100,
 	},
+	{
+		accessorKey: "created_at",
+		header: "Fecha",
+		cell: ({ row }) => {
+			return (
+				<div className="text-sm whitespace-nowrap flex flex-col ">
+					<span>{format(new Date(row.original?.created_at), "dd/MM/yyyy HH:mm a")}</span>
+					<span className="text-xs text-muted-foreground">{row.original?.user?.name}</span>
+				</div>
+			);
+		},
+		size: 150,
+	},
 
 	{
 		accessorKey: "payment_status",
 		header: "Payment",
 		cell: ({ row }) => {
-			return <Badge variant="outline">{row.original?.payment_status}</Badge>;
+			return paymentStatus(row.original?.payment_status);
 		},
 		size: 100,
 	},
@@ -252,8 +263,12 @@ export const orderColumns: ColumnDef<Invoice>[] = [
 		header: "Total",
 		cell: ({ row }) => {
 			return (
-				<div className="text-right font-medium whitespace-nowrap">
+				<div className="text-right font-medium whitespace-nowrap flex flex-col items-end">
 					${(row.original?.total_amount / 100).toFixed(2)}
+					<span className="text-xs text-muted-foreground">
+						{(row.original?.total_amount - row.original?.paid_amount) / 100 !== 0 &&
+							` ${((row.original?.total_amount - row.original?.paid_amount) / 100).toFixed(2)}`}
+					</span>
 				</div>
 			);
 		},
@@ -296,3 +311,29 @@ export const orderColumns: ColumnDef<Invoice>[] = [
 		enableSorting: false,
 	},
 ];
+
+const paymentStatus = (payment_status: string) => {
+	switch (payment_status) {
+		case "PAID":
+			return (
+				<Badge className="bg-green-500/10 text-green-500/80">
+					<CheckCircle2 className="w-4 h-4 mr-1" />
+					Pagado
+				</Badge>
+			);
+		case "PARTIALLY_PAID":
+			return (
+				<Badge className="bg-yellow-500/10 text-yellow-500/80">
+					<CircleDashed className="w-4 h-4 mr-1 " />
+					Parcial
+				</Badge>
+			);
+		default:
+			return (
+				<Badge variant="outline">
+					<Clock className="w-4 h-4 mr-1" />
+					Pendiente
+				</Badge>
+			);
+	}
+};
