@@ -323,21 +323,21 @@ const paymentStatus = (payment_status: string) => {
 			return (
 				<Badge className="bg-green-500/10 text-green-500/80">
 					<CheckCircle2 className="w-4 h-4 mr-1" />
-					Pagado
+					Completed
 				</Badge>
 			);
 		case "PARTIALLY_PAID":
 			return (
 				<Badge className="bg-yellow-500/10 text-yellow-500/80">
 					<CircleDashed className="w-4 h-4 mr-1 " />
-					Parcial
+					Partial
 				</Badge>
 			);
 		default:
 			return (
 				<Badge variant="outline">
 					<Clock className="w-4 h-4 mr-1" />
-					Pendiente
+					Pending
 				</Badge>
 			);
 	}
