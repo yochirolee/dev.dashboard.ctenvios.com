@@ -53,11 +53,16 @@ export type Invoice = {
 		id: number;
 		name: string;
 	};
-	payment_status: boolean;
+	payment_status: string;
 	status: string;
 	created_at: string;
 	updated_at: string;
 	total_amount: number;
+	paid_amount: number;
+	user: {
+		id: number;
+		name: string;
+	};
 	_count: {
 		items: number;
 	};
