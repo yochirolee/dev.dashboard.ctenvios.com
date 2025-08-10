@@ -18,6 +18,37 @@ export const roles = {
 	CARRIER_ADMIN: "CARRIER_ADMIN",
 } as const;
 
+export const payment_methods = [
+	{
+		value: "CASH",
+		label: "Efectivo",
+	},
+	{
+		value: "CREDIT_CARD",
+		label: "Tarjeta de crédito",
+	},
+	{
+		value: "DEBIT_CARD",
+		label: "Tarjeta de débito",
+	},
+	{
+		value: "TRANSFER",
+		label: "Transferencia",
+	},
+	{
+		value: "ZELLE",
+		label: "Zelle",
+	},
+	{
+		value: "PAYPAL",
+		label: "Paypal",
+	},
+	{
+		value: "OTHER",
+		label: "Otro",
+	},
+];
+
 // Helper function to check if a role has higher or equal hierarchy
 export const hasHigherOrEqualRole = (
 	userRole: keyof typeof roles,

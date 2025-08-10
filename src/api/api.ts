@@ -8,6 +8,7 @@ import type {
 	Service,
 	Rate,
 	Invoice,
+	Payment,
 } from "@/data/types";
 import type { User } from "@/data/types";
 import { useAppStore } from "@/stores/app-store";
@@ -203,7 +204,25 @@ const api = {
 			const response = await axiosInstance.post("/invoices", data);
 			return response.data;
 		},
+		getHistory: async (invoice_id: number) => {
+			const response = await axiosInstance.get(`/invoices/${invoice_id}/history`);
+			return response.data;
+		},
+		payments: {
+			create: async (invoice_id: number, data: Payment) => {
+				console.log(data,"on api");
+				const response = await axiosInstance.post(`/payments/invoice/${invoice_id}`, data);
+				return response.data;
+			},
+			delete: async (invoice_id: number, payment_id: number) => {
+				const response = await axiosInstance.delete(
+					`/invoices/${invoice_id}/payments/${payment_id}`,
+				);
+				return response.data;
+			},
+		},
 	},
+
 	users: {
 		get: async (page: number | 1, limit: number | 25) => {
 			const response = await axiosInstance.get("/users", {

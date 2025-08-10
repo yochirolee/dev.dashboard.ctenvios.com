@@ -8,11 +8,11 @@ import {
 	Pencil,
 	PrinterIcon,
 	MoreVertical,
-	DollarSign,
 	Plane,
 	Ship,
 	ChevronLeft,
 	Edit,
+	CheckCircle2,
 } from "lucide-react";
 import {
 	Table,
@@ -33,6 +33,7 @@ import {
 	DropdownMenuItem,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { PaymentForm } from "@/components/orders/payments/payment-form";
 
 const baseUrl = import.meta.env.VITE_API_URL;
 
@@ -41,6 +42,8 @@ export default function InvoiceDetailsPage() {
 	const navigate = useNavigate();
 	const { data, isLoading } = useGetInvoiceById(Number(invoiceId));
 	const invoice = data?.rows[0];
+
+	console.log(invoice, "invoice");
 
 	const total = parseFloat(
 		invoice?.items.reduce(
@@ -104,10 +107,7 @@ export default function InvoiceDetailsPage() {
 									Print Labels
 								</Button>
 							</Link>
-							<Button variant="outline" className="print:hidden">
-								<DollarSign className=" h-4 w-4" />
-								Pagar
-							</Button>
+
 							<Separator orientation="vertical" className="min-h-6 ml-2" />
 							<div className="flex items-center ">
 								<Link to={`/orders/${invoiceId}/edit`}>
@@ -209,15 +209,15 @@ export default function InvoiceDetailsPage() {
 					<Table>
 						<TableHeader>
 							<TableRow>
-								<TableHead className="w-20">HBL</TableHead>
-								<TableHead className="w-full">Descripción</TableHead>
-								<TableHead className="text-right w-14">Seguro</TableHead>
-								<TableHead className="text-right w-14">Delivery</TableHead>
-								<TableHead className="text-right w-14">Arancel</TableHead>
-								<TableHead className="text-right w-14">Precio</TableHead>
-								<TableHead className="text-right w-14">Peso</TableHead>
-								<TableHead className="text-right w-14">Subtotal</TableHead>
-								<TableHead className="text-right w-14"></TableHead>
+								<TableHead className="w-20 text-muted-foreground">HBL</TableHead>
+								<TableHead className="w-full text-muted-foreground">Descripción</TableHead>
+								<TableHead className="text-right w-14 text-muted-foreground">Seguro</TableHead>
+								<TableHead className="text-right w-14 text-muted-foreground">Delivery</TableHead>
+								<TableHead className="text-right w-14 text-muted-foreground">Arancel</TableHead>
+								<TableHead className="text-right w-14 text-muted-foreground">Precio</TableHead>
+								<TableHead className="text-right w-14 text-muted-foreground">Peso</TableHead>
+								<TableHead className="text-right w-14 text-muted-foreground">Subtotal</TableHead>
+								<TableHead className="text-right w-14 text-muted-foreground"></TableHead>
 							</TableRow>
 						</TableHeader>
 						<TableBody>
@@ -270,29 +270,55 @@ export default function InvoiceDetailsPage() {
 							))}
 						</TableBody>
 					</Table>
-					<div className="mt-8 flex justify-end pr-4">
-						<ul className="grid gap-3 w-1/6 ">
-							<li className="flex items-center justify-between">
-								<span className="text-muted-foreground">Subtotal</span>
-								<span>${total.toFixed(2)}</span>
-							</li>
-							<li className="flex items-center justify-between">
-								<span className="text-muted-foreground">Shipping</span>
-								<span>${invoice?.shipping_fee?.toFixed(2) ?? 0.0}</span>
-							</li>
-							<li className="flex items-center justify-between">
-								<span className="text-muted-foreground">Tax</span>
-								<span>${invoice?.tax?.toFixed(2) ?? 0.0}</span>
-							</li>
-							<li className="flex items-center justify-between">
-								<span className="text-muted-foreground">Verify</span>
-								<span>${total.toFixed(2)}</span>
-							</li>
-							<li className="flex items-center justify-between font-semibold">
-								<span className="text-muted-foreground">Total</span>
-								<span>${(invoice?.total_amount / 100).toFixed(2)} </span>
-							</li>
-						</ul>
+					<div className="relative">
+						<div className="absolute p-4 inset-0 flex items-center justify-center pointer-events-none">
+							<span className="text-[90px] rounded-2xl p-4 bg-green-500/10 border font-extrabold text-green-500 opacity-10 rotate-[-30deg]">
+								{invoice?.payment_status }
+							</span>
+						</div>
+
+						<div className="mt-8 flex justify-end pr-4">
+							<ul className="grid gap-3 w-1/6 ">
+								<li className="flex items-center justify-between">
+									<span className="text-muted-foreground">Subtotal</span>
+									<span>${total.toFixed(2)}</span>
+								</li>
+								<li className="flex items-center justify-between">
+									<span className="text-muted-foreground">Shipping</span>
+									<span>${invoice?.shipping_fee?.toFixed(2) ?? 0.0}</span>
+								</li>
+								<li className="flex items-center justify-between">
+									<span className="text-muted-foreground">Tax</span>
+									<span>${invoice?.tax?.toFixed(2) ?? 0.0}</span>
+								</li>
+								<li className="flex items-center justify-between">
+									<span className="text-muted-foreground">Fee</span>
+									<span>${invoice?.fee?.toFixed(2) ?? 0.0}</span>
+								</li>
+
+								<li className="flex items-center justify-between font-semibold">
+									<span className="text-muted-foreground">Total</span>
+									<span>${(invoice?.total_amount / 100).toFixed(2)} </span>
+								</li>
+								<li className="flex items-center justify-between">
+									<span className="text-muted-foreground">Paid</span>
+									<span>${(invoice?.paid_amount / 100).toFixed(2) ?? 0.0}</span>
+								</li>
+								<li className="flex items-center justify-between">
+									<span className="text-muted-foreground">Balance</span>
+									<span>
+										${((invoice?.total_amount - invoice?.paid_amount) / 100).toFixed(2) ?? 0.0}
+									</span>
+								</li>
+							</ul>
+						</div>
+					</div>
+					<Separator className="my-4 print:hidden" />
+					<div className="print:hidden mx-auto w-1/6">
+						{invoice?.payment_status === "PENDING" ||
+						invoice?.payment_status === "PARTIALLY_PAID" ? (
+							<PaymentForm invoice={invoice} />
+						) : null}
 					</div>
 
 					<div className="mt-24 text-center text-gray-500 text-sm">
@@ -302,7 +328,7 @@ export default function InvoiceDetailsPage() {
 					</div>
 				</div>
 				<div className="col-span-3 print:hidden">
-					<OrderHistory />
+					<OrderHistory invoice={invoice} />
 				</div>
 			</div>
 		</div>

@@ -33,6 +33,8 @@ export default function InvoicesPage() {
 		setDate(undefined);
 	};
 
+	
+
 	return (
 		<div className="flex flex-col gap-4">
 			<div className="flex flex-row justify-between">
@@ -79,7 +81,10 @@ export default function InvoicesPage() {
 					pagination={pagination}
 					setPagination={setPagination}
 					isLoading={isLoading || isFetching}
+					
 				/>
+
+
 			</div>
 		</div>
 	);

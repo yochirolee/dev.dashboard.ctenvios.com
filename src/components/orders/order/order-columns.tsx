@@ -10,7 +10,6 @@ import {
 	EllipsisVertical,
 	FileText,
 	Pencil,
-	Printer,
 	TagIcon,
 	Trash,
 } from "lucide-react";
@@ -293,8 +292,8 @@ export const orderColumns: ColumnDef<Invoice>[] = [
 						<DropdownMenuContent align="end">
 							<Link to={`/orders/${row.original.id}`}>
 								<DropdownMenuItem>
-									<Printer className="w-4 h-4 mr-2" />
-									Print
+									<FileText className="w-4 h-4 mr-2" />
+									Details
 								</DropdownMenuItem>
 							</Link>
 							<Link to={`/orders/${row.original.id}/edit`}>
@@ -323,7 +322,7 @@ const paymentStatus = (payment_status: string) => {
 			return (
 				<Badge className="bg-green-500/10 text-green-500/80">
 					<CheckCircle2 className="w-4 h-4 mr-1" />
-					Completed
+					Paid
 				</Badge>
 			);
 		case "PARTIALLY_PAID":
@@ -335,7 +334,7 @@ const paymentStatus = (payment_status: string) => {
 			);
 		default:
 			return (
-				<Badge variant="outline">
+				<Badge  className="bg-red-500/10 text-red-500/80">
 					<Clock className="w-4 h-4 mr-1" />
 					Pending
 				</Badge>

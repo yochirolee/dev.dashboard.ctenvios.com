@@ -72,6 +72,13 @@ export const rateSchema = z.object({
 	public_rate: z.number(),
 	is_sale_by_pounds: z.boolean(),
 });
+export const paymentSchema = z.object({
+	id: z.number().optional(),
+	amount: z.number().min(0),
+	payment_method: z.string().min(0),
+	payment_reference: z.string().min(0).optional(),
+	notes: z.string().min(0).optional(),
+});
 
 export const itemsSchema = z.object({
 	description: z.string().min(1),
@@ -93,6 +100,8 @@ export const invoiceSchema = z.object({
 	total_amount: z.number().min(0),
 	total_weight: z.number().min(0),
 	payment_status: z.boolean().default(false),
+	created_at: z.string().optional(),
+	updated_at: z.string().optional(),
 });
 
 export const customsSchema = z.object({
@@ -177,6 +186,8 @@ export interface Rate {
 	public_rate: number;
 	is_sale_by_pounds: boolean;
 }
+
+export type Payment = z.infer<typeof paymentSchema>;
 
 export type Customs = z.infer<typeof customsSchema>;
 

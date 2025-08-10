@@ -26,10 +26,10 @@ export function EditOrderPage() {
 		setSelectedService(invoice?.service);
 		setSelectedRate(invoice?.service?.rate);
 		setSelectedReceiver(invoice?.receiver);
-	}, [orderId, data]);
+	}, [orderId]);
 
 	if (isLoading) return <div>Loading...</div>;
-	console.log(invoice);
+	
 
 	return (
 		<div className="space-y-4 ">

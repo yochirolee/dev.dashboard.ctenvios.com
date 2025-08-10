@@ -1,10 +1,15 @@
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import api from "@/api/api";
-import type { Invoice } from "@/data/types";
+import type { Invoice, Payment } from "@/data/types";
 import { useAppStore } from "@/stores/app-store";
-import { useLoaderData } from "react-router-dom";
 
-export const useSearchInvoices = (searchQuery: string, page: number, limit: number, startDate: string, endDate: string) => {
+export const useSearchInvoices = (
+	searchQuery: string,
+	page: number,
+	limit: number,
+	startDate: string,
+	endDate: string,
+) => {
 	return useQuery({
 		queryKey: ["get-invoices", "search", searchQuery, page, limit, startDate, endDate],
 		queryFn: () => api.invoices.search(searchQuery, page, limit, startDate, endDate),
@@ -36,7 +41,6 @@ export const useGetInvoiceById = (id: number) => {
 		enabled: !!id,
 		initialData: keepPreviousData,
 	});
-	useLoaderData;
 };
 
 export const useCreateInvoice = (options?: {
@@ -53,5 +57,55 @@ export const useCreateInvoice = (options?: {
 		onError: (error) => {
 			options?.onError?.(error);
 		},
+	});
+};
+
+export const usePayInvoice = (options?: {
+	onSuccess?: () => void;
+	onError?: (error: any) => void;
+}) => {
+	const queryClient = useQueryClient();
+	return useMutation({
+		mutationFn: ({ invoice_id, data }: { invoice_id: number; data: Payment }) => {
+			return api.invoices.payments.create(invoice_id, data);
+		},
+		onSuccess: (data: any) => {
+			console.log(data, "on hook");
+			queryClient.invalidateQueries({ queryKey: ["get-invoice", data?.id] });
+			queryClient.invalidateQueries({ queryKey: ["get-invoices"] });
+			queryClient.invalidateQueries({ queryKey: ["get-invoice-history", data?.id] });
+			options?.onSuccess?.();
+		},
+		onError: (error) => {
+			options?.onError?.(error);
+		},
+	});
+};
+
+export const useDeleteInvoicePayment = (options?: {
+	onSuccess?: (data: Payment) => void;
+	onError?: (error: any) => void;
+}) => {
+	const queryClient = useQueryClient();
+	return useMutation({
+		mutationFn: ({ invoice_id, payment_id }: { invoice_id: number; payment_id: number }) =>
+			api.invoices.payments.delete(invoice_id, payment_id),
+		onSuccess: ({ invoice_id, payment_id }: { invoice_id: number; payment_id: number }) => {
+			queryClient.invalidateQueries({ queryKey: ["get-invoices"] });
+			queryClient.invalidateQueries({ queryKey: ["get-invoice", invoice_id] });
+			queryClient.invalidateQueries({ queryKey: ["get-invoice-history", invoice_id] });
+			options?.onSuccess?.({ invoice_id, payment_id });
+		},
+		onError: (error) => {
+			options?.onError?.(error);
+		},
+	});
+};
+
+export const useGetInvoiceHistory = (invoice_id: number) => {
+	return useQuery({
+		queryKey: ["get-invoice-history", invoice_id],
+		queryFn: () => api.invoices.getHistory(invoice_id),
+		enabled: !!invoice_id,
 	});
 };
