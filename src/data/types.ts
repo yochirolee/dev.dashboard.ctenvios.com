@@ -100,6 +100,7 @@ export const invoiceSchema = z.object({
 	total_amount: z.number().min(0),
 	total_weight: z.number().min(0),
 	payment_status: z.boolean().default(false),
+	paid_amount: z.number().min(0).optional().default(0),
 	created_at: z.string().optional(),
 	updated_at: z.string().optional(),
 });

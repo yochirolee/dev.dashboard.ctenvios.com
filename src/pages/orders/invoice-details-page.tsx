@@ -12,7 +12,6 @@ import {
 	Ship,
 	ChevronLeft,
 	Edit,
-	CheckCircle2,
 } from "lucide-react";
 import {
 	Table,
@@ -273,7 +272,7 @@ export default function InvoiceDetailsPage() {
 					<div className="relative">
 						<div className="absolute p-4 inset-0 flex items-center justify-center pointer-events-none">
 							<span className="text-[90px] rounded-2xl p-4 bg-green-500/10 border font-extrabold text-green-500 opacity-10 rotate-[-30deg]">
-								{invoice?.payment_status }
+								{invoice?.payment_status}
 							</span>
 						</div>
 

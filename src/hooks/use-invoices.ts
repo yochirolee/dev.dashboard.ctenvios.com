@@ -82,26 +82,6 @@ export const usePayInvoice = (options?: {
 	});
 };
 
-export const useDeleteInvoicePayment = (options?: {
-	onSuccess?: (data: Payment) => void;
-	onError?: (error: any) => void;
-}) => {
-	const queryClient = useQueryClient();
-	return useMutation({
-		mutationFn: ({ invoice_id, payment_id }: { invoice_id: number; payment_id: number }) =>
-			api.invoices.payments.delete(invoice_id, payment_id),
-		onSuccess: ({ invoice_id, payment_id }: { invoice_id: number; payment_id: number }) => {
-			queryClient.invalidateQueries({ queryKey: ["get-invoices"] });
-			queryClient.invalidateQueries({ queryKey: ["get-invoice", invoice_id] });
-			queryClient.invalidateQueries({ queryKey: ["get-invoice-history", invoice_id] });
-			options?.onSuccess?.({ invoice_id, payment_id });
-		},
-		onError: (error) => {
-			options?.onError?.(error);
-		},
-	});
-};
-
 export const useGetInvoiceHistory = (invoice_id: number) => {
 	return useQuery({
 		queryKey: ["get-invoice-history", invoice_id],

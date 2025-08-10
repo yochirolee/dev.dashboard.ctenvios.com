@@ -1,5 +1,5 @@
 import { format } from "date-fns";
-import { ChevronLeft, ChevronRight, Copy, CreditCard, FileText, MoreVertical, Truck } from "lucide-react";
+import { ChevronLeft, ChevronRight, Copy, MoreVertical, Truck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
 	Card,
@@ -20,10 +20,6 @@ import { Pagination, PaginationContent, PaginationItem } from "@/components/ui/p
 import { useGetInvoiceHistory } from "@/hooks/use-invoices";
 import { type Invoice } from "@/data/types";
 import { Badge } from "@/components/ui/badge";
-
-
-
-
 
 export default function OrderHistory({ invoice }: { invoice: Invoice }) {
 	const { data: history } = useGetInvoiceHistory(Number(invoice.id));
