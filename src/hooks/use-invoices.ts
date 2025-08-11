@@ -70,7 +70,6 @@ export const usePayInvoice = (options?: {
 			return api.invoices.payments.create(invoice_id, data);
 		},
 		onSuccess: (data: any) => {
-			console.log(data, "on hook");
 			queryClient.invalidateQueries({ queryKey: ["get-invoice", data?.id] });
 			queryClient.invalidateQueries({ queryKey: ["get-invoices"] });
 			queryClient.invalidateQueries({ queryKey: ["get-invoice-history", data?.id] });

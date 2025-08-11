@@ -1,7 +1,14 @@
 import { useForm, useFormContext } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form";
+import {
+	Form,
+	FormControl,
+	FormField,
+	FormItem,
+	FormLabel,
+	FormMessage,
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Check, ChevronsUpDown, DollarSign, Loader2 } from "lucide-react";
@@ -29,13 +36,14 @@ import {
 	DialogTrigger,
 } from "@/components/ui/dialog";
 import { DialogDescription } from "@/components/ui/dialog";
+import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 export const PaymentForm = ({ invoice }: { invoice: Invoice }) => {
 	const balance = ((invoice?.total_amount - invoice?.paid_amount) / 100).toFixed(2);
 	const form = useForm<z.infer<typeof paymentSchema>>({
 		resolver: zodResolver(paymentSchema),
 		defaultValues: {
-			amount: Number(balance) > 0 ? Number(balance) : 0.0,
+			amount: parseFloat(balance),
 			payment_method: payment_methods[0].value,
 			payment_reference: undefined,
 			notes: undefined,
@@ -45,8 +53,10 @@ export const PaymentForm = ({ invoice }: { invoice: Invoice }) => {
 	const { mutate: createPayment, isPending } = usePayInvoice({
 		onSuccess: () => {
 			form.reset();
+
 			toast.success("Payment created successfully");
 			setOpen(false);
+			
 		},
 		onError: (error: any) => {
 			toast.error(error.response.data.message);
@@ -72,11 +82,23 @@ export const PaymentForm = ({ invoice }: { invoice: Invoice }) => {
 					<DialogTitle>Pagar</DialogTitle>
 					<DialogDescription>Pagar la factura</DialogDescription>
 				</DialogHeader>
-				<div className="flex flex-col mx-auto space-y-8">
-					<div className="flex flex-col space-y-2">
-						<h1 className="text-2xl font-bold">Balance de la factura</h1>
-						<h2 className="text-xl font-bold text-green-600">${balance ?? 0.0}</h2>
-					</div>
+				<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+					<Card className="@container/card">
+						<CardHeader>
+							<CardDescription>Total de la factura</CardDescription>
+							<CardTitle className="text-2xl font-semibold text-muted-foreground tabular-nums @[250px]/card:text-3xl">
+								${invoice?.total_amount / 100}
+							</CardTitle>
+						</CardHeader>
+					</Card>
+					<Card className="@container/card">
+						<CardHeader>
+							<CardDescription>Pendiente de Pago</CardDescription>
+							<CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
+								${balance}
+							</CardTitle>
+						</CardHeader>
+					</Card>
 				</div>
 				<Form {...form}>
 					<form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col space-y-8">
@@ -112,6 +134,7 @@ export const PaymentForm = ({ invoice }: { invoice: Invoice }) => {
 											onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
 										/>
 									</FormControl>
+									<FormMessage />
 								</FormItem>
 							)}
 						/>

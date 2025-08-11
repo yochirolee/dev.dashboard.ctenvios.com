@@ -61,13 +61,13 @@ export default function InvoiceDetailsPage() {
 
 	if (isLoading) return <div>Loading...</div>;
 	return (
-		<div className="space-y-6  ">
-			<div className="grid grid-cols-10 gap-4">
-				<div className="p-4 col-span-7 rounded-lg shadow-lg print:shadow-none bg-card print:bg-white print:py-0 print:text-gray-500">
-					<div className="flex justify-between items-center print:hidden">
+		<div className="space-y-6 ">
+			<div className="grid grid-cols-1 xl:grid-cols-12 gap-4">
+				<div className="p-4 col-span-1 xl:col-span-9 rounded-lg shadow-lg print:shadow-none bg-card print:bg-white print:py-0 print:text-gray-500">
+					<div className="flex flex-col gap-2 md:flex-row lg:justify-between lg:items-center print:hidden">
 						<div className="flex flex-col gap-2">
 							<div className="flex items-center gap-2">
-								<ChevronLeft size={20} className="cursor-pointer" onClick={() => navigate(-1)} />
+								<ChevronLeft size={20} className="cursor-pointer" onClick={() => navigate('/orders/list')} />
 
 								<Separator orientation="vertical" className="min-h-6 mx-2" />
 								<div>
@@ -93,7 +93,7 @@ export default function InvoiceDetailsPage() {
 								</div>
 							</div>
 						</div>
-						<div className="flex items-center justify-end gap-2">
+						<div className="flex  items-center lg:justify-end gap-2">
 							<Link target="_blank" to={`${baseUrl}/invoices/${invoiceId}/pdf`}>
 								<Button className="print:hidden bg-blue-600 hover:bg-blue-700 text-white">
 									<PrinterIcon className=" h-4 w-4" />
@@ -125,7 +125,7 @@ export default function InvoiceDetailsPage() {
 					</div>
 
 					<Separator className="my-4 print:hidden" />
-					<div className="flex  justify-between mt-4 items-start mb-8">
+					<div className="flex flex-col xl:flex-row justify-between mt-4 items-start mb-8">
 						<div className="flex items-center gap-4">
 							{invoice?.agency?.logo ? (
 								<img
@@ -144,65 +144,62 @@ export default function InvoiceDetailsPage() {
 							</div>
 						</div>
 
-						<div>
-							<h1 className="text-xl text-end font-bold ">Invoice {invoice?.id}</h1>
-							<p className="text-lg text-end">Items: {invoice?.items.length}</p>
-							<time className="text-sm">
+						<div className=" flex w-full flex-col  justify-end text-center xl:text-end">
+							<h1 className="xl:text-xl text-end font-bold ">Invoice {invoice?.id}</h1>
+							<p className="xl:text-lg text-end">Items: {invoice?.items.length}</p>
+							<time className="text-sm text-end text-muted-foreground">
 								Fecha: {format(new Date(invoice?.created_at), "dd/MM/yyyy HH:mm a")}
 							</time>
 						</div>
 					</div>
-					<div className="grid grid-cols-2 items-start justify-between gap-20 mb-8">
-						<div>
-							<ul className="grid gap-3  ">
-								<li className="flex items-center gap-2 justify-start">
-									<span className="text-muted-foreground">
-										<User size={16} />
-									</span>
-									<span>
-										{invoice?.customer?.first_name} {invoice?.customer?.middle_name}{" "}
-										{invoice?.customer?.last_name} {invoice?.customer?.second_last_name}
-									</span>
-								</li>
-								<li className="flex items-center gap-2 justify-start">
-									<span className="text-muted-foreground">
-										<Phone size={16} />
-									</span>
-									<span>{invoice?.customer?.mobile}</span>
-								</li>
-								<li className="flex items-center gap-2 justify-start">
-									<span className="text-muted-foreground">
-										<MapPin size={16} />
-									</span>
-									<span>{invoice?.customer?.address}</span>
-								</li>
-							</ul>
-						</div>
-						<div>
-							<ul className="grid gap-3  ">
-								<li className="flex items-center gap-2 justify-start">
-									<span className="text-muted-foreground">
-										<User size={16} />
-									</span>
-									<span>
-										{invoice?.receiver?.first_name} {invoice?.receiver?.middle_name}{" "}
-										{invoice?.receiver?.last_name} {invoice?.receiver?.second_last_name}
-									</span>
-								</li>
-								<li className="flex items-center gap-2 justify-start">
-									<span className="text-muted-foreground">
-										<Phone size={16} />
-									</span>
-									<span>{invoice?.receiver?.phone || invoice?.receiver?.mobile}</span>
-								</li>
-								<li className="flex items-center gap-2 justify-start">
-									<span className="text-muted-foreground">
-										<MapPin size={16} />
-									</span>
-									<span>{invoice?.receiver?.address}</span>
-								</li>
-							</ul>
-						</div>
+					<div className="grid grid-cols-1 xl:grid-cols-2 items-start justify-between gap-10 xl:gap-20 mb-4 xl:mb-8">
+						<ul className="grid gap-3  ">
+							<li className="flex items-center gap-2 justify-start">
+								<span className="text-muted-foreground">
+									<User size={16} />
+								</span>
+								<span>
+									{invoice?.customer?.first_name} {invoice?.customer?.middle_name}{" "}
+									{invoice?.customer?.last_name} {invoice?.customer?.second_last_name}
+								</span>
+							</li>
+							<li className="flex items-center gap-2 justify-start">
+								<span className="text-muted-foreground">
+									<Phone size={16} />
+								</span>
+								<span>{invoice?.customer?.mobile}</span>
+							</li>
+							<li className="flex items-center gap-2 justify-start">
+								<span className="text-muted-foreground">
+									<MapPin size={16} />
+								</span>
+								<span>{invoice?.customer?.address}</span>
+							</li>
+						</ul>
+
+						<ul className="grid gap-3  ">
+							<li className="flex items-center gap-2 justify-start">
+								<span className="text-muted-foreground">
+									<User size={16} />
+								</span>
+								<span>
+									{invoice?.receiver?.first_name} {invoice?.receiver?.middle_name}{" "}
+									{invoice?.receiver?.last_name} {invoice?.receiver?.second_last_name}
+								</span>
+							</li>
+							<li className="flex items-center gap-2 justify-start">
+								<span className="text-muted-foreground">
+									<Phone size={16} />
+								</span>
+								<span>{invoice?.receiver?.phone || invoice?.receiver?.mobile}</span>
+							</li>
+							<li className="flex items-center gap-2 justify-start">
+								<span className="text-muted-foreground">
+									<MapPin size={16} />
+								</span>
+								<span>{invoice?.receiver?.address}</span>
+							</li>
+						</ul>
 					</div>
 
 					<Table>
@@ -276,9 +273,9 @@ export default function InvoiceDetailsPage() {
 							</span>
 						</div>
 
-						<div className="mt-8 flex justify-end pr-4">
-							<ul className="grid gap-3 w-1/6 ">
-								<li className="flex items-center justify-between">
+						<div className="mt-8 grid justify-end xl:pr-4 ">
+							<ul className="grid gap-2 w-1/5 ">
+								<li className="flex items-center gap-4 justify-between">
 									<span className="text-muted-foreground">Subtotal</span>
 									<span>${total.toFixed(2)}</span>
 								</li>
@@ -326,9 +323,8 @@ export default function InvoiceDetailsPage() {
 						<p>Payment is due within 30 days. Please process this invoice within that time.</p>
 					</div>
 				</div>
-				<div className="col-span-3 print:hidden">
-					<OrderHistory invoice={invoice} />
-				</div>
+
+				<OrderHistory invoice={invoice} />
 			</div>
 		</div>
 	);

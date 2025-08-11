@@ -24,7 +24,7 @@ import { Badge } from "@/components/ui/badge";
 export default function OrderHistory({ invoice }: { invoice: Invoice }) {
 	const { data: history } = useGetInvoiceHistory(Number(invoice.id));
 	return (
-		<Card className="overflow-hidden">
+		<Card className="overflow-hidden col-span-1 xl:col-span-3">
 			<CardHeader className="flex flex-row items-start bg-muted/50">
 				<div className="grid gap-0.5">
 					<CardTitle className="group flex items-center gap-2 text-lg">
@@ -64,8 +64,8 @@ export default function OrderHistory({ invoice }: { invoice: Invoice }) {
 				</div>
 			</CardHeader>
 			<CardContent className="p-6 text-sm">
-				{history?.map((item: any) => (
-					<dl className="grid gap-3 my-2  pb-2">
+				{history?.map((item: any, index: number) => (
+					<dl className="grid gap-3 my-2  pb-2" key={index}>
 						<div className="flex items-center justify-between">
 							<div className="flex  gap-4">
 								<Badge variant="secondary">{item.type}</Badge>
