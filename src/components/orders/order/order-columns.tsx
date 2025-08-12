@@ -98,13 +98,6 @@ export const orderColumns: ColumnDef<Invoice>[] = [
 		accessorKey: "id",
 		header: "Factura",
 		cell: ({ row }) => {
-			const invoiceId = row.original?.id;
-			const handleFocus = () => {
-				queryClient.prefetchQuery({
-					queryKey: ["get-invoice", invoiceId],
-					queryFn: () => api.invoices.getById(invoiceId),
-				});
-			};
 			return (
 				<Link
 					className="flex items-center gap-2"
