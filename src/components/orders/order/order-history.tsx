@@ -1,14 +1,7 @@
 import { format } from "date-fns";
-import { ChevronLeft, ChevronRight, Copy, MoreVertical, Truck } from "lucide-react";
+import { Copy, MoreVertical, Truck } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import {
-	Card,
-	CardContent,
-	CardDescription,
-	CardFooter,
-	CardHeader,
-	CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -16,13 +9,12 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Pagination, PaginationContent, PaginationItem } from "@/components/ui/pagination";
-import { useGetInvoiceHistory } from "@/hooks/use-invoices";
+import { useInvoices } from "@/hooks/use-invoices";
 import { type Invoice } from "@/data/types";
 import { Badge } from "@/components/ui/badge";
 
 export default function OrderHistory({ invoice }: { invoice: Invoice }) {
-	const { data: history } = useGetInvoiceHistory(Number(invoice.id));
+	const { data: history } = useInvoices.getHistory(Number(invoice.id));
 	return (
 		<Card className="overflow-hidden col-span-1 xl:col-span-3">
 			<CardHeader className="flex flex-row items-start bg-muted/50">
@@ -63,42 +55,21 @@ export default function OrderHistory({ invoice }: { invoice: Invoice }) {
 					</DropdownMenu>
 				</div>
 			</CardHeader>
-			<CardContent className="p-6 text-sm">
+			<CardContent className="p-2 text-sm">
 				{history?.map((item: any, index: number) => (
-					<dl className="grid gap-3 my-2  pb-2" key={index}>
-						<div className="flex items-center justify-between">
-							<div className="flex  gap-4">
+					<dl className="grid gap-3 my-2  pb-2 bg-muted/50 px-2 py-3 rounded-md" key={index}>
+						<div className="flex items-center gap-2 justify-between">
+							<div className="flex  gap-4 items-center">
 								<Badge variant="secondary">{item.type}</Badge>
-								<dd className="text-sm">{item.description}</dd>
+								<dd className="text-xs">{item.description}</dd>
 							</div>
-							<time className="flex items-center gap-1 text-right text-xs text-muted-foreground">
+							<time className="  text-right text-xs text-muted-foreground">
 								{format(new Date(item.date), "dd/MM/yyyy HH:mm a")}
 							</time>
 						</div>
 					</dl>
 				))}
 			</CardContent>
-			<CardFooter className="flex flex-row items-center border-t bg-muted/50 px-6 py-3">
-				<div className="text-xs text-muted-foreground">
-					Updated <time dateTime="2023-11-23">November 23, 2023</time>
-				</div>
-				<Pagination className="ml-auto mr-0 w-auto">
-					<PaginationContent>
-						<PaginationItem>
-							<Button size="icon" variant="outline" className="h-6 w-6">
-								<ChevronLeft className="h-3.5 w-3.5" />
-								<span className="sr-only">Previous Order</span>
-							</Button>
-						</PaginationItem>
-						<PaginationItem>
-							<Button size="icon" variant="outline" className="h-6 w-6">
-								<ChevronRight className="h-3.5 w-3.5" />
-								<span className="sr-only">Next Order</span>
-							</Button>
-						</PaginationItem>
-					</PaginationContent>
-				</Pagination>
-			</CardFooter>
 		</Card>
 	);
 }

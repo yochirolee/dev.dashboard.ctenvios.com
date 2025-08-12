@@ -1,5 +1,5 @@
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { useGetInvoiceById } from "@/hooks/use-invoices";
+import { useInvoices } from "@/hooks/use-invoices";
 import {
 	MapPin,
 	Phone,
@@ -39,10 +39,19 @@ const baseUrl = import.meta.env.VITE_API_URL;
 export default function InvoiceDetailsPage() {
 	const { invoiceId } = useParams();
 	const navigate = useNavigate();
-	const { data, isLoading } = useGetInvoiceById(Number(invoiceId));
+	const { data, isLoading } = useInvoices.getById(Number(invoiceId));
 	const invoice = data?.rows[0];
 
 	console.log(invoice, "invoice");
+
+	const total_customs_fee = invoice?.items.reduce(
+		(acc: number, item: any) => acc + item?.customs_fee,
+		0,
+	);
+	const subtotal = invoice?.items.reduce(
+		(acc: number, item: any) => acc + (item?.weight * item?.rate) / 100,
+		0,
+	);
 
 	const total = parseFloat(
 		invoice?.items.reduce(
@@ -55,6 +64,7 @@ export default function InvoiceDetailsPage() {
 			0,
 		),
 	);
+	const total_weight = invoice?.items.reduce((acc: number, item: any) => acc + item?.weight, 0);
 	console.log(total, "total");
 
 	console.log(invoice);
@@ -67,7 +77,11 @@ export default function InvoiceDetailsPage() {
 					<div className="flex flex-col gap-2 md:flex-row lg:justify-between lg:items-center print:hidden">
 						<div className="flex flex-col gap-2">
 							<div className="flex items-center gap-2">
-								<ChevronLeft size={20} className="cursor-pointer" onClick={() => navigate('/orders/list')} />
+								<ChevronLeft
+									size={20}
+									className="cursor-pointer"
+									onClick={() => navigate("/orders/list")}
+								/>
 
 								<Separator orientation="vertical" className="min-h-6 mx-2" />
 								<div>
@@ -146,7 +160,10 @@ export default function InvoiceDetailsPage() {
 
 						<div className=" flex w-full flex-col  justify-end text-center xl:text-end">
 							<h1 className="xl:text-xl text-end font-bold ">Invoice {invoice?.id}</h1>
-							<p className="xl:text-lg text-end">Items: {invoice?.items.length}</p>
+							<div className="flex items-center gap-2 text-end justify-end">
+								<span className="xl:text-lg text-end">{total_weight.toFixed(2)} lbs</span>
+								<span className="xl:text-lg text-end">Items: {invoice?.items.length}</span>
+							</div>
 							<time className="text-sm text-end text-muted-foreground">
 								Fecha: {format(new Date(invoice?.created_at), "dd/MM/yyyy HH:mm a")}
 							</time>
@@ -268,23 +285,26 @@ export default function InvoiceDetailsPage() {
 					</Table>
 					<div className="relative">
 						<div className="absolute p-4 inset-0 flex items-center justify-center pointer-events-none">
-							<span className="text-[90px] rounded-2xl p-4 bg-green-500/10 border font-extrabold text-green-500 opacity-10 rotate-[-30deg]">
+							<span className="xl:text-[90px] text-4xl rounded-2xl p-4 bg-green-500/10 border font-extrabold text-green-500 opacity-10 rotate-[-30deg]">
 								{invoice?.payment_status}
 							</span>
 						</div>
-
-						<div className="mt-8 grid justify-end xl:pr-4 ">
-							<ul className="grid gap-2 w-1/5 ">
+						<div className="flex justify-end my-8 ">
+							<ul className="flex flex-col w-1/2  xl:w-1/4 xl:mr-4 py-4 justify-end gap-2 border-t border-dashed  ">
 								<li className="flex items-center gap-4 justify-between">
 									<span className="text-muted-foreground">Subtotal</span>
-									<span>${total.toFixed(2)}</span>
+									<span>${subtotal.toFixed(2)}</span>
+								</li>
+								<li className="flex items-center gap-4 justify-between">
+									<span className="text-muted-foreground">Aranceles</span>
+									<span>${total_customs_fee.toFixed(2)}</span>
 								</li>
 								<li className="flex items-center justify-between">
 									<span className="text-muted-foreground">Shipping</span>
 									<span>${invoice?.shipping_fee?.toFixed(2) ?? 0.0}</span>
 								</li>
 								<li className="flex items-center justify-between">
-									<span className="text-muted-foreground">Tax</span>
+									<span className="text-muted-foreground">Discount</span>
 									<span>${invoice?.tax?.toFixed(2) ?? 0.0}</span>
 								</li>
 								<li className="flex items-center justify-between">
@@ -310,7 +330,7 @@ export default function InvoiceDetailsPage() {
 						</div>
 					</div>
 					<Separator className="my-4 print:hidden" />
-					<div className="print:hidden mx-auto w-1/6">
+					<div className="print:hidden mx-auto w-full xl:w-1/6">
 						{invoice?.payment_status === "PENDING" ||
 						invoice?.payment_status === "PARTIALLY_PAID" ? (
 							<PaymentForm invoice={invoice} />

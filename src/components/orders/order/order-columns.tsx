@@ -18,6 +18,7 @@ import {
 	DropdownMenu,
 	DropdownMenuItem,
 	DropdownMenuContent,
+	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Link } from "react-router-dom";
@@ -106,9 +107,9 @@ export const orderColumns: ColumnDef<Invoice>[] = [
 			};
 			return (
 				<Link
-					onMouseEnter={handleFocus}
-					className="flex items-center gap-2 hover:underline"
-					to={`/orders/${row.original?.id}`}
+					className="flex items-center gap-2"
+					target="_blank"
+					to={`${baseUrl}/invoices/${row.original?.id}/pdf`}
 				>
 					<FileText size={16} className="shrink-0" />
 					<span className="font-medium">{row.original?.id}</span>
@@ -296,6 +297,7 @@ export const orderColumns: ColumnDef<Invoice>[] = [
 									Details
 								</DropdownMenuItem>
 							</Link>
+							<DropdownMenuSeparator />
 							<Link to={`/orders/${row.original.id}/edit`}>
 								<DropdownMenuItem>
 									<Pencil className="w-4 h-4 mr-2" />
@@ -334,7 +336,7 @@ const paymentStatus = (payment_status: string) => {
 			);
 		default:
 			return (
-				<Badge  className="bg-red-500/10 text-red-500/80">
+				<Badge className="bg-red-500/10 text-red-500/80">
 					<Clock className="w-4 h-4 mr-1" />
 					Pending
 				</Badge>

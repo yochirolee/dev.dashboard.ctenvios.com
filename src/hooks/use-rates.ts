@@ -42,7 +42,6 @@ export const useRates = {
 
 		return useMutation({
 			mutationFn: (id: number) => {
-				console.log("delete rate", id);
 				return api.rates.delete(id);
 			},
 			onSuccess: () => {

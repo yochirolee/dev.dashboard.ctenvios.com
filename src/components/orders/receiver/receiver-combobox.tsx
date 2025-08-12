@@ -60,7 +60,7 @@ export function ReceiverCombobox() {
 						  " " +
 						  selectedReceiver.second_last_name +
 						  " - " +
-						  selectedReceiver.mobile
+						  (selectedReceiver.mobile || selectedReceiver.phone)
 						: "Seleccionar cliente..."}
 					<ChevronsUpDown className="opacity-50" />
 				</Button>
@@ -97,7 +97,7 @@ export function ReceiverCombobox() {
 										" " +
 										receiver?.second_last_name +
 										" - " +
-										(receiver?.phone || receiver?.mobile)}
+										(receiver?.mobile || receiver?.phone)}
 									<Check
 										className={cn(
 											"ml-auto",

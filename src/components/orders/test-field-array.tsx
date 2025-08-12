@@ -5,14 +5,14 @@ import { useShallow } from "zustand/react/shallow";
 import { Table, TableRow, TableHeader, TableCaption, TableHead, TableBody } from "../ui/table";
 import { CardContent, CardHeader, CardTitle, Card } from "../ui/card";
 import { Button } from "../ui/button";
-import { Trash, PackagePlus, Loader2 } from "lucide-react";
+import { Trash, PackagePlus, Loader2, PlusCircle } from "lucide-react";
 import ItemRow from "./item-row";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import { invoiceSchema } from "@/data/types";
-import { useCreateInvoice } from "@/hooks/use-invoices";
+import { useInvoices } from "@/hooks/use-invoices";
 import { Input } from "../ui/input";
 import { useAppStore } from "@/stores/app-store";
 import { Separator } from "../ui/separator";
@@ -103,7 +103,11 @@ export function TestFieldArray() {
 		setItemsCount(1);
 	};
 
-	const { mutate: createInvoice, isPending: isCreatingInvoice } = useCreateInvoice({
+	const total_customs_fee = form
+		.watch("items")
+		.reduce((acc: number, item: any) => acc + item?.customs_fee, 0);
+
+	const { mutate: createInvoice, isPending: isCreatingInvoice } = useInvoices.create({
 		onSuccess: (data) => {
 			form.reset();
 			setSelectedCustomer(null);
@@ -175,7 +179,7 @@ export function TestFieldArray() {
 								<TableHead>Description</TableHead>
 								<TableHead className="text-right w-20">Arancel</TableHead>
 								<TableHead className="text-right w-20">Peso</TableHead>
-								<TableHead className="text-right w-20">Price</TableHead>
+								<TableHead className="text-right w-20">Rate</TableHead>
 								<TableHead className="text-right w-20">Subtotal</TableHead>
 								<TableHead className="w-10"></TableHead>
 							</TableRow>
@@ -193,16 +197,39 @@ export function TestFieldArray() {
 						</TableBody>
 					</Table>
 				</CardContent>
+
 				<div className="mt-8 flex justify-end pr-6">
 					<ul className="grid gap-3 w-1/6 ">
+						<li className="flex items-center bg-foreground/5 p-2 rounded-md justify-between">
+							<span className="text-muted-foreground">Peso</span>
+							<span>{form.getValues("total_weight").toFixed(2)} lbs</span>
+						</li>
+						<Separator />
 						<li className="flex items-center justify-between">
 							<span className="text-muted-foreground">Subtotal</span>
-							<span>${form.getValues("total_amount")}</span>
+							<span>${(form.getValues("total_amount") - total_customs_fee).toFixed(2)}</span>
+						</li>
+						<li className="flex items-center justify-between">
+							<span className="text-muted-foreground">Aranceles</span>
+							<span>${total_customs_fee.toFixed(2)}</span>
+						</li>
+						<li className="flex items-center justify-between">
+							<span className="text-muted-foreground">Shipping</span>
+							<span>$0.00</span>
 						</li>
 
 						<li className="flex items-center justify-between">
-							<span className="text-muted-foreground">Discount</span>
-							<span>${0.0}</span>
+							<div className="flex items-center gap-2">
+								<span className="text-muted-foreground">Discount</span>
+								<Button type="button" variant="ghost" size="icon" className="ml-2">
+									<PlusCircle />
+								</Button>
+							</div>
+							<span>$0.00</span>
+						</li>
+						<li className="flex items-center justify-between">
+							<span className="text-muted-foreground">Fee</span>
+							<span>$0.00</span>
 						</li>
 						<li className="flex items-center justify-between font-semibold">
 							<span className="text-muted-foreground">Total</span>

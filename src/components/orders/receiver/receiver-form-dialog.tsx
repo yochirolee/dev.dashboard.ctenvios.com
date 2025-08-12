@@ -27,7 +27,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { UserRoundPlus } from "lucide-react";
 import { useReceivers } from "@/hooks/use-receivers";
-import { type Province, type City, type Receiver, 	receiverSchema } from "@/data/types";
+import { type Province, type City, type Receiver, receiverSchema } from "@/data/types";
 import { isValidCubanCI } from "@/lib/utils";
 import { Separator } from "@/components/ui/separator";
 
@@ -110,9 +110,9 @@ export function ReceiverFormDialog({ expand = false }: { expand?: boolean }) {
 		if (data?.email === "") {
 			data.email = undefined;
 		}
-		data.phone = data.mobile ? `53${data.mobile}` : undefined;
+		data.mobile = data.mobile ? `53${data.mobile}` : undefined;
 
-			createReceiver(data as Receiver);
+		createReceiver(data as Receiver);
 	};
 
 	const onError = (errors: any) => {
@@ -305,7 +305,7 @@ export function ReceiverFormDialog({ expand = false }: { expand?: boolean }) {
 										name="second_last_name"
 										render={({ field }) => (
 											<FormItem>
-												<FormLabel>2 Apellido</FormLabel>
+												<FormLabel>Segundo Apellido</FormLabel>
 												<FormControl>
 													<Input {...field} />
 												</FormControl>

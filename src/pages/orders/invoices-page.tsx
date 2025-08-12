@@ -1,4 +1,3 @@
-import { useSearchInvoices } from "@/hooks/use-invoices";
 import { FilePlus2, Printer, Search, X } from "lucide-react";
 import { useState } from "react";
 import { DataTable } from "@/components/ui/data-table";
@@ -9,6 +8,7 @@ import type { PaginationState } from "@tanstack/react-table";
 import { useDebounce } from "use-debounce";
 import { Input } from "@/components/ui/input";
 import { DatePickerWithRange } from "@/components/dates/data-range-picker";
+import { useInvoices } from "@/hooks/use-invoices";
 
 export default function InvoicesPage() {
 	const navigate = useNavigate();
@@ -20,7 +20,7 @@ export default function InvoicesPage() {
 		pageSize: 20,
 	});
 
-	const { data, isLoading, isFetching } = useSearchInvoices(
+	const { data, isLoading, isFetching } = useInvoices.search(
 		debouncedSearchQuery,
 		pagination.pageIndex,
 		pagination.pageSize,
@@ -32,8 +32,6 @@ export default function InvoicesPage() {
 		setSearchQuery("");
 		setDate(undefined);
 	};
-
-	
 
 	return (
 		<div className="flex flex-col gap-4">
@@ -81,10 +79,7 @@ export default function InvoicesPage() {
 					pagination={pagination}
 					setPagination={setPagination}
 					isLoading={isLoading || isFetching}
-					
 				/>
-
-
 			</div>
 		</div>
 	);

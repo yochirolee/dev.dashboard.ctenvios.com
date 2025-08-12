@@ -181,7 +181,7 @@ const api = {
 		search: async (
 			search: string,
 			page: number | 1,
-			limit: number | 50,
+			limit: number | 20,
 			startDate: string,
 			endDate: string,
 		) => {
@@ -210,7 +210,7 @@ const api = {
 		},
 		payments: {
 			create: async (invoice_id: number, data: Payment) => {
-				console.log(data,"on api");
+				console.log(data, "on api");
 				const response = await axiosInstance.post(`/payments/invoice/${invoice_id}`, data);
 				return response.data;
 			},
@@ -350,6 +350,14 @@ const api = {
 	roles: {
 		get: async () => {
 			const response = await axiosInstance.get("/roles");
+			return response.data;
+		},
+	},
+	analytics: {
+		getSales: async () => {
+			console.log("getSales");
+			const response = await axiosInstance.get("/analytics/sales");
+			console.log(response.data, "response.data");
 			return response.data;
 		},
 	},

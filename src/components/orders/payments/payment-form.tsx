@@ -12,7 +12,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Check, ChevronsUpDown, DollarSign, Loader2 } from "lucide-react";
-import { usePayInvoice } from "@/hooks/use-invoices";
+import { useInvoices } from "@/hooks/use-invoices";
 import { payment_methods } from "@/data/data";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useState } from "react";
@@ -40,6 +40,7 @@ import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/ca
 
 export const PaymentForm = ({ invoice }: { invoice: Invoice }) => {
 	const balance = ((invoice?.total_amount - invoice?.paid_amount) / 100).toFixed(2);
+
 	const form = useForm<z.infer<typeof paymentSchema>>({
 		resolver: zodResolver(paymentSchema),
 		defaultValues: {
@@ -50,13 +51,12 @@ export const PaymentForm = ({ invoice }: { invoice: Invoice }) => {
 		},
 	});
 
-	const { mutate: createPayment, isPending } = usePayInvoice({
+	const { mutate: createPayment, isPending } = useInvoices.pay({
 		onSuccess: () => {
 			form.reset();
 
 			toast.success("Payment created successfully");
 			setOpen(false);
-			
 		},
 		onError: (error: any) => {
 			toast.error(error.response.data.message);
@@ -74,7 +74,7 @@ export const PaymentForm = ({ invoice }: { invoice: Invoice }) => {
 			<DialogTrigger asChild>
 				<Button variant="default" className="print:hidden w-full">
 					<DollarSign className="w-4 h-4" />
-					<span className="hidden md:block">Pagar</span>
+					<span className=" md:block">Pagar</span>
 				</Button>
 			</DialogTrigger>
 			<DialogContent>
@@ -122,18 +122,20 @@ export const PaymentForm = ({ invoice }: { invoice: Invoice }) => {
 							render={({ field }) => (
 								<FormItem>
 									<FormLabel>Amount</FormLabel>
-									<FormControl>
-										<Input
-											{...field}
-											placeholder="Amount"
-											type="number"
-											min={0}
-											max={Number(balance) ?? 0.0}
-											step={0.01}
-											className="[&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none [-moz-appearance:textfield] text-right"
-											onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
-										/>
-									</FormControl>
+
+									<Input
+										{...form.register(`amount`, {
+											valueAsNumber: true,
+										})}
+										placeholder="0.00"
+										type="number"
+										min={0}
+										max={Number(balance)}
+										step={0.01}
+										className="[&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none [-moz-appearance:textfield] text-right"
+										onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
+									/>
+
 									<FormMessage />
 								</FormItem>
 							)}

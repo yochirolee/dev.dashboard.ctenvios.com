@@ -16,45 +16,9 @@ import InvoiceDetailsPage from "@/pages/orders/invoice-details-page";
 import { CustomsPage } from "@/pages/settings/customs-page";
 import ProvidersServicesPage from "@/pages/settings/providers-services-page";
 import { EditOrderPage } from "@/pages/orders/edit-order-page";
-import { queryClient } from "@/lib/query-client";
-import api from "@/api/api";
-import { useAppStore } from "@/stores/app-store";
 import { ReceiversPage } from "@/pages/settings/receiver-page";
 
-const useLoadInitialData = () => {
-	const session = useAppStore((state) => state.session);
-
-	queryClient.ensureQueryData({
-		queryKey: ["get-invoices", 0, 20],
-		queryFn: () => api.invoices.get(0, 20),
-		staleTime: 1000 * 60 * 60 * 24 * 30,
-		gcTime: 1000 * 60 * 60 * 24 * 30,
-	});
-	if (session?.user) {
-		queryClient.ensureQueryData({
-			queryKey: ["get-agencies", 0, 20],
-			queryFn: () => api.agencies.get(),
-			staleTime: 1000 * 60 * 60 * 24 * 30,
-			gcTime: 1000 * 60 * 60 * 24 * 30,
-		});
-		queryClient.ensureQueryData({
-			queryKey: ["get-customers", 0, 20],
-			queryFn: () => api.customer.get(0, 20),
-			staleTime: 1000 * 60 * 60 * 24 * 30,
-			gcTime: 1000 * 60 * 60 * 24 * 30,
-		});
-		queryClient.ensureQueryData({
-			queryKey: ["get-rates"],
-			queryFn: () => api.rates.getByAgencyId(session?.user?.agency_id),
-			staleTime: 1000 * 60 * 60 * 24 * 30,
-			gcTime: 1000 * 60 * 60 * 24 * 30,
-		});
-	}
-};
-
 export const AppRouter = () => {
-	useLoadInitialData();
-
 	return (
 		<Routes>
 			<Route path="/login" element={<LoginPage />} />

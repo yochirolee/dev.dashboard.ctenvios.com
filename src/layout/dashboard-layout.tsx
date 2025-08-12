@@ -29,8 +29,8 @@ export const DashboardLayout = () => {
 								<BreadcrumbList>
 									<BreadcrumbItem className="hidden md:block">
 										<BreadcrumbLink asChild>
-											<Link to={`/${breadcrumb[0]}`}>
-												{breadcrumb[0]?.charAt(0).toUpperCase() + breadcrumb[0]?.slice(1)}
+											<Link to={`/${breadcrumb[0] ? breadcrumb[0] : "/"}`}>
+												{breadcrumb[0] ? breadcrumb[0]?.charAt(0).toUpperCase() + breadcrumb[0]?.slice(1) : "Home"}
 											</Link>
 										</BreadcrumbLink>
 									</BreadcrumbItem>

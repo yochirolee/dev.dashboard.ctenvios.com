@@ -8,15 +8,14 @@ import { ReceiverFormDialog } from "@/components/orders/receiver/receiver-form-d
 import { CustomerFormDialog } from "@/components/orders/customer/customer-form-dialog";
 import { TestFieldArray } from "@/components/orders/test-field-array";
 import { useParams } from "react-router-dom";
-import { useGetInvoiceById } from "@/hooks/use-invoices";
+import { useInvoices } from "@/hooks/use-invoices";
 import { useInvoiceStore } from "@/stores/invoice-store";
 import { useEffect } from "react";
 
 export function EditOrderPage() {
 	const params = useParams();
 	const orderId = Number(params.invoiceId);
-	console.log(orderId);
-	const { data, isLoading } = useGetInvoiceById(orderId);
+	const { data, isLoading } = useInvoices.getById(orderId);
 	const invoice = data?.rows[0];
 	const { setSelectedCustomer, setSelectedRate, setSelectedService, setSelectedReceiver } =
 		useInvoiceStore();
@@ -29,7 +28,6 @@ export function EditOrderPage() {
 	}, [orderId]);
 
 	if (isLoading) return <div>Loading...</div>;
-	
 
 	return (
 		<div className="space-y-4 ">
