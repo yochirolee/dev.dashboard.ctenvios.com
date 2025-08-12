@@ -46,7 +46,7 @@ export const useReceivers = {
 	) => {
 		const queryClient = useQueryClient();
 		return useMutation({
-				mutationFn: (data: Receiver) => {
+			mutationFn: (data: Receiver) => {
 				return api.receivers.create(data, customerId);
 			},
 			onSuccess: (data: Receiver) => {
@@ -66,8 +66,24 @@ export const useReceivers = {
 			queryFn: () => {
 				return api.receivers.getByCI(ci);
 			},
+
 			enabled: ci.length === 11,
 			retry: false,
+		});
+	},
+	update: (options?: { onSuccess?: (data: Receiver) => void; onError?: (error: any) => void }) => {
+		const queryClient = useQueryClient();
+		return useMutation({
+			mutationFn: ({ id, data }: { id: number; data: Receiver }) => api.receivers.update(id, data),
+			onSuccess: (data: Receiver) => {
+				queryClient.invalidateQueries({
+					queryKey: ["search-receivers"],
+				});
+				options?.onSuccess?.(data);
+			},
+			onError: (error) => {
+				options?.onError?.(error);
+			},
 		});
 	},
 };

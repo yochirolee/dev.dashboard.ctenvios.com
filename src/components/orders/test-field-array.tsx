@@ -198,8 +198,8 @@ export function TestFieldArray() {
 					</Table>
 				</CardContent>
 
-				<div className="mt-8 flex justify-end pr-6">
-					<ul className="grid gap-3 w-1/6 ">
+				<div className="mt-8 flex justify-end p-2 lg:pr-6">
+					<ul className="grid gap-3 w-full lg:w-1/6 ">
 						<li className="flex items-center bg-foreground/5 p-2 rounded-md justify-between">
 							<span className="text-muted-foreground">Peso</span>
 							<span>{form.getValues("total_weight").toFixed(2)} lbs</span>
@@ -253,11 +253,11 @@ export function TestFieldArray() {
 					</Button>
 				</div>
 
-				<div className="flex justify-end m-10">
+				{/* <div className="grid grid-cols-1 lg:grid-cols-2">
 					{Object.keys(form.formState.errors).length > 0 && (
 						<p className="text-red-500">{JSON.stringify(form.formState)}</p>
 					)}
-				</div>
+				</div> */}
 			</form>
 		</Card>
 	);

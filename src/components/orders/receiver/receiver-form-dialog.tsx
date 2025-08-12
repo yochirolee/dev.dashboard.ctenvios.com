@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { cn } from "@/lib/utils";
 import { Check, ChevronsUpDown } from "lucide-react";
 
@@ -25,7 +25,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { UserRoundPlus } from "lucide-react";
+import { UserRoundPenIcon, UserRoundPlus } from "lucide-react";
 import { useReceivers } from "@/hooks/use-receivers";
 import { type Province, type City, type Receiver, receiverSchema } from "@/data/types";
 import { isValidCubanCI } from "@/lib/utils";
@@ -41,25 +41,23 @@ import {
 } from "@/components/ui/form";
 import { useProvinces } from "@/hooks/use-provinces";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { InputOTP } from "@/components/ui/input-otp";
-import { InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
 import { useInvoiceStore } from "@/stores/invoice-store";
 import { useShallow } from "zustand/react/shallow";
 
-export function ReceiverFormDialog({ expand = false }: { expand?: boolean }) {
-	const { setSelectedReceiver, selectedCustomer } = useInvoiceStore(
+export function ReceiverFormDialog() {
+	const { data: provinces } = useProvinces();
+	const [ci, setCi] = useState("");
+	const { setSelectedReceiver, selectedCustomer, selectedReceiver } = useInvoiceStore(
 		useShallow((state) => ({
 			setSelectedReceiver: state.setSelectedReceiver,
 			selectedCustomer: state.selectedCustomer,
+			selectedReceiver: state.selectedReceiver,
 		})),
 	);
-	const [isOpen, setIsOpen] = useState(false);
 	const [isProvinceOpen, setIsProvinceOpen] = useState(false);
+	const [isOpen, setIsOpen] = useState(false);
 	const [isCityOpen, setIsCityOpen] = useState(false);
-
-	const [formError, setFormError] = useState("");
-	const { data: provinces } = useProvinces();
-
+	console.log(selectedReceiver, "selectedReceiver");
 	const form = useForm<Receiver>({
 		resolver: zodResolver(receiverSchema),
 		defaultValues: {
@@ -77,34 +75,79 @@ export function ReceiverFormDialog({ expand = false }: { expand?: boolean }) {
 			passport: undefined,
 		},
 	});
+	useEffect(() => {
+		if (selectedReceiver == null) {
+			form.reset({
+				first_name: "",
+				middle_name: "",
+				last_name: "",
+				second_last_name: "",
+				ci: "",
+				email: undefined,
+				phone: "",
+				mobile: "",
+				address: "",
+				province_id: undefined,
+				city_id: undefined,
+				passport: undefined,
+			});
+		} else {
+			form.reset({
+				first_name: selectedReceiver.first_name,
+				middle_name: selectedReceiver.middle_name,
+				last_name: selectedReceiver.last_name,
+				second_last_name: selectedReceiver.second_last_name,
+				ci: selectedReceiver.ci,
+				email: selectedReceiver.email ? selectedReceiver.email : undefined,
+				phone: selectedReceiver.phone ? selectedReceiver.phone : undefined,
+				mobile: selectedReceiver.mobile ? selectedReceiver.mobile.slice(2) : undefined,
+				address: selectedReceiver.address ? selectedReceiver.address : undefined,
+				province_id: selectedReceiver.province_id ? selectedReceiver.province_id : undefined,
+				city_id: selectedReceiver.city_id ? selectedReceiver.city_id : undefined,
+			});
+		}
+	}, [selectedReceiver, form]);
 
+	const provinceId = form.watch("province_id");
 	const cities = useMemo(() => {
-		return provinces?.find((province: Province) => province.id === form.getValues().province_id)
-			?.cities;
-	}, [form.getValues().province_id, provinces]);
+		return provinces?.find((province: Province) => province.id === provinceId)?.cities;
+	}, [provinceId]);
 
 	const { mutate: createReceiver, isPending } = useReceivers.create(selectedCustomer?.id || 0, {
 		onSuccess: (data: Receiver) => {
 			setIsOpen(false);
 			form.reset();
-			setFormError("");
 			setSelectedReceiver(data);
 		},
 		onError: (error: any) => {
 			console.log("Error creating receipt:", error);
-			setFormError(error.message);
 		},
 	});
 
-	const { data: receiver } = useReceivers.getByCI(
-		form.watch("ci")?.length === 11 ? form.watch("ci") : "",
-	);
-	if (receiver) {
+	const { mutate: updateReceiver, isPending: isUpdating } = useReceivers.update({
+		onSuccess: (data: Receiver) => {
+			setIsOpen(false);
+			form.reset();
+			setSelectedReceiver(data);
+		},
+		onError: (error: any) => {
+			console.log("Error updating receiver:", error);
+		},
+	});
+
+	const { data: receiver } = useReceivers.getByCI(ci);
+	if (receiver && selectedReceiver == null) {
 		setSelectedReceiver(receiver);
 		setIsOpen(false);
 		form.reset();
-		setFormError("");
+		setCi("");
 	}
+
+	const handleSearchByCi = async (ciValue: string) => {
+		if (ciValue?.length === 11) {
+			setCi(ciValue);
+		}
+	};
 
 	const onSubmit = (data: Receiver) => {
 		if (data?.email === "") {
@@ -112,28 +155,37 @@ export function ReceiverFormDialog({ expand = false }: { expand?: boolean }) {
 		}
 		data.mobile = data.mobile ? `53${data.mobile}` : undefined;
 
-		createReceiver(data as Receiver);
+		if (selectedReceiver) {
+			updateReceiver({ id: selectedReceiver.id || 0, data });
+		} else {
+			createReceiver(data as Receiver);
+		}
 	};
 
 	const onError = (errors: any) => {
 		console.log("Form validation errors:", errors);
 	};
 
-	console.log(form.formState.errors);
-
 	return (
 		<Dialog open={isOpen} onOpenChange={setIsOpen}>
 			<DialogTrigger asChild>
 				<Button variant="outline">
-					<UserRoundPlus />
-					{expand && "Crear Destinatario"}
+					{selectedReceiver ? <UserRoundPenIcon /> : <UserRoundPlus />}
+					<span className="hidden lg:block">
+						{" "}
+						{selectedReceiver ? "Editar Destinatario" : "Nuevo Destinatario"}
+					</span>
 				</Button>
 			</DialogTrigger>
-			<DialogContent className="sm:max-w-[550px] p-2 ">
+			<DialogContent className="sm:max-w-[550px]  p-2 ">
 				<DialogHeader className="px-4">
-					<DialogTitle>Crear Cliente</DialogTitle>
+					<DialogTitle>
+						{selectedReceiver ? "Editar Destinatario" : "Nuevo Destinatario"}
+					</DialogTitle>
 					<DialogDescription>
-						Por favor, complete el formulario para crear un nuevo cliente.
+						{selectedReceiver
+							? "Edita los datos del destinatario para que puedas usarlo en tus pedidos."
+							: "Agrega un nuevo destinatario para que puedas usarlo en tus pedidos."}
 					</DialogDescription>
 				</DialogHeader>
 				<Form {...form}>
@@ -155,8 +207,20 @@ export function ReceiverFormDialog({ expand = false }: { expand?: boolean }) {
 											</FormLabel>
 											<FormControl>
 												<div className="inline-flex items-center gap-3">
-													<InputOTP maxLength={11} pattern="[0-9]*" {...field}>
-														<InputOTPGroup>
+													<Input
+														id="ci"
+														{...field}
+														onChange={(e) => {
+															const value = e.target.value.replace(/\D/g, "").slice(0, 11);
+															field.onChange(value);
+															handleSearchByCi(e.target.value);
+														}}
+														maxLength={11}
+														pattern="[0-9]*"
+														placeholder="CI"
+													/>
+													{/* <InputOTP  maxLength={11} pattern="[0-9]*" {...field}>
+														<InputOTPGroup >
 															<InputOTPSlot index={0} />
 															<InputOTPSlot index={1} />
 															<InputOTPSlot index={2} />
@@ -169,14 +233,14 @@ export function ReceiverFormDialog({ expand = false }: { expand?: boolean }) {
 															<InputOTPSlot index={9} />
 															<InputOTPSlot index={10} />
 														</InputOTPGroup>
-													</InputOTP>
+													</InputOTP> */}
 												</div>
 											</FormControl>
 											<FormMessage />
 										</FormItem>
 									)}
 								/>
-								<div className="grid grid-cols-2 gap-4">
+								<div className="grid lg:grid-cols-2 gap-4">
 									<FormField
 										control={form.control}
 										name="mobile"
@@ -217,16 +281,12 @@ export function ReceiverFormDialog({ expand = false }: { expand?: boolean }) {
 												<FormLabel>Teléfono</FormLabel>
 												<FormControl>
 													<div className="flex">
-														<span className="inline-flex items-center px-3 text-sm border  border-r-0  rounded-l-md">
-															+53
-														</span>
 														<Input
 															id="phone"
 															{...field}
 															type="tel"
 															maxLength={8}
 															pattern="[0-9]{8}"
-															className="rounded-l-none"
 															placeholder="12345678"
 															onChange={(e) => {
 																// Only allow digits and limit to 8 characters
@@ -256,7 +316,7 @@ export function ReceiverFormDialog({ expand = false }: { expand?: boolean }) {
 								/>
 								<Separator />
 
-								<div className="grid grid-cols-2 gap-4">
+								<div className="grid lg:grid-cols-2 gap-4">
 									<FormField
 										control={form.control}
 										name="first_name"
@@ -285,7 +345,7 @@ export function ReceiverFormDialog({ expand = false }: { expand?: boolean }) {
 										)}
 									/>
 								</div>
-								<div className="grid grid-cols-2 gap-4">
+								<div className="grid lg:grid-cols-2 gap-4">
 									<FormField
 										control={form.control}
 										name="last_name"
@@ -315,7 +375,7 @@ export function ReceiverFormDialog({ expand = false }: { expand?: boolean }) {
 									/>
 								</div>
 
-								<div className="grid grid-cols-2 gap-4">
+								<div className="grid lg:grid-cols-2 gap-4">
 									<FormField
 										control={form.control}
 										name="province_id"
@@ -329,7 +389,7 @@ export function ReceiverFormDialog({ expand = false }: { expand?: boolean }) {
 																variant="outline"
 																role="combobox"
 																className={cn(
-																	"w-[200px] justify-between",
+																	"w-full lg:w-[200px] justify-between",
 																	!field.value && "text-muted-foreground",
 																)}
 															>
@@ -389,7 +449,7 @@ export function ReceiverFormDialog({ expand = false }: { expand?: boolean }) {
 																variant="outline"
 																role="combobox"
 																className={cn(
-																	"w-[200px] justify-between",
+																	"w-full lg:w-[200px] justify-between",
 																	!field.value && "text-muted-foreground",
 																)}
 															>
@@ -444,20 +504,17 @@ export function ReceiverFormDialog({ expand = false }: { expand?: boolean }) {
 									<p className="text-red-500 text-sm">{form.formState.errors.address?.message}</p>
 								</div>
 							</div>
-							<div className="flex flex-col gap-2 text-center my-4">
-								{formError && <p className="text-red-500 text-sm">{formError}</p>}
-							</div>
 						</ScrollArea>
 						<DialogFooter className="px-4">
-							<Button type="submit" disabled={isPending}>
-								{isPending ? "Guardando..." : "Guardar"}
+							<Button type="submit" disabled={isPending || isUpdating}>
+								{isPending || isUpdating ? "Guardando..." : "Guardar"}
 							</Button>
 							<Button
 								type="button"
 								variant="outline"
 								onClick={() => {
 									form.reset();
-									setFormError("");
+
 									setIsOpen(false);
 								}}
 							>

@@ -161,6 +161,10 @@ const api = {
 			});
 			return response.data;
 		},
+		update: async (id: number, data: Receiver) => {
+			const response = await axiosInstance.put(`/receivers/${id}`, data);
+			return response.data;
+		},
 	},
 	invoices: {
 		get: async (page: number | 1, limit: number | 25) => {

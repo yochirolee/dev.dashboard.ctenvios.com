@@ -106,7 +106,7 @@ function ItemRow({
 			</TableCell>
 			<TableCell className="flex items-center gap-2 ">
 				<div className="w-full relative gap-2">
-					<Input className="w-full" {...form.register(`items.${index}.description`)} />
+					<Input className="lg:w-full w-auto" {...form.register(`items.${index}.description`)} />
 					<div className="absolute right-2 top-1/2 -translate-y-1/2">
 						<div className="flex gap-2">
 							{form.getValues(`items.${index}.insurance_fee`) > 0 && (

@@ -27,6 +27,7 @@ import { type Customer } from "@/data/types";
 import { toast } from "sonner";
 import { useInvoiceStore } from "@/stores/invoice-store";
 import { useShallow } from "zustand/react/shallow";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 const customerFormSchema = z.object({
 	first_name: z.string().min(1, "El nombre es requerido"),
@@ -135,136 +136,144 @@ export const CustomerFormDialog = React.memo(function CustomerFormDialog() {
 			<DialogTrigger asChild>
 				<Button variant="outline">
 					{selectedCustomer ? <UserRoundPenIcon /> : <UserRoundPlus />}
+					<span className="hidden lg:block">
+						{" "}
+						{selectedCustomer ? "Editar Cliente" : "Nuevo Cliente"}
+					</span>
 				</Button>
 			</DialogTrigger>
-			<DialogContent className="sm:max-xl-[425px] ">
+			<DialogContent className="sm:max-w-[550px] p-2  ">
+				<DialogHeader className="px-4">
+					<DialogTitle>{selectedCustomer ? "Editar Cliente" : "Nuevo Cliente"}</DialogTitle>
+					<DialogDescription>
+						{selectedCustomer
+							? "Edita los datos del cliente para que puedas usarlo en tus pedidos."
+							: "Agrega un nuevo cliente para que puedas usarlo en tus pedidos."}
+					</DialogDescription>
+				</DialogHeader>
 				<Form {...form}>
 					<form onSubmit={form.handleSubmit(onSubmit, onError)}>
-						<DialogHeader>
-							<DialogTitle>{selectedCustomer ? "Editar Cliente" : "Nuevo Cliente"}</DialogTitle>
-							<DialogDescription>
-								{selectedCustomer
-									? "Edita los datos del cliente para que puedas usarlo en tus pedidos."
-									: "Agrega un nuevo cliente para que puedas usarlo en tus pedidos."}
-							</DialogDescription>
-						</DialogHeader>
-						<div className="space-y-6 mt-4">
-							<FormField
-								control={form.control}
-								name="mobile"
-								render={({ field }) => (
-									<FormItem>
-										<FormLabel>Movil</FormLabel>
-										<FormControl>
-											<Input id="mobile" {...field} />
-										</FormControl>
-										<FormMessage />
-									</FormItem>
-								)}
-							/>
+						<ScrollArea className="h-[calc(100vh-200px)] px-4 ">
+							<div className="grid  gap-1  space-y-6 ">
+								<div className="space-y-6 mt-4">
+									<FormField
+										control={form.control}
+										name="mobile"
+										render={({ field }) => (
+											<FormItem>
+												<FormLabel>Movil</FormLabel>
+												<FormControl>
+													<Input id="mobile" {...field} />
+												</FormControl>
+												<FormMessage />
+											</FormItem>
+										)}
+									/>
 
-							<div className="grid grid-cols-2 justify-center  gap-4">
-								<FormField
-									control={form.control}
-									name="first_name"
-									render={({ field }) => (
-										<FormItem>
-											<FormLabel>Nombre</FormLabel>
-											<FormControl>
-												<Input id="first_name" {...field} placeholder="Nombre" />
-											</FormControl>
+									<div className="grid lg:grid-cols-2 gap-4">
+										<FormField
+											control={form.control}
+											name="first_name"
+											render={({ field }) => (
+												<FormItem>
+													<FormLabel>Nombre</FormLabel>
+													<FormControl>
+														<Input id="first_name" {...field} placeholder="Nombre" />
+													</FormControl>
 
-											<FormMessage />
-										</FormItem>
-									)}
-								/>
-								<FormField
-									control={form.control}
-									name="middle_name"
-									render={({ field }) => (
-										<FormItem>
-											<FormLabel>Segundo Nombre (Opcional)</FormLabel>
-											<FormControl>
-												<Input id="middle_name" {...field} />
-											</FormControl>
-											<FormMessage />
-										</FormItem>
-									)}
-								/>
+													<FormMessage />
+												</FormItem>
+											)}
+										/>
+										<FormField
+											control={form.control}
+											name="middle_name"
+											render={({ field }) => (
+												<FormItem>
+													<FormLabel>Segundo Nombre (Opcional)</FormLabel>
+													<FormControl>
+														<Input id="middle_name" {...field} />
+													</FormControl>
+													<FormMessage />
+												</FormItem>
+											)}
+										/>
+									</div>
+
+									<div className="grid lg:grid-cols-2 gap-4">
+										<FormField
+											control={form.control}
+											name="last_name"
+											render={({ field }) => (
+												<FormItem>
+													<FormLabel>Apellido</FormLabel>
+													<FormControl>
+														<Input id="last_name" {...field} />
+													</FormControl>
+													<FormMessage />
+												</FormItem>
+											)}
+										/>
+										<FormField
+											control={form.control}
+											name="second_last_name"
+											render={({ field }) => (
+												<FormItem>
+													<FormLabel>2 Apellido</FormLabel>
+													<FormControl>
+														<Input id="second_last_name" {...field} />
+													</FormControl>
+													<FormMessage />
+												</FormItem>
+											)}
+										/>
+									</div>
+
+									<FormField
+										control={form.control}
+										name="identity_document"
+										render={({ field }) => (
+											<FormItem>
+												<FormLabel>Documento de Identidad</FormLabel>
+												<FormControl>
+													<Input id="identity_document" {...field} />
+												</FormControl>
+												<FormMessage />
+											</FormItem>
+										)}
+									/>
+									<FormField
+										control={form.control}
+										name="email"
+										render={({ field }) => (
+											<FormItem>
+												<FormLabel>Correo Electrónico</FormLabel>
+												<FormControl>
+													<Input id="email" {...field} />
+												</FormControl>
+												<FormMessage />
+											</FormItem>
+										)}
+									/>
+									<FormField
+										control={form.control}
+										name="address"
+										render={({ field }) => (
+											<FormItem>
+												<FormLabel>Dirección</FormLabel>
+												<FormControl>
+													<Input id="address" {...field} />
+												</FormControl>
+												<FormMessage />
+											</FormItem>
+										)}
+									/>
+								</div>
+								<div className="flex flex-col gap-2 text-center my-4">
+									<p className="text-red-500 text-sm">{formError}</p>
+								</div>
 							</div>
-
-							<div className="grid grid-cols-2 gap-4">
-								<FormField
-									control={form.control}
-									name="last_name"
-									render={({ field }) => (
-										<FormItem>
-											<FormLabel>Apellido</FormLabel>
-											<FormControl>
-												<Input id="last_name" {...field} />
-											</FormControl>
-											<FormMessage />
-										</FormItem>
-									)}
-								/>
-								<FormField
-									control={form.control}
-									name="second_last_name"
-									render={({ field }) => (
-										<FormItem>
-											<FormLabel>2 Apellido</FormLabel>
-											<FormControl>
-												<Input id="second_last_name" {...field} />
-											</FormControl>
-											<FormMessage />
-										</FormItem>
-									)}
-								/>
-							</div>
-
-							<FormField
-								control={form.control}
-								name="identity_document"
-								render={({ field }) => (
-									<FormItem>
-										<FormLabel>Documento de Identidad</FormLabel>
-										<FormControl>
-											<Input id="identity_document" {...field} />
-										</FormControl>
-										<FormMessage />
-									</FormItem>
-								)}
-							/>
-							<FormField
-								control={form.control}
-								name="email"
-								render={({ field }) => (
-									<FormItem>
-										<FormLabel>Correo Electrónico</FormLabel>
-										<FormControl>
-											<Input id="email" {...field} />
-										</FormControl>
-										<FormMessage />
-									</FormItem>
-								)}
-							/>
-							<FormField
-								control={form.control}
-								name="address"
-								render={({ field }) => (
-									<FormItem>
-										<FormLabel>Dirección</FormLabel>
-										<FormControl>
-											<Input id="address" {...field} />
-										</FormControl>
-										<FormMessage />
-									</FormItem>
-								)}
-							/>
-						</div>
-						<div className="flex flex-col gap-2 text-center my-4">
-							<p className="text-red-500 text-sm">{formError}</p>
-						</div>
+						</ScrollArea>
 
 						<DialogFooter className="flex mt-8 justify-center">
 							<Button type="submit" disabled={isPending || isUpdating}>
