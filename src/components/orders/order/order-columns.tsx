@@ -22,8 +22,7 @@ import {
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Link } from "react-router-dom";
-import { queryClient } from "@/lib/query-client";
-import api from "@/api/api";
+
 
 // This type is used to define the shape of our data.
 // You can use a Zod schema here if you want.
