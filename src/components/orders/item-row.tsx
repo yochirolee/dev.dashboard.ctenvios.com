@@ -162,7 +162,16 @@ function ItemRow({
 			<TableCell className="text-right">{subtotal.toFixed(2)}</TableCell>
 
 			<TableCell className="w-10">
-				<Button type="button" variant="ghost" size="icon" onClick={() => handleRemove(index)}>
+				<Button
+					type="button"
+					variant="ghost"
+					size="icon"
+					onClick={() => {
+						if (index !== 0) {
+							handleRemove(index);
+						}
+					}}
+				>
 					<Trash2 />
 				</Button>
 			</TableCell>
