@@ -148,8 +148,6 @@ export const DiscountDialog = ({
 	setOpen: (open: boolean) => void;
 	form: any;
 }) => {
-	const discount_type = useWatch({ control: form.control, name: "discount_type" });
-
 	return (
 		<AlertDialog open={open} onOpenChange={setOpen}>
 			<AlertDialogContent>
@@ -182,7 +180,6 @@ export const DiscountDialog = ({
 						onChange={(e) => {
 							form.setValue(`discount_amount`, parseFloat(e.target.value));
 						}}
-					
 						placeholder="Descuento"
 					/>
 				</div>

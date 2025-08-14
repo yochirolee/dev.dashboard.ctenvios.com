@@ -6,8 +6,6 @@ import { EditAgencyForm } from "./edit-agency-form";
 import { NewAgencyDialog } from "./new-agency-dialog";
 import { useState } from "react";
 import { Badge } from "../ui/badge";
-import { ImageIcon } from "lucide-react";
-import { Button } from "../ui/button";
 import ImageUploadForm from "../upload/ImageUploadForm";
 
 export const AgencyDetails = ({
