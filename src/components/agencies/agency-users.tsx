@@ -13,9 +13,10 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Skeleton } from "../ui/skeleton";
 import { UserRegisterForm } from "../users/user-register-form";
+import type { Agency } from "@/data/types";
 
-export default function AgencyUsers({ agencyId }: { agencyId: number }) {
-	const { data: users, isLoading } = useAgencies.getUsers(agencyId);
+export default function AgencyUsers({ selectedAgency }: { selectedAgency: Agency }) {
+	const { data: users, isLoading } = useAgencies.getUsers(selectedAgency?.id ?? 0);
 	if (isLoading) return <Skeleton className="h-[400px] w-full" />;
 	return (
 		<Card>
@@ -28,7 +29,7 @@ export default function AgencyUsers({ agencyId }: { agencyId: number }) {
 						</p>
 					</CardTitle>
 
-					<UserRegisterForm agencyId={agencyId} />
+					<UserRegisterForm agencyId={selectedAgency?.id ?? 0} />
 				</div>
 			</CardHeader>
 			<Separator />

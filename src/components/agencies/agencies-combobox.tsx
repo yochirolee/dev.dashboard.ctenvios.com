@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Check, ChevronsUpDown } from "lucide-react";
+import type { Agency } from "@/data/types";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -13,16 +14,19 @@ import {
 } from "@/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useAgencies } from "@/hooks/use-agencies";
 
-export const AgenciesCombobox = ({ selectedAgencyId, setSelectedAgencyId }: { selectedAgencyId: number, setSelectedAgencyId: (id: number) => void }) => {
+export const AgenciesCombobox = ({
+	isLoading,
+	selectedAgency,
+	setSelectedAgency,
+	agencies,
+}: {
+	isLoading: boolean;
+	selectedAgency: Agency | null;
+	setSelectedAgency: (agency: Agency | null) => void;
+	agencies: Agency[];
+}) => {
 	const [open, setOpen] = useState(false);
-
-	const { data: agencies = [], isLoading, error } = useAgencies.get();
-
-	if (error) {
-		return <div>Error loading agencies</div>;
-	}
 
 	return (
 		<>
@@ -36,8 +40,10 @@ export const AgenciesCombobox = ({ selectedAgencyId, setSelectedAgencyId }: { se
 					>
 						{isLoading ? (
 							<Skeleton className="h-4 w-full" />
-						) : selectedAgencyId ? (
-							agencies.find((agency: any) => agency.id === selectedAgencyId)?.name + " - " + selectedAgencyId
+						) : selectedAgency?.id ? (
+							agencies.find((agency: any) => agency.id === selectedAgency.id)?.name +
+							" - " +
+							selectedAgency.id
 						) : (
 							"Agencias..."
 						)}
@@ -55,14 +61,14 @@ export const AgenciesCombobox = ({ selectedAgencyId, setSelectedAgencyId }: { se
 										key={agency.id}
 										value={agency.id}
 										onSelect={() => {
-											setSelectedAgencyId(agency.id);
+											setSelectedAgency(agency);
 											setOpen(false);
 										}}
 									>
 										<Check
 											className={cn(
 												"mr-2 h-4 w-4",
-												setSelectedAgencyId === agency.id ? "opacity-100" : "opacity-0",
+												selectedAgency?.id === agency.id ? "opacity-100" : "opacity-0",
 											)}
 										/>
 										{agency.name + " - " + agency.id}

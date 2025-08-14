@@ -16,6 +16,7 @@ import { useInvoices } from "@/hooks/use-invoices";
 import { Input } from "../ui/input";
 import { useAppStore } from "@/stores/app-store";
 import { Separator } from "../ui/separator";
+import { ChargeDialog, DiscountDialog, InsuranceFeeDialog } from "./order-dialogs";
 
 type FormValues = z.infer<typeof invoiceSchema>;
 
@@ -23,6 +24,10 @@ export function TestFieldArray() {
 	const session = useAppStore((state) => state.session);
 	const [items_count, setItemsCount] = useState(1);
 	const navigate = useNavigate();
+	const [dialogState, setDialogState] = useState({
+		type: "" as "insurance" | "charge" | "rate" | "",
+		index: 0 as number,
+	});
 
 	const {
 		selectedRate,
@@ -51,6 +56,8 @@ export function TestFieldArray() {
 			user_id: session?.user?.id || "",
 			service_id: selectedRate?.service_id || 0,
 			total_amount: 0,
+			discount_amount: 0,
+			rate_id: selectedRate?.id || 0,
 			total_weight: 0,
 			items: [
 				{
@@ -103,10 +110,6 @@ export function TestFieldArray() {
 		setItemsCount(1);
 	};
 
-	const total_customs_fee = form
-		.watch("items")
-		.reduce((acc: number, item: any) => acc + item?.customs_fee, 0);
-
 	const { mutate: createInvoice, isPending: isCreatingInvoice } = useInvoices.create({
 		onSuccess: (data) => {
 			form.reset();
@@ -115,6 +118,9 @@ export function TestFieldArray() {
 			setSelectedService(null);
 			toast.success("Orden creada correctamente");
 			navigate(`/orders/${data.id}`);
+		},
+		onError: (error) => {
+			toast.error(error.response.data.message);
 		},
 	});
 
@@ -125,6 +131,7 @@ export function TestFieldArray() {
 		data.user_id = session?.user?.id || "";
 		data.customer_id = selectedCustomer?.id || 0;
 		data.receiver_id = selectedReceiver?.id || 0;
+		data.rate_id = selectedRate?.id || 0;
 		data.items.forEach((item) => {
 			item.rate = selectedRate?.public_rate || 0;
 		});
@@ -132,6 +139,11 @@ export function TestFieldArray() {
 		createInvoice(data);
 	};
 	console.log(form.formState.errors, "errors");
+
+	const handleOpenDialog = (type: "insurance" | "charge" | "rate", index: number) => {
+		console.log(type, index, "type and index");
+		setDialogState({ type, index });
+	};
 
 	return (
 		<Card>
@@ -192,55 +204,13 @@ export function TestFieldArray() {
 									form={form}
 									remove={remove}
 									selectedRate={selectedRate}
+									openDialog={handleOpenDialog}
 								/>
 							))}
 						</TableBody>
 					</Table>
 				</CardContent>
-
-				<div className="mt-8 flex justify-end p-2 lg:pr-6">
-					<ul className="grid gap-3 w-full lg:w-1/6 ">
-						<li className="flex items-center bg-foreground/5 p-2 rounded-md justify-between">
-							<span className="text-muted-foreground">Peso</span>
-							<span>{form.getValues("total_weight").toFixed(2)} lbs</span>
-						</li>
-						<Separator />
-						<li className="flex items-center justify-between">
-							<span className="text-muted-foreground">Subtotal</span>
-							<span>${(form.getValues("total_amount") - total_customs_fee).toFixed(2)}</span>
-						</li>
-						<li className="flex items-center justify-between">
-							<span className="text-muted-foreground">Aranceles</span>
-							<span>${total_customs_fee.toFixed(2)}</span>
-						</li>
-						<li className="flex items-center justify-between">
-							<span className="text-muted-foreground">Shipping</span>
-							<span>$0.00</span>
-						</li>
-
-						<li className="flex items-center justify-between">
-							<div className="flex items-center gap-2">
-								<span className="text-muted-foreground">Discount</span>
-								<Button type="button" variant="ghost" size="icon" className="ml-2">
-									<PlusCircle />
-								</Button>
-							</div>
-							<span>$0.00</span>
-						</li>
-						<li className="flex items-center justify-between">
-							<span className="text-muted-foreground">Fee</span>
-							<span>$0.00</span>
-						</li>
-						<li className="flex items-center justify-between font-semibold">
-							<span className="text-muted-foreground">Total</span>
-							<span>${useWatch({ control: form.control, name: "total_amount" })}</span>
-						</li>
-					</ul>
-				</div>
-
-				<div className="flex justify-end m-10">
-					<Separator />
-				</div>
+				<InvoiceTotal form={form} />
 				<div className="flex justify-end m-10">
 					<Button className="w-1/2 mt-4 mx-auto" type="submit" disabled={isCreatingInvoice}>
 						{isCreatingInvoice ? (
@@ -253,12 +223,83 @@ export function TestFieldArray() {
 					</Button>
 				</div>
 
-				{/* <div className="grid grid-cols-1 lg:grid-cols-2">
+				{/* <div className="grid grid-cols-1 lg:grid-cols-2  m-">
 					{Object.keys(form.formState.errors).length > 0 && (
 						<p className="text-red-500">{JSON.stringify(form.formState)}</p>
 					)}
 				</div> */}
 			</form>
+			<InsuranceFeeDialog
+				open={dialogState.type === "insurance"}
+				setOpen={() => setDialogState({ type: "", index: 0 })}
+				form={form}
+				index={dialogState.index || 0}
+			/>
+			<ChargeDialog
+				open={dialogState.type === "charge"}
+				setOpen={() => setDialogState({ type: "", index: 0 })}
+				form={form}
+				index={dialogState.index || 0}
+			/>
 		</Card>
+	);
+}
+
+function InvoiceTotal({ form }: { form: any }) {
+	const total_weight = useWatch({ control: form.control, name: "total_weight" });
+	const total_amount = useWatch({ control: form.control, name: "total_amount" });
+
+	const [open, setOpen] = useState(false);
+	console.log(total_weight, total_amount, "total_weight and total_amount");
+	return (
+		<div>
+			<div className="mt-8 flex justify-end p-2 lg:pr-6">
+				<ul className="grid gap-3 w-full lg:w-1/4 ">
+					<li className="flex items-center bg-foreground/5 p-2 rounded-md justify-between">
+						<span className="text-muted-foreground">Peso</span>
+						<span>{total_weight} lbs</span>
+					</li>
+					<Separator />
+					<li className="flex items-center justify-between">
+						<span className="text-muted-foreground">Subtotal</span>
+						<span>${total_amount}</span>
+					</li>
+
+					<li className="flex items-center justify-between">
+						<span className="text-muted-foreground">Shipping</span>
+						<span>$0.00</span>
+					</li>
+
+					<li className="flex items-center justify-between">
+						<div className="flex items-center gap-2">
+							<span className="text-muted-foreground">Discount</span>
+							<Button
+								onClick={() => setOpen(true)}
+								type="button"
+								variant="ghost"
+								size="icon"
+								className="ml-2"
+							>
+								<PlusCircle />
+							</Button>
+						</div>
+						<span>${form.getValues("discount_amount") || 0}</span>
+					</li>
+					<li className="flex items-center justify-between">
+						<span className="text-muted-foreground">Fee</span>
+						<span>$0.00</span>
+					</li>
+					<li className="flex items-center justify-between font-semibold">
+						<span className="text-muted-foreground">Total</span>
+						<span>${form.getValues("total_amount").toFixed(2)}</span>
+					</li>
+				</ul>
+			</div>
+
+			<div className="flex justify-end m-10">
+				<Separator />
+			</div>
+			<DiscountDialog open={open} setOpen={setOpen} form={form} />
+		</div>
 	);
 }

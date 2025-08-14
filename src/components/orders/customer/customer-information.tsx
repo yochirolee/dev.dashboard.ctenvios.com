@@ -12,6 +12,8 @@ export function CustomerInformation() {
 		})),
 	);
 
+	const fullName = `${selectedCustomer?.first_name || ""} ${selectedCustomer?.middle_name || ""} ${selectedCustomer?.last_name || ""} ${selectedCustomer?.second_last_name || ""}`;
+
 	return (
 		<>
 			{selectedCustomer && (
@@ -33,8 +35,7 @@ export function CustomerInformation() {
 						<div className="flex items-center justify-between">
 							<dt className="text-muted-foreground">Nombre</dt>
 							<dd>
-								{selectedCustomer?.first_name} {selectedCustomer?.middle_name || ""}{" "}
-								{selectedCustomer?.last_name} {selectedCustomer?.second_last_name}
+								{fullName}
 							</dd>
 						</div>
 						<div className="flex items-center justify-between">

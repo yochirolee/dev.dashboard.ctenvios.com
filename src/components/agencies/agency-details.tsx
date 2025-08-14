@@ -1,40 +1,70 @@
-import { useAgencies } from "@/hooks/use-agencies";
 import { Card, CardContent } from "../ui/card";
-import { Button } from "../ui/button";
 import { Separator } from "../ui/separator";
-import { Pencil } from "lucide-react";
 import { Skeleton } from "../ui/skeleton";
+import type { Agency } from "@/data/types";
+import { EditAgencyForm } from "./edit-agency-form";
+import { NewAgencyDialog } from "./new-agency-dialog";
+import { useState } from "react";
+import { Badge } from "../ui/badge";
+import { ImageIcon } from "lucide-react";
+import { Button } from "../ui/button";
+import ImageUploadForm from "../upload/ImageUploadForm";
 
-export const AgencyDetails = ({ agencyId }: { agencyId: number }) => {
-	const { data: agency, isLoading } = useAgencies.getById(agencyId ?? 0);
-	if (isLoading) return <Skeleton className="h-[200px] w-full" />;
+export const AgencyDetails = ({
+	selectedAgency,
+	setSelectedAgency,
+}: {
+	selectedAgency: Agency;
+	setSelectedAgency: (agency: Agency) => void;
+}) => {
+	const [openEdit, setOpenEdit] = useState(false);
+	if (!selectedAgency) return <Skeleton className="h-[200px] w-full" />;
 	return (
 		<Card>
 			<CardContent>
 				<div className="flex flex-col lg:flex-row items-center gap-4">
-					{agency?.logo ? (
-						<img src={agency?.logo} alt={agency?.name} className="w-20 h-20  object-center object-scale-down rounded-full border  " />
+					{selectedAgency?.logo ? (
+						<img
+							src={selectedAgency?.logo}
+							alt={selectedAgency?.name}
+							className="w-20 h-20  object-center object-scale-down rounded-full border  "
+						/>
 					) : (
-						<div className=" bg-muted min-h-20 min-w-20 object-cover rounded-full border"></div>
+						<ImageUploadForm
+							onChange={() => {}}
+							label="Seleccionar imagen"
+							defaultImage={selectedAgency?.logo}
+						/>
 					)}
 
 					<div className="flex flex-col gap-2 w-full">
-						<h1 className="text-2xl font-bold">{agency?.name}</h1>
-						<p className="text-sm text-muted-foreground">{agency?.address}</p>
+						<h1 className="text-2xl font-bold">{selectedAgency?.name}</h1>
+						<Badge variant="outline">{selectedAgency?.agency_type?.toUpperCase()}</Badge>
+
+						<p className="text-sm text-muted-foreground">{selectedAgency?.address}</p>
 					</div>
 					<div className="ml-auto w-full lg:w-fit">
-						<Button variant="outline" className="gap-2 w-full lg:w-fit">
-							<Pencil className="w-4 h-4" />
-							<span>Editar</span>
-						</Button>
+						<NewAgencyDialog
+							title="Editar Agencia"
+							description="Editar la agencia"
+							action="Editar Agencia"
+							open={openEdit}
+							setOpen={setOpenEdit}
+						>
+							<EditAgencyForm
+								setOpen={setOpenEdit}
+								selectedAgency={selectedAgency}
+								setSelectedAgency={setSelectedAgency}
+							/>
+						</NewAgencyDialog>
 					</div>
 				</div>
 				<Separator className="my-4" />
 				<div className="grid grid-cols-1 lg:grid-cols-2 gap-3 my-4">
-					<span>Contacto: {agency?.contact}</span>
-					<span>Teléfono: {agency?.phone}</span>
-					<span>Email: {agency?.email}</span>
-					<span>Website: {agency?.website}</span>
+					<span>Contacto: {selectedAgency?.contact}</span>
+					<span>Teléfono: {selectedAgency?.phone}</span>
+					<span>Email: {selectedAgency?.email}</span>
+					<span>Website: {selectedAgency?.website}</span>
 				</div>
 			</CardContent>
 		</Card>

@@ -11,6 +11,10 @@ export function ReceiverInformation() {
 			setSelectedReceiver: state.setSelectedReceiver,
 		})),
 	);
+
+	const fullName = `${selectedReceiver?.first_name || ""} ${selectedReceiver?.middle_name || ""} ${
+		selectedReceiver?.last_name || ""
+	} ${selectedReceiver?.second_last_name || ""}`;
 	return (
 		<>
 			{selectedReceiver && (
@@ -30,10 +34,7 @@ export function ReceiverInformation() {
 					<dl className="grid gap-3">
 						<div className="flex items-center justify-between">
 							<dt className="text-muted-foreground">Nombre</dt>
-							<dd>
-								{selectedReceiver?.first_name} {selectedReceiver?.middle_name}
-								{selectedReceiver?.last_name} {selectedReceiver?.second_last_name}
-							</dd>
+							<dd>{fullName}</dd>
 						</div>
 						<div className="flex items-center justify-between">
 							<dt className="text-muted-foreground">Carne de Identidad</dt>
@@ -43,13 +44,19 @@ export function ReceiverInformation() {
 						<div className="flex items-center justify-between">
 							<dt className="text-muted-foreground">Movil/Telefono</dt>
 							<dd>
-								<a href={`tel:${selectedReceiver?.phone}`}>{selectedReceiver?.phone}</a>
+								<a href={`tel:${selectedReceiver?.mobile}`}>{selectedReceiver?.mobile}</a>{" "}
+								{selectedReceiver?.phone && (
+									<>
+										<span className="text-muted-foreground">/ </span>
+										<a href={`tel:${selectedReceiver?.phone}`}>{selectedReceiver?.phone}</a>
+									</>
+								)}
 							</dd>
 						</div>
 						<div className="flex items-center justify-between">
 							<dt className="text-muted-foreground">Dirección</dt>
 							<div className="flex flex-col items-end  gap-2">
-									<dd className="text-sm text-right">{selectedReceiver?.address}</dd>
+								<dd className="text-sm text-right">{selectedReceiver?.address}</dd>
 
 								<Badge variant="outline">
 									{selectedReceiver?.province} / {selectedReceiver?.city}

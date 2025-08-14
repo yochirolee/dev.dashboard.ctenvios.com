@@ -43,6 +43,7 @@ import { useProvinces } from "@/hooks/use-provinces";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useInvoiceStore } from "@/stores/invoice-store";
 import { useShallow } from "zustand/react/shallow";
+import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
 
 export function ReceiverFormDialog() {
 	const { data: provinces } = useProvinces();
@@ -193,10 +194,11 @@ export function ReceiverFormDialog() {
 						<ScrollArea className="h-[calc(100vh-200px)] px-4">
 							<div className="grid  gap-1  space-y-6 mt-4">
 								<FormField
+									
 									control={form.control}
 									name="ci"
 									render={({ field }) => (
-										<FormItem>
+										<FormItem className="mx-auto">
 											<FormLabel>
 												Carne de Identidad
 												{!isValidCubanCI(field.value) ? (
@@ -207,20 +209,17 @@ export function ReceiverFormDialog() {
 											</FormLabel>
 											<FormControl>
 												<div className="inline-flex items-center gap-3">
-													<Input
-														id="ci"
-														{...field}
-														onChange={(e) => {
-															const value = e.target.value.replace(/\D/g, "").slice(0, 11);
+													<InputOTP
+														onComplete={(value) => {
 															field.onChange(value);
-															handleSearchByCi(e.target.value);
+															handleSearchByCi(value);
 														}}
+														className="w-full"
 														maxLength={11}
 														pattern="[0-9]*"
-														placeholder="CI"
-													/>
-													{/* <InputOTP  maxLength={11} pattern="[0-9]*" {...field}>
-														<InputOTPGroup >
+														{...field}
+													>
+														<InputOTPGroup>
 															<InputOTPSlot index={0} />
 															<InputOTPSlot index={1} />
 															<InputOTPSlot index={2} />
@@ -233,13 +232,14 @@ export function ReceiverFormDialog() {
 															<InputOTPSlot index={9} />
 															<InputOTPSlot index={10} />
 														</InputOTPGroup>
-													</InputOTP> */}
+													</InputOTP>
 												</div>
 											</FormControl>
 											<FormMessage />
 										</FormItem>
 									)}
 								/>
+								<Separator />
 								<div className="grid lg:grid-cols-2 gap-4">
 									<FormField
 										control={form.control}

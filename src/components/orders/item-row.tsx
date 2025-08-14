@@ -1,26 +1,16 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo } from "react";
 import { Input } from "../ui/input";
 import { TableCell, TableRow } from "../ui/table";
 import { useWatch } from "react-hook-form";
 import CustomsFeeCombobox from "./customs-fee-combobox";
 import { Button } from "../ui/button";
-import { DollarSign, PlusCircle, ShieldCheck, Trash2 } from "lucide-react";
+import { DollarSign, PencilIcon, PlusCircle, ShieldCheck, Trash2 } from "lucide-react";
 import {
 	DropdownMenu,
 	DropdownMenuItem,
 	DropdownMenuContent,
 	DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
-import {
-	AlertDialog,
-	AlertDialogAction,
-	AlertDialogCancel,
-	AlertDialogContent,
-	AlertDialogDescription,
-	AlertDialogFooter,
-	AlertDialogHeader,
-	AlertDialogTitle,
-} from "../ui/alert-dialog";
 
 import { Badge } from "../ui/badge";
 
@@ -29,11 +19,13 @@ function ItemRow({
 	form,
 	remove,
 	selectedRate,
+	openDialog,
 }: {
 	index: number;
 	form: any;
 	remove: any;
 	selectedRate: any;
+	openDialog: (type: "insurance" | "charge" | "rate", index: number) => void;
 }) {
 	const weight = useWatch({
 		control: form.control,
@@ -64,8 +56,6 @@ function ItemRow({
 
 		return subtotal;
 	}, [weight, selectedRate?.public_rate, customs?.fee, insuranceFee]);
-
-	const [openInsuranceFeeDialog, setOpenInsuranceFeeDialog] = useState(false);
 
 	// Actualiza el subtotal del ítem
 	useEffect(() => {
@@ -106,7 +96,10 @@ function ItemRow({
 			</TableCell>
 			<TableCell className="flex items-center gap-2 ">
 				<div className="w-full relative gap-2">
-					<Input className="lg:w-full w-auto" {...form.register(`items.${index}.description`)} />
+					<Input
+						className="lg:w-full pr-40 w-auto"
+						{...form.register(`items.${index}.description`)}
+					/>
 					<div className="absolute right-2 top-1/2 -translate-y-1/2">
 						<div className="flex gap-2">
 							{form.getValues(`items.${index}.insurance_fee`) > 0 && (
@@ -114,9 +107,9 @@ function ItemRow({
 									Seguro: {form.getValues(`items.${index}.insurance_fee`)}
 								</Badge>
 							)}
-							{form.getValues(`items.${index}.delivery_fee`) > 0 && (
-								<Badge variant="outline">
-									Envio: {form.getValues(`items.${index}.delivery_fee`)}
+							{form.getValues(`items.${index}.charge_fee`) > 0 && (
+								<Badge variant="outline" className="">
+									Cargo: {form.getValues(`items.${index}.charge_fee`).toFixed(2)}
 								</Badge>
 							)}
 						</div>
@@ -129,21 +122,31 @@ function ItemRow({
 						</Button>
 					</DropdownMenuTrigger>
 					<DropdownMenuContent>
-						<DropdownMenuItem className="flex items-center gap-2">
+						<DropdownMenuItem
+							onClick={() => openDialog("charge", index)}
+							className="flex items-center gap-2"
+						>
 							<DollarSign />
 							<span>Cargo</span>
 						</DropdownMenuItem>
 						<DropdownMenuItem
-							onClick={() => setOpenInsuranceFeeDialog(true)}
+							onClick={() => openDialog("insurance", index)}
 							className="flex items-center gap-2"
 						>
 							<ShieldCheck />
 							<span>Seguro</span>
 						</DropdownMenuItem>
+						<DropdownMenuItem
+							onClick={() => openDialog("rate", index)}
+							className="flex items-center gap-2"
+						>
+							<PencilIcon />
+							<span>Cambiar Tarifa</span>
+						</DropdownMenuItem>
 					</DropdownMenuContent>
 				</DropdownMenu>
 			</TableCell>
-			<TableCell className="text-right">{customs?.fee}</TableCell>
+			<TableCell className="text-right">{customs?.fee || 0}</TableCell>
 
 			<TableCell>
 				<Input
@@ -158,7 +161,7 @@ function ItemRow({
 					autoComplete="off"
 				/>
 			</TableCell>
-			<TableCell className="text-right">{selectedRate?.public_rate.toFixed(2)}</TableCell>
+			<TableCell className="text-right">{selectedRate?.public_rate.toFixed(2) || 0}</TableCell>
 			<TableCell className="text-right">{subtotal.toFixed(2)}</TableCell>
 
 			<TableCell className="w-10">
@@ -175,57 +178,9 @@ function ItemRow({
 					<Trash2 />
 				</Button>
 			</TableCell>
-			<InsuranceFeeDialog
-				open={openInsuranceFeeDialog}
-				setOpen={setOpenInsuranceFeeDialog}
-				form={form}
-				index={index}
-			/>
 		</TableRow>
 	);
 }
 
 // Memoizar para evitar re-render si las props no cambian
 export default React.memo(ItemRow);
-
-const InsuranceFeeDialog = ({
-	open,
-	setOpen,
-	index,
-	form,
-}: {
-	open: boolean;
-	setOpen: (open: boolean) => void;
-	index: number;
-	form: any;
-}) => {
-	return (
-		<AlertDialog open={open} onOpenChange={setOpen}>
-			<AlertDialogContent>
-				<AlertDialogHeader>
-					<AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-					<AlertDialogDescription>
-						This action cannot be undone. This will permanently delete your account and remove your
-						data from our servers.
-					</AlertDialogDescription>
-				</AlertDialogHeader>
-
-				<Input
-					{...form.register(`items.${index}.insurance_fee`, {
-						valueAsNumber: true,
-					})}
-					type="number"
-					onChange={(e) => {
-						form.setValue(`items.${index}.insurance_fee`, parseFloat(e.target.value));
-					}}
-					placeholder="Insurance fee"
-				/>
-
-				<AlertDialogFooter>
-					<AlertDialogCancel>Cancel</AlertDialogCancel>
-					<AlertDialogAction>Continue</AlertDialogAction>
-				</AlertDialogFooter>
-			</AlertDialogContent>
-		</AlertDialog>
-	);
-};

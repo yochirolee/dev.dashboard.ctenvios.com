@@ -16,9 +16,10 @@ export const useInvoices = {
 		limit: number,
 		startDate: string,
 		endDate: string,
+		user_id: string,
 	) => {
 		return useQuery({
-			queryKey: ["get-invoices", "search", searchQuery, page, limit, startDate, endDate],
+			queryKey: ["get-invoices", "search", searchQuery, page, limit, startDate, endDate, user_id],
 			queryFn: () => api.invoices.search(searchQuery, page, limit, startDate, endDate),
 			staleTime: 1000 * 60 * 5,
 		});
@@ -68,5 +69,3 @@ export const useInvoices = {
 		});
 	},
 };
-
-

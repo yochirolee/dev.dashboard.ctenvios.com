@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import { useAppStore } from "@/stores/app-store";
 import type { User } from "@/data/types";
 import { useNavigate } from "react-router-dom";
+import { queryClient } from "@/lib/query-client";
 
 export const useGetUsers = (page: number | 1, limit: number | 25) => {
 	return useQuery({
@@ -55,6 +56,7 @@ export const useLogOut = () => {
 			useAppStore.setState({ session: null });
 			localStorage.removeItem("authToken");
 			navigate("/login", { replace: true });
+			queryClient.clear();
 		},
 	});
 };

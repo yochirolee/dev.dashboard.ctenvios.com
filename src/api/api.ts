@@ -303,6 +303,11 @@ const api = {
 			const response = await axiosInstance.get(`/agencies/${id}/services`);
 			return response.data;
 		},
+		update: async (id: number, data: Agency) => {
+			console.log(data, "Data in API");
+			const response = await axiosInstance.put(`/agencies/${id}`, data);
+			return response.data;
+		},
 	},
 	customs: {
 		get: async (page: number | 1, limit: number | 25) => {

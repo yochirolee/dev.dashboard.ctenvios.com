@@ -9,9 +9,11 @@ import { useDebounce } from "use-debounce";
 import { Input } from "@/components/ui/input";
 import { DatePickerWithRange } from "@/components/dates/data-range-picker";
 import { useInvoices } from "@/hooks/use-invoices";
+import { useAppStore } from "@/stores/app-store";
 
 export default function InvoicesPage() {
 	const navigate = useNavigate();
+	const { session } = useAppStore();
 	const [searchQuery, setSearchQuery] = useState("");
 	const [debouncedSearchQuery] = useDebounce(searchQuery, 500);
 	const [date, setDate] = useState<Date | undefined>(undefined);
@@ -26,6 +28,7 @@ export default function InvoicesPage() {
 		pagination.pageSize,
 		date?.toISOString() || "",
 		date?.toISOString() || "",
+		session?.user?.id.toString() || "",
 	);
 
 	const handleClearFilters = () => {

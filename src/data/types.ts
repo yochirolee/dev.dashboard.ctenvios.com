@@ -95,10 +95,13 @@ export const invoiceSchema = z.object({
 	receiver_id: z.number().min(0),
 	agency_id: z.number().min(0),
 	user_id: z.string().min(0),
+	rate_id: z.number().min(0),
 	service_id: z.number().min(0),
 	items: z.array(itemsSchema).min(1, "La factura debe tener al menos 1 item"),
 	total_amount: z.number().min(0),
 	total_weight: z.number().min(0),
+	discount_type: z.string().optional().default("percent"),
+	discount_amount: z.number().min(0).optional(),
 	payment_status: z.boolean().default(false),
 	paid_amount: z.number().min(0).optional().default(0),
 	created_at: z.string().optional(),
@@ -120,10 +123,11 @@ export const agencySchema = z.object({
 	name: z.string().min(1, "El nombre es requerido"),
 	address: z.string().min(1, "La dirección es requerida"),
 	phone: z.string().min(10, "El teléfono debe tener al menos 10 dígitos"),
+	contact: z.string().optional(),
 	email: z.string().email().optional(),
 	website: z.string().url().optional(),
 	logo: z.string().url().optional(),
-	parent_agency_id: z.number().optional(),
+	agency_type: z.enum(["FORWARDER", "AGENCY", "RESELLER"]).optional(),
 });
 
 export const providerSchema = z.object({

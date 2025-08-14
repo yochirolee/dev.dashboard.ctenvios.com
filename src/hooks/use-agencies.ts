@@ -29,6 +29,18 @@ export const useAgencies = {
 			},
 		});
 	},
+	update: (options?: { onSuccess?: () => void; onError?: (error: any) => void }) => {
+		return useMutation({
+			mutationFn: ({ id, data }: { id: number; data: Agency }) => api.agencies.update(id, data),
+			onSuccess: () => {
+				queryClient.invalidateQueries({ queryKey: ["get-agencies"] });
+				options?.onSuccess?.();
+			},
+			onError: (error) => {
+				options?.onError?.(error);
+			},
+		});
+	},
 	getById: (id: number) => {
 		return useQuery({
 			queryKey: ["get-agency", id],
