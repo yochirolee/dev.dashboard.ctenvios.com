@@ -5,7 +5,7 @@ import type { Customs } from "@/data/types";
 export const useCustoms = {
 	get: (page: number, limit: number) => {
 		return useQuery({
-			queryKey: ["customs", page, limit],
+			queryKey: ["get-customs-rates", page, limit],
 			queryFn: () => api.customs.get(page, limit),
 			refetchOnWindowFocus: false,
 			staleTime: 1000 * 60 * 5,
@@ -16,7 +16,7 @@ export const useCustoms = {
 		return useMutation({
 			mutationFn: (data: Customs) => api.customs.create(data),
 			onSuccess: () => {
-				queryClient.invalidateQueries({ queryKey: ["customs"] });
+				queryClient.invalidateQueries({ queryKey: ["get-customs-rates"] });
 			},
 		});
 	},

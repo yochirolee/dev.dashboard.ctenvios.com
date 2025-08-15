@@ -48,7 +48,7 @@ function ItemRow({
 		const subtotal = parseFloat(
 			(
 				(weight || 0) * (selectedRate?.public_rate || 0) +
-				(customs?.fee || 0) +
+				(customs?.fee / 100 || 0) +
 				(parseFloat(insuranceFee) || 0) +
 				(parseFloat(form.getValues(`items.${index}.charge_fee`)) || 0)
 			).toFixed(2),
@@ -80,7 +80,7 @@ function ItemRow({
 	useEffect(() => {
 		if (customs?.description) {
 			form.setValue(`items.${index}.description`, customs.description);
-			form.setValue(`items.${index}.customs_fee`, customs.fee);
+			form.setValue(`items.${index}.customs_fee`, customs.fee / 100);
 		}
 	}, [customs?.id, customs?.description, customs?.fee, form, index]);
 
@@ -146,7 +146,7 @@ function ItemRow({
 					</DropdownMenuContent>
 				</DropdownMenu>
 			</TableCell>
-			<TableCell className="text-right">{customs?.fee || 0}</TableCell>
+			<TableCell className="text-right">{(customs?.fee / 100 || 0).toFixed(2)}</TableCell>
 
 			<TableCell>
 				<Input
