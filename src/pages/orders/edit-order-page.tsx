@@ -6,7 +6,7 @@ import { CustomerInformation } from "@/components/orders/customer/customer-infor
 import { ReceiverInformation } from "@/components/orders/receiver/receiver-information";
 import { ReceiverFormDialog } from "@/components/orders/receiver/receiver-form-dialog";
 import { CustomerFormDialog } from "@/components/orders/customer/customer-form-dialog";
-import { TestFieldArray } from "@/components/orders/test-field-array";
+import { ItemsInOrder } from "@/components/orders/items-in-order";
 import { useParams } from "react-router-dom";
 import { useInvoices } from "@/hooks/use-invoices";
 import { useInvoiceStore } from "@/stores/invoice-store";
@@ -65,7 +65,7 @@ export function EditOrderPage() {
 			</div>
 
 			<ServiceSelector />
-			<TestFieldArray />
+			<ItemsInOrder />
 		</div>
 	);
 }

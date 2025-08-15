@@ -72,7 +72,8 @@ const CustomsFeeCombobox = React.memo(function CustomsFeeCombobox({
 											value={custom?.name}
 											onSelect={() => {
 												field.onChange(custom);
-												setValue(`items.${index}.customs_rate_id`, custom.id);
+												setValue(`items.${index}.customs_id`, custom.id);
+												setValue(`customs_id`, custom.id);
 												setOpen(false);
 											}}
 										>

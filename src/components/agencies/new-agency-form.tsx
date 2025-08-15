@@ -127,7 +127,7 @@ export const NewAgencyForm = ({ setOpen }: { setOpen: (open: boolean) => void })
 					)}
 				/>
 
-				<div className="flex justify-end gap-2">
+				<div className="flex lg:flex-row flex-col justify-end gap-2">
 					<Button type="submit" disabled={isPending}>
 						{isPending ? (
 							<>

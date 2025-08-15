@@ -44,26 +44,17 @@ export default function InvoiceDetailsPage() {
 
 	console.log(invoice, "invoice");
 
-	const total_customs_fee = invoice?.items.reduce(
-		(acc: number, item: any) => acc + item?.customs_fee,
-		0,
-	);
 	const subtotal = invoice?.items.reduce(
-		(acc: number, item: any) => acc + (item?.weight * item?.rate) / 100,
+		(acc: number, item: any) => acc + (item?.weight * item?.rate) / 100 + item?.customs_fee,
 		0,
 	);
 
-	const total = parseFloat(
-		invoice?.items.reduce(
-			(acc: number, item: any) =>
-				acc +
-				(item?.rate / 100) * item?.weight +
-				item?.customs_fee +
-				item?.delivery_fee +
-				item?.insurance_fee,
-			0,
-		),
-	);
+	const total =
+		subtotal +
+		invoice?.shipping_fee +
+		invoice?.fee +
+		invoice?.charge_fee -
+		invoice?.discount_amount;
 	const total_weight = invoice?.items.reduce((acc: number, item: any) => acc + item?.weight, 0);
 	console.log(total, "total");
 
@@ -285,7 +276,15 @@ export default function InvoiceDetailsPage() {
 					</Table>
 					<div className="relative">
 						<div className="absolute p-4 inset-0 flex items-center justify-center pointer-events-none">
-							<span className="xl:text-[90px] text-4xl rounded-2xl p-4 bg-green-500/10 border font-extrabold text-green-500 opacity-10 rotate-[-30deg]">
+							<span
+								className={`xl:text-[90px] text-4xl rounded-2xl p-4 border font-extrabold  opacity-10 rotate-[-30deg]  ${
+									invoice?.payment_status === "PAID"
+										? "text-green-500 bg-green-500/10 border-green-500"
+										: invoice?.payment_status === "PARTIALLY_PAID"
+										? "text-yellow-500 bg-yellow-500/10 border-yellow-500"
+										: "text-red-500 bg-red-500/10 border-red-500"
+								}`}
+							>
 								{invoice?.payment_status}
 							</span>
 						</div>
@@ -295,10 +294,7 @@ export default function InvoiceDetailsPage() {
 									<span className="text-muted-foreground">Subtotal</span>
 									<span>${subtotal.toFixed(2)}</span>
 								</li>
-								<li className="flex items-center gap-4 justify-between">
-									<span className="text-muted-foreground">Aranceles</span>
-									<span>${total_customs_fee.toFixed(2)}</span>
-								</li>
+
 								<li className="flex items-center justify-between">
 									<span className="text-muted-foreground">Shipping</span>
 									<span>${invoice?.shipping_fee?.toFixed(2) ?? 0.0}</span>

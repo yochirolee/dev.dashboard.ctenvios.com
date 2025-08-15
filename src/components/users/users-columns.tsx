@@ -22,6 +22,7 @@ const userSchemaColumns = z.object({
 	agency: z.object({
 		id: z.number(),
 		name: z.string(),
+		agency_type: z.string(),
 	}),
 	role: z.string(),
 	isActive: z.boolean(),
@@ -53,7 +54,10 @@ export const userColumns = (handleDeleteUser: (id: number) => void): ColumnDef<U
 		accessorKey: "agency",
 		header: "Agency",
 		cell: ({ row }) => (
-			<div className="text-sm text-muted-foreground">{row.original?.agency?.name}</div>
+			<div className="text-sm text-muted-foreground flex gap-2">
+				<div>{row.original?.agency?.name}</div>
+				<Badge variant="outline">{row.original?.agency?.agency_type}</Badge>
+			</div>
 		),
 	},
 	{

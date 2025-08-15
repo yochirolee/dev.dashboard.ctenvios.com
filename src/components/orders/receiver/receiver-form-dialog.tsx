@@ -178,7 +178,7 @@ export function ReceiverFormDialog() {
 					</span>
 				</Button>
 			</DialogTrigger>
-			<DialogContent className="sm:max-w-[550px]  p-2 ">
+			<DialogContent className="w-full max-w-[calc(100%-2rem)] sm:max-w-md ">
 				<DialogHeader className="px-4">
 					<DialogTitle>
 						{selectedReceiver ? "Editar Destinatario" : "Nuevo Destinatario"}
@@ -194,7 +194,6 @@ export function ReceiverFormDialog() {
 						<ScrollArea className="h-[calc(100vh-200px)] px-4">
 							<div className="grid  gap-1  space-y-6 mt-4">
 								<FormField
-									
 									control={form.control}
 									name="ci"
 									render={({ field }) => (

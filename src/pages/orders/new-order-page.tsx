@@ -6,7 +6,7 @@ import { CustomerInformation } from "@/components/orders/customer/customer-infor
 import { ReceiverInformation } from "@/components/orders/receiver/receiver-information";
 import { ReceiverFormDialog } from "@/components/orders/receiver/receiver-form-dialog";
 import { CustomerFormDialog } from "@/components/orders/customer/customer-form-dialog";
-import { TestFieldArray } from "@/components/orders/test-field-array";
+import { ItemsInOrder } from "@/components/orders/items-in-order";
 
 export function NewOrderPage() {
 	return (
@@ -45,7 +45,7 @@ export function NewOrderPage() {
 			</div>
 
 			<ServiceSelector />
-			<TestFieldArray />
+			<ItemsInOrder />
 		</div>
 	);
 }

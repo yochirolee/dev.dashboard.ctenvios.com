@@ -83,6 +83,7 @@ export const paymentSchema = z.object({
 export const itemsSchema = z.object({
 	description: z.string().min(1),
 	weight: z.number().min(0).optional(),
+	customs_id: z.number().min(0),
 	customs_fee: z.number().min(0).optional(),
 	delivery_fee: z.number().min(0).optional(),
 	insurance_fee: z.number().min(0).optional(),

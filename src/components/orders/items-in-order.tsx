@@ -20,7 +20,7 @@ import { ChargeDialog, DiscountDialog, InsuranceFeeDialog } from "./order-dialog
 
 type FormValues = z.infer<typeof invoiceSchema>;
 
-export function TestFieldArray() {
+export function ItemsInOrder() {
 	const session = useAppStore((state) => state.session);
 	const [items_count, setItemsCount] = useState(1);
 	const navigate = useNavigate();
@@ -98,6 +98,16 @@ export function TestFieldArray() {
 			}));
 
 			itemsToAdd.forEach((item) => append(item));
+
+			// Después de que React actualice el DOM, enfoca el primer ítem agregado
+			if (items_count > 1) {
+				setTimeout(() => {
+					const input = document.querySelector<HTMLInputElement>(
+						`input[name="items.${0}.description"]`,
+					);
+					input?.focus();
+				}, 0);
+			}
 		}
 	};
 	const handleRemoveAll = () => {
@@ -166,6 +176,12 @@ export function TestFieldArray() {
 										if (!isNaN(num) && num >= 1) {
 											setItemsCount(num);
 										}
+									}
+								}}
+								onKeyDown={(e) => {
+									if (e.key === "Enter") {
+										e.preventDefault();
+										handleAddItem();
 									}
 								}}
 							/>

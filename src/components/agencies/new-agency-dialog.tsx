@@ -32,7 +32,7 @@ export const NewAgencyDialog = ({
 					<span className="hidden lg:block">{action}</span>
 				</Button>
 			</DialogTrigger>
-			<DialogContent>
+			<DialogContent className="w-full max-w-[calc(100%-2rem)] sm:max-w-lg">
 				<DialogHeader>
 					<DialogTitle>{title}</DialogTitle>
 					<DialogDescription>{description}</DialogDescription>

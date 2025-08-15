@@ -41,16 +41,16 @@ function ItemRow({
 	});
 	const subtotal = useMemo(() => {
 		if (parseFloat(weight) > 100) {
-			form.setValue(`items.${index}.delivery_fee`, 30);
+			form.setValue(`items.${index}.charge_fee`, 30);
 		} else {
-			form.setValue(`items.${index}.delivery_fee`, 0);
+			form.setValue(`items.${index}.charge_fee`, 0);
 		}
 		const subtotal = parseFloat(
 			(
 				(weight || 0) * (selectedRate?.public_rate || 0) +
 				(customs?.fee || 0) +
 				(parseFloat(insuranceFee) || 0) +
-				(parseFloat(form.getValues(`items.${index}.delivery_fee`)) || 0)
+				(parseFloat(form.getValues(`items.${index}.charge_fee`)) || 0)
 			).toFixed(2),
 		);
 
