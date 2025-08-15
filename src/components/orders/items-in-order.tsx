@@ -93,6 +93,7 @@ export function ItemsInOrder() {
 				customs_fee: 0,
 				delivery_fee: 0,
 				insurance_fee: 0,
+				customs_id: 0,
 				rate: selectedRate?.public_rate || 0,
 				subtotal: 0,
 			}));
