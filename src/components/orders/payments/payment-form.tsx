@@ -1,4 +1,4 @@
-import { useForm, useFormContext } from "react-hook-form";
+import { useForm, useFormContext, useWatch } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -15,7 +15,7 @@ import { Check, ChevronsUpDown, DollarSign, Loader2 } from "lucide-react";
 import { useInvoices } from "@/hooks/use-invoices";
 import { payment_methods } from "@/data/data";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
 	Command,
 	CommandEmpty,
@@ -41,20 +41,38 @@ import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/ca
 export const PaymentForm = ({ invoice }: { invoice: Invoice }) => {
 	const balance = ((invoice?.total_amount - invoice?.paid_amount) / 100).toFixed(2);
 
+	console.log(balance, "balance");
+	console.log(invoice, "invoice");
+
 	const form = useForm<z.infer<typeof paymentSchema>>({
 		resolver: zodResolver(paymentSchema),
 		defaultValues: {
-			amount: parseFloat(balance),
+			amount: Number(balance),
+			charge: 0,
 			payment_method: payment_methods[0].value,
 			payment_reference: undefined,
 			notes: undefined,
 		},
 	});
 
+	const amount = useWatch({
+		control: form.control,
+		name: "amount",
+	});
+
+	const payment_method = useWatch({
+		control: form.control,
+		name: "payment_method",
+	});
+
+	if (payment_method === "CREDIT_CARD" || payment_method === "DEBIT_CARD") {
+		form.setValue("charge", amount * 0.03);
+	} else {
+		form.setValue("charge", 0);
+	}
+
 	const { mutate: createPayment, isPending } = useInvoices.pay({
 		onSuccess: () => {
-			form.reset();
-
 			toast.success("Payment created successfully");
 			setOpen(false);
 		},
@@ -65,9 +83,17 @@ export const PaymentForm = ({ invoice }: { invoice: Invoice }) => {
 
 	const onSubmit = (data: z.infer<typeof paymentSchema>) => {
 		createPayment({ invoice_id: Number(invoice.id), data });
+		form.reset({});
 	};
 
 	const [open, setOpen] = useState(false);
+	useEffect(() => {
+		form.reset({
+			amount: Number(balance),
+			charge: 0,
+			payment_method: payment_methods[0].value,
+		});
+	}, [open, form]);
 
 	return (
 		<Dialog open={open} onOpenChange={setOpen}>
@@ -87,7 +113,7 @@ export const PaymentForm = ({ invoice }: { invoice: Invoice }) => {
 						<CardHeader>
 							<CardDescription>Total de la factura</CardDescription>
 							<CardTitle className="text-2xl font-semibold text-muted-foreground tabular-nums @[250px]/card:text-3xl">
-								${invoice?.total_amount / 100}
+								${(invoice?.total_amount / 100).toFixed(2)}
 							</CardTitle>
 						</CardHeader>
 					</Card>
@@ -130,7 +156,7 @@ export const PaymentForm = ({ invoice }: { invoice: Invoice }) => {
 										placeholder="0.00"
 										type="number"
 										min={0}
-										max={Number(balance)}
+										max={Number(balance) + form.getValues("charge")}
 										step={0.01}
 										className="[&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none [-moz-appearance:textfield] text-right"
 										onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
@@ -140,6 +166,10 @@ export const PaymentForm = ({ invoice }: { invoice: Invoice }) => {
 								</FormItem>
 							)}
 						/>
+						<div className="grid  justify-end  gap-2">
+							<p>Cargo por tarjeta: ${form.getValues("charge").toFixed(2)}</p>
+							<p>Total a pagar: ${(amount + form.getValues("charge")).toFixed(2)}</p>
+						</div>
 
 						<Button type="submit" disabled={isPending}>
 							{isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : "Pagar"}

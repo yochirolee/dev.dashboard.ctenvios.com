@@ -74,12 +74,12 @@ export const ChargeDialog = ({
 				</AlertDialogHeader>
 
 				<Input
-					{...form.register(`items.${index}.charge_fee`, {
+					{...form.register(`items.${index}.charge_amount`, {
 						valueAsNumber: true,
 					})}
 					type="number"
 					onChange={(e) => {
-						form.setValue(`items.${index}.charge_fee`, parseFloat(e.target.value));
+						form.setValue(`items.${index}.charge_amount`, parseFloat(e.target.value));
 					}}
 					placeholder="Cargo"
 				/>

@@ -23,7 +23,6 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Link } from "react-router-dom";
 
-
 // This type is used to define the shape of our data.
 // You can use a Zod schema here if you want.
 export type Invoice = {
@@ -47,6 +46,12 @@ export type Invoice = {
 		last_name: string;
 		second_last_name: string;
 		mobile: string;
+		province: {
+			name: string;
+		};
+		city: {
+			name: string;
+		};
 	};
 	service: {
 		id: number;
@@ -136,7 +141,7 @@ export const orderColumns: ColumnDef<Invoice>[] = [
 		cell: ({ row }) => {
 			return (
 				<div className="max-w-[150px] truncate" title={row.original?.agency?.name}>
-					{row.original?.agency?.name}
+					<span className="text-sm">{row.original?.agency?.name}</span>
 				</div>
 			);
 		},
@@ -221,6 +226,20 @@ export const orderColumns: ColumnDef<Invoice>[] = [
 		size: 200,
 	},
 	{
+		accessorKey: "receiver.province.name",
+		header: "Provincia",
+		cell: ({ row }) => {
+			return (
+				<div className="flex flex-col text-muted-foreround truncate">
+					<span className="text-sm">{row.original?.receiver?.province?.name} </span>
+					<span className="text-xs text-muted-foreground">
+						{row.original?.receiver?.city?.name}
+					</span>
+				</div>
+			);
+		},
+	},
+	{
 		accessorKey: "status",
 		header: "Status",
 		cell: ({ row }) => {
@@ -238,7 +257,9 @@ export const orderColumns: ColumnDef<Invoice>[] = [
 		cell: ({ row }) => {
 			return (
 				<div className="text-sm whitespace-nowrap flex flex-col ">
-					<span>{format(new Date(row.original?.created_at), "dd/MM/yyyy HH:mm a")}</span>
+					<span className="text-xs ">
+						{format(new Date(row.original?.created_at), "dd/MM/yyyy HH:mm a")}
+					</span>
 					<span className="text-xs text-muted-foreground">{row.original?.user?.name}</span>
 				</div>
 			);

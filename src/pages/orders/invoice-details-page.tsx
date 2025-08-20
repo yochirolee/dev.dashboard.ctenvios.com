@@ -33,6 +33,7 @@ import {
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { PaymentForm } from "@/components/orders/payments/payment-form";
+import { cn } from "@/lib/utils";
 
 const baseUrl = import.meta.env.VITE_API_URL;
 
@@ -49,12 +50,7 @@ export default function InvoiceDetailsPage() {
 		0,
 	);
 
-	const total =
-		subtotal +
-		invoice?.shipping_fee +
-		invoice?.fee +
-		invoice?.charge_fee -
-		invoice?.discount_amount;
+	const total = subtotal + invoice?.charge_amount - invoice?.discount_amount;
 	const total_weight = invoice?.items.reduce((acc: number, item: any) => acc + item?.weight, 0);
 	console.log(total, "total");
 
@@ -292,7 +288,7 @@ export default function InvoiceDetailsPage() {
 							<ul className="flex flex-col w-1/2  xl:w-1/4 xl:mr-4 py-4 justify-end gap-2 border-t border-dashed  ">
 								<li className="flex items-center gap-4 justify-between">
 									<span className="text-muted-foreground">Subtotal</span>
-									<span>${subtotal.toFixed(2)}</span>
+									<span>${subtotal.toFixed(2) ?? 0.0}</span>
 								</li>
 
 								<li className="flex items-center justify-between">
@@ -304,22 +300,23 @@ export default function InvoiceDetailsPage() {
 									<span>${invoice?.tax?.toFixed(2) ?? 0.0}</span>
 								</li>
 								<li className="flex items-center justify-between">
-									<span className="text-muted-foreground">Fee</span>
-									<span>${invoice?.fee?.toFixed(2) ?? 0.0}</span>
+									<span className="text-muted-foreground">Charge</span>
+									<span>${(invoice?.charge_amount / 100)?.toFixed(2) ?? 0.0}</span>
 								</li>
 
 								<li className="flex items-center justify-between font-semibold">
 									<span className="text-muted-foreground">Total</span>
-									<span>${(invoice?.total_amount / 100).toFixed(2)} </span>
+									<span>${((invoice?.total_amount + invoice?.charge_amount) / 100).toFixed(2)} </span>
 								</li>
-								<li className="flex items-center justify-between">
+								<Separator />
+								<li className="flex text-sm items-center justify-between ">
 									<span className="text-muted-foreground">Paid</span>
-									<span>${(invoice?.paid_amount / 100).toFixed(2) ?? 0.0}</span>
+									<span className={cn(invoice?.payment_status === "PAID" && "text-muted-foreground" ? "text-green-500" : "text-red-500")}>${((invoice?.paid_amount + invoice?.charge_amount) / 100).toFixed(2) ?? 0.0}</span>
 								</li>
-								<li className="flex items-center justify-between">
+								<li className="flex text-sm items-center justify-between">
 									<span className="text-muted-foreground">Balance</span>
-									<span>
-										${((invoice?.total_amount - invoice?.paid_amount) / 100).toFixed(2) ?? 0.0}
+									<span className={cn(invoice?.payment_status === "PAID" && "text-muted-foreground")}>
+										${((invoice?.total_amount - invoice?.paid_amount ) / 100).toFixed(2) ?? 0.0}
 									</span>
 								</li>
 							</ul>

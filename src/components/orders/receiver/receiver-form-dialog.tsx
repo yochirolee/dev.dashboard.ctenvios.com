@@ -178,7 +178,7 @@ export function ReceiverFormDialog() {
 					</span>
 				</Button>
 			</DialogTrigger>
-			<DialogContent className="w-full max-w-[calc(100%-2rem)] sm:max-w-md ">
+			<DialogContent className="sm:max-w-[550px] p-2 h-auto ">
 				<DialogHeader className="px-4">
 					<DialogTitle>
 						{selectedReceiver ? "Editar Destinatario" : "Nuevo Destinatario"}
