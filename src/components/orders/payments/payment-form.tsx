@@ -167,8 +167,8 @@ export const PaymentForm = ({ invoice }: { invoice: Invoice }) => {
 							)}
 						/>
 						<div className="grid  justify-end  gap-2">
-							<p>Cargo por tarjeta: ${form.getValues("charge").toFixed(2)}</p>
-							<p>Total a pagar: ${(amount + form.getValues("charge")).toFixed(2)}</p>
+							<p>Cargo por tarjeta: ${form.getValues("charge")?.toFixed(2) ?? 0.0}</p>
+							<p>Total a pagar: ${(amount + (form.getValues("charge") ?? 0)).toFixed(2)}</p>
 						</div>
 
 						<Button type="submit" disabled={isPending}>
