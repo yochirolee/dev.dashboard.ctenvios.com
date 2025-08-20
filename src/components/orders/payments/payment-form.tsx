@@ -156,7 +156,7 @@ export const PaymentForm = ({ invoice }: { invoice: Invoice }) => {
 										placeholder="0.00"
 										type="number"
 										min={0}
-										max={Number(balance) + form.getValues("charge")}
+										max={Number(balance) + (form.getValues("charge") ?? 0)}
 										step={0.01}
 										className="[&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none [-moz-appearance:textfield] text-right"
 										onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}

@@ -1,6 +1,5 @@
 import { z } from "zod";
 import { isValidCubanCI } from "@/lib/utils";
-import { payment_methods } from "./data";
 
 export const customerSchema = z.object({
 	id: z.number().optional(),
