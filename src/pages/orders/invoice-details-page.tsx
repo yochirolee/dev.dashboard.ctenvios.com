@@ -46,7 +46,7 @@ export default function InvoiceDetailsPage() {
 	console.log(invoice, "invoice");
 
 	const subtotal = invoice?.items.reduce(
-		(acc: number, item: any) => acc + (item?.weight * item?.rate) / 100 + item?.customs_fee,
+		(acc: number, item: any) => acc + (item?.weight * item?.rate + item?.customs_fee) / 100,
 		0,
 	);
 
@@ -232,7 +232,7 @@ export default function InvoiceDetailsPage() {
 										${parseFloat(item?.delivery_fee).toFixed(2)}
 									</TableCell>
 									<TableCell className="text-right">
-										${parseFloat(item?.customs_fee).toFixed(2)}
+										${((item?.customs_fee / 100).toFixed(2))}
 									</TableCell>
 									<TableCell className="text-right">${(item?.rate / 100).toFixed(2)}</TableCell>
 									<TableCell className="text-right">{item?.weight.toFixed(2)}</TableCell>
@@ -240,7 +240,7 @@ export default function InvoiceDetailsPage() {
 										$
 										{(
 											(item?.rate / 100) * item?.weight +
-											item?.customs_fee +
+											item?.customs_fee / 100 +
 											item?.delivery_fee +
 											item?.insurance_fee
 										).toFixed(2)}
@@ -306,17 +306,29 @@ export default function InvoiceDetailsPage() {
 
 								<li className="flex items-center justify-between font-semibold">
 									<span className="text-muted-foreground">Total</span>
-									<span>${((invoice?.total_amount + invoice?.charge_amount) / 100).toFixed(2)} </span>
+									<span>
+										${((invoice?.total_amount + invoice?.charge_amount) / 100).toFixed(2)}{" "}
+									</span>
 								</li>
 								<Separator />
 								<li className="flex text-sm items-center justify-between ">
 									<span className="text-muted-foreground">Paid</span>
-									<span className={cn(invoice?.payment_status === "PAID" && "text-muted-foreground" ? "text-green-500" : "text-red-500")}>${((invoice?.paid_amount + invoice?.charge_amount) / 100).toFixed(2) ?? 0.0}</span>
+									<span
+										className={cn(
+											invoice?.payment_status === "PAID" && "text-muted-foreground"
+												? "text-green-500"
+												: "text-red-500",
+										)}
+									>
+										${((invoice?.paid_amount + invoice?.charge_amount) / 100).toFixed(2) ?? 0.0}
+									</span>
 								</li>
 								<li className="flex text-sm items-center justify-between">
 									<span className="text-muted-foreground">Balance</span>
-									<span className={cn(invoice?.payment_status === "PAID" && "text-muted-foreground")}>
-										${((invoice?.total_amount - invoice?.paid_amount ) / 100).toFixed(2) ?? 0.0}
+									<span
+										className={cn(invoice?.payment_status === "PAID" && "text-muted-foreground")}
+									>
+										${((invoice?.total_amount - invoice?.paid_amount) / 100).toFixed(2) ?? 0.0}
 									</span>
 								</li>
 							</ul>

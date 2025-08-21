@@ -80,7 +80,7 @@ function ItemRow({
 	useEffect(() => {
 		if (customs?.description) {
 			form.setValue(`items.${index}.description`, customs.description);
-			form.setValue(`items.${index}.customs_fee`, customs.fee / 100);
+			form.setValue(`items.${index}.customs_fee`, customs.fee);
 		}
 	}, [customs?.id, customs?.description, customs?.fee, form, index]);
 
