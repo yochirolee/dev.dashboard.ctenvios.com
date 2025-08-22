@@ -46,11 +46,22 @@ export default function InvoiceDetailsPage() {
 	console.log(invoice, "invoice");
 
 	const subtotal = invoice?.items.reduce(
-		(acc: number, item: any) => acc + (item?.weight * item?.rate + item?.customs_fee) / 100,
+		(acc: number, item: any) =>
+			acc +
+			(item?.rate / 100) * item?.weight +
+			item?.customs_fee / 100 +
+			item?.delivery_fee +
+			item?.insurance_fee
+		,
 		0,
 	);
 
-	const total = subtotal + invoice?.charge_amount - invoice?.discount_amount;
+	const total =
+		subtotal +
+		invoice?.charge_amount +
+		invoice?.shipping_fee +
+		invoice?.insurance_fee -
+		invoice?.discount_amount;
 	const total_weight = invoice?.items.reduce((acc: number, item: any) => acc + item?.weight, 0);
 	console.log(total, "total");
 
@@ -217,7 +228,6 @@ export default function InvoiceDetailsPage() {
 								<TableHead className="text-right w-14 text-muted-foreground">Precio</TableHead>
 								<TableHead className="text-right w-14 text-muted-foreground">Peso</TableHead>
 								<TableHead className="text-right w-14 text-muted-foreground">Subtotal</TableHead>
-								<TableHead className="text-right w-14 text-muted-foreground"></TableHead>
 							</TableRow>
 						</TableHeader>
 						<TableBody>
@@ -232,7 +242,7 @@ export default function InvoiceDetailsPage() {
 										${parseFloat(item?.delivery_fee).toFixed(2)}
 									</TableCell>
 									<TableCell className="text-right">
-										${((item?.customs_fee / 100).toFixed(2))}
+										${(item?.customs_fee / 100).toFixed(2)}
 									</TableCell>
 									<TableCell className="text-right">${(item?.rate / 100).toFixed(2)}</TableCell>
 									<TableCell className="text-right">{item?.weight.toFixed(2)}</TableCell>
@@ -245,27 +255,7 @@ export default function InvoiceDetailsPage() {
 											item?.insurance_fee
 										).toFixed(2)}
 									</TableCell>
-									<TableCell className="text-right">
-										<DropdownMenu>
-											<DropdownMenuTrigger>
-												<MoreVertical size={16} className="cursor-pointer" />
-											</DropdownMenuTrigger>
-											<DropdownMenuContent align="end">
-												<DropdownMenuItem className="cursor-pointer">
-													<PrinterIcon size={16} />
-													Imprimir
-												</DropdownMenuItem>
-												<DropdownMenuItem className="cursor-pointer">
-													<Pencil size={16} />
-													Editar
-												</DropdownMenuItem>
-												<DropdownMenuItem className="cursor-pointer">
-													<Trash2 size={16} />
-													Eliminar
-												</DropdownMenuItem>
-											</DropdownMenuContent>
-										</DropdownMenu>
-									</TableCell>
+								
 								</TableRow>
 							))}
 						</TableBody>
