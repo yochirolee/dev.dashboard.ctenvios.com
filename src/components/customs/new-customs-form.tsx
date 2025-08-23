@@ -233,33 +233,27 @@ export function NewCustomsForm({
 							</div>
 						</FormItem>
 
-						<FormField
-							control={form.control}
-							name="max_quantity"
-							render={({ field }) => (
-								<FormItem className="flex flex-col">
-									<div className="grid gap-4">
-										<div className="grid gap-2">
-											<Label htmlFor="max_quantity">Cantidad Max Permitida</Label>
-											<FormControl>
-												<Input
-													className="[&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none [-moz-appearance:textfield] text-right"
-													{...form.register(`max_quantity`, {
-														valueAsNumber: true,
-													})}
-													placeholder="0"
-													type="number"
-													min={1}
-													step={1}
-													autoComplete="off"
-												/>
-											</FormControl>
-										</div>
-										<FormMessage />
-									</div>
-								</FormItem>
-							)}
-						/>
+						<FormItem className="flex flex-col">
+							<div className="grid gap-4">
+								<div className="grid gap-2">
+									<Label htmlFor="max_quantity">Cantidad Max Permitida</Label>
+									<FormControl>
+										<Input
+											className="[&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none [-moz-appearance:textfield] text-right"
+											{...form.register(`max_quantity`, {
+												valueAsNumber: true,
+											})}
+											placeholder="0"
+											type="number"
+											min={1}
+											step={1}
+											autoComplete="off"
+										/>
+									</FormControl>
+								</div>
+								<FormMessage />
+							</div>
+						</FormItem>
 
 						<Button
 							type="submit"

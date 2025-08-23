@@ -5,9 +5,7 @@ import {
 	Phone,
 	User,
 	Trash2,
-	Pencil,
 	PrinterIcon,
-	MoreVertical,
 	Plane,
 	Ship,
 	ChevronLeft,
@@ -26,12 +24,7 @@ import { format } from "date-fns";
 import { Badge } from "@/components/ui/badge";
 import OrderHistory from "@/components/orders/order/order-history";
 import { Separator } from "@/components/ui/separator";
-import {
-	DropdownMenu,
-	DropdownMenuContent,
-	DropdownMenuItem,
-	DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+
 import { PaymentForm } from "@/components/orders/payments/payment-form";
 import { cn, centsToDollars } from "@/lib/utils";
 
