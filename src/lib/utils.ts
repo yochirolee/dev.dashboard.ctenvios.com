@@ -37,3 +37,21 @@ export function isValidCubanCI(ci: string): boolean {
 	const controlDigit = (10 - (sum % 10)) % 10;
 	return controlDigit === digits[10];
 }
+
+export function dollarsToCents(amount: number | string): number {
+	const num = typeof amount === "string" ? parseFloat(amount) : amount;
+	if (!Number.isFinite(num)) throw new Error("Monto inválido");
+	return Math.round(num * 100);
+}
+
+export function centsToDollars(cents: number): number {
+	return cents / 100;
+}
+
+export function formatCents(
+	cents: number,
+	locale: string = "en-US",
+	currency: string = "USD",
+): string {
+	return new Intl.NumberFormat(locale, { style: "currency", currency }).format(cents / 100);
+}

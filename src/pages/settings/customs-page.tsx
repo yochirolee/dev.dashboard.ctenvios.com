@@ -6,6 +6,8 @@ import { useCustoms } from "@/hooks/use-customs";
 import { NewCustomsForm } from "@/components/customs/new-customs-form";
 import { useState } from "react";
 import type { PaginationState } from "@tanstack/react-table";
+import type { Customs } from "@/data/types";
+import { AlertDeleteDialog } from "@/components/customs/alert-delete-dialog";
 
 export const CustomsPage = () => {
 	const [pagination, setPagination] = useState<PaginationState>({
@@ -13,6 +15,20 @@ export const CustomsPage = () => {
 		pageSize: 25,
 	});
 	const { data, isLoading } = useCustoms.get(pagination.pageIndex, pagination.pageSize);
+
+	const [customsRate, setCustomsRate] = useState<Customs | undefined>(undefined);
+	const [open, setOpen] = useState(false);
+	const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
+
+	const handleEdit = (customsRate: Customs) => {
+		setCustomsRate(customsRate);
+		setOpen(true);
+	};
+
+	const handleDelete = (customsRate: Customs) => {
+		setCustomsRate(customsRate);
+		setOpenDeleteDialog(true);
+	};
 
 	return (
 		<div className="flex flex-col gap-4">
@@ -31,11 +47,22 @@ export const CustomsPage = () => {
 
 						<Input type="search" className="pl-10" />
 					</div>
-					<NewCustomsForm />
+					<NewCustomsForm
+						customsRate={customsRate}
+						setCustomsRate={setCustomsRate}
+						open={open}
+						setOpen={setOpen}
+					/>
+					<AlertDeleteDialog
+						open={openDeleteDialog}
+						setOpen={setOpenDeleteDialog}
+						customsRate={customsRate as Customs}
+						setCustomsRate={setCustomsRate}
+					/>
 				</div>
 
 				<DataTable
-					columns={customsColumns()}
+					columns={customsColumns(handleEdit, handleDelete)}
 					data={data}
 					pagination={pagination}
 					setPagination={setPagination}

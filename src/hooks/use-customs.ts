@@ -21,13 +21,21 @@ export const useCustoms = {
 		});
 	},
 	update: () => {
+		const queryClient = useQueryClient();
 		return useMutation({
 			mutationFn: ({ id, data }: { id: number; data: Customs }) => api.customs.update(id, data),
+			onSuccess: () => {
+				queryClient.invalidateQueries({ queryKey: ["get-customs-rates"] });
+			},
 		});
 	},
 	delete: () => {
+		const queryClient = useQueryClient();
 		return useMutation({
 			mutationFn: (id: number) => api.customs.delete(id),
+			onSuccess: () => {
+				queryClient.invalidateQueries({ queryKey: ["get-customs-rates"] });
+			},
 		});
 	},
 };

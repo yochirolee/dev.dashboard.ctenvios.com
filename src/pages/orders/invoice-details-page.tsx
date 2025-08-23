@@ -33,7 +33,7 @@ import {
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { PaymentForm } from "@/components/orders/payments/payment-form";
-import { cn } from "@/lib/utils";
+import { cn, centsToDollars } from "@/lib/utils";
 
 const baseUrl = import.meta.env.VITE_API_URL;
 
@@ -48,11 +48,10 @@ export default function InvoiceDetailsPage() {
 	const subtotal = invoice?.items.reduce(
 		(acc: number, item: any) =>
 			acc +
-			(item?.rate / 100) * item?.weight +
-			item?.customs_fee / 100 +
-			item?.delivery_fee +
-			item?.insurance_fee
-		,
+			centsToDollars(item?.rate) * item?.weight +
+			centsToDollars(item?.customs_fee) +
+			centsToDollars(item?.delivery_fee) +
+			centsToDollars(item?.insurance_fee),
 		0,
 	);
 
@@ -255,7 +254,6 @@ export default function InvoiceDetailsPage() {
 											item?.insurance_fee
 										).toFixed(2)}
 									</TableCell>
-								
 								</TableRow>
 							))}
 						</TableBody>

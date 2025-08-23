@@ -80,7 +80,7 @@ function ItemRow({
 	useEffect(() => {
 		if (customs?.description) {
 			form.setValue(`items.${index}.description`, customs.description);
-			form.setValue(`items.${index}.customs_fee`, customs.fee);
+			form.setValue(`items.${index}.customs_fee`, customs.fee_in_cents);
 		}
 	}, [customs?.id, customs?.description, customs?.fee, form, index]);
 
@@ -146,7 +146,7 @@ function ItemRow({
 					</DropdownMenuContent>
 				</DropdownMenu>
 			</TableCell>
-			<TableCell className="text-right">{(customs?.fee / 100 || 0).toFixed(2)}</TableCell>
+			<TableCell className="text-right">{(customs?.fee_in_cents / 100 || 0).toFixed(2)}</TableCell>
 
 			<TableCell>
 				<Input

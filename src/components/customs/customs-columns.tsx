@@ -10,8 +10,13 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 import type { Customs } from "@/data/types";
+import { Badge } from "../ui/badge";
+import { centsToDollars } from "@/lib/utils";
 
-export const customsColumns = (): ColumnDef<Customs>[] => [
+export const customsColumns = (
+	handleEdit: (customsRate: Customs) => void,
+	handleDelete: (customsRate: Customs) => void,
+): ColumnDef<Customs>[] => [
 	{
 		accessorKey: "id",
 		header: "ID",
@@ -25,9 +30,14 @@ export const customsColumns = (): ColumnDef<Customs>[] => [
 		cell: ({ row }) => <div>{row.original?.name}</div>,
 	},
 	{
-		accessorKey: "fee",
+		accessorKey: "description",
+		header: "Description",
+		cell: ({ row }) => <div>{row.original?.description}</div>,
+	},
+	{
+		accessorKey: "fee_in_cents",
 		header: "Fee",
-		cell: ({ row }) => <div>{row.original?.fee}</div>,
+		cell: ({ row }) => <div>${centsToDollars(row.original?.fee_in_cents).toFixed(2)}</div>,
 	},
 	{
 		accessorKey: "max_quantity",
@@ -41,14 +51,27 @@ export const customsColumns = (): ColumnDef<Customs>[] => [
 		accessorKey: "fee_type",
 		header: "Fee Type",
 		cell: ({ row }) => {
-			return <div>{row.original?.fee_type}</div>;
+			return <Badge>{row.original?.fee_type}</Badge>;
 		},
+		size: 100,
 	},
+	{
+		accessorKey: "min_weight",
+		header: "Min Weight",
+		cell: ({ row }) => <div>{row.original?.min_weight}</div>,
+	},
+
+	{
+		accessorKey: "max_weight",
+		header: "Max Weight",
+		cell: ({ row }) => <div>{row.original?.max_weight}</div>,
+	},
+
 	// TODO: Add actions
 	{
 		accessorKey: "actions",
 		header: "Actions",
-		cell: () => (
+		cell: ({ row }) => (
 			<Button asChild size="icon" variant="ghost">
 				<DropdownMenu>
 					<DropdownMenuTrigger asChild>
@@ -57,13 +80,13 @@ export const customsColumns = (): ColumnDef<Customs>[] => [
 						</Button>
 					</DropdownMenuTrigger>
 					<DropdownMenuContent align="end">
-						<DropdownMenuItem>
+						<DropdownMenuItem onClick={() => handleEdit(row.original as Customs)}>
 							<PencilIcon className="w-4 h-4 mr-2" />
 							Edit
 						</DropdownMenuItem>
 
 						<DropdownMenuSeparator />
-						<DropdownMenuItem>
+						<DropdownMenuItem onClick={() => handleDelete(row.original as Customs)}>
 							<TrashIcon className="w-4 h-4 mr-2" />
 							Delete
 						</DropdownMenuItem>

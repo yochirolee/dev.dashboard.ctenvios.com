@@ -22,52 +22,102 @@ import {
 	DialogHeader,
 	DialogTrigger,
 } from "@/components/ui/dialog";
-import { useState } from "react";
 import { PlusCircle } from "lucide-react";
 import { useCustoms } from "@/hooks/use-customs";
 import type { Customs } from "@/data/types";
+import { customsRatesSchema } from "@/data/types";
+import { centsToDollars, dollarsToCents } from "@/lib/utils";
+import { useEffect } from "react";
 
-const CUSTOMS_FEE_TYPES = ["UNIT", "WEIGHT", "VALUE"] as const;
+type FormData = z.input<typeof customsRatesSchema>;
 
-// Create a form-specific schema that matches expected input
-const formSchema = z.object({
-	name: z.string().min(1, "El nombre es requerido"),
-	description: z.string().min(1, "La descripción es requerida"),
-	country_id: z.number().min(1, "El país es requerido"),
-	chapter: z.string().optional(),
-	fee_type: z.enum(["UNIT", "WEIGHT", "VALUE"]),
-	fee: z.number().min(0, "El fee es requerido"),
-	max_quantity: z.number().optional(),
-});
-
-type FormData = z.infer<typeof formSchema>;
-
-export function NewCustomsForm() {
-	const [open, setOpen] = useState(false);
-
+export function NewCustomsForm({
+	customsRate,
+	setCustomsRate,
+	open,
+	setOpen,
+}: {
+	customsRate: Customs | undefined;
+	setCustomsRate: (customsRate: Customs | undefined) => void;
+	open: boolean;
+	setOpen: (open: boolean) => void;
+}) {
 	const form = useForm<FormData>({
-		resolver: zodResolver(formSchema),
+		resolver: zodResolver(customsRatesSchema),
 		defaultValues: {
 			name: "",
 			description: "",
-			country_id: 1,
 			chapter: "",
-			fee_type: "UNIT" as const,
-			fee: 0,
-			max_quantity: undefined,
+			country_id: 1,
+			fee_type: "UNIT",
+			fee_in_cents: undefined,
+			min_weight: 0,
+			max_weight: 0,
+			max_quantity: 0,
 		},
 	});
 
-	const createCustomsMutation = useCustoms.create();
+	useEffect(() => {
+		if (customsRate) {
+			form.reset({
+				name: customsRate?.name,
+				description: customsRate?.description,
+				chapter: customsRate?.chapter,
+				country_id: customsRate?.country_id,
+				fee_type: customsRate?.fee_type,
+				fee_in_cents: centsToDollars(customsRate?.fee_in_cents ?? 0),
+				min_weight: customsRate?.min_weight ?? 0,
+				max_weight: customsRate?.max_weight ?? 0,
+				max_quantity: customsRate?.max_quantity ?? 0,
+			});
+		} else {
+			form.reset({
+				name: "",
+				description: "",
+				chapter: "",
+				country_id: 1,
+				fee_type: "UNIT",
+				fee_in_cents: undefined,
+				min_weight: 0,
+				max_weight: 0,
+				max_quantity: 0,
+			});
+		}
+	}, [customsRate, open]);
 
+	console.log(customsRate, "customsRate");
+
+	const createCustomsMutation = useCustoms.create();
+	const updateCustomsMutation = useCustoms.update();
 	const onSubmit = async (data: FormData) => {
-		createCustomsMutation.mutate(data as Customs, {
-			onSuccess: () => {
-				setOpen(false);
-				form.reset();
-			},
-		});
+		const feeInCents = dollarsToCents(data.fee_in_cents ?? 0);
+		console.log(feeInCents);
+		if (customsRate) {
+			updateCustomsMutation.mutate(
+				{ id: customsRate?.id, data: { ...data, fee_in_cents: feeInCents } } as {
+					id: number;
+					data: Customs;
+				},
+				{
+					onSuccess: () => {
+						setOpen(false);
+						setCustomsRate(undefined);
+						form.reset();
+					},
+				},
+			);
+		} else {
+			createCustomsMutation.mutate({ ...data, fee_in_cents: feeInCents } as Customs, {
+				onSuccess: () => {
+					setCustomsRate(undefined);
+					setOpen(false);
+					form.reset();
+				},
+			});
+		}
 	};
+
+	console.log(form.formState.errors, "errors");
 
 	return (
 		<Dialog open={open} onOpenChange={setOpen}>
@@ -147,7 +197,7 @@ export function NewCustomsForm() {
 											</SelectTrigger>
 											<SelectContent>
 												<SelectGroup>
-													{CUSTOMS_FEE_TYPES.map((feeType) => (
+													{["UNIT", "WEIGHT", "VALUE"].map((feeType) => (
 														<SelectItem key={feeType} value={feeType}>
 															{feeType}
 														</SelectItem>
@@ -160,32 +210,29 @@ export function NewCustomsForm() {
 								)}
 							/>
 						</div>
-						<FormField
-							control={form.control}
-							name="fee"
-							render={({ field }) => (
-								<FormItem className="flex flex-col">
-									<div className="grid gap-4">
-										<div className="grid gap-2">
-											<Label htmlFor="fee">Fee</Label>
-											<FormControl>
-												<Input
-													className="[&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none [-moz-appearance:textfield] text-right"
-													{...field}
-													onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
-													placeholder="0.00"
-													type="number"
-													min={0.01}
-													step={0.01}
-													autoComplete="off"
-												/>
-											</FormControl>
-										</div>
-										<FormMessage />
-									</div>
-								</FormItem>
-							)}
-						/>
+
+						<FormItem className="flex flex-col">
+							<div className="grid gap-4">
+								<div className="grid gap-2">
+									<Label htmlFor="fee_in_cents">Fee</Label>
+									<FormControl>
+										<Input
+											className="[&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none [-moz-appearance:textfield] text-right"
+											{...form.register(`fee_in_cents`, {
+												valueAsNumber: true,
+											})}
+											placeholder="0.00"
+											type="number"
+											min={0.01}
+											step={0.01}
+											autoComplete="off"
+										/>
+									</FormControl>
+								</div>
+								<FormMessage />
+							</div>
+						</FormItem>
+
 						<FormField
 							control={form.control}
 							name="max_quantity"
@@ -196,16 +243,15 @@ export function NewCustomsForm() {
 											<Label htmlFor="max_quantity">Cantidad Max Permitida</Label>
 											<FormControl>
 												<Input
-													{...field}
-													id="max_quantity"
-													placeholder="Cantidad Maxima"
+													className="[&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none [-moz-appearance:textfield] text-right"
+													{...form.register(`max_quantity`, {
+														valueAsNumber: true,
+													})}
+													placeholder="0"
 													type="number"
-													required
-													onChange={(e) => {
-														const value = e.target.value;
-														field.onChange(value === "" ? undefined : parseFloat(value));
-													}}
-													value={field.value || ""}
+													min={1}
+													step={1}
+													autoComplete="off"
 												/>
 											</FormControl>
 										</div>
@@ -215,8 +261,22 @@ export function NewCustomsForm() {
 							)}
 						/>
 
-						<Button type="submit" className="w-full" disabled={createCustomsMutation.isPending}>
-							{createCustomsMutation.isPending ? "Registrando..." : "Registrar"}
+						<Button
+							type="submit"
+							className="w-full"
+							disabled={createCustomsMutation.isPending || updateCustomsMutation.isPending}
+						>
+							{createCustomsMutation.isPending || updateCustomsMutation.isPending
+								? "Creando..."
+								: "Crear"}
+						</Button>
+						<Button
+							type="button"
+							variant="outline"
+							className="w-full"
+							onClick={() => setOpen(false)}
+						>
+							Cancelar
 						</Button>
 
 						{createCustomsMutation.error && (

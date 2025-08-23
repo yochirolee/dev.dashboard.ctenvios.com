@@ -110,16 +110,19 @@ export const invoiceSchema = z.object({
 	updated_at: z.string().optional(),
 });
 
-export const customsSchema = z.object({
+export const customsRatesSchema = z.object({
 	id: z.number().optional(),
-	name: z.string().min(1, "El nombre es requerido"),
-	description: z.string().min(1, "La descripción es requerida"),
-	country_id: z.number().min(1, "El país es requerido").default(1),
+	country_id: z.number().min(1, "Country ID is required"),
+	name: z.string().min(1, "Name is required"),
+	description: z.string().optional(),
 	chapter: z.string().optional(),
-	fee_type: z.enum(["UNIT", "WEIGHT", "VALUE"]).default("UNIT"),
-	fee: z.number().min(0, "El fee es requerido"),
+	fee_type: z.enum(["UNIT", "WEIGHT", "VALUE"]).optional().default("UNIT"),
+	fee_in_cents: z.number().min(0, "Fee must be greater than 0"),
+	min_weight: z.number().optional().default(0),
+	max_weight: z.number().optional().default(0),
 	max_quantity: z.number().optional().default(0),
 });
+
 export const agencySchema = z.object({
 	id: z.number().optional(),
 	name: z.string().min(1, "El nombre es requerido"),
@@ -196,6 +199,6 @@ export interface Rate {
 
 export type Payment = z.infer<typeof paymentSchema>;
 
-export type Customs = z.infer<typeof customsSchema>;
+export type Customs = z.infer<typeof customsRatesSchema>;
 
 export type User = z.infer<typeof userSchema>;
