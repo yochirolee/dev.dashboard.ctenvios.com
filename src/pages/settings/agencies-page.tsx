@@ -55,10 +55,7 @@ export const AgenciesPage = () => {
 			) : (
 				<div className="grid grid-cols-1 lg:grid-cols-5  gap-4">
 					<div className="col-span-2 space-y-4">
-						<AgencyDetails
-							selectedAgency={selectedAgency}
-							setSelectedAgency={(agency) => setSelectedAgency(agency as Agency)}
-						/>
+						<AgencyDetails selectedAgency={selectedAgency} />
 						<AgencyUsers agency_id={selectedAgency.id ?? 0} />
 					</div>
 					<div className="col-span-3 space-y-4">
