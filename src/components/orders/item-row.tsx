@@ -1,10 +1,11 @@
-import React, { useEffect, useMemo } from "react";
+import React, { useEffect } from "react";
 import { Input } from "../ui/input";
 import { TableCell, TableRow } from "../ui/table";
 import { useWatch } from "react-hook-form";
 import CustomsFeeCombobox from "./customs-fee-combobox";
 import { Button } from "../ui/button";
 import { DollarSign, PencilIcon, PlusCircle, ShieldCheck, Trash2 } from "lucide-react";
+import { useState } from "react";
 import {
 	DropdownMenu,
 	DropdownMenuItem,
@@ -13,86 +14,72 @@ import {
 } from "../ui/dropdown-menu";
 
 import { Badge } from "../ui/badge";
+import { Switch } from "../ui/switch";
+import FixedRatesCombobox from "./fixed-rates-combobox";
+import { centsToDollars } from "@/lib/utils";
+
+const calculateSubtotal = (rate_in_cents: number, weight: number, customs_fee_in_cents: number, rate_type: string) => {
+	console.log(rate_type, "rate_type");
+	if(rate_type === "WEIGHT") {
+		return rate_in_cents * weight + customs_fee_in_cents;
+	} else {
+		return rate_in_cents + customs_fee_in_cents;
+	}
+};
 
 function ItemRow({
 	index,
 	form,
 	remove,
-	selectedRate,
+
 	openDialog,
 }: {
 	index: number;
 	form: any;
 	remove: any;
-	selectedRate: any;
+
 	openDialog: (type: "insurance" | "charge" | "rate", index: number) => void;
 }) {
-	const weight = useWatch({
+	// Watch form values to trigger re-renders when they change
+	const item = useWatch({
 		control: form.control,
-		name: `items.${index}.weight`,
+		name: `items.${index}`, // escuchas todo el objeto item
 	});
-	const customs = useWatch({
-		control: form.control,
-		name: `items.${index}.customs`,
-	});
-	const insuranceFee = useWatch({
-		control: form.control,
-		name: `items.${index}.insurance_fee`,
-	});
-	const subtotal = useMemo(() => {
-		if (parseFloat(weight) > 100) {
-			form.setValue(`items.${index}.charge_fee`, 30);
-		} else {
-			form.setValue(`items.${index}.charge_fee`, 0);
-		}
-		const subtotal = parseFloat(
-			(
-				(weight || 0) * (selectedRate?.public_rate || 0) +
-				(customs?.fee / 100 || 0) +
-				(parseFloat(insuranceFee) || 0) +
-				(parseFloat(form.getValues(`items.${index}.charge_fee`)) || 0)
-			).toFixed(2),
-		);
 
-		return subtotal;
-	}, [weight, selectedRate?.public_rate, customs?.fee, insuranceFee]);
-
-	// Actualiza el subtotal del ítem
 	useEffect(() => {
-		form.setValue(`items.${index}.subtotal`, subtotal);
-	}, [subtotal, form, index, insuranceFee]);
-
-	// Actualiza el total y el peso total
-	useEffect(() => {
-		const items = form.getValues("items");
-		const total = parseFloat(
-			items.reduce((acc: number, item: any) => acc + (item.subtotal || 0), 0).toFixed(2),
+		form.setValue(
+			`items.${index}.subtotal`,
+			calculateSubtotal(item.rate_in_cents, item.weight, item.customs_fee_in_cents, item.rate_type),
 		);
-		const totalWeight = parseFloat(
-			items.reduce((acc: number, item: any) => acc + (item.weight || 0), 0).toFixed(2),
-		);
+	}, [item?.rate_in_cents, item?.weight, item?.customs_fee_in_cents]);
 
-		form.setValue("total_amount", total);
-		form.setValue("total_weight", totalWeight);
-	}, [weight, customs, subtotal, form, index, insuranceFee]);
+	const [byRate, setByRate] = useState(false);
 
-	// Actualiza descripción y fee si cambian los customs
 	useEffect(() => {
-		if (customs?.description) {
-			form.setValue(`items.${index}.description`, customs.description);
-			form.setValue(`items.${index}.customs_fee`, customs.fee_in_cents);
-		}
-	}, [customs?.id, customs?.description, customs?.fee, form, index]);
+		form.setValue(`items.${index}.subtotal`, 0);
+		form.setValue(`items.${index}.description`, "");
+	
+	}, [byRate]);
 
-	const handleRemove = (index: number) => {
+	
+
+	const handleRemove = () => {
+		// Use index for removal - React Hook Form's remove function expects the index
 		remove(index);
 	};
 
 	return (
 		<TableRow key={index}>
 			<TableCell>{index + 1}</TableCell>
+			<TableCell className=" flex justify-center items-center mt-2">
+				<Switch checked={byRate} onCheckedChange={() => setByRate(!byRate)} id="mode" />
+			</TableCell>
 			<TableCell className="w-10">
-				<CustomsFeeCombobox index={index} form={form} />
+				{byRate ? (
+					<FixedRatesCombobox form={form} index={index} />
+				) : (
+					<CustomsFeeCombobox index={index} form={form} />
+				)}
 			</TableCell>
 			<TableCell className="flex items-center gap-2 ">
 				<div className="w-full relative gap-2">
@@ -102,14 +89,12 @@ function ItemRow({
 					/>
 					<div className="absolute right-2 top-1/2 -translate-y-1/2">
 						<div className="flex gap-2">
-							{form.getValues(`items.${index}.insurance_fee`) > 0 && (
-								<Badge variant="outline">
-									Seguro: {form.getValues(`items.${index}.insurance_fee`)}
-								</Badge>
+							{item.insurance_fee_in_cents > 0 && (
+								<Badge variant="outline">Seguro: {item.insurance_fee_in_cents}</Badge>
 							)}
-							{form.getValues(`items.${index}.charge_fee`) > 0 && (
+							{item.charge_fee_in_cents > 0 && (
 								<Badge variant="outline" className="">
-									Cargo: {form.getValues(`items.${index}.charge_fee`).toFixed(2)}
+									Cargo: {item.charge_fee_in_cents.toFixed(2)}
 								</Badge>
 							)}
 						</div>
@@ -146,7 +131,9 @@ function ItemRow({
 					</DropdownMenuContent>
 				</DropdownMenu>
 			</TableCell>
-			<TableCell className="text-right">{(customs?.fee_in_cents / 100 || 0).toFixed(2)}</TableCell>
+			<TableCell className="text-right">
+				{centsToDollars(item.customs_fee_in_cents).toFixed(2)}
+			</TableCell>
 
 			<TableCell>
 				<Input
@@ -161,8 +148,8 @@ function ItemRow({
 					autoComplete="off"
 				/>
 			</TableCell>
-			<TableCell className="text-right">{selectedRate?.public_rate.toFixed(2) || 0}</TableCell>
-			<TableCell className="text-right">{subtotal.toFixed(2)}</TableCell>
+			<TableCell className="text-right">{centsToDollars(item.rate_in_cents).toFixed(2)}</TableCell>
+			<TableCell className="text-right">{centsToDollars(item.subtotal || 0).toFixed(2)}</TableCell>
 
 			<TableCell className="w-10">
 				<Button
@@ -171,7 +158,7 @@ function ItemRow({
 					size="icon"
 					onClick={() => {
 						if (index !== 0) {
-							handleRemove(index);
+							handleRemove();
 						}
 					}}
 				>

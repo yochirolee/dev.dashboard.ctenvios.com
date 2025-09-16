@@ -61,8 +61,8 @@ export type Invoice = {
 	status: string;
 	created_at: string;
 	updated_at: string;
-	total_amount: number;
-	paid_amount: number;
+	total_in_cents: number;
+	paid_in_cents: number;
 	user: {
 		id: number;
 		name: string;
@@ -282,10 +282,10 @@ export const orderColumns: ColumnDef<Invoice>[] = [
 		cell: ({ row }) => {
 			return (
 				<div className="text-right font-medium whitespace-nowrap flex flex-col items-end">
-					${(row.original?.total_amount / 100).toFixed(2)}
+					${(row.original?.total_in_cents / 100).toFixed(2)}
 					<span className="text-xs text-muted-foreground">
-						{(row.original?.total_amount - row.original?.paid_amount) / 100 !== 0 &&
-							` ${((row.original?.total_amount - row.original?.paid_amount) / 100).toFixed(2)}`}
+						{(row.original?.total_in_cents - row.original?.paid_in_cents) / 100 !== 0 &&
+							` ${((row.original?.total_in_cents - row.original?.paid_in_cents) / 100).toFixed(2)}`}
 					</span>
 				</div>
 			);

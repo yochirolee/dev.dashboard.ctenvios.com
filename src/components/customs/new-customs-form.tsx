@@ -21,6 +21,7 @@ import {
 	DialogTitle,
 	DialogHeader,
 	DialogTrigger,
+	DialogFooter,
 } from "@/components/ui/dialog";
 import { PlusCircle } from "lucide-react";
 import { useCustoms } from "@/hooks/use-customs";
@@ -189,13 +190,13 @@ export function NewCustomsForm({
 								render={({ field }) => (
 									<FormItem>
 										<Select onValueChange={field.onChange} value={field.value}>
-											<SelectTrigger>
+											<SelectTrigger className="w-full">
 												<SelectValue
 													placeholder="Selecciona un tipo de fee"
 													aria-placeholder="Selecciona un tipo de fee"
 												/>
 											</SelectTrigger>
-											<SelectContent>
+											<SelectContent className="w-full">
 												<SelectGroup>
 													{["UNIT", "WEIGHT", "VALUE"].map((feeType) => (
 														<SelectItem key={feeType} value={feeType}>
@@ -223,7 +224,7 @@ export function NewCustomsForm({
 											})}
 											placeholder="0.00"
 											type="number"
-											min={0.01}
+											min={0.0}
 											step={0.01}
 											autoComplete="off"
 										/>
@@ -255,27 +256,30 @@ export function NewCustomsForm({
 							</div>
 						</FormItem>
 
-						<Button
-							type="submit"
-							className="w-full"
-							disabled={createCustomsMutation.isPending || updateCustomsMutation.isPending}
-						>
-							{createCustomsMutation.isPending || updateCustomsMutation.isPending
-								? "Creando..."
-								: "Crear"}
-						</Button>
-						<Button
-							type="button"
-							variant="outline"
-							className="w-full"
-							onClick={() => setOpen(false)}
-						>
-							Cancelar
-						</Button>
-
-						{createCustomsMutation.error && (
-							<Alert variant="destructive">{createCustomsMutation.error.message}</Alert>
-						)}
+						<DialogFooter>
+							<div className="flex flex-col gap-2 w-full	">
+								<Button
+									type="submit"
+									className="w-full"
+									disabled={createCustomsMutation.isPending || updateCustomsMutation.isPending}
+								>
+									{createCustomsMutation.isPending || updateCustomsMutation.isPending
+										? "Creando..."
+										: "Crear"}
+								</Button>
+								<Button
+									type="button"
+									variant="outline"
+									className="w-full"
+									onClick={() => setOpen(false)}
+								>
+									Cancelar
+								</Button>
+							</div>
+							{createCustomsMutation.error && (
+								<Alert variant="destructive">{createCustomsMutation.error.message}</Alert>
+							)}
+						</DialogFooter>
 					</form>
 				</Form>
 			</DialogContent>

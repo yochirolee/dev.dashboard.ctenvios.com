@@ -70,29 +70,34 @@ export const customsColumns = (
 	// TODO: Add actions
 	{
 		accessorKey: "actions",
-		header: "Actions",
-		cell: ({ row }) => (
-			<Button asChild size="icon" variant="ghost">
-				<DropdownMenu>
-					<DropdownMenuTrigger asChild>
-						<Button variant="ghost" size="icon">
-							<EllipsisVerticalIcon className="w-4 h-4" />
-						</Button>
-					</DropdownMenuTrigger>
-					<DropdownMenuContent align="end">
-						<DropdownMenuItem onClick={() => handleEdit(row.original as Customs)}>
-							<PencilIcon className="w-4 h-4 mr-2" />
-							Edit
-						</DropdownMenuItem>
+		header: "",
+		enableResizing: false,
+		size: 100,
 
-						<DropdownMenuSeparator />
-						<DropdownMenuItem onClick={() => handleDelete(row.original as Customs)}>
-							<TrashIcon className="w-4 h-4 mr-2" />
-							Delete
-						</DropdownMenuItem>
-					</DropdownMenuContent>
-				</DropdownMenu>
-			</Button>
+		cell: ({ row }) => (
+			<div className="flex justify-end">
+				<Button asChild size="icon" variant="ghost">
+					<DropdownMenu>
+						<DropdownMenuTrigger asChild>
+							<Button variant="ghost" size="icon">
+								<EllipsisVerticalIcon className="w-4 h-4" />
+							</Button>
+						</DropdownMenuTrigger>
+						<DropdownMenuContent align="end">
+							<DropdownMenuItem onClick={() => handleEdit(row.original as Customs)}>
+								<PencilIcon className="w-4 h-4 mr-2" />
+								Edit
+							</DropdownMenuItem>
+
+							<DropdownMenuSeparator />
+							<DropdownMenuItem onClick={() => handleDelete(row.original as Customs)}>
+								<TrashIcon className="w-4 h-4 mr-2" />
+								Delete
+							</DropdownMenuItem>
+						</DropdownMenuContent>
+					</DropdownMenu>
+				</Button>
+			</div>
 		),
 	},
 ];

@@ -8,7 +8,7 @@ import {
 	AlertDialogHeader,
 	AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { useRates } from "@/hooks/use-rates";
+import { useShippingRates } from "@/hooks/use-shipping-rates";
 import { Loader2 } from "lucide-react";
 
 type AgencyRateDeleteDialogProps = {
@@ -18,7 +18,7 @@ type AgencyRateDeleteDialogProps = {
 };
 
 export function AgencyRateDeleteDialog({ open, setOpen, rateId }: AgencyRateDeleteDialogProps) {
-	const { mutate: deleteRate, isPending, error } = useRates.delete();
+	const { mutate: deleteRate, isPending, error } = useShippingRates.delete();
 
 	console.log(error, "error");
 

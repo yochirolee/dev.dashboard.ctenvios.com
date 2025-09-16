@@ -33,6 +33,7 @@ export default function InvoicesPage() {
 
 	const handleClearFilters = () => {
 		setSearchQuery("");
+		setPagination({ pageIndex: 0, pageSize: 20 });
 		setDate(undefined);
 	};
 

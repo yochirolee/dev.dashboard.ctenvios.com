@@ -39,9 +39,10 @@ export function UserRegisterForm({ agencyId }: { agencyId: number }) {
 		defaultValues: {
 			email: "",
 			password: "",
+			repeat_password: "",
 			role: "AGENCY_SALES",
 			name: "",
-			agency_id: agencyId,
+			phone: "",
 		},
 	});
 	const { data: roles } = useRoles.get();
@@ -60,6 +61,8 @@ export function UserRegisterForm({ agencyId }: { agencyId: number }) {
 			},
 		});
 	};
+
+	console.log(form.formState.errors, "errors");
 
 	return (
 		<Dialog open={open} onOpenChange={setOpen}>
@@ -96,6 +99,21 @@ export function UserRegisterForm({ agencyId }: { agencyId: number }) {
 						/>
 						<FormField
 							control={form.control}
+							name="phone"
+							render={({ field }) => (
+								<FormItem className="flex flex-col">
+									<div className="grid gap-2">
+										<Label htmlFor="phone">Teléfono</Label>
+										<FormControl>
+											<Input {...field} id="phone" type="tel" required />
+										</FormControl>
+									</div>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+						<FormField
+							control={form.control}
 							name="email"
 							render={({ field }) => (
 								<FormItem className="flex flex-col">
@@ -126,6 +144,21 @@ export function UserRegisterForm({ agencyId }: { agencyId: number }) {
 										<Label htmlFor="password">Password</Label>
 										<FormControl>
 											<Input {...field} id="password" type="password" required />
+										</FormControl>
+									</div>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+						<FormField
+							control={form.control}
+							name="repeat_password"
+							render={({ field }) => (
+								<FormItem className="flex flex-col">
+									<div className="grid gap-2">
+										<Label htmlFor="repeat_password">Repetir Password</Label>
+										<FormControl>
+											<Input {...field} id="repeat_password" type="password" required />
 										</FormControl>
 									</div>
 									<FormMessage />

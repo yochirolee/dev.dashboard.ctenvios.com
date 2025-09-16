@@ -6,8 +6,8 @@ import { Input } from "../ui/input";
 import { Button } from "../ui/button";
 
 import { Loader2, X } from "lucide-react";
-import { useRates } from "@/hooks/use-rates";
-import type { Rate } from "@/data/types";
+import { useShippingRates } from "@/hooks/use-shipping-rates";
+import type { ShippingRate } from "@/data/types";
 import { useAppStore } from "@/stores/app-store";
 
 const agenciesRatesSchema = z
@@ -55,13 +55,13 @@ export const AgenciesRatesForm = ({
 						public_rate: rate.public_rate/100,
 				  },
 	});
-	const { mutate: updateRate, isPending: isUpdating } = useRates.update();
-	const { mutate: createRate, isPending: isCreating } = useRates.create();
+	const { mutate: updateRate, isPending: isUpdating } = useShippingRates.update();
+	const { mutate: createRate, isPending: isCreating } = useShippingRates.create();
 	const isPending = isUpdating || isCreating;
 	const onSubmit = (data: AgenciesRatesSchema) => {
 		mode === "update"
-			? updateRate({ id: rate.id, data: data as unknown as Rate })
-			: createRate(data as unknown as Rate);
+			? updateRate({ id: rate.id, data: data as unknown as ShippingRate })
+			: createRate(data as unknown as ShippingRate);
 		form.reset();
 		setOpen(false);
 	};

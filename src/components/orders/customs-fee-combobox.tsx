@@ -34,7 +34,7 @@ const CustomsFeeCombobox = React.memo(function CustomsFeeCombobox({
 	return (
 		<FormField
 			control={control}
-			name={`items.${index}.customs`}
+			name={`items.${index}.customs_id`}
 			render={({ field }) => (
 				<Popover open={open} onOpenChange={setOpen}>
 					<PopoverTrigger asChild>
@@ -48,14 +48,17 @@ const CustomsFeeCombobox = React.memo(function CustomsFeeCombobox({
 						>
 							{isLoading ? (
 								<Skeleton className="w-full h-4" />
-							) : data?.rows?.find((custom: Customs) => custom.name === field.value?.name)?.name ? (
-								field.value.name.length > 20 ? (
-									`${field.value.name.substring(0, 20)}...`
-								) : (
-									field.value.name
-								)
 							) : (
-								"Seleccionar Arancel"
+								(() => {
+									const selectedCustom = data?.rows?.find(
+										(custom: Customs) => custom.id === field.value,
+									);
+									return selectedCustom?.name
+										? selectedCustom.name.length > 20
+											? `${selectedCustom.name.substring(0, 20)}...`
+											: selectedCustom.name
+										: "Seleccionar Arancel";
+								})()
 							)}
 							<ChevronsUpDown className="opacity-50" />
 						</Button>
@@ -71,9 +74,18 @@ const CustomsFeeCombobox = React.memo(function CustomsFeeCombobox({
 											key={custom?.id}
 											value={custom?.name}
 											onSelect={() => {
-												field.onChange(custom);
-												setValue(`items.${index}.customs_id`, custom.id);
-												setValue(`customs_id`, custom.id);
+												console.log("Selected custom:", custom);
+												console.log("Setting customs_id to:", custom.id);
+												console.log("Setting customs_fee to:", custom.fee_in_cents);
+												field.onChange(custom.id);
+												setValue(`items.${index}.description`, custom.description, {
+													shouldDirty: true,
+													shouldTouch: true,
+												});
+												setValue(`items.${index}.customs_fee_in_cents`, custom.fee_in_cents, {
+													shouldDirty: true,
+													shouldTouch: true,
+												});
 												setOpen(false);
 											}}
 										>
@@ -81,7 +93,7 @@ const CustomsFeeCombobox = React.memo(function CustomsFeeCombobox({
 											<Check
 												className={cn(
 													"ml-auto",
-													field?.value?.name === custom?.name ? "opacity-100" : "opacity-0",
+													field?.value === custom?.id ? "opacity-100" : "opacity-0",
 												)}
 											/>
 										</CommandItem>

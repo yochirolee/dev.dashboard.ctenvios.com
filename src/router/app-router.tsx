@@ -17,6 +17,7 @@ import { CustomsPage } from "@/pages/settings/customs-page";
 import ProvidersServicesPage from "@/pages/settings/providers-services-page";
 import { EditOrderPage } from "@/pages/orders/edit-order-page";
 import { ReceiversPage } from "@/pages/settings/receiver-page";
+import { NewAgencyPage } from "@/pages/settings/agencies/new-agency-page";
 
 export const AppRouter = () => {
 	return (
@@ -38,6 +39,7 @@ export const AppRouter = () => {
 						<Route index element={<Navigate to="providers" replace />} />
 						<Route path="providers" element={<ProvidersServicesPage />} />
 						<Route path="agencies" element={<AgenciesPage />} />
+						<Route path="agencies/new" element={<NewAgencyPage />} />
 						<Route path="customers" element={<CustomersPage />} />
 						<Route path="receivers" element={<ReceiversPage />} />
 						<Route path="users" element={<UserPage />} />

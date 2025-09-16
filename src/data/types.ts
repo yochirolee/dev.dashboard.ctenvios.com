@@ -63,14 +63,31 @@ export const receiverSchema = z
 		path: ["phone", "mobile"],
 	});
 
-export const rateSchema = z.object({
+export const shippingRateSchema = z
+	.object({
+		id: z.number().optional(),
+		agency_id: z.number(),
+		name: z.string(),
+		service_id: z.number(),
+		rate_in_cents: z.number().min(0, { message: "El precio de la agencia debe ser mayor a 0" }),
+		cost_in_cents: z.number().min(0, { message: "El precio de costo debe ser mayor a 0" }),
+		is_active: z.boolean().default(true),
+		rate_type: z.enum(["WEIGHT", "FIXED"]),
+	})
+	.refine((data) => data.rate_in_cents >= data.cost_in_cents, {
+		message: "El precio público debe ser mayor o igual al precio de la agencia",
+		path: ["rate_in_cents"],
+	});
+export const productRateSchema = z.object({
 	id: z.number(),
+	name: z.string(),
+	rate_in_cents: z.number().min(0, { message: "El precio de la agencia debe ser mayor a 0" }),
+	cost_in_cents: z.number().min(0, { message: "El precio de costo debe ser mayor a 0" }),
+	rate_id: z.number().min(0),
+	is_active: z.boolean().default(true),
+	agency_id: z.number(),
 	service_id: z.number(),
-	agency_id: z.number().default(1),
-	min_weight: z.number(),
-	max_weight: z.number(),
-	public_rate: z.number(),
-	is_sale_by_pounds: z.boolean(),
+	rate_type: z.enum(["WEIGHT", "FIXED"]),
 });
 export const paymentSchema = z.object({
 	id: z.number().optional(),
@@ -85,11 +102,10 @@ export const itemsSchema = z.object({
 	description: z.string().min(1),
 	weight: z.number().min(0).optional(),
 	customs_id: z.number().min(0),
-	customs_fee: z.number().min(0).optional(),
-	delivery_fee: z.number().min(0).optional(),
-	insurance_fee: z.number().min(0).optional(),
-	rate: z.number().min(0),
-	subtotal: z.number().min(0),
+	customs_fee_in_cents: z.number().min(0).optional(),
+	insurance_fee_in_cents: z.number().min(0).optional(),
+	rate_in_cents: z.number().min(0),
+	rate_id: z.number().min(0),
 });
 export const invoiceSchema = z.object({
 	id: z.number().optional(),
@@ -97,14 +113,11 @@ export const invoiceSchema = z.object({
 	receiver_id: z.number().min(0),
 	agency_id: z.number().min(0),
 	user_id: z.string().min(0),
-	rate_id: z.number().min(0),
 	service_id: z.number().min(0),
 	items: z.array(itemsSchema).min(1, "La factura debe tener al menos 1 item"),
-	total_amount: z.number().min(0),
-	total_weight: z.number().min(0),
 	discount_type: z.string().optional().default("percent"),
 	discount_amount: z.number().min(0).optional(),
-	payment_status: z.boolean().default(false),
+
 	paid_amount: z.number().min(0).optional().default(0),
 	created_at: z.string().optional(),
 	updated_at: z.string().optional(),
@@ -133,6 +146,7 @@ export const agencySchema = z.object({
 	website: z.string().url().optional(),
 	logo: z.string().url().optional(),
 	agency_type: z.enum(["FORWARDER", "AGENCY", "RESELLER"]).optional(),
+	parent_agency_id: z.number(),
 });
 
 export const providerSchema = z.object({
@@ -154,14 +168,21 @@ export const serviceSchema = z.object({
 	provider_id: z.number().min(1, "El proveedor es requerido"),
 	forwarder_id: z.number().min(1, "El forwarder es requerido"),
 });
-export const userSchema = z.object({
-	id: z.number().optional(),
-	email: z.string().email("Email inválido"),
-	password: z.string().min(8, "La contraseña debe tener al menos 8 caracteres"),
-	role: z.string().min(1, "El rol es requerido"),
-	name: z.string().min(2, "El nombre debe tener al menos 2 caracteres"),
-	agency_id: z.number().min(1, "El ID de la agencia es requerido"),
-});
+export const userSchema = z
+	.object({
+		id: z.number().optional(),
+		email: z.string().email("Email inválido"),
+		image: z.string().url().optional(),
+		password: z.string().min(8, "La contraseña debe tener al menos 8 caracteres"),
+		repeat_password: z.string().min(8, "La contraseña debe tener al menos 8 caracteres"),
+		role: z.string().min(1, "El rol es requerido"),
+		phone: z.string().min(10, "El teléfono debe tener al menos 10 dígitos"),
+		name: z.string().min(2, "El nombre debe tener al menos 2 caracteres"),
+	})
+	.refine((data) => data.password === data.repeat_password, {
+		message: "Las contraseñas no coinciden",
+		path: ["repeat_password"],
+	});
 
 export type Agency = z.infer<typeof agencySchema>;
 export type Provider = z.infer<typeof providerSchema>;
@@ -187,18 +208,12 @@ export interface City {
 	name: string;
 }
 
-export interface Rate {
-	id: number;
-	agency_id: number;
-	service_id: number;
-	min_weight: number;
-	max_weight: number;
-	public_rate: number;
-	is_sale_by_pounds: boolean;
-}
-
 export type Payment = z.infer<typeof paymentSchema>;
 
 export type Customs = z.infer<typeof customsRatesSchema>;
 
 export type User = z.infer<typeof userSchema>;
+
+export type ShippingRate = z.infer<typeof shippingRateSchema>;
+
+export type ProductRate = z.infer<typeof productRateSchema>;

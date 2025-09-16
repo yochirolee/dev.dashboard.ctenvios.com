@@ -7,8 +7,27 @@ import { ReceiverInformation } from "@/components/orders/receiver/receiver-infor
 import { ReceiverFormDialog } from "@/components/orders/receiver/receiver-form-dialog";
 import { CustomerFormDialog } from "@/components/orders/customer/customer-form-dialog";
 import { ItemsInOrder } from "@/components/orders/items-in-order";
+import { useShallow } from "zustand/react/shallow";
+import { useInvoiceStore } from "@/stores/invoice-store";
+import { useAppStore } from "@/stores/app-store";
+import { usePrefetch } from "@/hooks/use-prefetch";
 
 export function NewOrderPage() {
+	const { selectedCustomer, selectedReceiver, selectedService } = useInvoiceStore(
+		useShallow((state) => ({
+			selectedCustomer: state.selectedCustomer,
+			selectedReceiver: state.selectedReceiver,
+			setSelectedCustomer: state.setSelectedCustomer,
+			setSelectedReceiver: state.setSelectedReceiver,
+			selectedService: state.selectedService,
+		})),
+	);
+	const session = useAppStore((state) => state.session);
+	const agencyId = session?.user?.agency_id;
+	usePrefetch.services(agencyId);
+	usePrefetch.customsRates(1, 100);
+	usePrefetch.baseRate(agencyId, selectedService?.id || 0);
+
 	return (
 		<div className="space-y-4 ">
 			<div className="flex flex-col">
@@ -43,9 +62,12 @@ export function NewOrderPage() {
 					</CardContent>
 				</Card>
 			</div>
-
-			<ServiceSelector />
-			<ItemsInOrder />
+			{selectedCustomer && selectedReceiver && (
+				<>
+					<ServiceSelector />
+					{selectedService && <ItemsInOrder />}
+				</>
+			)}
 		</div>
 	);
 }

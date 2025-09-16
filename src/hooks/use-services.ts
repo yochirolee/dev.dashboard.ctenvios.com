@@ -1,4 +1,4 @@
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import api from "@/api/api";
 import { queryClient } from "@/lib/query-client";
 import type { Service } from "@/data/types";
@@ -14,6 +14,15 @@ export const useServices = {
 			onError: (error) => {
 				options?.onError?.(error);
 			},
+		});
+	},
+	get: () => {
+		return useQuery({ queryKey: ["get-services"], queryFn: api.services.get });
+	},
+	getByAgencyId: (agencyId: number) => {
+		return useQuery({
+			queryKey: ["services", agencyId],
+			queryFn: () => api.services.getByAgencyId(agencyId),
 		});
 	},
 };

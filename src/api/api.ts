@@ -1,18 +1,28 @@
 import axios from "axios";
-import type {
-	Customer,
-	Receiver,
-	Customs,
-	Agency,
-	Provider,
-	Service,
-	Rate,
-	Invoice,
-	Payment,
+import {
+	type Customer,
+	type Receiver,
+	type Customs,
+	type Agency,
+	type Provider,
+	type Service,
+	type ShippingRate,
+	type Invoice,
+	type Payment,
+	type User,
+	agencySchema,
+	userSchema,
 } from "@/data/types";
-import type { User } from "@/data/types";
 import { useAppStore } from "@/stores/app-store";
 import { toast } from "sonner";
+import { z } from "zod";
+
+const createAgencyFormSchema = z.object({
+	agency: agencySchema,
+	user: userSchema,
+});
+
+export type CreateAgencyFormSchema = z.infer<typeof createAgencyFormSchema>;
 
 const config = {
 	baseURL:
@@ -295,8 +305,9 @@ const api = {
 			});
 			return response.data;
 		},
-		create: async (data: Agency) => {
+		create: async (data: CreateAgencyFormSchema) => {
 			const response = await axiosInstance.post("/agencies", data);
+
 			return response.data;
 		},
 		getServices: async (id: number) => {
@@ -304,7 +315,6 @@ const api = {
 			return response.data;
 		},
 		update: async (id: number, data: Agency) => {
-			console.log(data, "Data in API");
 			const response = await axiosInstance.put(`/agencies/${id}`, data);
 			return response.data;
 		},
@@ -337,22 +347,42 @@ const api = {
 			const response = await axiosInstance.post("/services", data);
 			return response.data;
 		},
-	},
-	rates: {
-		create: async (data: Rate) => {
-			const response = await axiosInstance.post("/rates", data);
-			return response.data;
-		},
-		update: async (id: number, data: Rate) => {
-			const response = await axiosInstance.put(`/rates/${id}`, data);
+		get: async () => {
+			const response = await axiosInstance.get("/services");
 			return response.data;
 		},
 		getByAgencyId: async (agency_id: number) => {
-			const response = await axiosInstance.get(`/rates/agency/${agency_id}`);
+			const response = await axiosInstance.get(`/services/agency/${agency_id}`);
+			return response.data;
+		},
+	},
+	shippingRates: {
+		getBaseRate: async (agency_id: number, service_id: number) => {
+			const response = await axiosInstance.get(
+				`/shipping-rates/base_rate/agency/${agency_id}/service/${service_id}`,
+			);
+			return response.data;
+		},
+		create: async (data: ShippingRate) => {
+			const response = await axiosInstance.post("/shipping-rates", data);
+			return response.data;
+		},
+		update: async (id: number, data: ShippingRate) => {
+			const response = await axiosInstance.put(`/shipping-rates/${id}`, data);
+			return response.data;
+		},
+		getByAgencyIdAndServiceId: async (agency_id: number, service_id: number) => {
+			const response = await axiosInstance.get(
+				`/shipping-rates/agency/${agency_id}/service/${service_id}`,
+			);
+			return response.data;
+		},
+		getByAgencyId: async (agency_id: number) => {
+			const response = await axiosInstance.get(`/shipping-rates/agency/${agency_id}`);
 			return response.data;
 		},
 		delete: async (id: number) => {
-			const response = await axiosInstance.delete(`/rates/${id}`);
+			const response = await axiosInstance.delete(`/shipping-rates/${id}`);
 			return response.data;
 		},
 	},
@@ -367,6 +397,15 @@ const api = {
 			console.log("getSales");
 			const response = await axiosInstance.get("/analytics/sales");
 			console.log(response.data, "response.data");
+			return response.data;
+		},
+	},
+
+	products: {
+		getRates: async (agency_id: number, service_id: number) => {
+			const response = await axiosInstance.get(
+				`/products/shipping_rates/agency/${agency_id}/service/${service_id}`,
+			);
 			return response.data;
 		},
 	},

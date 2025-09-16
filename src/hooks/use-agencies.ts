@@ -1,8 +1,18 @@
 //user agencies hooks
 import { useMutation, useQuery } from "@tanstack/react-query";
 import api from "@/api/api";
-import type { Agency } from "@/data/types";
+import { type Agency, agencySchema, userSchema } from "@/data/types";
 import { queryClient } from "@/lib/query-client";
+import { z } from "zod";
+import { useAppStore } from "@/stores/app-store";
+
+const createAgencyFormSchema = z.object({
+	agency: agencySchema,
+	user: userSchema,
+});
+
+export type CreateAgencyFormSchema = z.infer<typeof createAgencyFormSchema>;
+
 export const useAgencies = {
 	get: () => {
 		return useQuery({ queryKey: ["get-agencies"], queryFn: api.agencies.get });
@@ -19,7 +29,7 @@ export const useAgencies = {
 
 	create: (options?: { onSuccess?: () => void; onError?: (error: any) => void }) => {
 		return useMutation({
-			mutationFn: (data: Agency) => api.agencies.create(data),
+			mutationFn: (data: CreateAgencyFormSchema) => api.agencies.create(data),
 			onSuccess: () => {
 				queryClient.invalidateQueries({ queryKey: ["get-agencies"] });
 				options?.onSuccess?.();

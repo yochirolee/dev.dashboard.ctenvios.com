@@ -58,7 +58,6 @@ export function ReceiverFormDialog() {
 	const [isProvinceOpen, setIsProvinceOpen] = useState(false);
 	const [isOpen, setIsOpen] = useState(false);
 	const [isCityOpen, setIsCityOpen] = useState(false);
-	console.log(selectedReceiver, "selectedReceiver");
 	const form = useForm<Receiver>({
 		resolver: zodResolver(receiverSchema),
 		defaultValues: {

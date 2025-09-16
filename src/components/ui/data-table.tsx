@@ -50,8 +50,6 @@ export function DataTable<TData, TValue>({
 
 		getCoreRowModel: getCoreRowModel(),
 		manualPagination: true, //we're doing manual "server-side" pagination
-		// getPaginationRowModel: getPaginationRowModel(), // If only doing manual pagination, you don't need this
-		debugTable: true,
 	});
 
 	return (

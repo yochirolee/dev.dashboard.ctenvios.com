@@ -41,17 +41,17 @@ export default function InvoiceDetailsPage() {
 	const subtotal = invoice?.items.reduce(
 		(acc: number, item: any) =>
 			acc +
-			centsToDollars(item?.rate) * item?.weight +
-			centsToDollars(item?.customs_fee) +
-			centsToDollars(item?.delivery_fee) +
-			centsToDollars(item?.insurance_fee),
+			centsToDollars(item?.rate_in_cents) * item?.weight +
+			centsToDollars(item?.customs_fee_in_cents) +
+			centsToDollars(item?.delivery_fee_in_cents) +
+			centsToDollars(item?.insurance_fee_in_cents),
 		0,
 	);
 
 	const total =
 		subtotal +
 		invoice?.charge_amount +
-		invoice?.shipping_fee +
+		invoice?.shipping_fee_in_cents +
 		invoice?.insurance_fee -
 		invoice?.discount_amount;
 	const total_weight = invoice?.items.reduce((acc: number, item: any) => acc + item?.weight, 0);
@@ -228,23 +228,25 @@ export default function InvoiceDetailsPage() {
 									<TableCell className="">{item?.hbl}</TableCell>
 									<TableCell className="">{item?.description}</TableCell>
 									<TableCell className="text-right">
-										${parseFloat(item?.insurance_fee).toFixed(2)}
+										${centsToDollars(item?.insurance_fee_in_cents).toFixed(2)}
 									</TableCell>
 									<TableCell className="text-right">
-										${parseFloat(item?.delivery_fee).toFixed(2)}
+										${centsToDollars(item?.delivery_fee_in_cents).toFixed(2)}
 									</TableCell>
 									<TableCell className="text-right">
-										${(item?.customs_fee / 100).toFixed(2)}
+										${centsToDollars(item?.customs_fee_in_cents).toFixed(2)}
 									</TableCell>
-									<TableCell className="text-right">${(item?.rate / 100).toFixed(2)}</TableCell>
+									<TableCell className="text-right">
+										${centsToDollars(item?.rate_in_cents).toFixed(2)}
+									</TableCell>
 									<TableCell className="text-right">{item?.weight.toFixed(2)}</TableCell>
 									<TableCell className="text-right">
 										$
-										{(
-											(item?.rate / 100) * item?.weight +
-											item?.customs_fee / 100 +
-											item?.delivery_fee +
-											item?.insurance_fee
+										{centsToDollars(
+											item?.rate_in_cents * item?.weight +
+												item?.customs_fee_in_cents +
+												item?.delivery_fee_in_cents +
+												item?.insurance_fee_in_cents,
 										).toFixed(2)}
 									</TableCell>
 								</TableRow>
@@ -274,22 +276,20 @@ export default function InvoiceDetailsPage() {
 
 								<li className="flex items-center justify-between">
 									<span className="text-muted-foreground">Shipping</span>
-									<span>${invoice?.shipping_fee?.toFixed(2) ?? 0.0}</span>
+									<span>${invoice?.shipping_fee_in_cents?.toFixed(2) ?? 0.0}</span>
 								</li>
 								<li className="flex items-center justify-between">
 									<span className="text-muted-foreground">Discount</span>
-									<span>${invoice?.tax?.toFixed(2) ?? 0.0}</span>
+									<span>${invoice?.tax_in_cents?.toFixed(2) ?? 0.0}</span>
 								</li>
 								<li className="flex items-center justify-between">
 									<span className="text-muted-foreground">Charge</span>
-									<span>${(invoice?.charge_amount / 100)?.toFixed(2) ?? 0.0}</span>
+									<span>$ 0.00</span>
 								</li>
 
 								<li className="flex items-center justify-between font-semibold">
 									<span className="text-muted-foreground">Total</span>
-									<span>
-										${((invoice?.total_amount + invoice?.charge_amount) / 100).toFixed(2)}{" "}
-									</span>
+									<span>${centsToDollars(invoice?.total_in_cents).toFixed(2)}</span>
 								</li>
 								<Separator />
 								<li className="flex text-sm items-center justify-between ">
@@ -297,19 +297,25 @@ export default function InvoiceDetailsPage() {
 									<span
 										className={cn(
 											invoice?.payment_status === "PAID" && "text-muted-foreground"
-												? "text-green-500"
-												: "text-red-500",
+												? "text-green-500/80"
+												: "text-muted-foreground",
 										)}
 									>
-										${((invoice?.paid_amount + invoice?.charge_amount) / 100).toFixed(2) ?? 0.0}
+										${centsToDollars(invoice?.paid_in_cents).toFixed(2) ?? 0.0}
 									</span>
 								</li>
 								<li className="flex text-sm items-center justify-between">
 									<span className="text-muted-foreground">Balance</span>
 									<span
-										className={cn(invoice?.payment_status === "PAID" && "text-muted-foreground")}
+										className={cn(
+											invoice?.payment_status !== "PAID"
+												? "text-red-500/60"
+												: "text-muted-foreground",
+										)}
 									>
-										${((invoice?.total_amount - invoice?.paid_amount) / 100).toFixed(2) ?? 0.0}
+										$
+										{centsToDollars(invoice?.total_in_cents - invoice?.paid_in_cents).toFixed(2) ??
+											0.0}
 									</span>
 								</li>
 							</ul>

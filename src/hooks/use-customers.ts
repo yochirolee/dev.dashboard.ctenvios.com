@@ -16,10 +16,7 @@ export const useCustomers = {
 			staleTime: 1000 * 60 * 5,
 		});
 	},
-	create: (options?: {
-		onSuccess?: (data: Customer) => void;
-		onError?: (error: any) => void;
-	}) => {
+	create: (options?: { onSuccess?: (data: Customer) => void; onError?: (error: any) => void }) => {
 		const queryClient = useQueryClient();
 		return useMutation({
 			mutationFn: (data: Customer) => api.customer.create(data),
@@ -32,10 +29,7 @@ export const useCustomers = {
 			},
 		});
 	},
-	update: (options?: {
-		onSuccess?: (data: Customer) => void;
-		onError?: (error: any) => void;
-	}) => {
+	update: (options?: { onSuccess?: (data: Customer) => void; onError?: (error: any) => void }) => {
 		const queryClient = useQueryClient();
 		return useMutation({
 			mutationFn: ({ id, data }: { id: number; data: Customer }) => api.customer.update(id, data),
@@ -48,6 +42,4 @@ export const useCustomers = {
 			},
 		});
 	},
-	
 };
-
