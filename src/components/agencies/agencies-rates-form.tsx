@@ -51,8 +51,8 @@ export const AgenciesRatesForm = ({
 						name: rate.name,
 						rate_id: rate.id,
 						agency_id: rate.agency_id,
-						rate_in_cents: rate.rate_in_cents/100,
-						cost_in_cents: rate.cost_in_cents/100,
+						rate_in_cents: rate.rate_in_cents / 100,
+						cost_in_cents: rate.cost_in_cents / 100,
 				  },
 	});
 	//kkk
