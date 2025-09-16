@@ -39,7 +39,7 @@ import { DialogDescription } from "@/components/ui/dialog";
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 export const PaymentForm = ({ invoice }: { invoice: Invoice }) => {
-	const balance = ((invoice?.total_amount - invoice?.paid_amount) / 100).toFixed(2);
+	const balance = ((invoice?.total_in_cents - invoice?.paid_in_cents) / 100).toFixed(2);
 
 	console.log(balance, "balance");
 	console.log(invoice, "invoice");
@@ -47,28 +47,28 @@ export const PaymentForm = ({ invoice }: { invoice: Invoice }) => {
 	const form = useForm<z.infer<typeof paymentSchema>>({
 		resolver: zodResolver(paymentSchema),
 		defaultValues: {
-			amount: Number(balance),
-			charge: 0,
-			payment_method: payment_methods[0].value,
-			payment_reference: undefined,
+			amount_in_cents: Number(balance),
+			charge_in_cents: 0,
+			method: payment_methods[0].value,
+			reference: undefined,
 			notes: undefined,
 		},
 	});
 
 	const amount = useWatch({
 		control: form.control,
-		name: "amount",
+		name: "amount_in_cents",
 	});
 
 	const payment_method = useWatch({
 		control: form.control,
-		name: "payment_method",
+		name: "method",
 	});
 
 	if (payment_method === "CREDIT_CARD" || payment_method === "DEBIT_CARD") {
-		form.setValue("charge", amount * 0.03);
+		form.setValue("charge_in_cents", amount * 0.03);
 	} else {
-		form.setValue("charge", 0);
+		form.setValue("charge_in_cents", 0);
 	}
 
 	const { mutate: createPayment, isPending } = useInvoices.pay({
@@ -89,9 +89,11 @@ export const PaymentForm = ({ invoice }: { invoice: Invoice }) => {
 	const [open, setOpen] = useState(false);
 	useEffect(() => {
 		form.reset({
-			amount: Number(balance),
-			charge: 0,
-			payment_method: payment_methods[0].value,
+			amount_in_cents: Number(balance),
+			charge_in_cents: 0,
+			reference: undefined,
+			notes: undefined,
+			method: payment_methods[0].value as "CREDIT_CARD" | "DEBIT_CARD" | "CASH" | "ZELLE" | "OTHER",
 		});
 	}, [open, form]);
 
@@ -113,7 +115,7 @@ export const PaymentForm = ({ invoice }: { invoice: Invoice }) => {
 						<CardHeader>
 							<CardDescription>Total de la factura</CardDescription>
 							<CardTitle className="text-2xl font-semibold text-muted-foreground tabular-nums @[250px]/card:text-3xl">
-								${(invoice?.total_amount / 100).toFixed(2)}
+								${(invoice?.total_in_cents / 100).toFixed(2)}
 							</CardTitle>
 						</CardHeader>
 					</Card>
@@ -132,7 +134,7 @@ export const PaymentForm = ({ invoice }: { invoice: Invoice }) => {
 
 						<FormField
 							control={form.control}
-							name="payment_reference"
+							name="reference"
 							render={({ field }) => (
 								<FormItem>
 									<FormLabel>Referencia de pago</FormLabel>
@@ -144,19 +146,19 @@ export const PaymentForm = ({ invoice }: { invoice: Invoice }) => {
 						/>
 						<FormField
 							control={form.control}
-							name="amount"
+							name="amount_in_cents"
 							render={({ field }) => (
 								<FormItem>
 									<FormLabel>Amount</FormLabel>
 
 									<Input
-										{...form.register(`amount`, {
+										{...form.register(`amount_in_cents`, {
 											valueAsNumber: true,
 										})}
 										placeholder="0.00"
 										type="number"
 										min={0}
-										max={Number(balance) + (form.getValues("charge") ?? 0)}
+										max={Number(balance) + (form.getValues("charge_in_cents") ?? 0)}
 										step={0.01}
 										className="[&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none [-moz-appearance:textfield] text-right"
 										onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
@@ -167,8 +169,10 @@ export const PaymentForm = ({ invoice }: { invoice: Invoice }) => {
 							)}
 						/>
 						<div className="grid  justify-end  gap-2">
-							<p>Cargo por tarjeta: ${form.getValues("charge")?.toFixed(2) ?? 0.0}</p>
-							<p>Total a pagar: ${(amount + (form.getValues("charge") ?? 0)).toFixed(2)}</p>
+							<p>Cargo por tarjeta: ${form.getValues("charge_in_cents")?.toFixed(2) ?? 0.0}</p>
+							<p>
+								Total a pagar: ${(amount + (form.getValues("charge_in_cents") ?? 0)).toFixed(2)}
+							</p>
 						</div>
 
 						<Button type="submit" disabled={isPending}>
@@ -187,7 +191,7 @@ const PaymentMethodCombobox = () => {
 	return (
 		<FormField
 			control={form.control}
-			name="payment_method"
+			name="method"
 			render={({ field }) => (
 				<FormItem>
 					<FormLabel>Método de pago</FormLabel>

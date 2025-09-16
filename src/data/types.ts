@@ -91,11 +91,11 @@ export const productRateSchema = z.object({
 });
 export const paymentSchema = z.object({
 	id: z.number().optional(),
-	amount: z.number().min(0),
-	payment_method: z.string(),
-	payment_reference: z.string().min(0).optional(),
+	amount_in_cents: z.number().min(0),
+	charge_in_cents: z.number().min(0).optional(),
+	method: z.string(),
+	reference: z.string().min(0).optional(),
 	notes: z.string().min(0).optional(),
-	charge: z.number().min(0).optional(),
 });
 
 export const itemsSchema = z.object({
@@ -115,10 +115,9 @@ export const invoiceSchema = z.object({
 	user_id: z.string().min(0),
 	service_id: z.number().min(0),
 	items: z.array(itemsSchema).min(1, "La factura debe tener al menos 1 item"),
-	discount_type: z.string().optional().default("percent"),
-	discount_amount: z.number().min(0).optional(),
-
-	paid_amount: z.number().min(0).optional().default(0),
+	charge_in_cents: z.number().min(0).optional(),
+	total_in_cents: z.number().min(0),
+	paid_in_cents: z.number().min(0).optional().default(0),
 	created_at: z.string().optional(),
 	updated_at: z.string().optional(),
 });
