@@ -150,7 +150,7 @@ export const infiniteQueryUtils = {
 	/**
 	 * Check if there are more pages to load
 	 */
-	hasNextPage: <T>(data?: InfiniteQueryResult<T>, hasNextPage?: boolean): boolean => {
+	hasNextPage: <T>(_data?: InfiniteQueryResult<T>, hasNextPage?: boolean): boolean => {
 		return hasNextPage || false;
 	},
 

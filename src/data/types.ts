@@ -177,6 +177,7 @@ export const userSchema = z
 		role: z.string().min(1, "El rol es requerido"),
 		phone: z.string().min(10, "El teléfono debe tener al menos 10 dígitos"),
 		name: z.string().min(2, "El nombre debe tener al menos 2 caracteres"),
+		agency_id: z.string().optional(),
 	})
 	.refine((data) => data.password === data.repeat_password, {
 		message: "Las contraseñas no coinciden",

@@ -1,5 +1,5 @@
 import api from "@/api/api";
-import type { Product, ShippingRate } from "@/data/types";
+import type { ProductRate, ShippingRate } from "@/data/types";
 import { useQuery } from "@tanstack/react-query";
 
 export const useProducts = {
@@ -12,7 +12,7 @@ export const useProducts = {
 		});
 
 		console.log(data, "data on useProducts");
-		const flatData = data?.map((product: Product & { shipping_rate: ShippingRate }) => {
+		const flatData = data?.map((product: ProductRate & { shipping_rate: ShippingRate }) => {
 			return {
 				name: product.name,
 				rate_in_cents: product.shipping_rate.rate_in_cents,

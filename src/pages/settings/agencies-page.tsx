@@ -4,33 +4,20 @@ import { AgencyDetails } from "@/components/agencies/agency-details";
 
 import AgencyUsers from "@/components/agencies/agency-users";
 import AgencyServiceRates from "@/components/agencies/agency-service-rates";
-import { useEffect, useState} from "react";
+import { useEffect, useState } from "react";
 import { useAgencies } from "@/hooks/use-agencies";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { Agency, User, Service, ShippingRate, Provider } from "@/data/types";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 
-interface AgencyDetailsProps {
-	selectedAgency: Agency & {
-		users: User[];
-		services: Service[] & {
-			provider: Provider & {
-				name: string;
-			};
-			shipping_rates: ShippingRate[];
-		};
-	};
-	isLoading: boolean;
-}
-
 export const AgenciesPage = () => {
 	const navigate = useNavigate();
 	const { data: agencies = [], isLoading, error } = useAgencies.get();
-	const [selectedAgency, setSelectedAgency] = useState<AgencyDetailsProps["selectedAgency"]>(agencies[0] ?? null);
-    
+	const [selectedAgency, setSelectedAgency] = useState<Agency | null>(agencies[0] ?? null);
+
 	useEffect(() => {
-		setSelectedAgency(agencies[0] ?? null as unknown as AgencyDetailsProps["selectedAgency"]);
+		setSelectedAgency(agencies[0] as Agency);
 	}, [agencies]);
 
 	if (isLoading) return <Skeleton className="h-[200px] w-full" />;
@@ -49,7 +36,7 @@ export const AgenciesPage = () => {
 							isLoading={isLoading}
 							agencies={agencies}
 							selectedAgency={selectedAgency}
-							setSelectedAgency={(agency) => setSelectedAgency(agency as Agency & { services: Service[] & { provider: Provider & { name: string }; shipping_rates: ShippingRate[] } })}
+							setSelectedAgency={(agency) => setSelectedAgency(agency)}
 						/>
 
 						<Button
@@ -68,11 +55,14 @@ export const AgenciesPage = () => {
 			) : (
 				<div className="grid grid-cols-1 lg:grid-cols-5  gap-4">
 					<div className="col-span-2 space-y-4">
-						<AgencyDetails selectedAgency={selectedAgency} setSelectedAgency={(agency) => setSelectedAgency(agency as AgencyDetailsProps["selectedAgency"])} />
-						<AgencyUsers selectedAgency={selectedAgency as AgencyDetailsProps["selectedAgency"]} />
+						<AgencyDetails
+							selectedAgency={selectedAgency}
+							setSelectedAgency={(agency) => setSelectedAgency(agency as Agency)}
+						/>
+						<AgencyUsers agency_id={selectedAgency.id ?? 0} />
 					</div>
 					<div className="col-span-3 space-y-4">
-						<AgencyServiceRates selectedAgency={selectedAgency as AgencyDetailsProps["selectedAgency"]} />
+						<AgencyServiceRates agencyId={selectedAgency.id ?? 0} />
 					</div>
 				</div>
 			)}
