@@ -7,7 +7,7 @@ import AgencyServiceRates from "@/components/agencies/agency-service-rates";
 import { useEffect, useState } from "react";
 import { useAgencies } from "@/hooks/use-agencies";
 import { Skeleton } from "@/components/ui/skeleton";
-import type { Agency, User, Service, ShippingRate, Provider } from "@/data/types";
+import type { Agency } from "@/data/types";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 
