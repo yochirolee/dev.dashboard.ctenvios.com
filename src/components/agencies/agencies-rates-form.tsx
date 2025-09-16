@@ -15,13 +15,13 @@ const agenciesRatesSchema = z
 		name: z.string().min(1, { message: "El nombre es requerido" }),
 		rate_id: z.number().optional(),
 		agency_id: z.number().optional(),
-		agency_rate: z.number().min(0, { message: "El precio de la agencia debe ser mayor a 0" }),
-		public_rate: z.number().min(0, { message: "El precio público debe ser mayor a 0" }),
+		rate_in_cents: z.number().min(0, { message: "El precio de la agencia debe ser mayor a 0" }),
+		cost_in_cents: z.number().min(0, { message: "El precio público debe ser mayor a 0" }),
 		service_id: z.number().optional(),
 	})
-	.refine((data) => data.public_rate >= data.agency_rate, {
+	.refine((data) => data.cost_in_cents >= data.rate_in_cents, {
 		message: "El precio público debe ser mayor o igual al precio de la agencia",
-		path: ["public_rate"],
+		path: ["cost_in_cents"],
 	});
 
 type AgenciesRatesSchema = z.infer<typeof agenciesRatesSchema>;
@@ -43,16 +43,16 @@ export const AgenciesRatesForm = ({
 				? {
 						name: "",
 						agency_id: rate.agency_id,
-						agency_rate: rate.agency_rate,
-						public_rate: rate.public_rate,
+						rate_in_cents: rate.rate_in_cents,
+						cost_in_cents: rate.cost_in_cents,
 						service_id: rate.service_id,
 				  }
 				: {
 						name: rate.name,
 						rate_id: rate.id,
 						agency_id: rate.agency_id,
-						agency_rate: rate.agency_rate/100,
-						public_rate: rate.public_rate/100,
+						rate_in_cents: rate.rate_in_cents/100,
+						cost_in_cents: rate.cost_in_cents/100,
 				  },
 	});
 	//kkk
@@ -86,7 +86,7 @@ export const AgenciesRatesForm = ({
 					)}
 				/>
 				<FormField
-					name="agency_rate"
+					name="cost_in_cents"
 					render={({ field }) => (
 						<FormItem>
 							<FormLabel>Precio Agencia</FormLabel>
@@ -99,7 +99,7 @@ export const AgenciesRatesForm = ({
 									{...field}
 									onChange={(e) => {
 										field.onChange(e);
-										form.setValue("agency_rate", parseFloat(e.target.value));
+										form.setValue("cost_in_cents", parseFloat(e.target.value));
 									}}
 									placeholder="Precio Agencia"
 								/>
@@ -110,19 +110,19 @@ export const AgenciesRatesForm = ({
 				/>
 				<FormField
 					control={form.control}
-					name="public_rate"
+					name="rate_in_cents"
 					render={({ field }) => (
 						<FormItem>
-							<FormLabel>Precio Público</FormLabel>
+							<FormLabel>Precio Costo</FormLabel>
 							<FormControl>
 								<Input
 									type="number"
 									{...field}
 									onChange={(e) => {
 										field.onChange(e);
-										form.setValue("public_rate", parseFloat(e.target.value));
+										form.setValue("rate_in_cents", parseFloat(e.target.value));
 									}}
-									placeholder="Precio Público"
+									placeholder="Precio Costo"
 								/>
 							</FormControl>
 							<FormMessage />
