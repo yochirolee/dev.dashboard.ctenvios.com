@@ -285,9 +285,6 @@ export function ItemsInOrder() {
 
 function InvoiceTotal({ form }: { form: any }) {
 	const [open, setOpen] = useState(false);
-	const subtotal = form
-		.watch("items")
-		.reduce((acc: number, item: any) => acc + item.rate_in_cents * item?.weight || 0, 0);
 	const total_weight = form
 		.watch("items")
 		.reduce((acc: number, item: any) => acc + item?.weight || 0, 0);
