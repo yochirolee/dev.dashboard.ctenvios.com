@@ -38,24 +38,21 @@ export default function InvoiceDetailsPage() {
 
 	console.log(invoice, "invoice");
 
-	const subtotal = invoice?.items.reduce(
-		(acc: number, item: any) =>
-			acc +
-			centsToDollars(item?.rate_in_cents) * item?.weight +
-			centsToDollars(item?.customs_fee_in_cents) +
-			centsToDollars(item?.delivery_fee_in_cents) +
-			centsToDollars(item?.insurance_fee_in_cents),
-		0,
-	);
-
-	const total =
-		subtotal +
-		invoice?.charge_amount +
-		invoice?.shipping_fee_in_cents +
-		invoice?.insurance_fee -
-		invoice?.discount_amount;
+	const calculateRowSubtotal = (item: any) => {
+		switch (item.rate?.rate_type) {
+			case "WEIGHT":
+				return (
+					item.rate_in_cents * item.weight +
+					item.customs_fee_in_cents +
+					item.delivery_fee_in_cents +
+					item.insurance_fee_in_cents
+				);
+			case "FIXED":
+				return item.rate_in_cents;
+		}
+	};
+	const subtotal = invoice?.items.reduce((acc: number, item: any) => acc + calculateRowSubtotal(item), 0);
 	const total_weight = invoice?.items.reduce((acc: number, item: any) => acc + item?.weight, 0);
-	console.log(total, "total");
 
 	console.log(invoice);
 
@@ -241,13 +238,7 @@ export default function InvoiceDetailsPage() {
 									</TableCell>
 									<TableCell className="text-right">{item?.weight.toFixed(2)}</TableCell>
 									<TableCell className="text-right">
-										$
-										{centsToDollars(
-											item?.rate_in_cents * item?.weight +
-												item?.customs_fee_in_cents +
-												item?.delivery_fee_in_cents +
-												item?.insurance_fee_in_cents,
-										).toFixed(2)}
+										${centsToDollars(calculateRowSubtotal(item)).toFixed(2)}
 									</TableCell>
 								</TableRow>
 							))}
@@ -271,7 +262,7 @@ export default function InvoiceDetailsPage() {
 							<ul className="flex flex-col w-1/2  xl:w-1/4 xl:mr-4 py-4 justify-end gap-2 border-t border-dashed  ">
 								<li className="flex items-center gap-4 justify-between">
 									<span className="text-muted-foreground">Subtotal</span>
-									<span>${subtotal.toFixed(2) ?? 0.0}</span>
+									<span>${ centsToDollars(subtotal).toFixed(2) ?? 0.0}</span>
 								</li>
 
 								<li className="flex items-center justify-between">

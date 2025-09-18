@@ -19,7 +19,7 @@ import FixedRatesCombobox from "./fixed-rates-combobox";
 import { centsToDollars } from "@/lib/utils";
 
 const calculateSubtotal = (rate_in_cents: number, weight: number, customs_fee_in_cents: number, rate_type: string) => {
-	console.log(rate_type, "rate_type");
+	
 	if(rate_type === "WEIGHT") {
 		return rate_in_cents * weight + customs_fee_in_cents;
 	} else {
@@ -50,7 +50,9 @@ function ItemRow({
 		form.setValue(
 			`items.${index}.subtotal`,
 			calculateSubtotal(item.rate_in_cents, item.weight, item.customs_fee_in_cents, item.rate_type),
+			
 		);
+		form.setValue(`total_in_cents`, form.getValues("items").reduce((acc: number, item: any) => acc + item.subtotal, 0));
 	}, [item?.rate_in_cents, item?.weight, item?.customs_fee_in_cents]);
 
 	const [byRate, setByRate] = useState(false);

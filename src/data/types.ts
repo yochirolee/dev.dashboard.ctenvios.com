@@ -106,6 +106,7 @@ export const itemsSchema = z.object({
 	insurance_fee_in_cents: z.number().min(0).optional(),
 	rate_in_cents: z.number().min(0),
 	rate_id: z.number().min(0),
+	rate_type: z.enum(["WEIGHT", "FIXED"]),
 });
 export const invoiceSchema = z.object({
 	id: z.number().optional(),
@@ -116,7 +117,7 @@ export const invoiceSchema = z.object({
 	service_id: z.number().min(0),
 	items: z.array(itemsSchema).min(1, "La factura debe tener al menos 1 item"),
 	charge_in_cents: z.number().min(0).optional(),
-	total_in_cents: z.number().min(0),
+	total_in_cents: z.number().optional().default(0),
 	paid_in_cents: z.number().min(0).optional().default(0),
 	created_at: z.string().optional(),
 	updated_at: z.string().optional(),

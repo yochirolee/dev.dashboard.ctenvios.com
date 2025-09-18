@@ -18,6 +18,7 @@ import { useAppStore } from "@/stores/app-store";
 import { Separator } from "../ui/separator";
 import { ChargeDialog, DiscountDialog, InsuranceFeeDialog } from "./order-dialogs";
 import { useShippingRates } from "@/hooks/use-shipping-rates";
+import { centsToDollars } from "@/lib/utils";
 
 type FormValues = z.infer<typeof invoiceSchema>;
 
@@ -68,6 +69,7 @@ export function ItemsInOrder() {
 					weight: undefined,
 					rate_in_cents: rate?.rate_in_cents || 0,
 					rate_id: rate?.id || 0,
+					rate_type: rate?.rate_type || "WEIGHT",
 					insurance_fee_in_cents: 0,
 					customs_fee_in_cents: 0,
 					customs_id: 0,
@@ -111,6 +113,7 @@ export function ItemsInOrder() {
 					weight: undefined,
 					rate_id: rate?.id || 0,
 					rate_in_cents: rate?.rate_in_cents || 0,
+					rate_type: rate?.rate_type || "WEIGHT",
 					insurance_fee_in_cents: 0,
 					customs_fee_in_cents: 0,
 					customs_id: 0,
@@ -143,6 +146,8 @@ export function ItemsInOrder() {
 			setSelectedReceiver(null);
 			setSelectedService(null);
 			toast.success("Orden creada correctamente");
+
+			console.log(data, "invoice Created");
 			navigate(`/orders/${data.id}`);
 		},
 		onError: (error) => {
@@ -280,18 +285,24 @@ export function ItemsInOrder() {
 
 function InvoiceTotal({ form }: { form: any }) {
 	const [open, setOpen] = useState(false);
+	const subtotal = form
+		.watch("items")
+		.reduce((acc: number, item: any) => acc + item.rate_in_cents * item?.weight || 0, 0);
+	const total_weight = form
+		.watch("items")
+		.reduce((acc: number, item: any) => acc + item?.weight || 0, 0);
 	return (
 		<div>
 			<div className="mt-8 flex justify-end p-2 lg:pr-6">
 				<ul className="grid gap-3 w-full lg:w-1/4 ">
 					<li className="flex items-center bg-foreground/5 p-2 rounded-md justify-between">
 						<span className="text-muted-foreground">Peso</span>
-						<span>0.00 lbs</span>
+						<span>{total_weight.toFixed(2)} lbs</span>
 					</li>
 					<Separator />
 					<li className="flex items-center justify-between">
 						<span className="text-muted-foreground">Subtotal</span>
-						<span>$0.00</span>
+						<span>${centsToDollars(form.getValues("total_in_cents")).toFixed(2) || 0.0}</span>
 					</li>
 
 					<li className="flex items-center justify-between">

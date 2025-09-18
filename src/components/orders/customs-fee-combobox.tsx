@@ -86,6 +86,7 @@ const CustomsFeeCombobox = React.memo(function CustomsFeeCombobox({
 													shouldDirty: true,
 													shouldTouch: true,
 												});
+												
 												setOpen(false);
 											}}
 										>
