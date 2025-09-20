@@ -17,7 +17,6 @@ import { useAppStore } from "@/stores/app-store";
 import { useInvoiceStore } from "@/stores/invoice-store";
 import { useShallow } from "zustand/react/shallow";
 import { useProducts } from "@/hooks/use-products";
-import { useWatch } from "react-hook-form";
 
 const FixedRatesCombobox = React.memo(function FixedRatesCombobox({
 	form,
@@ -57,7 +56,7 @@ const FixedRatesCombobox = React.memo(function FixedRatesCombobox({
 
 		setOpen(false);
 	};
-	
+
 	return (
 		<Popover open={open} onOpenChange={setOpen}>
 			<PopoverTrigger asChild>
