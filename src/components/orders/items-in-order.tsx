@@ -87,6 +87,9 @@ export function ItemsInOrder() {
 		setItemsCount(fields.length);
 	}, [fields]);
 
+
+	console.log(rate, "rate");
+
 	// Update form values when rate data becomes available
 	useEffect(() => {
 		if (rate?.rate_in_cents && rate?.id) {

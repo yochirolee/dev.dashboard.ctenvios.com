@@ -18,12 +18,21 @@ import { Switch } from "../ui/switch";
 import FixedRatesCombobox from "./fixed-rates-combobox";
 import { centsToDollars } from "@/lib/utils";
 
-const calculateSubtotal = (rate_in_cents: number, weight: number, customs_fee_in_cents: number, rate_type: string) => {
-	
-	if(rate_type === "WEIGHT") {
-		return rate_in_cents * weight + customs_fee_in_cents;
+const calculateSubtotal = (
+	rate_in_cents: number,
+	weight: number,
+	customs_fee_in_cents: number,
+	rate_type: string,
+) => {
+	// Ensure all values are valid numbers
+	const safeRateInCents = Number(rate_in_cents) || 0;
+	const safeWeight = Number(weight) || 0;
+	const safeCustomsFeeInCents = Number(customs_fee_in_cents) || 0;
+
+	if (rate_type === "WEIGHT") {
+		return safeRateInCents * safeWeight + safeCustomsFeeInCents;
 	} else {
-		return rate_in_cents + customs_fee_in_cents;
+		return safeRateInCents + safeCustomsFeeInCents;
 	}
 };
 
@@ -47,23 +56,30 @@ function ItemRow({
 	});
 
 	useEffect(() => {
-		form.setValue(
-			`items.${index}.subtotal`,
-			calculateSubtotal(item.rate_in_cents, item.weight, item.customs_fee_in_cents, item.rate_type),
-			
+		const subtotal = calculateSubtotal(
+			item?.rate_in_cents,
+			item?.weight,
+			item?.customs_fee_in_cents,
+			item?.rate_type,
 		);
-		form.setValue(`total_in_cents`, form.getValues("items").reduce((acc: number, item: any) => acc + item.subtotal, 0));
-	}, [item?.rate_in_cents, item?.weight, item?.customs_fee_in_cents]);
+
+		form.setValue(`items.${index}.subtotal`, subtotal);
+
+		// Calculate total from all items
+		const items = form.getValues("items") || [];
+		const total = items.reduce((acc: number, currentItem: any) => {
+			return acc + (Number(currentItem?.subtotal) || 0);
+		}, 0);
+
+		form.setValue(`total_in_cents`, total);
+	}, [item?.rate_in_cents, item?.weight, item?.customs_fee_in_cents, item?.rate_type]);
 
 	const [byRate, setByRate] = useState(false);
 
 	useEffect(() => {
 		form.setValue(`items.${index}.subtotal`, 0);
 		form.setValue(`items.${index}.description`, "");
-	
 	}, [byRate]);
-
-	
 
 	const handleRemove = () => {
 		// Use index for removal - React Hook Form's remove function expects the index

@@ -12,11 +12,12 @@ import {
 } from "@/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useFormContext } from "react-hook-form";
-import type { ProductRate } from "@/data/types";
+// ProductRate type not needed as we're using the flattened structure from useProducts
 import { useAppStore } from "@/stores/app-store";
 import { useInvoiceStore } from "@/stores/invoice-store";
 import { useShallow } from "zustand/react/shallow";
 import { useProducts } from "@/hooks/use-products";
+import { useWatch } from "react-hook-form";
 
 const FixedRatesCombobox = React.memo(function FixedRatesCombobox({
 	form,
@@ -42,15 +43,21 @@ const FixedRatesCombobox = React.memo(function FixedRatesCombobox({
 		selectedService?.id || 0,
 	);
 
-	const handleUpdateRate = (product: ProductRate) => {
+	console.log(products);
+
+	const handleUpdateRate = (product: any) => {
 		setSelectedProduct(product);
-		setValue(`items.${index}.rate_in_cents`, product.rate_in_cents);
-		setValue(`items.${index}.rate_id`, product.rate_id);
-		setValue(`items.${index}.description`, product.name);
-		setValue(`items.${index}.rate_type`, product.rate_type);
+		setValue(`items.${index}.rate_in_cents`, product.rate_in_cents || 0);
+		setValue(`items.${index}.rate_id`, product.rate_id || product.product_id);
+		setValue(`items.${index}.description`, product.name || product.product_name || "");
+		setValue(`items.${index}.rate_type`, product.rate_type || "FIXED");
+		setValue(`items.${index}.weight`, product.weight || 0);
+		setValue(`items.${index}.customs_id`, product.customs_id || 0);
+		setValue(`items.${index}.customs_fee_in_cents`, product.customs_fee_in_cents || 0);
+
 		setOpen(false);
 	};
-
+	
 	return (
 		<Popover open={open} onOpenChange={setOpen}>
 			<PopoverTrigger asChild>
@@ -65,7 +72,7 @@ const FixedRatesCombobox = React.memo(function FixedRatesCombobox({
 						!selectedProduct?.name && "text-muted-foreground",
 					)}
 				>
-					{products?.find((product: ProductRate) => product.name === selectedProduct?.name)?.name
+					{selectedProduct?.name
 						? selectedProduct.name.length > 20
 							? `${selectedProduct.name.substring(0, 20)}...`
 							: selectedProduct.name
@@ -79,19 +86,21 @@ const FixedRatesCombobox = React.memo(function FixedRatesCombobox({
 					<CommandList>
 						<CommandEmpty>No se encontraron Productos.</CommandEmpty>
 						<CommandGroup>
-							{products?.map((product: ProductRate) => (
+							{products?.map((product: any) => (
 								<CommandItem
-									key={product?.id}
-									value={product?.name}
+									key={product?.product_id || product?.rate_id}
+									value={product?.name || product?.product_name}
 									onSelect={() => {
 										handleUpdateRate(product);
 									}}
 								>
-									{product.name}
+									{product.name || product.product_name}
 									<Check
 										className={cn(
 											"ml-auto",
-											selectedProduct?.name === product.name ? "opacity-100" : "opacity-0",
+											selectedProduct?.name === (product.name || product.product_name)
+												? "opacity-100"
+												: "opacity-0",
 										)}
 									/>
 								</CommandItem>
