@@ -2,6 +2,7 @@ import { useInvoiceStore } from "@/stores/invoice-store";
 import { useShallow } from "zustand/react/shallow";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
+import { formatFullName } from "@/lib/utils";
 
 export function CustomerInformation() {
 	const { selectedCustomer, setSelectedCustomer, setSelectedReceiver } = useInvoiceStore(
@@ -12,7 +13,12 @@ export function CustomerInformation() {
 		})),
 	);
 
-	const fullName = `${selectedCustomer?.first_name || ""} ${selectedCustomer?.middle_name || ""} ${selectedCustomer?.last_name || ""} ${selectedCustomer?.second_last_name || ""}`;
+	const fullName = formatFullName(
+		selectedCustomer?.first_name,
+		selectedCustomer?.middle_name,
+		selectedCustomer?.last_name,
+		selectedCustomer?.second_last_name,
+	);
 
 	return (
 		<>
@@ -34,9 +40,7 @@ export function CustomerInformation() {
 					<dl className="grid gap-3">
 						<div className="flex items-center justify-between">
 							<dt className="text-muted-foreground">Nombre</dt>
-							<dd>
-								{fullName}
-							</dd>
+							<dd>{fullName}</dd>
 						</div>
 						<div className="flex items-center justify-between">
 							<dt className="text-muted-foreground">Email</dt>

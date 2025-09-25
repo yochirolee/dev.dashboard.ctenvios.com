@@ -18,6 +18,9 @@ import ProvidersServicesPage from "@/pages/settings/providers-services-page";
 import { EditOrderPage } from "@/pages/orders/edit-order-page";
 import { ReceiversPage } from "@/pages/settings/receiver-page";
 import { NewAgencyPage } from "@/pages/settings/agencies/new-agency-page";
+import { DispatchPage } from "@/pages/logistics/dispatch-page";
+import { ContainersPage } from "@/pages/logistics/containers-page";
+import { FlightsPage } from "@/pages/logistics/flights-page";
 
 export const AppRouter = () => {
 	return (
@@ -34,6 +37,11 @@ export const AppRouter = () => {
 						<Route path="new" element={<NewOrderPage />} />
 						<Route path=":invoiceId/edit" element={<EditOrderPage />} />
 						<Route path=":invoiceId" element={<InvoiceDetailsPage />} />
+					</Route>
+					<Route path="logistics">
+						<Route path="dispatch" element={<DispatchPage />} />
+						<Route path="containers" element={<ContainersPage />} />
+						<Route path="flights" element={<FlightsPage />} />
 					</Route>
 					<Route path="settings">
 						<Route index element={<Navigate to="providers" replace />} />

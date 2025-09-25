@@ -1,9 +1,9 @@
 import React, { useEffect } from "react";
-import { Input } from "../ui/input";
-import { TableCell, TableRow } from "../ui/table";
+import { Input } from "@/components/ui/input";
+import { TableCell, TableRow } from "@/components/ui/table";
 import { useWatch } from "react-hook-form";
 import CustomsFeeCombobox from "./customs-fee-combobox";
-import { Button } from "../ui/button";
+import { Button } from "@/components/ui/button";
 import { DollarSign, PencilIcon, PlusCircle, ShieldCheck, Trash2 } from "lucide-react";
 import { useState } from "react";
 import {
@@ -11,11 +11,11 @@ import {
 	DropdownMenuItem,
 	DropdownMenuContent,
 	DropdownMenuTrigger,
-} from "../ui/dropdown-menu";
+} from "@/components/ui/dropdown-menu";
 
-import { Badge } from "../ui/badge";
-import { Switch } from "../ui/switch";
-import FixedRatesCombobox from "./fixed-rates-combobox";
+import { Badge } from "@/components/ui/badge";
+import { Switch } from "@/components/ui/switch";
+import FixedRatesCombobox from "@/components/orders/edit/fixed-rates-combobox";
 import { centsToDollars, calculate_row_subtotal, dollarsToCents } from "@/lib/utils";
 
 /* const calculateSubtotal = (
@@ -37,7 +37,7 @@ import { centsToDollars, calculate_row_subtotal, dollarsToCents } from "@/lib/ut
 	}
 }; */
 
-function ItemRow({
+function EditItemRow({
 	index,
 	form,
 	remove,
@@ -200,4 +200,4 @@ function ItemRow({
 }
 
 // Memoizar para evitar re-render si las props no cambian
-export default React.memo(ItemRow);
+export default React.memo(EditItemRow);

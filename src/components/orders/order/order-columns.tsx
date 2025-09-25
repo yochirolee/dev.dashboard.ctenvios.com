@@ -3,6 +3,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { type ColumnDef } from "@tanstack/react-table";
 import { format } from "date-fns";
+import { formatFullName } from "@/lib/utils";
 import {
 	CheckCircle2,
 	Clock,
@@ -170,9 +171,12 @@ export const orderColumns: ColumnDef<Invoice>[] = [
 		header: "Envia",
 		cell: ({ row }) => {
 			const customer = row.original?.customer;
-			const fullName = `${customer?.first_name || ""} ${customer?.middle_name || ""} ${
-				customer?.last_name || ""
-			} ${customer?.second_last_name || ""}`.trim();
+			const fullName = formatFullName(
+				customer?.first_name,
+				customer?.middle_name,
+				customer?.last_name,
+				customer?.second_last_name,
+			);
 
 			return (
 				<div className="flex items-center gap-2 min-w-0">
@@ -200,9 +204,12 @@ export const orderColumns: ColumnDef<Invoice>[] = [
 		header: "Recibe",
 		cell: ({ row }) => {
 			const receiver = row.original?.receiver;
-			const fullName = `${receiver?.first_name || ""} ${receiver?.middle_name || ""} ${
-				receiver?.last_name || ""
-			} ${receiver?.second_last_name || ""}`.trim();
+			const fullName = formatFullName(
+				receiver?.first_name,
+				receiver?.middle_name,
+				receiver?.last_name,
+				receiver?.second_last_name,
+			);
 
 			return (
 				<div className="flex items-center gap-2 min-w-0">

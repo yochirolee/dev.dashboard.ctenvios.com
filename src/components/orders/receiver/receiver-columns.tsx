@@ -2,6 +2,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Checkbox } from "@/components/ui/checkbox";
 import { type ColumnDef } from "@tanstack/react-table";
 import { type Receiver } from "@/data/types";
+import { formatFullName } from "@/lib/utils";
 
 export const receiversColumns: ColumnDef<Receiver>[] = [
 	{
@@ -38,8 +39,12 @@ export const receiversColumns: ColumnDef<Receiver>[] = [
 							{row.original.last_name.charAt(0)}
 						</AvatarFallback>
 					</Avatar>
-					{row.original.first_name} {row.original.middle_name || ""}
-					{row.original.last_name} {row.original.second_last_name || ""}
+					{formatFullName(
+						row.original.first_name,
+						row.original.middle_name,
+						row.original.last_name,
+						row.original.second_last_name,
+					)}
 				</div>
 			);
 		},

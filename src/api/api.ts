@@ -310,10 +310,33 @@ const api = {
 
 			return response.data;
 		},
-		getServices: async (id: number) => {
-			const response = await axiosInstance.get(`/agencies/${id}/services`);
+		getServices: async (id: number, is_active?: boolean) => {
+			const response = await axiosInstance.get(`/agencies/${id}/services`, {
+				params: {
+					...(is_active !== undefined && { is_active }),
+				},
+			});
 			return response.data;
 		},
+		getServiceShippingRates: async (
+			agency_id: number,
+			service_id: number,
+			rate_type?: "WEIGHT" | "FIXED",
+			is_active?: boolean,
+		) => {
+			const response = await axiosInstance.get(
+				`/agencies/${agency_id}/service/${service_id}/shipping-rates`,
+				{
+					params: {
+						rate_type,
+						...(is_active !== undefined && { is_active }),
+						...(rate_type !== undefined && { rate_type }),
+					},
+				},
+			);
+			return response.data;
+		},
+
 		update: async (id: number, data: Agency) => {
 			const response = await axiosInstance.put(`/agencies/${id}`, data);
 			return response.data;
@@ -323,6 +346,16 @@ const api = {
 		get: async (page: number | 1, limit: number | 25) => {
 			const response = await axiosInstance.get("/customs-rates", {
 				params: {
+					page: page + 1,
+					limit: limit,
+				},
+			});
+			return response.data;
+		},
+		search: async (query: string, page: number | 1, limit: number | 25) => {
+			const response = await axiosInstance.get("/customs-rates/search", {
+				params: {
+					query,
 					page: page + 1,
 					limit: limit,
 				},
@@ -367,13 +400,13 @@ const api = {
 			const response = await axiosInstance.post("/shipping-rates", data);
 			return response.data;
 		},
-		update: async (id: number, data: ShippingRate) => {
-			const response = await axiosInstance.put(`/shipping-rates/${id}`, data);
+		update: async (data: ShippingRate) => {
+			const response = await axiosInstance.put(`/shipping-rates/${data.id}`, data);
 			return response.data;
 		},
-		getByAgencyIdAndServiceId: async (agency_id: number, service_id: number) => {
+		getFixedRatesForAgencyAndService: async (agency_id: number, service_id: number) => {
 			const response = await axiosInstance.get(
-				`/shipping-rates/agency/${agency_id}/service/${service_id}`,
+				`/shipping-rates/agency/${agency_id}/service/${service_id}/fixed`,
 			);
 			return response.data;
 		},

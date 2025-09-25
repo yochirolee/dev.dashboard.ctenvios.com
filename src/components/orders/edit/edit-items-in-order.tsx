@@ -2,80 +2,58 @@ import { useForm, useFieldArray } from "react-hook-form";
 import { useEffect, useState } from "react";
 import { useInvoiceStore } from "@/stores/invoice-store";
 import { useShallow } from "zustand/react/shallow";
-import { Table, TableRow, TableHeader, TableCaption, TableHead, TableBody } from "../ui/table";
-import { CardContent, CardHeader, CardTitle, Card } from "../ui/card";
-import { Button } from "../ui/button";
+import {
+	Table,
+	TableRow,
+	TableHeader,
+	TableCaption,
+	TableHead,
+	TableBody,
+} from "@/components/ui/table";
+import { CardContent, CardHeader, CardTitle, Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { Trash, PackagePlus, Loader2, PlusCircle, Scale, BoxIcon } from "lucide-react";
-import ItemRow from "./item-row";
+import ItemRow from "@/components/orders/edit/edit-item-row";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
-import { invoiceSchema } from "@/data/types";
+import { invoiceSchema, type Invoice } from "@/data/types";
 import { useInvoices } from "@/hooks/use-invoices";
-import { Input } from "../ui/input";
+import { Input } from "@/components/ui/input";
 import { useAppStore } from "@/stores/app-store";
-import { Separator } from "../ui/separator";
-import { ChargeDialog, DiscountDialog, InsuranceFeeDialog } from "./order-dialogs";
-import { useShippingRates } from "@/hooks/use-shipping-rates";
+import { Separator } from "@/components/ui/separator";
+import {
+	ChargeDialog,
+	DiscountDialog,
+	InsuranceFeeDialog,
+} from "@/components/orders/order-dialogs";
 import { centsToDollars } from "@/lib/utils";
 
 type FormValues = z.infer<typeof invoiceSchema>;
 
-export function ItemsInOrder() {
+export function EditItemsInOrder({ invoice }: { invoice: Invoice }) {
 	const navigate = useNavigate();
 	const session = useAppStore((state) => state.session);
-	const [items_count, setItemsCount] = useState(1);
+	let { items, customer, receiver, service } = invoice;
+	const [items_count, setItemsCount] = useState(items?.length || 1);
 	const [dialogState, setDialogState] = useState({
 		type: "" as "insurance" | "charge" | "rate" | "",
 		index: 0 as number,
 	});
 
-	const {
-		selectedCustomer,
-		selectedReceiver,
-		selectedService,
-		setSelectedCustomer,
-		setSelectedReceiver,
-		setSelectedService,
-	} = useInvoiceStore(
-		useShallow((state) => ({
-			selectedCustomer: state.selectedCustomer,
-			selectedReceiver: state.selectedReceiver,
-			setSelectedCustomer: state.setSelectedCustomer,
-			setSelectedReceiver: state.setSelectedReceiver,
-			setSelectedService: state.setSelectedService,
-			selectedService: state.selectedService,
-		})),
-	);
-
-	const { data: rate, isLoading: isLoadingBaseRate } = useShippingRates.getBaseRate(
-		session?.user?.agency_id || 0,
-		selectedService?.id || 0,
-	);
+	console.log(items, "items");
 
 	const form = useForm<FormValues>({
 		resolver: zodResolver(invoiceSchema) as any,
 		defaultValues: {
-			customer_id: selectedCustomer?.id || 0,
-			receiver_id: selectedReceiver?.id || 0,
+			customer_id: customer?.id || 0,
+			receiver_id: receiver?.id || 0,
 			agency_id: session?.user?.agency_id || 0,
 			user_id: session?.user?.id || "",
-			service_id: selectedService?.id || 0,
+			service_id: service?.id || 0,
 
-			items: [
-				{
-					description: "",
-					weight: undefined,
-					rate_in_cents: rate?.rate_in_cents || 0,
-					rate_id: rate?.id || 0,
-					rate_type: rate?.rate_type || "WEIGHT",
-					insurance_fee_in_cents: 0,
-					customs_fee_in_cents: 0,
-					carge_fee_in_cents: 0,
-					customs_id: 0,
-				},
-			],
+			items: items,
 		},
 	});
 
@@ -88,22 +66,21 @@ export function ItemsInOrder() {
 		setItemsCount(fields.length);
 	}, [fields]);
 
-
-	console.log(rate, "rate");
+	console.log(service?.rate, "rate");
 
 	// Update form values when rate data becomes available
 	useEffect(() => {
-		if (rate?.rate_in_cents && rate?.id) {
+		if (service?.rate?.rate_in_cents && service?.rate?.id) {
 			const currentItems = form.getValues("items");
 			const updatedItems = currentItems.map((item) => ({
 				...item,
-				rate_in_cents: rate.rate_in_cents,
-				rate_type: rate.rate_type,
-				rate_id: rate.id,
+				rate_in_cents: service?.rate?.rate_in_cents,
+				rate_type: service?.rate?.rate_type,
+				rate_id: service?.rate?.id,
 			}));
 			form.setValue("items", updatedItems);
 		}
-	}, [rate, form]);
+	}, [service?.rate, form]);
 
 	const handleAddItem = () => {
 		// Simply add the number of items needed to reach the target count
@@ -115,9 +92,9 @@ export function ItemsInOrder() {
 				append({
 					description: "",
 					weight: undefined,
-					rate_id: rate?.id || 0,
-					rate_in_cents: rate?.rate_in_cents || 0,
-					rate_type: rate?.rate_type || "WEIGHT",
+					rate_id: service?.rate?.id || 0,
+					rate_in_cents: service?.rate?.rate_in_cents || 0,
+					rate_type: service?.rate?.rate_type || "WEIGHT",
 					insurance_fee_in_cents: 0,
 					customs_fee_in_cents: 0,
 					carge_fee_in_cents: 0,
@@ -147,9 +124,10 @@ export function ItemsInOrder() {
 	const { mutate: createInvoice, isPending: isCreatingInvoice } = useInvoices.create({
 		onSuccess: (data) => {
 			form.reset();
-			setSelectedCustomer(null);
-			setSelectedReceiver(null);
-			setSelectedService(null);
+			customer = null;
+			receiver = null;
+			service = null;
+		
 			toast.success("Orden creada correctamente");
 
 			console.log(data, "invoice Created");
@@ -161,11 +139,11 @@ export function ItemsInOrder() {
 	});
 
 	const handleSubmit = (data: FormValues) => {
-		data.service_id = selectedService?.id || 0;
+		data.service_id = service?.id || 0;
 		data.agency_id = session?.user?.agency_id || 0;
 		data.user_id = session?.user?.id || "";
-		data.customer_id = selectedCustomer?.id || 0;
-		data.receiver_id = selectedReceiver?.id || 0;
+		data.customer_id = customer?.id || 0;
+		data.receiver_id = receiver?.id || 0;
 		console.log(data, "form DATA on submit");
 		createInvoice(data);
 	};
@@ -178,8 +156,8 @@ export function ItemsInOrder() {
 
 	console.log("re -render");
 
-	if (isLoadingBaseRate) {
-		return <div>Loading...</div>;
+	if (service?.rate) {
+		return <div>Loading Rate...</div>;
 	}
 
 	return (

@@ -4,10 +4,10 @@ import { useShallow } from "zustand/react/shallow";
 
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
-import { CogIcon, Plane, Ship } from "lucide-react";
+import { Plane, Ship } from "lucide-react";
 import { useAppStore } from "@/stores/app-store";
 import { useServices } from "@/hooks/use-services";
-import { Skeleton } from "../ui/skeleton";
+import { Loading } from "../shares/loading";
 
 // Extended Service interface to match API response
 interface Service {
@@ -56,11 +56,7 @@ export function ServiceSelector() {
 	return (
 		<>
 			{isLoadingServices ? (
-				<Skeleton className="w-full h-1/4 rounded-lg grid items-center justify-center">
-					<div className="flex items-center gap-2">
-						<CogIcon size={20} className="animate-spin" /> Loading...
-					</div>
-				</Skeleton>
+				<Loading />
 			) : (
 				<Card>
 					<CardHeader>

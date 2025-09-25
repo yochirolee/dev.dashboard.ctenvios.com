@@ -2,14 +2,13 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { useAgencies } from "@/hooks/use-agencies";
 import { Separator } from "../ui/separator";
 import { Badge } from "../ui/badge";
-import { AgencyRates } from "./agency-rates";
-import { Skeleton } from "../ui/skeleton";
 import { AgenciesRatesForm } from "./agencies-rates-form";
 import { ShareDialog } from "../shares/share-dialog";
 import { useState } from "react";
-import { Table, TableBody, TableHead, TableHeader, TableRow } from "../ui/table";
+import { Skeleton } from "../ui/skeleton";
+import { AgencyRates } from "./agency-rates";
 
-export default function AgencyServiceRates({ agencyId }: { agencyId: number }) {
+export default function AgencyServices({ agencyId }: { agencyId: number }) {
 	const { data: services, isLoading } = useAgencies.getServices(agencyId);
 	const [openDialogs, setOpenDialogs] = useState<Record<number, boolean>>({});
 
@@ -20,7 +19,9 @@ export default function AgencyServiceRates({ agencyId }: { agencyId: number }) {
 		}));
 	};
 
-	if (isLoading) return <Skeleton className="h-[200px] w-full" />;
+	console.log(services, "services");
+
+	if (isLoading) return <Skeleton />;
 
 	return (
 		<Card>
@@ -67,24 +68,7 @@ export default function AgencyServiceRates({ agencyId }: { agencyId: number }) {
 								/>
 							</ShareDialog>
 						</div>
-						{service?.rates?.length > 0 && (
-							<Table>
-								<TableHeader>
-									<TableRow>
-										<TableHead>Nombre</TableHead>
-										<TableHead>Costo Agencia</TableHead>
-										<TableHead>Venta al Público</TableHead>
-										<TableHead>Profit</TableHead>
-										<TableHead className="w-10 text-right"></TableHead>
-									</TableRow>
-								</TableHeader>
-								<TableBody>
-									{service?.rates?.map((rate: any) => (
-										<AgencyRates key={rate.id} rate={rate} />
-									))}
-								</TableBody>
-							</Table>
-						)}
+						<AgencyRates serviceId={service.id || 0} agencyId={agencyId || 0} />
 					</div>
 				))}
 			</CardContent>

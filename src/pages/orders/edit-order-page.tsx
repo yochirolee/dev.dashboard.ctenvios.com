@@ -6,7 +6,7 @@ import { CustomerInformation } from "@/components/orders/customer/customer-infor
 import { ReceiverInformation } from "@/components/orders/receiver/receiver-information";
 import { ReceiverFormDialog } from "@/components/orders/receiver/receiver-form-dialog";
 import { CustomerFormDialog } from "@/components/orders/customer/customer-form-dialog";
-import { ItemsInOrder } from "@/components/orders/items-in-order";
+import { EditItemsInOrder } from "@/components/orders/edit/edit-items-in-order";
 import { useParams } from "react-router-dom";
 import { useInvoices } from "@/hooks/use-invoices";
 import { useInvoiceStore } from "@/stores/invoice-store";
@@ -16,16 +16,18 @@ export function EditOrderPage() {
 	const params = useParams();
 	const orderId = Number(params.invoiceId);
 	const { data, isLoading } = useInvoices.getById(orderId);
-	const invoice = data?.rows[0];
+
+	const invoice = data?.rows[0] || null;
+
 	const { setSelectedCustomer, setSelectedRate, setSelectedService, setSelectedReceiver } =
 		useInvoiceStore();
 
 	useEffect(() => {
-		setSelectedCustomer(invoice?.customer);
-		setSelectedService(invoice?.service);
-		setSelectedRate(invoice?.service?.rate);
-		setSelectedReceiver(invoice?.receiver);
-	}, [orderId]);
+		setSelectedCustomer(data?.rows[0]?.customer);
+		setSelectedService(data?.rows[0]?.service);
+		setSelectedRate(data?.rows[0]?.service?.rate);
+		setSelectedReceiver(data?.rows[0]?.receiver);
+	}, [orderId, data]);
 
 	if (isLoading) return <div>Loading...</div>;
 
@@ -65,7 +67,7 @@ export function EditOrderPage() {
 			</div>
 
 			<ServiceSelector />
-			<ItemsInOrder />
+			<EditItemsInOrder invoice={invoice} />
 		</div>
 	);
 }

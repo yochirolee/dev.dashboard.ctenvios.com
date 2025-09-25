@@ -1,7 +1,7 @@
 import * as React from "react";
 import { Check, ChevronsUpDown, Loader2 } from "lucide-react";
 
-import { cn } from "@/lib/utils";
+import { cn, formatFullName } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
 	Command,
@@ -13,7 +13,6 @@ import {
 } from "@/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useCustomers } from "@/hooks/use-customers";
-import { useDebounce } from "use-debounce";
 import type { Customer } from "@/data/types";
 
 import { useInvoiceStore } from "@/stores/invoice-store";
@@ -22,9 +21,8 @@ import { useShallow } from "zustand/react/shallow";
 export const CustomerCombobox = React.memo(function CustomerCombobox() {
 	const [open, setOpen] = React.useState(false);
 	const [searchQuery, setSearchQuery] = React.useState("");
-	const [debouncedSearchQuery] = useDebounce(searchQuery, 500);
+	const { data, isLoading } = useCustomers.search(searchQuery, 0, 50);
 
-	const { data, isLoading } = useCustomers.search(debouncedSearchQuery, 0, 100);
 	const { selectedCustomer, setSelectedCustomer } = useInvoiceStore(
 		useShallow((state) => ({
 			selectedCustomer: state.selectedCustomer,
@@ -56,9 +54,16 @@ export const CustomerCombobox = React.memo(function CustomerCombobox() {
 					className="flex-1 justify-between"
 				>
 					{selectedCustomer?.id
-						? `${selectedCustomer.first_name} ${selectedCustomer.middle_name || ""} ${
-								selectedCustomer.last_name
-						  } ${selectedCustomer.second_last_name || ""} - ${selectedCustomer.mobile}`
+						? [
+								selectedCustomer.first_name,
+								selectedCustomer.middle_name,
+								selectedCustomer.last_name,
+								selectedCustomer.second_last_name,
+						  ]
+								.filter(Boolean)
+								.join(" ") +
+						  " - " +
+						  selectedCustomer.mobile
 						: "Seleccionar cliente..."}
 					<ChevronsUpDown className="opacity-50" />
 				</Button>
@@ -88,9 +93,14 @@ export const CustomerCombobox = React.memo(function CustomerCombobox() {
 										handlePopoverClose();
 									}}
 								>
-									{customer?.first_name} {customer?.middle_name || ""} {customer?.last_name}{" "}
-									{customer?.second_last_name || ""} -{" "}
-									{customer?.mobile ? customer?.mobile : customer?.phone}
+									{formatFullName(
+										customer?.first_name,
+										customer?.middle_name,
+										customer?.last_name,
+										customer?.second_last_name,
+									)	 +
+										" - " +
+										(customer?.mobile || customer?.phone)}
 									<Check
 										className={cn(
 											"ml-auto",

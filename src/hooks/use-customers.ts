@@ -1,12 +1,16 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import api from "@/api/api";
 import type { Customer } from "@/data/types";
+import { useDebounce } from "use-debounce";
 
 export const useCustomers = {
 	search: (query: string, page: number, limit: number) => {
+		const [queryDebounced] = useDebounce(query, 500);
 		return useQuery({
-			queryKey: ["customers", query, page, limit],
-			queryFn: () => api.customer.search(query, page, limit),
+			queryKey: ["customers", queryDebounced, page, limit],
+			queryFn: () => api.customer.search(queryDebounced, page, limit),
+			refetchOnWindowFocus: false,
+			staleTime: 1000 * 60 * 5,
 		});
 	},
 	get: (page: number, limit: number) => {

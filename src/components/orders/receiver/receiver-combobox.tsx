@@ -1,7 +1,7 @@
 import * as React from "react";
 import { Check, ChevronsUpDown, Loader2 } from "lucide-react";
 
-import { cn } from "@/lib/utils";
+import { cn, formatFullName } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
 	Command,
@@ -54,11 +54,12 @@ export function ReceiverCombobox() {
 					className="flex-1  justify-between"
 				>
 					{selectedReceiver?.id
-						? selectedReceiver.first_name +
-						  " " +
-						  selectedReceiver.last_name +
-						  " " +
-						  selectedReceiver.second_last_name +
+						? formatFullName(
+								selectedReceiver.first_name,
+								selectedReceiver.middle_name,
+								selectedReceiver.last_name,
+								selectedReceiver.second_last_name,
+						  )	 +
 						  " - " +
 						  (selectedReceiver.mobile || selectedReceiver.phone)
 						: "Seleccionar cliente..."}
@@ -91,11 +92,14 @@ export function ReceiverCombobox() {
 										setOpen(false);
 									}}
 								>
-									{receiver?.first_name +
-										" " +
-										receiver?.last_name +
-										" " +
-										receiver?.second_last_name +
+									{[
+										receiver?.first_name,
+										receiver?.middle_name,
+										receiver?.last_name,
+										receiver?.second_last_name,
+									]
+										.filter(Boolean)
+										.join(" ") +
 										" - " +
 										(receiver?.mobile || receiver?.phone)}
 									<Check

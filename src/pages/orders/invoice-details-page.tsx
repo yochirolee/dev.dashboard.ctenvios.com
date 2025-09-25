@@ -10,6 +10,7 @@ import {
 	Ship,
 	ChevronLeft,
 	Edit,
+	FileWarning,
 } from "lucide-react";
 import {
 	Table,
@@ -26,38 +27,47 @@ import OrderHistory from "@/components/orders/order/order-history";
 import { Separator } from "@/components/ui/separator";
 
 import { PaymentForm } from "@/components/orders/payments/payment-form";
-import { cn, centsToDollars } from "@/lib/utils";
+import { cn, centsToDollars, calculate_row_subtotal, formatFullName } from "@/lib/utils";
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
+import { Loading } from "@/components/shares/loading";
 
 const baseUrl = import.meta.env.VITE_API_URL;
 
 export default function InvoiceDetailsPage() {
 	const { invoiceId } = useParams();
 	const navigate = useNavigate();
-	const { data, isLoading } = useInvoices.getById(Number(invoiceId));
-	const invoice = data?.rows[0];
+	const { data, isLoading, error } = useInvoices.getById(Number(invoiceId));
+	const invoice = data?.rows[0] || null;
 
 	console.log(invoice, "invoice");
 
-	const calculateRowSubtotal = (item: any) => {
-		switch (item.rate?.rate_type) {
-			case "WEIGHT":
-				return (
-					item.rate_in_cents * item.weight +
-					item.customs_fee_in_cents +
-					item.delivery_fee_in_cents +
-					item.insurance_fee_in_cents
-				);
-			case "FIXED":
-				return item.rate_in_cents;
-		}
-	};
-	const subtotal = invoice?.items.reduce((acc: number, item: any) => acc + calculateRowSubtotal(item), 0);
-	const total_weight = invoice?.items.reduce((acc: number, item: any) => acc + item?.weight, 0);
+	if (error) {
+		return <div>Error: {error.message}</div>;
+	}
 
-	console.log(invoice);
+	const subtotal = invoice?.items.reduce(
+		(acc: number, item: any) =>
+			acc +
+			calculate_row_subtotal(
+				item?.rate_in_cents,
+				item?.weight,
+				item?.customs_fee_in_cents,
+				item?.charge_fee_in_cents,
+				item?.rate?.rate_type,
+			),
+		0,
+	);
 
-	if (isLoading) return <div>Loading...</div>;
-	return (
+	console.log(subtotal, "subtotal");
+	const total_weight = invoice?.items.reduce(
+		(acc: number, item: any) => acc + item?.weight || 0,
+		0,
+	);
+
+	console.log(invoice, error);
+
+	if (isLoading) return <Loading />;
+	return invoice ? (
 		<div className="space-y-6 ">
 			<div className="grid grid-cols-1 xl:grid-cols-12 gap-4">
 				<div className="p-4 col-span-1 xl:col-span-9 rounded-lg shadow-lg print:shadow-none bg-card print:bg-white print:py-0 print:text-gray-500">
@@ -148,8 +158,8 @@ export default function InvoiceDetailsPage() {
 						<div className=" flex w-full flex-col  justify-end text-center xl:text-end">
 							<h1 className="xl:text-xl text-end font-bold ">Invoice {invoice?.id}</h1>
 							<div className="flex items-center gap-2 text-end justify-end">
-								<span className="xl:text-lg text-end">{total_weight.toFixed(2)} lbs</span>
-								<span className="xl:text-lg text-end">Items: {invoice?.items.length}</span>
+								<span className="xl:text-lg text-end">{total_weight?.toFixed(2) || 0} lbs</span>
+								<span className="xl:text-lg text-end">Items: {invoice?.items?.length || 0}</span>
 							</div>
 							<time className="text-sm text-end text-muted-foreground">
 								Fecha: {format(new Date(invoice?.created_at), "dd/MM/yyyy HH:mm a")}
@@ -163,8 +173,12 @@ export default function InvoiceDetailsPage() {
 									<User size={16} />
 								</span>
 								<span>
-									{invoice?.customer?.first_name} {invoice?.customer?.middle_name}{" "}
-									{invoice?.customer?.last_name} {invoice?.customer?.second_last_name}
+									{formatFullName(
+										invoice?.customer?.first_name,
+										invoice?.customer?.middle_name,
+										invoice?.customer?.last_name,
+										invoice?.customer?.second_last_name,
+									)}
 								</span>
 							</li>
 							<li className="flex items-center gap-2 justify-start">
@@ -187,8 +201,12 @@ export default function InvoiceDetailsPage() {
 									<User size={16} />
 								</span>
 								<span>
-									{invoice?.receiver?.first_name} {invoice?.receiver?.middle_name}{" "}
-									{invoice?.receiver?.last_name} {invoice?.receiver?.second_last_name}
+									{formatFullName(
+										invoice?.receiver?.first_name,
+										invoice?.receiver?.middle_name,
+										invoice?.receiver?.last_name,
+										invoice?.receiver?.second_last_name,
+									)}
 								</span>
 							</li>
 							<li className="flex items-center gap-2 justify-start">
@@ -212,9 +230,9 @@ export default function InvoiceDetailsPage() {
 								<TableHead className="w-20 text-muted-foreground">HBL</TableHead>
 								<TableHead className="w-full text-muted-foreground">Descripción</TableHead>
 								<TableHead className="text-right w-14 text-muted-foreground">Seguro</TableHead>
-								<TableHead className="text-right w-14 text-muted-foreground">Delivery</TableHead>
+								<TableHead className="text-right w-14 text-muted-foreground">Cargo</TableHead>
 								<TableHead className="text-right w-14 text-muted-foreground">Arancel</TableHead>
-								<TableHead className="text-right w-14 text-muted-foreground">Precio</TableHead>
+								<TableHead className="text-right w-14 text-muted-foreground">Rate</TableHead>
 								<TableHead className="text-right w-14 text-muted-foreground">Peso</TableHead>
 								<TableHead className="text-right w-14 text-muted-foreground">Subtotal</TableHead>
 							</TableRow>
@@ -236,9 +254,18 @@ export default function InvoiceDetailsPage() {
 									<TableCell className="text-right">
 										${centsToDollars(item?.rate_in_cents).toFixed(2)}
 									</TableCell>
-									<TableCell className="text-right">{item?.weight.toFixed(2)}</TableCell>
+									<TableCell className="text-right">{item?.weight?.toFixed(2)}</TableCell>
 									<TableCell className="text-right">
-										${centsToDollars(calculateRowSubtotal(item)).toFixed(2)}
+										$
+										{centsToDollars(
+											calculate_row_subtotal(
+												item?.rate_in_cents,
+												item?.weight,
+												item?.customs_fee_in_cents,
+												item?.charge_fee_in_cents,
+												item.rate.rate_type,
+											),
+										).toFixed(2)}
 									</TableCell>
 								</TableRow>
 							))}
@@ -262,7 +289,7 @@ export default function InvoiceDetailsPage() {
 							<ul className="flex flex-col w-1/2  xl:w-1/4 xl:mr-4 py-4 justify-end gap-2 border-t border-dashed  ">
 								<li className="flex items-center gap-4 justify-between">
 									<span className="text-muted-foreground">Subtotal</span>
-									<span>${ centsToDollars(subtotal).toFixed(2) ?? 0.0}</span>
+									<span>${centsToDollars(subtotal)?.toFixed(2) ?? 0.0}</span>
 								</li>
 
 								<li className="flex items-center justify-between">
@@ -280,7 +307,7 @@ export default function InvoiceDetailsPage() {
 
 								<li className="flex items-center justify-between font-semibold">
 									<span className="text-muted-foreground">Total</span>
-									<span>${centsToDollars(invoice?.total_in_cents).toFixed(2)}</span>
+									<span>${centsToDollars(invoice?.total_in_cents)?.toFixed(2)}</span>
 								</li>
 								<Separator />
 								<li className="flex text-sm items-center justify-between ">
@@ -292,7 +319,7 @@ export default function InvoiceDetailsPage() {
 												: "text-muted-foreground",
 										)}
 									>
-										${centsToDollars(invoice?.paid_in_cents).toFixed(2) ?? 0.0}
+										${centsToDollars(invoice?.paid_in_cents)?.toFixed(2) ?? 0.0}
 									</span>
 								</li>
 								<li className="flex text-sm items-center justify-between">
@@ -305,7 +332,7 @@ export default function InvoiceDetailsPage() {
 										)}
 									>
 										$
-										{centsToDollars(invoice?.total_in_cents - invoice?.paid_in_cents).toFixed(2) ??
+										{centsToDollars(invoice?.total_in_cents - invoice?.paid_in_cents)?.toFixed(2) ??
 											0.0}
 									</span>
 								</li>
@@ -330,5 +357,21 @@ export default function InvoiceDetailsPage() {
 				<OrderHistory invoice={invoice} />
 			</div>
 		</div>
+	) : (
+		<Card className="flex justify-center items-center h-full">
+			<CardContent className="flex flex-col gap-4 items-center">
+				<FileWarning className="w-10 h-10 text-red-500" />
+				<h2 className="text-center font-bold">No invoice found</h2>
+				<p className="text-center text-muted-foreground">Please try again later</p>
+			</CardContent>
+			<CardFooter>
+				<div className="flex gap-4">
+					<Button variant="outline" onClick={() => navigate("/orders/list")}>
+						Go to orders
+					</Button>
+					<Button onClick={() => navigate("/orders/new")}>Create order</Button>
+				</div>
+			</CardFooter>
+		</Card>
 	);
 }

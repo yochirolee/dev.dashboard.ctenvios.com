@@ -3,7 +3,7 @@ import { AgenciesCombobox } from "@/components/agencies/agencies-combobox";
 import { AgencyDetails } from "@/components/agencies/agency-details";
 
 import AgencyUsers from "@/components/agencies/agency-users";
-import AgencyServiceRates from "@/components/agencies/agency-service-rates";
+import AgencyServices from "@/components/agencies/agency-services";
 import { useEffect, useState } from "react";
 import { useAgencies } from "@/hooks/use-agencies";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -15,6 +15,7 @@ export const AgenciesPage = () => {
 	const navigate = useNavigate();
 	const { data: agencies = [], isLoading, error } = useAgencies.get();
 	const [selectedAgency, setSelectedAgency] = useState<Agency | null>(agencies[0] ?? null);
+
 
 	useEffect(() => {
 		setSelectedAgency(agencies[0] as Agency);
@@ -59,7 +60,7 @@ export const AgenciesPage = () => {
 						<AgencyUsers agency_id={selectedAgency.id ?? 0} />
 					</div>
 					<div className="col-span-3 space-y-4">
-						<AgencyServiceRates agencyId={selectedAgency.id ?? 0} />
+						<AgencyServices  agencyId={selectedAgency.id ?? 0} />
 					</div>
 				</div>
 			)}

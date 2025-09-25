@@ -55,3 +55,33 @@ export function formatCents(
 ): string {
 	return new Intl.NumberFormat(locale, { style: "currency", currency }).format(cents / 100);
 }
+
+export function formatFullName(
+	firstName?: string,
+	middleName?: string,
+	lastName?: string,
+	secondLastName?: string,
+): string {
+	return [firstName, middleName, lastName, secondLastName].filter(Boolean).join(" ");
+}
+
+export const calculate_row_subtotal = (
+	rate_in_cents: number,
+	weight: number,
+	customs_fee_in_cents: number,
+	charge_fee_in_cents: number,
+	rate_type: string,
+) => {
+	// Ensure all values are valid numbers
+	const safeRateInCents = Number(rate_in_cents) || 0;
+	const safeWeight = Number(weight) || 0;
+	const safeCustomsFeeInCents = Number(customs_fee_in_cents) || 0;
+	const safeChargeFeeInCents = charge_fee_in_cents || 0;
+
+	console.log(safeRateInCents, safeWeight, safeCustomsFeeInCents, safeChargeFeeInCents, rate_type);
+	if (rate_type === "WEIGHT") {
+		return safeRateInCents * safeWeight + safeCustomsFeeInCents + safeChargeFeeInCents;
+	} else {
+		return safeRateInCents + safeCustomsFeeInCents;
+	}
+};

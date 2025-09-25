@@ -9,9 +9,11 @@ import { Loader2, X } from "lucide-react";
 import { useShippingRates } from "@/hooks/use-shipping-rates";
 import type { ShippingRate } from "@/data/types";
 import { useAppStore } from "@/stores/app-store";
+import { centsToDollars, dollarsToCents } from "@/lib/utils";
 
 const agenciesRatesSchema = z
 	.object({
+		id: z.number().optional(),
 		name: z.string().min(1, { message: "El nombre es requerido" }),
 		rate_id: z.number().optional(),
 		agency_id: z.number().optional(),
@@ -19,8 +21,8 @@ const agenciesRatesSchema = z
 		cost_in_cents: z.number().min(0, { message: "El precio público debe ser mayor a 0" }),
 		service_id: z.number().optional(),
 	})
-	.refine((data) => data.cost_in_cents >= data.rate_in_cents, {
-		message: "El precio público debe ser mayor o igual al precio de la agencia",
+	.refine((data) => data.rate_in_cents >= data.cost_in_cents, {
+		message: "El precio de venta debe ser mayor o igual al precio de costo para la agencia",
 		path: ["cost_in_cents"],
 	});
 
@@ -31,7 +33,7 @@ export const AgenciesRatesForm = ({
 	setOpen,
 	mode,
 }: {
-	rate: any;
+	rate: ShippingRate;
 	setOpen: (open: boolean) => void;
 	mode: "create" | "update";
 }) => {
@@ -48,20 +50,24 @@ export const AgenciesRatesForm = ({
 						service_id: rate.service_id,
 				  }
 				: {
+						id: rate.id,
 						name: rate.name,
 						rate_id: rate.id,
 						agency_id: rate.agency_id,
-						rate_in_cents: rate.rate_in_cents / 100,
-						cost_in_cents: rate.cost_in_cents / 100,
+						rate_in_cents: centsToDollars(rate.rate_in_cents),
+						cost_in_cents: centsToDollars(rate.cost_in_cents),
 				  },
 	});
 	//kkk
 	const { mutate: updateRate, isPending: isUpdating } = useShippingRates.update();
 	const { mutate: createRate, isPending: isCreating } = useShippingRates.create();
 	const isPending = isUpdating || isCreating;
+
 	const onSubmit = (data: AgenciesRatesSchema) => {
+		data.rate_in_cents = dollarsToCents(data.rate_in_cents);
+		data.cost_in_cents = dollarsToCents(data.cost_in_cents);
 		mode === "update"
-			? updateRate({ id: rate.id, data: data as unknown as ShippingRate })
+			? updateRate({ data: data as unknown as ShippingRate })
 			: createRate(data as unknown as ShippingRate);
 		form.reset();
 		setOpen(false);
@@ -89,7 +95,7 @@ export const AgenciesRatesForm = ({
 					name="cost_in_cents"
 					render={({ field }) => (
 						<FormItem>
-							<FormLabel>Precio Agencia</FormLabel>
+							<FormLabel>Costo Agencia</FormLabel>
 							<FormControl>
 								<Input
 									disabled={
@@ -101,7 +107,7 @@ export const AgenciesRatesForm = ({
 										field.onChange(e);
 										form.setValue("cost_in_cents", parseFloat(e.target.value));
 									}}
-									placeholder="Precio Agencia"
+									placeholder="Costo"
 								/>
 							</FormControl>
 							<FormMessage />
@@ -113,7 +119,7 @@ export const AgenciesRatesForm = ({
 					name="rate_in_cents"
 					render={({ field }) => (
 						<FormItem>
-							<FormLabel>Precio Costo</FormLabel>
+							<FormLabel>Precio Venta</FormLabel>
 							<FormControl>
 								<Input
 									type="number"

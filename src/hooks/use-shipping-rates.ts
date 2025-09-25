@@ -20,13 +20,19 @@ export const useShippingRates = {
 	update: () => {
 		const queryClient = useQueryClient();
 		return useMutation({
-			mutationFn: ({ id, data }: { id: number; data: ShippingRate }) => {
-				console.log(data, "ShippingRates data in Hook");
-				return api.shippingRates.update(id, data);
+			mutationFn: ({ data }: { data: ShippingRate }) => {
+				console.log(data, "data on update");
+				return api.shippingRates.update(data);
 			},
-			onSuccess: () => {
-				queryClient.invalidateQueries({ queryKey: ["get-agency-by-id"] });
+			onSuccess: (data: ShippingRate) => {
+				console.log(data, "data on update success");
+				queryClient.invalidateQueries({
+					queryKey: ["get-service-shipping-rates", data.agency_id, data.service_id],
+				});
 				toast.success("ShippingRate actualizada correctamente");
+			},
+			onError: (error) => {
+				toast.error(error.message);
 			},
 		});
 	},
@@ -37,10 +43,10 @@ export const useShippingRates = {
 			enabled: !!agency_id && !!service_id,
 		});
 	},
-	getByAgencyIdAndServiceId: (agency_id: number, service_id: number) => {
+	getFixedRatesForAgencyAndService: (agency_id: number, service_id: number) => {
 		return useQuery({
-			queryKey: ["get-shipping-rates-by-agency-id-and-service-id", agency_id, service_id],
-			queryFn: () => api.shippingRates.getByAgencyIdAndServiceId(agency_id, service_id),
+			queryKey: ["get-fixed_rates", agency_id, service_id],
+			queryFn: () => api.shippingRates.getFixedRatesForAgencyAndService(agency_id, service_id),
 			enabled: !!agency_id && !!service_id,
 		});
 	},

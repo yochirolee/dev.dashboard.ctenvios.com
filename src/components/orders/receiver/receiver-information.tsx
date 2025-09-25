@@ -2,6 +2,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useInvoiceStore } from "@/stores/invoice-store";
 import { useShallow } from "zustand/react/shallow";
+import { formatFullName } from "@/lib/utils";
 import { Separator } from "@/components/ui/separator";
 
 export function ReceiverInformation() {
@@ -12,9 +13,13 @@ export function ReceiverInformation() {
 		})),
 	);
 
-	const fullName = `${selectedReceiver?.first_name || ""} ${selectedReceiver?.middle_name || ""} ${
-		selectedReceiver?.last_name || ""
-	} ${selectedReceiver?.second_last_name || ""}`;
+	const fullName = formatFullName(
+		selectedReceiver?.first_name,
+		selectedReceiver?.middle_name,
+		selectedReceiver?.last_name,
+		selectedReceiver?.second_last_name,
+	);
+
 	return (
 		<>
 			{selectedReceiver && (

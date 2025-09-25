@@ -1,11 +1,14 @@
 import * as React from "react";
 import {
 	AudioWaveform,
+	BoxIcon,
 	Command,
 	FileBox,
 	GalleryVerticalEnd,
 	HomeIcon,
 	Settings2,
+	Sparkles,
+	Warehouse,
 } from "lucide-react";
 
 import { NavMain } from "@/components/nav-main";
@@ -21,7 +24,7 @@ import {
 import { Link } from "react-router-dom";
 import { Button } from "./ui/button";
 import { useLocation } from "react-router-dom";
-
+import { NavMarketplace } from "./nav-marketplace";
 // This is sample data.
 const data = {
 	user: {
@@ -63,7 +66,25 @@ const data = {
 				},
 			],
 		},
-
+		{
+			title: "Logistica",
+			url: "#",
+			icon: Warehouse,
+			items: [
+				{
+					title: "Despachos",
+					url: "/logistics/dispatch",
+				},
+				{
+					title: "Contenedores",
+					url: "/logistics/containers",
+				},
+				{
+					title: "Vuelos",
+					url: "/logistics/flights",
+				},
+			],
+		},
 		{
 			title: "Settings",
 			url: "#",
@@ -96,6 +117,40 @@ const data = {
 			],
 		},
 	],
+
+	marketplace: [
+		{
+			title: "Sales",
+			url: "#",
+			icon: Sparkles,
+
+			items: [
+				{
+					title: "Crear Orden",
+					url: "/orders/new",
+				},
+				{
+					title: "Ordenes",
+					url: "/orders/list",
+				},
+			],
+		},
+		{
+			title: "Manage Products",
+			url: "#",
+			icon: BoxIcon,
+			items: [
+				{
+					title: "Providers",
+					url: "/settings/providers",
+				},
+				{
+					title: "Agencies",
+					url: "/settings/agencies",
+				},
+			],
+		},
+	],
 };
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
@@ -117,6 +172,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 					</Button>
 				</Link>
 				<NavMain items={data.navMain} />
+				<NavMarketplace items={data.marketplace} />
 			</SidebarContent>
 			<SidebarFooter>
 				<NavUser />
