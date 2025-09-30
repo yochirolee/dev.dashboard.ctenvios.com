@@ -9,7 +9,7 @@ import { Skeleton } from "../ui/skeleton";
 import { AgencyRates } from "./agency-rates";
 
 export default function AgencyServices({ agencyId }: { agencyId: number }) {
-	const { data: services, isLoading } = useAgencies.getServices(agencyId);
+	const { data: services, isLoading } = useAgencies.getServiceswithShippingRates(agencyId);
 	const [openDialogs, setOpenDialogs] = useState<Record<number, boolean>>({});
 
 	const handleDialogOpen = (serviceId: number, open: boolean): void => {
@@ -19,8 +19,7 @@ export default function AgencyServices({ agencyId }: { agencyId: number }) {
 		}));
 	};
 
-	console.log(services, "services");
-
+	
 	if (isLoading) return <Skeleton />;
 
 	return (
@@ -62,13 +61,18 @@ export default function AgencyServices({ agencyId }: { agencyId: number }) {
 									rate={{
 										agency_id: agencyId,
 										service_id: service.id,
+										rate_in_cents: service.rate_in_cents,
+										rate_type: service.rate_type,
+										name: service.name,
+										is_active: service.is_active,
+										cost_in_cents: service.cost_in_cents,
 									}}
 									setOpen={(open) => handleDialogOpen(service.id, open)}
 									mode="create"
 								/>
 							</ShareDialog>
 						</div>
-						<AgencyRates serviceId={service.id || 0} agencyId={agencyId || 0} />
+						<AgencyRates rates={service.shipping_rates} />
 					</div>
 				))}
 			</CardContent>

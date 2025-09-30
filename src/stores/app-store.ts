@@ -1,10 +1,14 @@
+import type { User } from "@/data/types";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
 interface AppStore {
 	session: any;
 	setSession: (session: any) => void;
-	clearSession: () => void;
+	user: User | null;
+	setUser: (user: User | null) => void;
+	clearAll: () => void;
+	
 }
 
 export const useAppStore = create<AppStore>()(
@@ -12,7 +16,10 @@ export const useAppStore = create<AppStore>()(
 		(set) => ({
 			session: null,
 			setSession: (session) => set({ session }),
-			clearSession: () => set({ session: null }),
+			user: null,
+			setUser: (user) => set({ user }),
+			
+			clearAll: () => set({ session: null, user: null }),
 		}),
 		{
 			name: "app-store",

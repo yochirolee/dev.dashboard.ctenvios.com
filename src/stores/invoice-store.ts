@@ -1,30 +1,24 @@
 import { create } from "zustand";
-import { type Customer, type Receiver, type Item, type Service } from "@/data/types";
+import { type Customer, type Receiver, type Item, type Service, type ShippingRate } from "@/data/types";
 
-interface UiRate {
-	id: number;
-	name: string;
-	rate_in_cents: number;
-	rate_type: "WEIGHT" | "FIXED";
-	product_id: number | null;
-	min_weight: number | null;
-	max_weight: number | null;
-	product_name: string | null;
-	
+
+
+ interface ServiceWithRates extends Service {
+	shipping_rates: ShippingRate[];
 }
 
 
 interface InvoiceStore {
 	selectedCustomer: Customer | null;
 	selectedReceiver: Receiver | null;
-	selectedService: Service | null;
+	selectedService: ServiceWithRates | null;
 
 	items: Item[];
-	selectedRate: UiRate | null;
+	selectedRate: ShippingRate | null;
 	setSelectedCustomer: (selectedCustomer: Customer | null) => void;
 	setSelectedReceiver: (selectedReceiver: Receiver | null) => void;
-	setSelectedService: (selectedService: Service | null) => void;
-	setSelectedRate: (selectedRate: UiRate | null) => void;
+	setSelectedService: (selectedService: ServiceWithRates | null) => void;
+	setSelectedRate: (selectedRate: ShippingRate | null) => void;
 }
 
 export const useInvoiceStore = create<InvoiceStore>((set) => ({
@@ -32,13 +26,13 @@ export const useInvoiceStore = create<InvoiceStore>((set) => ({
 	selectedReceiver: null,
 	selectedService: null,
 	selectedRate: null,
-	setSelectedRate: (selectedRate: UiRate | null) => set({ selectedRate }),
+	setSelectedRate: (selectedRate: ShippingRate | null) => set({ selectedRate }),
 	items: [],
 	setSelectedCustomer: (selectedCustomer: Customer | null) => set({ selectedCustomer }),
 	setSelectedReceiver: (selectedReceiver: Receiver | null) => {
 		set({ selectedReceiver });
 	},
-	setSelectedService: (selectedService: Service | null) => {
+	setSelectedService: (selectedService: ServiceWithRates | null) => {
 		set({ selectedService });
 	},
 

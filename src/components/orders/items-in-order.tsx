@@ -11,20 +11,19 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
-import { invoiceSchema } from "@/data/types";
+import { invoiceSchema, type ShippingRate } from "@/data/types";
 import { useInvoices } from "@/hooks/use-invoices";
 import { Input } from "../ui/input";
 import { useAppStore } from "@/stores/app-store";
 import { Separator } from "../ui/separator";
 import { ChargeDialog, DiscountDialog, InsuranceFeeDialog } from "./order-dialogs";
-import { useShippingRates } from "@/hooks/use-shipping-rates";
 import { centsToDollars } from "@/lib/utils";
 
 type FormValues = z.infer<typeof invoiceSchema>;
 
-export function ItemsInOrder() {
+export function ItemsInOrder({ shipping_rates }: { shipping_rates: ShippingRate[] }) {
 	const navigate = useNavigate();
-	const session = useAppStore((state) => state.session);
+	const user = useAppStore((state) => state.user);
 	const [items_count, setItemsCount] = useState(1);
 	const [dialogState, setDialogState] = useState({
 		type: "" as "insurance" | "charge" | "rate" | "",
@@ -49,18 +48,22 @@ export function ItemsInOrder() {
 		})),
 	);
 
-	const { data: rate, isLoading: isLoadingBaseRate } = useShippingRates.getBaseRate(
-		session?.user?.agency_id || 0,
-		selectedService?.id || 0,
-	);
+ 
+	
+	// Get the first rate from the rates array that type is WEIGHT
+	//divide rates by type WEIGHT and FIXED
+	const weight_rates = shipping_rates?.filter((rate) => rate.rate_type === "WEIGHT");
+	const rate = weight_rates?.[0];
+
+	
 
 	const form = useForm<FormValues>({
 		resolver: zodResolver(invoiceSchema) as any,
 		defaultValues: {
 			customer_id: selectedCustomer?.id || 0,
 			receiver_id: selectedReceiver?.id || 0,
-			agency_id: session?.user?.agency_id || 0,
-			user_id: session?.user?.id || "",
+			agency_id: user?.agency_id || 0,
+			user_id: user?.id || "",
 			service_id: selectedService?.id || 0,
 
 			items: [
@@ -68,7 +71,7 @@ export function ItemsInOrder() {
 					description: "",
 					weight: undefined,
 					rate_in_cents: rate?.rate_in_cents || 0,
-					rate_id: rate?.id || 0,
+					rate_id: rate?.id || undefined,
 					rate_type: rate?.rate_type || "WEIGHT",
 					insurance_fee_in_cents: 0,
 					customs_fee_in_cents: 0,
@@ -91,19 +94,7 @@ export function ItemsInOrder() {
 
 	console.log(rate, "rate");
 
-	// Update form values when rate data becomes available
-	useEffect(() => {
-		if (rate?.rate_in_cents && rate?.id) {
-			const currentItems = form.getValues("items");
-			const updatedItems = currentItems.map((item) => ({
-				...item,
-				rate_in_cents: rate.rate_in_cents,
-				rate_type: rate.rate_type,
-				rate_id: rate.id,
-			}));
-			form.setValue("items", updatedItems);
-		}
-	}, [rate, form]);
+
 
 	const handleAddItem = () => {
 		// Simply add the number of items needed to reach the target count
@@ -162,8 +153,8 @@ export function ItemsInOrder() {
 
 	const handleSubmit = (data: FormValues) => {
 		data.service_id = selectedService?.id || 0;
-		data.agency_id = session?.user?.agency_id || 0;
-		data.user_id = session?.user?.id || "";
+		data.agency_id = user?.agency_id || 0;
+		data.user_id = user?.id || "";
 		data.customer_id = selectedCustomer?.id || 0;
 		data.receiver_id = selectedReceiver?.id || 0;
 		console.log(data, "form DATA on submit");
@@ -178,8 +169,9 @@ export function ItemsInOrder() {
 
 	console.log("re -render");
 
-	if (isLoadingBaseRate) {
-		return <div>Loading...</div>;
+	
+	if (shipping_rates?.length === 0)  {
+		return <div>No rates found</div>;
 	}
 
 	return (

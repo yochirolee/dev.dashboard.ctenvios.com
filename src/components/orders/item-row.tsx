@@ -89,6 +89,8 @@ function ItemRow({
 	useEffect(() => {
 		form.setValue(`items.${index}.subtotal`, 0);
 		form.setValue(`items.${index}.description`, "");
+		
+		
 	}, [byRate]);
 
 	const handleRemove = () => {

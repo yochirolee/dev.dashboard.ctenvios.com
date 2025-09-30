@@ -41,7 +41,7 @@ export function isValidCubanCI(ci: string): boolean {
 export function dollarsToCents(amount: number | string): number {
 	const num = typeof amount === "string" ? parseFloat(amount) : amount;
 	if (!Number.isFinite(num)) throw new Error("Monto inválido");
-	return Math.round(num * 100);
+	return (num * 100);
 }
 
 export function centsToDollars(cents: number): number {

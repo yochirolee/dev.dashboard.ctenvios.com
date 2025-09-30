@@ -25,18 +25,42 @@ const CustomsFeeCombobox = React.memo(function CustomsFeeCombobox({
 	form?: UseFormReturn<any>;
 }) {
 	const [open, setOpen] = React.useState(false);
-	const { data, isLoading } = useCustoms.get(0, 100);
+	const [searchQuery, setSearchQuery] = React.useState("");
+	const { data, isLoading } = useCustoms.get(0, 300);
 
 	// Use form prop if provided, otherwise use form context
 	const formContext = form || useFormContext();
 	const { control, setValue } = formContext;
+
+	// Filter customs based on search query
+	const filteredCustoms = React.useMemo(() => {
+		if (!data?.rows || !searchQuery.trim()) {
+			return data?.rows || [];
+		}
+		
+		const query = searchQuery.toLowerCase().trim();
+		return data.rows.filter((custom: Customs) =>
+			custom.name.toLowerCase().includes(query)
+		);
+	}, [data?.rows, searchQuery]);
+
+	const handleSearchChange = (value: string) => {
+		setSearchQuery(value);
+	};
+
+	const handleOpenChange = (newOpen: boolean) => {
+		setOpen(newOpen);
+		if (!newOpen) {
+			setSearchQuery("");
+		}
+	};
 
 	return (
 		<FormField
 			control={control}
 			name={`items.${index}.customs_id`}
 			render={({ field }) => (
-				<Popover open={open} onOpenChange={setOpen}>
+				<Popover open={open} onOpenChange={handleOpenChange}>
 					<PopoverTrigger asChild>
 						<Button
 							id={`customs-fee-combobox-${index}`}
@@ -64,12 +88,15 @@ const CustomsFeeCombobox = React.memo(function CustomsFeeCombobox({
 						</Button>
 					</PopoverTrigger>
 					<PopoverContent className="w-[200px] p-0">
-						<Command>
-							<CommandInput placeholder="Buscar Arancel..." />
+						<Command shouldFilter={false}>
+							<CommandInput 
+								placeholder="Buscar Arancel..." 
+								onValueChange={handleSearchChange}
+							/>
 							<CommandList>
 								<CommandEmpty>No se encontraron Aranceles.</CommandEmpty>
 								<CommandGroup>
-									{data?.rows?.map((custom: Customs) => (
+									{filteredCustoms?.map((custom: Customs) => (
 										<CommandItem
 											key={custom?.id}
 											value={custom?.name}

@@ -1,10 +1,7 @@
 import * as React from "react";
 import {
-	AudioWaveform,
 	BoxIcon,
-	Command,
 	FileBox,
-	GalleryVerticalEnd,
 	HomeIcon,
 	Settings2,
 	Sparkles,
@@ -32,23 +29,7 @@ const data = {
 		email: "yleecruz@gmail.com",
 		avatar: "/avatars/shadcn.jpg",
 	},
-	teams: [
-		{
-			name: "Caribe Travel Express",
-			logo: GalleryVerticalEnd,
-			plan: "Transitaria",
-		},
-		{
-			name: "Acme Corp.",
-			logo: AudioWaveform,
-			plan: "Agencia",
-		},
-		{
-			name: "CTEnvios.",
-			logo: Command,
-			plan: "Agencia",
-		},
-	],
+	
 	navMain: [
 		{
 			title: "Ordenes",
@@ -159,7 +140,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 	return (
 		<Sidebar collapsible="icon" {...props}>
 			<SidebarHeader>
-				<TeamSwitcher teams={data.teams} />
+				<TeamSwitcher  />
 			</SidebarHeader>
 			<SidebarContent className="[scrollbar-color:--alpha(var(--foreground)/20%)_transparent] [scrollbar-width:thin]">
 				<Link to="/" className="mx-2">

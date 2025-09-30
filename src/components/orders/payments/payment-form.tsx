@@ -27,7 +27,7 @@ import {
 import { cn } from "@/lib/utils";
 import { paymentSchema } from "@/data/types";
 import { toast } from "sonner";
-import { type Invoice } from "@/data/types";
+import { type OrderInvoice } from "@/data/types";
 import {
 	Dialog,
 	DialogContent,
@@ -38,7 +38,7 @@ import {
 import { DialogDescription } from "@/components/ui/dialog";
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
-export const PaymentForm = ({ invoice }: { invoice: Invoice }) => {
+export const PaymentForm = ({ invoice }: { invoice: OrderInvoice }) => {
 	const balance = ((invoice?.total_in_cents - invoice?.paid_in_cents) / 100).toFixed(2);
 
 	console.log(balance, "balance");

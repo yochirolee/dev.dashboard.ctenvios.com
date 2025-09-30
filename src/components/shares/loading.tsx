@@ -1,12 +1,11 @@
 import { CogIcon } from "lucide-react";
-import { Skeleton } from "../ui/skeleton";
 
 export const Loading = () => {
 	return (
-		<Skeleton className="w-full h-1/4 rounded-lg grid items-center justify-center">
-			<div className="flex items-center gap-2">
-				<CogIcon size={20} className="animate-spin" /> Loading...
+		<div className="grid h-full w-full justify-center items-center gap-2">
+			<div className="inline-flex gap-2 items-center">
+				<CogIcon size={20} className="animate-spin" /> <p>Loading...</p>
 			</div>
-		</Skeleton>
+		</div>
 	);
 };

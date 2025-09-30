@@ -11,6 +11,7 @@ import { useShallow } from "zustand/react/shallow";
 import { useInvoiceStore } from "@/stores/invoice-store";
 import { useAppStore } from "@/stores/app-store";
 import { usePrefetch } from "@/hooks/use-prefetch";
+import { useAgencies } from "@/hooks/use-agencies";
 
 export function NewOrderPage() {
 	const { selectedCustomer, selectedReceiver, selectedService } = useInvoiceStore(
@@ -22,11 +23,17 @@ export function NewOrderPage() {
 			selectedService: state.selectedService,
 		})),
 	);
-	const session = useAppStore((state) => state.session);
-	const agencyId = session?.user?.agency_id;
-	usePrefetch.services(agencyId);
-	usePrefetch.customsRates(1, 100);
-	usePrefetch.baseRate(agencyId, selectedService?.id || 0);
+	const user = useAppStore((state) => state.user || null);
+	const agencyId = user?.agency_id || 0;
+
+	const { data: services } = useAgencies.getServiceswithShippingRates(agencyId);
+
+
+	
+
+	
+	usePrefetch.customsRates(1, 500);
+	
 
 	return (
 		<div className="space-y-4 ">
@@ -62,10 +69,10 @@ export function NewOrderPage() {
 					</CardContent>
 				</Card>
 			</div>
-			{selectedCustomer && selectedReceiver && (
+			{selectedCustomer && selectedReceiver &&  (
 				<>
-					<ServiceSelector />
-					{selectedService && <ItemsInOrder />}
+					<ServiceSelector services={services || []} />
+					{selectedService && <ItemsInOrder shipping_rates={selectedService?.shipping_rates || []} />}
 				</>
 			)}
 		</div>

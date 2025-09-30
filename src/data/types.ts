@@ -171,7 +171,7 @@ export const serviceSchema = z.object({
 });
 export const userSchema = z
 	.object({
-		id: z.number().optional(),
+		id: z.string().optional(),
 		email: z.string().email("Email inválido"),
 		image: z.string().url().optional(),
 		password: z.string().min(8, "La contraseña debe tener al menos 8 caracteres"),
@@ -219,3 +219,25 @@ export type User = z.infer<typeof userSchema>;
 export type ShippingRate = z.infer<typeof shippingRateSchema>;
 
 export type ProductRate = z.infer<typeof productRateSchema>;
+
+export interface OrderInvoice {
+	id: number;
+	payment_status: string;
+	agency: Agency;
+	customer: Customer;
+	receiver: Receiver;
+	service: Service;
+	items: Item[];
+	total_in_cents: number;
+	paid_in_cents: number;
+	created_at: string;
+	updated_at: string;
+	user: User;
+	events: Event[];
+	charge_in_cents: number;
+	shipping_fee_in_cents: number;
+	tax_in_cents: number;
+	discount_in_cents: number;
+	
+	
+}

@@ -36,14 +36,18 @@ export const useRegister = () => {
 };
 
 export const useLoginMutation = () => {
+	const navigate = useNavigate();
 	return useMutation({
 		mutationFn: async ({ email, password }: { email: string; password: string }) => {
-			const session = await api.users.signIn(email, password);
-			return session;
+			const {session,user}	 = await api.users.signIn(email, password);
+			return {session,user};
 		},
-		onSuccess: (session) => {
-			localStorage.setItem("authToken", session.session.token);
-			useAppStore.setState({ session: session });
+		onSuccess: ({session,user}) => {
+			
+			const { setSession, setUser } = useAppStore.getState();
+			setSession(session);
+			setUser(user);
+			navigate("/", { replace: true });
 		},
 	});
 };
@@ -53,10 +57,9 @@ export const useLogOut = () => {
 	return useMutation({
 		mutationFn: () => api.users.signOut(),
 		onSuccess: () => {
-			useAppStore.setState({ session: null });
-			localStorage.removeItem("authToken");
-			navigate("/login", { replace: true });
+			useAppStore.getState().clearAll();
 			queryClient.clear();
+			navigate("/login", { replace: true });
 		},
 	});
 };

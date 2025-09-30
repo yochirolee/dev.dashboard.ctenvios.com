@@ -10,9 +10,9 @@ import { InteractiveChart } from "@/components/charts/interactive-chart";
 import { CustomersPage } from "@/pages/settings/customers-page";
 import { AgenciesPage } from "@/pages/settings/agencies-page";
 import ProtectedRoute from "./protected-route";
-import InvoicesPage from "@/pages/orders/invoices-page";
+import InvoicesPage from "@/pages/orders/orders-page";
 import { UserPage } from "@/pages/settings/user-page";
-import InvoiceDetailsPage from "@/pages/orders/invoice-details-page";
+import InvoiceDetailsPage from "@/pages/orders/orders-details-page";
 import { CustomsPage } from "@/pages/settings/customs-page";
 import ProvidersServicesPage from "@/pages/settings/providers-services-page";
 import { EditOrderPage } from "@/pages/orders/edit-order-page";
@@ -23,6 +23,10 @@ import { ContainersPage } from "@/pages/logistics/containers-page";
 import { FlightsPage } from "@/pages/logistics/flights-page";
 
 export const AppRouter = () => {
+	
+	
+	
+
 	return (
 		<Routes>
 			<Route path="/login" element={<LoginPage />} />

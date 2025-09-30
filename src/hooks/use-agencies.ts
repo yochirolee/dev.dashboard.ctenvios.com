@@ -16,31 +16,8 @@ export const useAgencies = {
 	get: () => {
 		return useQuery({ queryKey: ["get-agencies"], queryFn: api.agencies.get });
 	},
-	getServices: (agency_id: number, is_active?: boolean) => {
-		return useQuery({
-			queryKey: ["get-services", agency_id],
-			queryFn: () => api.agencies.getServices(agency_id, is_active),
-			refetchOnWindowFocus: false,
-			staleTime: 1000 * 60 * 5,
-			enabled: !!agency_id,
-		});
-	},
-	getServiceShippingRates: (
-		agency_id: number,
-		service_id: number,
-		rate_type?: "WEIGHT" | "FIXED",
-		is_active?: boolean,
-	) => {
-		return useQuery({
-			queryKey: ["get-service-shipping-rates", agency_id, service_id, rate_type, is_active],
-			queryFn: () =>
-				api.agencies.getServiceShippingRates(agency_id, service_id, rate_type, is_active),
-			refetchOnWindowFocus: false,
-			staleTime: 1000 * 60 * 5,
-			enabled: !!agency_id && !!service_id,
-		});
-	},
-
+	
+	
 	create: (options?: { onSuccess?: () => void; onError?: (error: any) => void }) => {
 		return useMutation({
 			mutationFn: (data: CreateAgencyFormSchema) => api.agencies.create(data),
@@ -77,6 +54,16 @@ export const useAgencies = {
 			queryKey: ["get-agency-users", id],
 			queryFn: () => api.agencies.getUsers(id),
 			enabled: !!id,
+		});
+	},
+	
+	getServiceswithShippingRates: (agency_id: number, is_active?: boolean) => {
+		return useQuery({
+			queryKey: ["get-services", agency_id],
+			queryFn: () => api.agencies.getServiceswithShippingRates(agency_id, is_active),
+			refetchOnWindowFocus: false,
+			staleTime: 1000 * 60 * 5,
+			enabled: !!agency_id,
 		});
 	},
 };

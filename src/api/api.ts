@@ -43,7 +43,7 @@ axiosInstance.interceptors.request.use(
 	async (config) => {
 		try {
 			// Get the current session from BetterAuth
-			const token = localStorage.getItem("authToken");
+			const token = useAppStore.getState().session?.token;
 			// If we have a session, include the session token in the headers
 			if (token) {
 				config.headers.Authorization = `Bearer ${token}`;
@@ -66,7 +66,7 @@ axiosInstance.interceptors.response.use(
 	(error) => {
 		// Handle 401 Unauthorized responses
 		if (error.response?.status === 401) {
-			localStorage.removeItem("authToken");
+			
 			useAppStore.setState({ session: null });
 			window.location.href = "/login";
 		}
@@ -186,12 +186,7 @@ const api = {
 			});
 			return response.data;
 		},
-		getByAgencyId: async (agency_id: number, page: number | 1, limit: number | 25) => {
-			const response = await axiosInstance.get(`/invoices/agency/${agency_id}`, {
-				params: { page: page + 1, limit: limit },
-			});
-			return response.data;
-		},
+		
 		search: async (
 			search: string,
 			page: number | 1,
@@ -224,7 +219,7 @@ const api = {
 		},
 		payments: {
 			create: async (invoice_id: number, data: Payment) => {
-				console.log(data, "on api");
+				
 				const response = await axiosInstance.post(`/payments/invoice/${invoice_id}`, data);
 				return response.data;
 			},
@@ -310,37 +305,21 @@ const api = {
 
 			return response.data;
 		},
-		getServices: async (id: number, is_active?: boolean) => {
-			const response = await axiosInstance.get(`/agencies/${id}/services`, {
+		update: async (id: number, data: Agency) => {
+			const response = await axiosInstance.put(`/agencies/${id}`, data);
+			return response.data;
+		},
+		getServiceswithShippingRates: async (id: number, is_active?: boolean) => {
+			const response = await axiosInstance.get(`/agencies/${id}/services-with-rates`, {
 				params: {
 					...(is_active !== undefined && { is_active }),
 				},
 			});
 			return response.data;
 		},
-		getServiceShippingRates: async (
-			agency_id: number,
-			service_id: number,
-			rate_type?: "WEIGHT" | "FIXED",
-			is_active?: boolean,
-		) => {
-			const response = await axiosInstance.get(
-				`/agencies/${agency_id}/service/${service_id}/shipping-rates`,
-				{
-					params: {
-						rate_type,
-						...(is_active !== undefined && { is_active }),
-						...(rate_type !== undefined && { rate_type }),
-					},
-				},
-			);
-			return response.data;
-		},
+		
 
-		update: async (id: number, data: Agency) => {
-			const response = await axiosInstance.put(`/agencies/${id}`, data);
-			return response.data;
-		},
+		
 	},
 	customs: {
 		get: async (page: number | 1, limit: number | 25) => {
@@ -427,21 +406,14 @@ const api = {
 	},
 	analytics: {
 		getSales: async () => {
-			console.log("getSales");
+			
 			const response = await axiosInstance.get("/analytics/sales");
-			console.log(response.data, "response.data");
+			
 			return response.data;
 		},
 	},
 
-	products: {
-		getRates: async (agency_id: number, service_id: number) => {
-			const response = await axiosInstance.get(
-				`/products/shipping_rates/agency/${agency_id}/service/${service_id}`,
-			);
-			return response.data;
-		},
-	},
+	
 };
 
 export default api;

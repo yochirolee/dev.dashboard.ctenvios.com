@@ -7,7 +7,7 @@ import {
 	DropdownMenuItem,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { MoreVerticalIcon, PencilIcon, Trash2Icon } from "lucide-react";
+import {  MoreVerticalIcon, PencilIcon, Trash2Icon } from "lucide-react";
 import {
 	TableCell,
 	TableHeader,
@@ -19,15 +19,12 @@ import {
 import { AgencyRateDeleteDialog } from "./agency-rate-delete-dialog";
 import type { ShippingRate } from "@/data/types";
 import { centsToDollars } from "@/lib/utils";
+import { Badge } from "../ui/badge";
 import { Switch } from "../ui/switch";
-import { useAgencies } from "@/hooks/use-agencies";
-import { useShippingRates } from "@/hooks/use-shipping-rates";
-import { Skeleton } from "../ui/skeleton";
 
-export const AgencyRates = ({ serviceId, agencyId }: { serviceId: number; agencyId: number }) => {
-	const { data: rates, isLoading } = useAgencies.getServiceShippingRates(agencyId, serviceId);
+export const AgencyRates = ({ rates }: { rates: ShippingRate[] }) => {
 
-	if (isLoading) return <Skeleton />;
+	
 
 	return (
 		<>
@@ -39,6 +36,7 @@ export const AgencyRates = ({ serviceId, agencyId }: { serviceId: number; agency
 						<TableHead>Costo Agencia</TableHead>
 						<TableHead>Venta al Público</TableHead>
 						<TableHead>Profit</TableHead>
+						<TableHead>Activo</TableHead>
 						<TableHead className="w-10 text-right"></TableHead>
 					</TableRow>
 				</TableHeader>
@@ -61,8 +59,7 @@ const RateRow = ({ rate }: { rate: ShippingRate }) => {
 		return rate?.rate_in_cents - rate?.cost_in_cents;
 	};
 
-	console.log(rate, "rate");
-
+	
 	
 
 	return (
@@ -71,7 +68,7 @@ const RateRow = ({ rate }: { rate: ShippingRate }) => {
 				<p>{rate?.name}</p>
 			</TableCell>
 			<TableCell>
-				<Switch checked={rate?.rate_type === "FIXED"} onCheckedChange={() => {}} />
+				<Badge variant="outline">{rate?.rate_type}</Badge>
 			</TableCell>
 			<TableCell>
 				<p>{centsToDollars(rate?.cost_in_cents)?.toFixed(2)} USD</p>
@@ -85,6 +82,9 @@ const RateRow = ({ rate }: { rate: ShippingRate }) => {
 						? `+${centsToDollars(calculateProfit(rate))?.toFixed(2)} USD`
 						: `${centsToDollars(calculateProfit(rate))?.toFixed(2)} USD`}
 				</p>
+			</TableCell>
+			<TableCell>
+				<Switch checked={rate?.is_active} onCheckedChange={() => {}} />
 			</TableCell>
 			<TableCell className="flex justify-end">
 				<DropdownMenu>

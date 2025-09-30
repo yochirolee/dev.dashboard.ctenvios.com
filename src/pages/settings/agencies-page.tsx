@@ -4,7 +4,7 @@ import { AgencyDetails } from "@/components/agencies/agency-details";
 
 import AgencyUsers from "@/components/agencies/agency-users";
 import AgencyServices from "@/components/agencies/agency-services";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useAgencies } from "@/hooks/use-agencies";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { Agency } from "@/data/types";
@@ -13,13 +13,11 @@ import { useNavigate } from "react-router-dom";
 
 export const AgenciesPage = () => {
 	const navigate = useNavigate();
+
+	const [selectedAgencyId, setSelectedAgencyId] = useState<number | null>(null);
 	const { data: agencies = [], isLoading, error } = useAgencies.get();
-	const [selectedAgency, setSelectedAgency] = useState<Agency | null>(agencies[0] ?? null);
-
-
-	useEffect(() => {
-		setSelectedAgency(agencies[0] as Agency);
-	}, [agencies]);
+	// Derive the actual selected agency object
+	const selectedAgency = agencies.find((agency: Agency) => agency.id === selectedAgencyId) ?? agencies[0] ?? null;
 
 	if (isLoading) return <Skeleton className="h-[200px] w-full" />;
 	if (error) return <div>Error loading agencies</div>;
@@ -37,7 +35,7 @@ export const AgenciesPage = () => {
 							isLoading={isLoading}
 							agencies={agencies}
 							selectedAgency={selectedAgency}
-							setSelectedAgency={(agency) => setSelectedAgency(agency)}
+							setSelectedAgency={(agency) => setSelectedAgencyId(agency?.id ?? null)}
 						/>
 
 						<Button

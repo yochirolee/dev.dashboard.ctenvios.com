@@ -29,16 +29,17 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
 			password: "",
 		},
 	});
-	//if user is already logged in, redirect to home
-	useEffect(() => {
-		if (session?.user) {
-			navigate("/", { replace: true });
-		}
-	}, [session]);
+
+	
+
 
 	const handleSubmit = async (values: z.infer<typeof formSchema>) => {
 		login(values);
 	};
+	
+	if(session) {
+		navigate("/", { replace: true });
+	}
 
 	return (
 		<div className={cn("flex flex-col gap-6", className)} {...props}>
