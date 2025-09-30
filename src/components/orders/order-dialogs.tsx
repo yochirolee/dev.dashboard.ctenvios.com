@@ -10,7 +10,7 @@ import {
 } from "../ui/alert-dialog";
 import { Input } from "../ui/input";
 import { Select, SelectTrigger, SelectItem, SelectContent, SelectValue } from "../ui/select";
-import { centsToDollars, dollarsToCents } from "@/lib/utils";
+import { centsToDollars } from "@/lib/utils";
 import { useEffect, useState } from "react";
 
 export const InsuranceFeeDialog = ({
@@ -67,11 +67,7 @@ export const ChargeDialog = ({
 	index: number;
 	form: any;
 }) => {
-	const [chargeFee, setChargeFee] = useState(0);
 
-	useEffect(() => {
-		setChargeFee(centsToDollars(form.getValues(`items.${index}.charge_fee_in_cents`)));
-	}, [form.getValues(`items.${index}.charge_fee_in_cents`)]);
 
 	return (
 		<AlertDialog open={open} onOpenChange={setOpen}>
