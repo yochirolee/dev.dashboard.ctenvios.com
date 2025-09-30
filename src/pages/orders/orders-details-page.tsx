@@ -34,6 +34,7 @@ import {
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Loading } from "@/components/shares/loading";
 import { OrderLog } from "@/components/orders/order/order-log";
+import type { OrderItem } from "@/data/types";
 
 const baseUrl = import.meta.env.VITE_API_URL;
 
@@ -50,7 +51,7 @@ export default function OrdersDetailsPage() {
   }
 
   const subtotal = invoice?.items.reduce(
-    (acc: number, item: any) =>
+    (acc: number, item: OrderItem) =>
       acc +
       calculate_row_subtotal(
         item?.rate_in_cents,

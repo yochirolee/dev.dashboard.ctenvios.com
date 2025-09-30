@@ -5,18 +5,16 @@ import { useShallow } from "zustand/react/shallow";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Plane, Ship } from "lucide-react";
-import type { Service, ShippingRate } from "@/data/types";
+import type { Service, ShippingRate, Provider } from "@/data/types";
 
 // Extended Service interface to match API response
 interface ServiceWithRates extends Service {
   shipping_rates: ShippingRate[];
+  provider: Provider;
 }
 
-interface ServiceSelectorProps {
-  services: Service[];
-}
 
-export function ServiceSelector({ services }: ServiceSelectorProps) {
+export function ServiceSelector({ services }: { services: ServiceWithRates[] }) {
   const { setSelectedService, selectedService, selectedCustomer, selectedReceiver } = useInvoiceStore(
     useShallow((state) => ({
       setSelectedService: state.setSelectedService,
@@ -29,7 +27,7 @@ export function ServiceSelector({ services }: ServiceSelectorProps) {
   const isDisabled = !selectedCustomer || !selectedReceiver;
 
   const handleServiceChange = (serviceId: string) => {
-    const service = services?.find((s: Service) => s.id?.toString() === serviceId);
+    const service = services?.find((s: ServiceWithRates) => s.id?.toString() === serviceId);
     if (service) {
       setSelectedService(service as ServiceWithRates);
     }
@@ -48,7 +46,7 @@ export function ServiceSelector({ services }: ServiceSelectorProps) {
           className="flex w-full"
           disabled={isDisabled}
         >
-          {services?.map((service: Service) => (
+          {services?.map((service: ServiceWithRates) => (
             <Label
               key={service.id}
               htmlFor={service.id?.toString()}
@@ -57,7 +55,10 @@ export function ServiceSelector({ services }: ServiceSelectorProps) {
               } ${selectedService?.id === service.id ? "border-ring bg-input/20" : ""}`}
             >
               <RadioGroupItem
-                value={service.id?.toString()}
+                value={service.id 
+                  ? service.id.toString()
+                  : ""
+                }
                 id={service.id?.toString()}
                 className="mt-0.5"
                 disabled={isDisabled}

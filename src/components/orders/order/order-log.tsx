@@ -81,7 +81,7 @@ export function OrderLog({ events = defaultEvents }: OrderLogProps) {
         {/* Timeline line */}
         <div className="absolute left-[7px] top-2 bottom-0 w-[2px] bg-border" />
 
-        {events.map((event, index) => (
+        {events.map((event) => (
           <div key={event.id} className="relative pl-8">
             {/* Timeline dot */}
             <div className={`absolute left-1 top-1 h-2 w-2 rounded-full ${eventDotStyles[event.type]}`} />

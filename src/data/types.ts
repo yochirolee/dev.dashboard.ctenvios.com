@@ -241,3 +241,18 @@ export interface OrderInvoice {
 	
 	
 }
+export interface OrderItem{
+	id: number;
+	hbl: string;
+	description: string;
+	weight: number;
+	rate_in_cents: number;
+	rate_id: number;
+	rate_type: string;
+	insurance_fee_in_cents: number;
+	delivery_fee_in_cents: number;
+	customs_fee_in_cents: number;
+	customs_id: number;
+	charge_fee_in_cents: number;
+	rate:ShippingRate;
+}
