@@ -10,8 +10,6 @@ import {
 } from "../ui/alert-dialog";
 import { Input } from "../ui/input";
 import { Select, SelectTrigger, SelectItem, SelectContent, SelectValue } from "../ui/select";
-import { centsToDollars } from "@/lib/utils";
-import { useEffect, useState } from "react";
 
 export const InsuranceFeeDialog = ({
 	open,
