@@ -59,7 +59,7 @@ export const useAgencies = {
 	
 	getServiceswithShippingRates: (agency_id: number, is_active?: boolean) => {
 		return useQuery({
-			queryKey: ["get-services", agency_id],
+			queryKey: ["get-services", agency_id, is_active],
 			queryFn: () => api.agencies.getServiceswithShippingRates(agency_id, is_active),
 			refetchOnWindowFocus: false,
 			staleTime: 1000 * 60 * 5,

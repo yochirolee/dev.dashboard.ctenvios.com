@@ -56,6 +56,8 @@ const defaultEvents: OrderEvent[] = [
 ]
 
 export function OrderLog({ events = defaultEvents }: OrderLogProps) {
+  
+
   return (
     <Card className=" col-span-1 xl:col-span-3 px-4 py-2">
       	<div className="grid gap-0.5">

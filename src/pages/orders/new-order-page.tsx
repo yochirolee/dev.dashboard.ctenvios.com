@@ -14,6 +14,7 @@ import { usePrefetch } from "@/hooks/use-prefetch";
 import { useAgencies } from "@/hooks/use-agencies";
 
 export function NewOrderPage() {
+	usePrefetch.customsRates(1, 500);
 	const { selectedCustomer, selectedReceiver, selectedService } = useInvoiceStore(
 		useShallow((state) => ({
 			selectedCustomer: state.selectedCustomer,
@@ -26,13 +27,7 @@ export function NewOrderPage() {
 	const user = useAppStore((state) => state.user || null);
 	const agencyId = user?.agency_id || 0;
 
-	const { data: services } = useAgencies.getServiceswithShippingRates(agencyId);
-
-
-	
-
-	
-	usePrefetch.customsRates(1, 500);
+	const { data: services } = useAgencies.getServiceswithShippingRates(agencyId,true);
 	
 
 	return (

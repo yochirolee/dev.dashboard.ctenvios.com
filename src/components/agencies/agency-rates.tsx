@@ -1,117 +1,92 @@
 import { useState } from "react";
 import { ShareDialog } from "../shares/share-dialog";
-import { AgenciesRatesForm } from "./agencies-rates-form";
-import {
-	DropdownMenu,
-	DropdownMenuContent,
-	DropdownMenuItem,
-	DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import {  MoreVerticalIcon, PencilIcon, Trash2Icon } from "lucide-react";
-import {
-	TableCell,
-	TableHeader,
-	TableHead,
-	TableRow,
-	TableBody,
-	Table,
-} from "@/components/ui/table";
-import { AgencyRateDeleteDialog } from "./agency-rate-delete-dialog";
+import { AgencyUpdateRatesForm } from "./agencies-update-rates-form";
+import {} from "@/components/ui/dropdown-menu";
+import { PencilIcon } from "lucide-react";
+import { TableCell, TableHeader, TableHead, TableRow, TableBody, Table } from "@/components/ui/table";
 import type { ShippingRate } from "@/data/types";
 import { centsToDollars } from "@/lib/utils";
 import { Badge } from "../ui/badge";
 import { Switch } from "../ui/switch";
+import { useShippingRates } from "@/hooks/use-shipping-rates";
+import { Button } from "../ui/button";
 
 export const AgencyRates = ({ rates }: { rates: ShippingRate[] }) => {
-
-	
-
-	return (
-		<>
-			<Table>
-				<TableHeader>
-					<TableRow>
-						<TableHead>Nombre</TableHead>
-						<TableHead>Tipo</TableHead>
-						<TableHead>Costo Agencia</TableHead>
-						<TableHead>Venta al Público</TableHead>
-						<TableHead>Profit</TableHead>
-						<TableHead>Activo</TableHead>
-						<TableHead className="w-10 text-right"></TableHead>
-					</TableRow>
-				</TableHeader>
-				<TableBody>
-					{rates?.map((rate: ShippingRate) => (
-						<RateRow key={rate.id} rate={rate} />
-					))}
-				</TableBody>
-			</Table>
-		</>
-	);
-};
-
-const RateRow = ({ rate }: { rate: ShippingRate }) => {
-	const [openDelete, setOpenDelete] = useState(false);
 	const [open, setOpen] = useState(false);
+	const [rateForUpdate, setRateForUpdate] = useState<ShippingRate | null>(null);
 
-	
-	const calculateProfit = (rate: ShippingRate) => {
-		return rate?.rate_in_cents - rate?.cost_in_cents;
+	const handleUpdate = (rate: ShippingRate) => {
+		setRateForUpdate(rate);
+		setOpen(true);
 	};
 
-	
-	
+   return (
+      <>
+         <Table>
+            <TableHeader>
+               <TableRow>
+                  <TableHead>Nombre</TableHead>
+                  <TableHead>Tipo</TableHead>
+                  <TableHead>Costo Agencia</TableHead>
+                  <TableHead>Venta al Público</TableHead>
+                  <TableHead>Profit</TableHead>
+                  <TableHead>Activo</TableHead>
+                  <TableHead className="w-10 text-right"></TableHead>
+               </TableRow>
+            </TableHeader>
+            <TableBody>
+               {rates?.map((rate: ShippingRate) => (
+                  <RateRow key={rate.id} rate={rate} handleUpdate={handleUpdate} />
+               ))}
+            </TableBody>
+		   </Table>
+		   <AgencyUpdateRatesForm key={`update-rate-form-${rateForUpdate?.id}`} rate={rateForUpdate} open={open} setOpen={setOpen} />
+      </>
+   );
+};
 
-	return (
-		<TableRow key={rate.id} className="border-b-0">
-			<TableCell>
-				<p>{rate?.name}</p>
-			</TableCell>
-			<TableCell>
-				<Badge variant="outline">{rate?.rate_type}</Badge>
-			</TableCell>
-			<TableCell>
-				<p>{centsToDollars(rate?.cost_in_cents)?.toFixed(2)} USD</p>
-			</TableCell>
-			<TableCell>
-				<p>{centsToDollars(rate?.rate_in_cents)?.toFixed(2)} USD</p>
-			</TableCell>
-			<TableCell>
-				<p>
-					{calculateProfit(rate) > 0
-						? `+${centsToDollars(calculateProfit(rate))?.toFixed(2)} USD`
-						: `${centsToDollars(calculateProfit(rate))?.toFixed(2)} USD`}
-				</p>
-			</TableCell>
-			<TableCell>
-				<Switch checked={rate?.is_active} onCheckedChange={() => {}} />
-			</TableCell>
-			<TableCell className="flex justify-end">
-				<DropdownMenu>
-					<DropdownMenuTrigger>
-						<MoreVerticalIcon size={16} />
-					</DropdownMenuTrigger>
-					<DropdownMenuContent align="end">
-						<DropdownMenuItem onClick={() => setOpen(true)}>
-							<PencilIcon size={16} /> Editar
-						</DropdownMenuItem>
-						<DropdownMenuItem onClick={() => setOpenDelete(true)}>
-							<Trash2Icon size={16} /> Eliminar
-						</DropdownMenuItem>
-					</DropdownMenuContent>
-				</DropdownMenu>
-			</TableCell>
-			<ShareDialog
-				title="Editar Tarifas"
-				description="Editar las tarifas de los servicios"
-				mode="update"
-				open={open}
-				trigger={false}
-				setOpen={setOpen}
-			>
-				<AgenciesRatesForm rate={rate as unknown as ShippingRate} setOpen={setOpen} mode="update" />
-			</ShareDialog>
-			<AgencyRateDeleteDialog open={openDelete} setOpen={setOpenDelete} rateId={rate?.id ?? 0} />
-		</TableRow>
-	);
+const RateRow = ({ rate, handleUpdate }: {  rate: ShippingRate, handleUpdate: (rate: ShippingRate) => void }) => {
+   const { mutate: updateRate } = useShippingRates.update();
+
+   const calculateProfit = (rate: ShippingRate) => {
+      return rate?.rate_in_cents - rate?.cost_in_cents;
+   };
+
+   const handleActivate = (rate: ShippingRate) => {
+      rate.is_active = !rate.is_active;
+      updateRate({ data: rate });
+   };
+
+   return (
+      <TableRow key={rate.id} className="border-b-0">
+         <TableCell>
+            <p>{rate?.name}</p>
+         </TableCell>
+         <TableCell>
+            <Badge variant="outline">{rate?.rate_type}</Badge>
+         </TableCell>
+         <TableCell>
+            <p>{centsToDollars(rate?.cost_in_cents)?.toFixed(2)} USD</p>
+         </TableCell>
+         <TableCell>
+            <p>{centsToDollars(rate?.rate_in_cents)?.toFixed(2)} USD</p>
+         </TableCell>
+         <TableCell>
+            <p>
+               {calculateProfit(rate) > 0
+                  ? `+${centsToDollars(calculateProfit(rate))?.toFixed(2)} USD`
+                  : `${centsToDollars(calculateProfit(rate))?.toFixed(2)} USD`}
+            </p>
+         </TableCell>
+         <TableCell>
+            <Switch checked={rate?.is_active} onCheckedChange={() => handleActivate(rate)} />
+         </TableCell>
+         <TableCell className="flex justify-end">
+            <Button variant="ghost" onClick={() => handleUpdate(rate)}>
+               <PencilIcon size={16} />
+            </Button>
+         </TableCell>
+        
+      </TableRow>
+   );
 };

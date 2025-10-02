@@ -29,7 +29,7 @@ const FixedRatesCombobox = React.memo(function FixedRatesCombobox({ form, index 
     setSelectedRate(rate);
     setValue(`items.${index}.rate_id`, rate.id || 0);
     setValue(`items.${index}.rate_in_cents`, rate.rate_in_cents || 0);
-    setValue(`items.${index}.description`, rate.name || "");
+    setValue(`items.${index}.description`, rate.description || "");
     setValue(`items.${index}.rate_type`, rate.rate_type || "FIXED");
     setValue(`items.${index}.customs_id`, rate.customs_id || 0);
     setValue(`items.${index}.customs_fee_in_cents`, rate.customs_fee_in_cents || 0);
