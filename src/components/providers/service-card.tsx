@@ -1,9 +1,6 @@
 import type { Service, Provider, ShippingRate } from "@/data/types";
 import { Card, CardHeader, CardContent } from "../ui/card";
 import { Badge } from "../ui/badge";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger } from "../ui/dialog";
-import { Button } from "../ui/button";
-import { Plus } from "lucide-react";
 import { CreateBaseRateForm } from "./create-base-rate-form";
 import { BaseRatesList } from "./base-rates-list";
 import { useState } from "react";

@@ -11,7 +11,7 @@ import { useAppStore } from "@/stores/app-store";
 import { centsToDollars, dollarsToCents } from "@/lib/utils";
 import { Switch } from "../ui/switch";
 import { Badge } from "../ui/badge";
-import { DialogContent, Dialog, DialogTrigger, DialogHeader, DialogTitle, DialogDescription } from "../ui/dialog";
+import { DialogContent, Dialog, DialogTrigger } from "../ui/dialog";
 import { toast } from "sonner";
 
 export const UpdateBaseRateForm = ({
@@ -74,7 +74,7 @@ export const UpdateBaseRateForm = ({
                <span>Actualizar Tarifa</span>
             </Button>
          </DialogTrigger>
-       
+
          <DialogContent>
             <Form {...form}>
                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
