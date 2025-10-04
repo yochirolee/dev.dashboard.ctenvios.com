@@ -1,11 +1,9 @@
 import { Card, CardContent } from "../ui/card";
-import { Button } from "../ui/button";
 import { useProviders } from "@/hooks/use-providers";
 import type { Provider } from "@/data/types";
-import { Badge, Globe, Mail, Pencil, Phone, User } from "lucide-react";
+import {  Globe, Mail, Phone, User } from "lucide-react";
 import { Skeleton } from "../ui/skeleton";
 import ServicesList from "./services-list";
-import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
 import ImageUploadForm from "../upload/ImageUploadForm";
 import { Separator } from "../ui/separator";
 
