@@ -5,13 +5,16 @@ import type { Agency } from "@/data/types";
 
 import { Badge } from "../ui/badge";
 import ImageUploadForm from "../upload/ImageUploadForm";
+import { Phone, User } from "lucide-react";
+import { Mail } from "lucide-react";
+import { Globe } from "lucide-react";
 
 export const AgencyDetails = ({ selectedAgency }: { selectedAgency: Agency }) => {
 	if (!selectedAgency) return <Skeleton className="h-[200px] w-full" />;
 	return (
 		<Card>
 			<CardContent>
-				<div className="flex flex-col lg:flex-row items-center gap-4">
+				<div className="flex flex-row items-center gap-4">
 					{selectedAgency?.logo ? (
 						<img
 							src={selectedAgency?.logo}
@@ -34,11 +37,11 @@ export const AgencyDetails = ({ selectedAgency }: { selectedAgency: Agency }) =>
 					</div>
 				</div>
 				<Separator className="my-4" />
-				<div className="grid grid-cols-1 lg:grid-cols-2 gap-3 my-4">
-					<span>Contacto: {selectedAgency?.contact}</span>
-					<span>Teléfono: {selectedAgency?.phone}</span>
-					<span>Email: {selectedAgency?.email}</span>
-					<span>Website: {selectedAgency?.website}</span>
+				<div className="grid grid-cols-2 gap-3 my-4 text-sm">
+					{selectedAgency?.contact && <span className="flex items-center gap-2"><User size={16} className="text-muted-foreground" />  {selectedAgency?.contact}</span>}
+					{selectedAgency?.phone && <span className="flex items-center gap-2"><Phone size={16} className="text-muted-foreground" /> {selectedAgency?.phone}</span>}
+					{selectedAgency?.email && <span className="flex items-center gap-2"><Mail size={16} className="text-muted-foreground" />  {selectedAgency?.email}</span>}
+				{selectedAgency?.website && <span className="flex items-center gap-2"><Globe size={16} className="text-muted-foreground" /> {selectedAgency?.website}</span>}
 				</div>
 			</CardContent>
 		</Card>

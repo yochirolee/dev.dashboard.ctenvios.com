@@ -43,6 +43,7 @@ export function ItemsTable({ items }: ItemsTableProps) {
                            item.weight,
                            item.customs_fee_in_cents,
                            item.charge_fee_in_cents,
+                           item.insurance_fee_in_cents,
                            item.rate.rate_type
                         )
                      ).toFixed(2)}

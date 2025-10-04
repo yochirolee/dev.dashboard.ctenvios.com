@@ -36,7 +36,7 @@ export const AgenciesCombobox = ({
 						variant="outline"
 						role="combobox"
 						aria-expanded={open}
-						className="w-[300px]  justify-between"
+						className="md:w-[300px] md:flex-none flex-1 justify-between"
 					>
 						{isLoading ? (
 							<Skeleton className="h-4 w-full" />

@@ -24,7 +24,7 @@ import {
 	CommandItem,
 	CommandList,
 } from "@/components/ui/command";
-import { cn } from "@/lib/utils";
+import { cn, dollarsToCents } from "@/lib/utils";
 import { paymentSchema } from "@/data/types";
 import { toast } from "sonner";
 import { type OrderInvoice } from "@/data/types";
@@ -82,6 +82,8 @@ export const PaymentForm = ({ invoice }: { invoice: OrderInvoice }) => {
 	});
 
 	const onSubmit = (data: z.infer<typeof paymentSchema>) => {
+		data.amount_in_cents = dollarsToCents(data.amount_in_cents);
+		data.charge_in_cents = dollarsToCents(data.charge_in_cents ?? 0);
 		createPayment({ invoice_id: Number(invoice.id), data });
 		form.reset({});
 	};

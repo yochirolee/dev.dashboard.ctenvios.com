@@ -35,12 +35,12 @@ export const InsuranceFeeDialog = ({
 				</AlertDialogHeader>
 
 				<Input
-					{...form.register(`items.${index}.insurance_fee`, {
+					{...form.register(`items.${index}.insurance_fee_in_cents`, {
 						valueAsNumber: true,
 					})}
 					type="number"
 					onChange={(e) => {
-						form.setValue(`items.${index}.insurance_fee`, parseFloat(e.target.value));
+						form.setValue(`items.${index}.insurance_fee_in_cents`, parseFloat(e.target.value));
 					}}
 					placeholder="Insurance fee"
 				/>

@@ -30,7 +30,6 @@ export const UpdateBaseRateForm = ({
    if (!rate || !providerId) return null;
    const form = useForm<ShippingRate>({
       resolver: zodResolver(shippingRateSchema),
-
       defaultValues: {
          id: rate.id,
          name: rate.name,

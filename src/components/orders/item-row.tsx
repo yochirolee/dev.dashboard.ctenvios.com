@@ -18,24 +18,7 @@ import { Switch } from "../ui/switch";
 import FixedRatesCombobox from "./fixed-rates-combobox";
 import { centsToDollars, calculate_row_subtotal, dollarsToCents } from "@/lib/utils";
 
-/* const calculateSubtotal = (
-	rate_in_cents: number,
-	weight: number,
-	customs_fee_in_cents: number,
-	rate_type: string,
-	charge_fee_in_cents: number,
-) => {
-	// Ensure all values are valid numbers
-	const safeRateInCents = Number(rate_in_cents) || 0;
-	const safeWeight = Number(weight) || 0;
-	const safeCustomsFeeInCents = Number(customs_fee_in_cents) || 0;
-	const safeChargeFeeInCents = charge_fee_in_cents || 0;
-	if (rate_type === "WEIGHT") {
-		return safeRateInCents * safeWeight + safeCustomsFeeInCents + dollarsToCents(safeChargeFeeInCents);
-	} else {
-		return safeRateInCents + safeCustomsFeeInCents;
-	}
-}; */
+
 
 function ItemRow({
 	index,
@@ -64,6 +47,7 @@ function ItemRow({
 			item?.weight,
 			item?.customs_fee_in_cents,
 			dollarsToCents(item?.charge_fee_in_cents || 0),
+			dollarsToCents(item?.insurance_fee_in_cents || 0),
 			item?.rate_type,
 		);
 
@@ -81,6 +65,7 @@ function ItemRow({
 		item?.weight || 0,
 		item?.customs_fee_in_cents || 0,
 		item?.charge_fee_in_cents || 0,
+		item?.insurance_fee_in_cents || 0,
 		item?.rate_type || "WEIGHT",
 	]);
 
@@ -89,7 +74,7 @@ function ItemRow({
 	useEffect(() => {
 		form.setValue(`items.${index}.subtotal`, 0);
 		form.setValue(`items.${index}.description`, "");
-		
+			
 		
 	}, [byRate]);
 
@@ -121,7 +106,7 @@ function ItemRow({
 						<div className="flex gap-2">
 							{item.insurance_fee_in_cents > 0 && (
 								<Badge variant="outline">
-									Seguro: {centsToDollars(item.insurance_fee_in_cents).toFixed(2)}
+									Seguro: {(item.insurance_fee_in_cents).toFixed(2)}
 								</Badge>
 							)}
 							{item.charge_fee_in_cents > 0 && (

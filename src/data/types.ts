@@ -109,8 +109,9 @@ export const itemsSchema = z.object({
    customs_id: z.number().min(0),
    customs_fee_in_cents: z.number().min(0).optional(),
    insurance_fee_in_cents: z.number().min(0).optional(),
-   carge_fee_in_cents: z.number().min(0).optional(),
+   charge_fee_in_cents: z.number().min(0).optional(),
    rate_in_cents: z.number().min(0),
+   cost_in_cents: z.number().min(0),
    rate_id: z.number().min(0),
    rate_type: z.enum(["WEIGHT", "FIXED"]),
 });

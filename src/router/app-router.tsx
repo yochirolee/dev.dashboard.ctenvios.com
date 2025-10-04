@@ -8,7 +8,7 @@ import { SectionCards } from "@/components/cards/section-cards";
 import { NewOrderPage } from "@/pages/orders/new-order-page";
 import { InteractiveChart } from "@/components/charts/interactive-chart";
 import { CustomersPage } from "@/pages/settings/customers-page";
-import { AgenciesPage } from "@/pages/settings/agencies-page";
+import { AgenciesPage } from "@/pages/settings/agencies/agencies-page";
 import ProtectedRoute from "./protected-route";
 import InvoicesPage from "@/pages/orders/orders-page";
 import { UserPage } from "@/pages/settings/user-page";
