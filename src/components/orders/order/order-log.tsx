@@ -6,25 +6,6 @@ import { Button } from "@/components/ui/button";
 import { useInvoices } from "@/hooks/use-invoices";
 import { format } from "date-fns";
 import { Skeleton } from "@/components/ui/skeleton";
-type EventType = "CREATED" | "PARTIALLY_PAID" | "PAID" | "PROCESSED" | "ISSUE_REPORTED" | "SYSTEM_ACTION";
-
-const eventTypeStyles: Record<EventType, string> = {
-   CREATED: "",
-   PARTIALLY_PAID: "bg-accent text-accent-foreground",
-   PAID: "bg-foreground text-background",
-   PROCESSED: "bg-foreground text-background",
-   ISSUE_REPORTED: "bg-foreground text-background",
-   SYSTEM_ACTION: "bg-foreground text-background",
-};
-
-const eventDotStyles: Record<EventType, string> = {
-   CREATED: "bg-foreground",
-   PARTIALLY_PAID: "bg-accent",
-   PAID: "bg-foreground",
-   PROCESSED: "bg-foreground",
-   ISSUE_REPORTED: "bg-foreground",
-   SYSTEM_ACTION: "bg-foreground",
-};
 
 export function OrderLog({ invoiceId }: { invoiceId: number }) {
    const { data: events, isLoading } = useInvoices.getHistory(invoiceId);

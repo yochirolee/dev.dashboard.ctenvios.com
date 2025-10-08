@@ -19,7 +19,6 @@ import { Separator } from "../ui/separator";
 import { ChangeRateDialog, ChargeDialog, DiscountDialog, InsuranceFeeDialog } from "./order-dialogs";
 import { centsToDollars } from "@/lib/utils";
 import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
-import { dollarsToCents } from "@/lib/utils";
 
 type FormValues = z.infer<typeof invoiceSchema>;
 
