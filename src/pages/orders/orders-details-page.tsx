@@ -1,6 +1,6 @@
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useInvoices } from "@/hooks/use-invoices";
-import { MapPin, Phone, User, Trash2, PrinterIcon, Plane, Ship, Edit, FileWarning } from "lucide-react";
+import { MapPin, Phone, User, Trash2, PrinterIcon, Plane, Ship, Edit, FileWarning, CreditCard } from "lucide-react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 
 import { PaymentForm } from "@/components/orders/payments/payment-form";
-import { cn, centsToDollars, calculate_row_subtotal, formatFullName } from "@/lib/utils";
+import { cn, centsToDollars, calculate_row_subtotal, formatFullName, formatCents } from "@/lib/utils";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Loading } from "@/components/shares/loading";
 import { OrderLog } from "@/components/orders/order/order-log";
@@ -276,25 +276,22 @@ export default function OrdersDetailsPage() {
                      <ul className="flex flex-col w-1/2  xl:w-1/4 xl:mr-4 py-4 justify-end gap-2 border-t border-dashed  ">
                         <li className="flex items-center gap-4 justify-between">
                            <span className="text-muted-foreground">Subtotal</span>
-                           <span>${centsToDollars(subtotal)?.toFixed(2) ?? 0.0}</span>
+                           <span>{formatCents(subtotal) ?? 0.0}</span>
                         </li>
 
                         <li className="flex items-center justify-between">
                            <span className="text-muted-foreground">Shipping</span>
                            <span>${invoice?.shipping_fee_in_cents?.toFixed(2) ?? 0.0}</span>
                         </li>
+                       
                         <li className="flex items-center justify-between">
-                           <span className="text-muted-foreground">Discount</span>
-                           <span>${invoice?.tax_in_cents?.toFixed(2) ?? 0.0}</span>
-                        </li>
-                        <li className="flex items-center justify-between">
-                           <span className="text-muted-foreground">Charge</span>
-                           <span>$ 0.00</span>
+                           <span className="inline-flex items-center gap-2 text-muted-foreground">Payment Fee<CreditCard/> </span>
+                           <span>{formatCents(invoice?.charge_in_cents) ?? 0.0}</span>
                         </li>
 
                         <li className="flex items-center justify-between font-semibold">
                            <span className="text-muted-foreground">Total</span>
-                           <span>${centsToDollars(invoice?.total_in_cents)?.toFixed(2)}</span>
+                           <span>{formatCents(invoice?.total_in_cents)}</span>
                         </li>
                         <Separator />
                         <li className="flex text-sm items-center justify-between ">
@@ -306,7 +303,7 @@ export default function OrdersDetailsPage() {
                                     : "text-muted-foreground"
                               )}
                            >
-                              ${centsToDollars(invoice?.paid_in_cents)?.toFixed(2) ?? 0.0}
+                              {formatCents(invoice?.paid_in_cents) ?? 0.0}
                            </span>
                         </li>
                         <li className="flex text-sm items-center justify-between">
@@ -316,7 +313,7 @@ export default function OrdersDetailsPage() {
                                  invoice?.payment_status !== "PAID" ? "text-red-500/60" : "text-muted-foreground"
                               )}
                            >
-                              ${centsToDollars(invoice?.total_in_cents - invoice?.paid_in_cents)?.toFixed(2) ?? 0.0}
+                              {formatCents(invoice?.total_in_cents - invoice?.paid_in_cents) ?? 0.0}
                            </span>
                         </li>
                      </ul>

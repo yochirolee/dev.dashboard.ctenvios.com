@@ -1,194 +1,239 @@
+import { useEffect, useState } from "react";
 import {
-	AlertDialog,
-	AlertDialogCancel,
-	AlertDialogAction,
-	AlertDialogContent,
-	AlertDialogDescription,
-	AlertDialogFooter,
-	AlertDialogHeader,
-	AlertDialogTitle,
+   AlertDialog,
+   AlertDialogCancel,
+   AlertDialogAction,
+   AlertDialogContent,
+   AlertDialogDescription,
+   AlertDialogFooter,
+   AlertDialogHeader,
+   AlertDialogTitle,
 } from "../ui/alert-dialog";
 import { Input } from "../ui/input";
 import { Select, SelectTrigger, SelectItem, SelectContent, SelectValue } from "../ui/select";
+import { centsToDollars, dollarsToCents } from "@/lib/utils";
 
 export const InsuranceFeeDialog = ({
-	open,
-	setOpen,
-	index,
-	form,
+   open,
+   setOpen,
+   index,
+   form,
 }: {
-	open: boolean;
-	setOpen: (open: boolean) => void;
-	index: number;
-	form: any;
+   open: boolean;
+   setOpen: (open: boolean) => void;
+   index: number;
+   form: any;
 }) => {
-	console.log("order-dialogs");
-	return (
-		<AlertDialog open={open} onOpenChange={setOpen}>
-			<AlertDialogContent>
-				<AlertDialogHeader>
-					<AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-					<AlertDialogDescription>
-						This action cannot be undone. This will permanently delete your account and remove your
-						data from our servers.
-					</AlertDialogDescription>
-				</AlertDialogHeader>
+   const [insuranceValue, setInsuranceValue] = useState<string>("");
 
-				<Input
-					{...form.register(`items.${index}.insurance_fee_in_cents`, {
-						valueAsNumber: true,
-					})}
-					type="number"
-					onChange={(e) => {
-						form.setValue(`items.${index}.insurance_fee_in_cents`, parseFloat(e.target.value));
-					}}
-					placeholder="Insurance fee"
-				/>
+   useEffect(() => {
+      if (open) {
+         const currentValue = form.getValues(`items.${index}.insurance_fee_in_cents`);
+         setInsuranceValue(currentValue ? centsToDollars(currentValue).toFixed(2) : "");
+      }
+   }, [open, form, index]);
 
-				<AlertDialogFooter>
-					<AlertDialogCancel>Cancel</AlertDialogCancel>
-					<AlertDialogAction>Continue</AlertDialogAction>
-				</AlertDialogFooter>
-			</AlertDialogContent>
-		</AlertDialog>
-	);
+   const handleInsurance = () => {
+      form.setValue(`items.${index}.insurance_fee_in_cents`, dollarsToCents(parseFloat(insuranceValue || "0")));
+      setOpen(false);
+   };
+
+   return (
+      <AlertDialog open={open} onOpenChange={setOpen}>
+         <AlertDialogContent>
+            <AlertDialogHeader>
+               <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+               <AlertDialogDescription>
+                  This action cannot be undone. This will permanently delete your account and remove your data from our
+                  servers.
+               </AlertDialogDescription>
+            </AlertDialogHeader>
+
+            <Input
+               type="number"
+               autoComplete="off"
+               className="[&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none [-moz-appearance:textfield] text-right"
+               value={insuranceValue}
+               onChange={(e) => setInsuranceValue(e.target.value)}
+               placeholder="Insurance fee"
+            />
+
+            <AlertDialogFooter>
+               <AlertDialogCancel>Cancel</AlertDialogCancel>
+               <AlertDialogAction onClick={() => handleInsurance()}>Continue</AlertDialogAction>
+            </AlertDialogFooter>
+         </AlertDialogContent>
+      </AlertDialog>
+   );
 };
 
 export const ChargeDialog = ({
-	open,
-	setOpen,
-	index,
-	form,
+   open,
+   setOpen,
+   index,
+   form,
 }: {
-	open: boolean;
-	setOpen: (open: boolean) => void;
-	index: number;
-	form: any;
+   open: boolean;
+   setOpen: (open: boolean) => void;
+   index: number;
+   form: any;
 }) => {
+   const [chargeValue, setChargeValue] = useState<string>("");
 
+   useEffect(() => {
+      if (open) {
+         const currentValue = form.getValues(`items.${index}.charge_fee_in_cents`);
+         setChargeValue(currentValue ? centsToDollars(currentValue).toFixed(2) : "");
+      }
+   }, [open, form, index]);
 
-	return (
-		<AlertDialog open={open} onOpenChange={setOpen}>
-			<AlertDialogContent>
-				<AlertDialogHeader>
-					<AlertDialogTitle>Adicionar Cargo</AlertDialogTitle>
-					<AlertDialogDescription>Adiciona un cargo a este item.</AlertDialogDescription>
-				</AlertDialogHeader>
+   const handleCharge = () => {
+      form.setValue(`items.${index}.charge_fee_in_cents`, dollarsToCents(parseFloat(chargeValue || "0")));
+      setOpen(false);
+   };
 
-				<Input
-					{...form.register(`items.${index}.charge_fee_in_cents`, {
-						valueAsNumber: true,
-					})}
-					type="number"
-					onChange={(e) => {
-						form.setValue(`items.${index}.charge_fee_in_cents`, parseFloat(e.target.value));
-					}}
-					placeholder="Cargo"
-				/>
+   return (
+      <AlertDialog open={open} onOpenChange={setOpen}>
+         <AlertDialogContent>
+            <AlertDialogHeader>
+               <AlertDialogTitle>Adicionar Cargo</AlertDialogTitle>
+               <AlertDialogDescription>Adiciona un cargo a este item.</AlertDialogDescription>
+            </AlertDialogHeader>
 
-				<AlertDialogFooter>
-					<AlertDialogCancel>Cancelar</AlertDialogCancel>
-					<AlertDialogAction>Adicionar</AlertDialogAction>
-				</AlertDialogFooter>
-			</AlertDialogContent>
-		</AlertDialog>
-	);
+            <Input
+               type="number"
+               autoComplete="off"
+               className="[&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none [-moz-appearance:textfield] text-right"
+               value={chargeValue}
+               onChange={(e) => setChargeValue(e.target.value)}
+               placeholder="0"
+            />
+
+            <AlertDialogFooter>
+               <AlertDialogCancel>Cancelar</AlertDialogCancel>
+               <AlertDialogAction onClick={() => handleCharge()}>Adicionar</AlertDialogAction>
+            </AlertDialogFooter>
+         </AlertDialogContent>
+      </AlertDialog>
+   );
 };
 
 export const ChangeRateDialog = ({
-	open,
-	setOpen,
-	index,
-	form,
+   open,
+   setOpen,
+   index,
+   form,
 }: {
-	open: boolean;
-	setOpen: (open: boolean) => void;
-	index: number;
-	form: any;
+   open: boolean;
+   setOpen: (open: boolean) => void;
+   index: number;
+   form: any;
 }) => {
-	return (
-		<AlertDialog open={open} onOpenChange={setOpen}>
-			<AlertDialogContent>
-				<AlertDialogHeader>
-					<AlertDialogTitle>Cambiar Tarifa</AlertDialogTitle>
-					<AlertDialogDescription>Cambia la tarifa de este item.</AlertDialogDescription>
-				</AlertDialogHeader>
+   const [rateValue, setRateValue] = useState<string>("");
 
-				<Input
-					{...form.register(`items.${index}.rate`, {
-						valueAsNumber: true,
-					})}
-					type="number"
-					onChange={(e) => {
-						form.setValue(`items.${index}.rate`, parseFloat(e.target.value));
-					}}
-					placeholder="Tarifa"
-				/>
+   useEffect(() => {
+      if (open) {
+         const currentValue = form.getValues(`items.${index}.rate_in_cents`);
+         setRateValue(currentValue ? centsToDollars(currentValue).toFixed(2) : "");
+      }
+   }, [open, form, index]);
 
-				<AlertDialogFooter>
-					<AlertDialogCancel>Cancelar</AlertDialogCancel>
-					<AlertDialogAction>Cambiar</AlertDialogAction>
-				</AlertDialogFooter>
-			</AlertDialogContent>
-		</AlertDialog>
-	);
+   const handleChangeRate = () => {
+      form.setValue(`items.${index}.rate_in_cents`, dollarsToCents(parseFloat(rateValue || "0")));
+      setOpen(false);
+   };
+
+   return (
+      <AlertDialog open={open} onOpenChange={setOpen}>
+         <AlertDialogContent>
+            <AlertDialogHeader>
+               <AlertDialogTitle>Cambiar Tarifa</AlertDialogTitle>
+               <AlertDialogDescription>Cambia la tarifa de este item.</AlertDialogDescription>
+            </AlertDialogHeader>
+
+            <Input
+               autoComplete="off"
+               className="[&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none [-moz-appearance:textfield] text-right"
+               value={rateValue}
+               type="number"
+               onChange={(e) => setRateValue(e.target.value)}
+               placeholder="Tarifa"
+            />
+
+            <AlertDialogFooter>
+               <AlertDialogCancel>Cancelar</AlertDialogCancel>
+               <AlertDialogAction onClick={() => handleChangeRate()}>Cambiar</AlertDialogAction>
+            </AlertDialogFooter>
+         </AlertDialogContent>
+      </AlertDialog>
+   );
 };
 
 const discountOptions = [
-	{ label: "cash", value: "cash" },
-	{ label: "percent", value: "percent" },
-	{ label: "rate", value: "rate" },
+   { label: "cash", value: "cash" },
+   { label: "percent", value: "percent" },
+   { label: "rate", value: "rate" },
 ];
 
 export const DiscountDialog = ({
-	open,
-	setOpen,
-	form,
+   open,
+   setOpen,
+   form,
 }: {
-	open: boolean;
-	setOpen: (open: boolean) => void;
-	form: any;
+   open: boolean;
+   setOpen: (open: boolean) => void;
+   form: any;
 }) => {
-	return (
-		<AlertDialog open={open} onOpenChange={setOpen}>
-			<AlertDialogContent>
-				<AlertDialogHeader>
-					<AlertDialogTitle>Descuento</AlertDialogTitle>
-					<AlertDialogDescription>Agrega un descuento a la factura.</AlertDialogDescription>
-				</AlertDialogHeader>
-				<div className="flex flex-col gap-2">
-					<Select
-						{...form.register(`discount_type`, {
-							valueAsNumber: true,
-						})}
-					>
-						<SelectTrigger className="w-full">
-							<SelectValue placeholder="Tipo de Descuento" />
-						</SelectTrigger>
-						<SelectContent>
-							{discountOptions.map((option) => (
-								<SelectItem key={option.value} value={option.value}>
-									{option.label}
-								</SelectItem>
-							))}
-						</SelectContent>
-					</Select>
-					<Input
-						{...form.register(`discount_amount`, {
-							valueAsNumber: true,
-						})}
-						type="number"
-						onChange={(e) => {
-							form.setValue(`discount_amount`, parseFloat(e.target.value));
-						}}
-						placeholder="Descuento"
-					/>
-				</div>
-				<AlertDialogFooter>
-					<AlertDialogCancel>Cancelar</AlertDialogCancel>
-					<AlertDialogAction>Adicionar</AlertDialogAction>
-				</AlertDialogFooter>
-			</AlertDialogContent>
-		</AlertDialog>
-	);
+   const [discountType, setDiscountType] = useState<string>("");
+   const [discountAmount, setDiscountAmount] = useState<string>("");
+
+   useEffect(() => {
+      if (open) {
+         const currentValue = form.getValues(`discount_type`);
+         setDiscountType(currentValue || "");
+         const currentAmount = form.getValues(`discount_amount_in_cents`);
+         setDiscountAmount(currentAmount ? centsToDollars(currentAmount).toFixed(2) : "");
+      }
+   }, [open, form]);
+
+   const handleAddDiscount = () => {
+      form.setValue(`discount_type`, discountType);
+      form.setValue(`discount_amount_in_cents`, dollarsToCents(parseFloat(discountAmount || "0")));
+      setOpen(false);
+   };
+
+   return (
+      <AlertDialog open={open} onOpenChange={setOpen}>
+         <AlertDialogContent>
+            <AlertDialogHeader>
+               <AlertDialogTitle>Descuento</AlertDialogTitle>
+               <AlertDialogDescription>Agrega un descuento a la factura.</AlertDialogDescription>
+            </AlertDialogHeader>
+            <div className="flex flex-col gap-2">
+               <Select value={discountType} onValueChange={(value) => setDiscountType(value)}>
+                  <SelectTrigger className="w-full">
+                     <SelectValue placeholder="Tipo de Descuento" />
+                  </SelectTrigger>
+                  <SelectContent>
+                     {discountOptions.map((option) => (
+                        <SelectItem key={option.value} value={option.value}>
+                           {option.label}
+                        </SelectItem>
+                     ))}
+                  </SelectContent>
+               </Select>
+               <Input
+                  value={discountAmount}
+                  onChange={(e) => setDiscountAmount(e.target.value)}
+                  type="number"
+                  placeholder="Descuento"
+               />
+            </div>
+            <AlertDialogFooter>
+               <AlertDialogCancel>Cancelar</AlertDialogCancel>
+               <AlertDialogAction onClick={() => handleAddDiscount()}>Adicionar</AlertDialogAction>
+            </AlertDialogFooter>
+         </AlertDialogContent>
+      </AlertDialog>
+   );
 };

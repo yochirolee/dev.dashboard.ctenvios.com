@@ -6,24 +6,32 @@ import { Button } from "@/components/ui/button";
 import { useInvoices } from "@/hooks/use-invoices";
 import { format } from "date-fns";
 import { Skeleton } from "@/components/ui/skeleton";
-type EventType = "PUBLIC" | "PRIVATE" | "CUSTOMER";
+type EventType = "CREATED" | "PARTIALLY_PAID" | "PAID" | "PROCESSED" | "ISSUE_REPORTED" | "SYSTEM_ACTION";
 
 const eventTypeStyles: Record<EventType, string> = {
-   PUBLIC: "bg-primary text-primary-foreground",
-   PRIVATE: "bg-accent text-accent-foreground",
-   CUSTOMER: "bg-foreground text-background",
+   CREATED: "",
+   PARTIALLY_PAID: "bg-accent text-accent-foreground",
+   PAID: "bg-foreground text-background",
+   PROCESSED: "bg-foreground text-background",
+   ISSUE_REPORTED: "bg-foreground text-background",
+   SYSTEM_ACTION: "bg-foreground text-background",
 };
 
 const eventDotStyles: Record<EventType, string> = {
-   PUBLIC: "bg-primary",
-   PRIVATE: "bg-accent",
-   CUSTOMER: "bg-foreground",
+   CREATED: "bg-foreground",
+   PARTIALLY_PAID: "bg-accent",
+   PAID: "bg-foreground",
+   PROCESSED: "bg-foreground",
+   ISSUE_REPORTED: "bg-foreground",
+   SYSTEM_ACTION: "bg-foreground",
 };
 
 export function OrderLog({ invoiceId }: { invoiceId: number }) {
    const { data: events, isLoading } = useInvoices.getHistory(invoiceId);
-  if (isLoading) return
-  <div className="col-span-1 xl:col-span-3 h-full"><Skeleton /></div>;
+   if (isLoading) return;
+   <div className="col-span-1 xl:col-span-3 h-full">
+      <Skeleton />
+   </div>;
    console.log(events, "events");
 
    return (
@@ -41,30 +49,24 @@ export function OrderLog({ invoiceId }: { invoiceId: number }) {
 
          <div className="relative space-y-6">
             {/* Timeline line */}
-            <div className="absolute left-[7px] top-2 bottom-0 w-[2px] bg-border" />
+            <div className="absolute left-[7px] top-2 bottom-0 w-[1px] bg-border" />
 
             {events?.map((event: any) => (
                <div key={event.id} className="relative pl-8">
                   {/* Timeline dot */}
-                  <div
-                     className={`absolute left-1 top-1 h-2 w-2 rounded-full ${eventDotStyles[event.type as EventType]}`}
-                  />
+                  <div className={`absolute left-1 top-1 h-2 w-2 rounded-full bg-muted-foreground/50`} />
 
                   <div className="space-y-1">
-                     <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                        <time className="text-xs">{format(new Date(event.created_at), "dd/MM/yyyy HH:mm a")}</time>
-                        <Badge
-                           variant="secondary"
-                           className={`text-[10px] font-semibold ${eventTypeStyles[event.status as EventType]}`}
-                        >
+                     <div className="flex items-center gap-2 text-xs text-muted-foreground justify-between">
+                        <Badge variant="secondary" className={`text-[10px] font-semibold `}>
                            {event.status}
                         </Badge>
+                        <time className="text-xs">{format(new Date(event.created_at), "dd/MM/yyyy HH:mm a")}</time>
                      </div>
 
                      <h3 className="font-sans text-xs font-semibold text-foreground">{event.comment}</h3>
 
                      <p className="text-xs text-muted-foreground flex items-center gap-1">
-                        {" "}
                         <User className="w-3 h-3" /> {event.user.name}
                      </p>
                   </div>

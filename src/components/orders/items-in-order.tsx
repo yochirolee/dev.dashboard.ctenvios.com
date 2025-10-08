@@ -16,7 +16,7 @@ import { useInvoices } from "@/hooks/use-invoices";
 import { Input } from "../ui/input";
 import { useAppStore } from "@/stores/app-store";
 import { Separator } from "../ui/separator";
-import { ChargeDialog, DiscountDialog, InsuranceFeeDialog } from "./order-dialogs";
+import { ChangeRateDialog, ChargeDialog, DiscountDialog, InsuranceFeeDialog } from "./order-dialogs";
 import { centsToDollars } from "@/lib/utils";
 import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
 import { dollarsToCents } from "@/lib/utils";
@@ -63,6 +63,7 @@ export function ItemsInOrder({ shipping_rates }: { shipping_rates: ShippingRate[
          agency_id: user?.agency_id || 0,
          user_id: user?.id || "",
          service_id: selectedService?.id || 0,
+         
 
          items: [
             {
@@ -136,7 +137,6 @@ export function ItemsInOrder({ shipping_rates }: { shipping_rates: ShippingRate[
          setSelectedService(null);
          toast.success("Orden creada correctamente");
 
-         console.log(data, "invoice Created");
          navigate(`/orders/${data.id}`);
       },
       onError: (error) => {
@@ -152,8 +152,11 @@ export function ItemsInOrder({ shipping_rates }: { shipping_rates: ShippingRate[
       data.receiver_id = selectedReceiver?.id || 0;
       data.items = data.items.map((item) => ({
          ...item,
-		  charge_fee_in_cents: dollarsToCents(item?.charge_fee_in_cents || 0),
-		  insurance_fee_in_cents: dollarsToCents(item?.insurance_fee_in_cents || 0),
+         rate_in_cents: item?.rate_in_cents || 0,
+         cost_in_cents: item?.cost_in_cents || 0,
+         customs_fee_in_cents: item?.customs_fee_in_cents || 0,
+         charge_fee_in_cents: item?.charge_fee_in_cents || 0,
+         insurance_fee_in_cents: item?.insurance_fee_in_cents || 0,
       }));
       console.log(data, "form DATA on submit");
 
@@ -231,7 +234,7 @@ export function ItemsInOrder({ shipping_rates }: { shipping_rates: ShippingRate[
                            <TableHead>Categoria</TableHead>
                            <TableHead>Description</TableHead>
                            <TableHead className="text-right w-20">Arancel</TableHead>
-                           <TableHead className="text-right w-20">Peso</TableHead>
+                           <TableHead className="text-right w-22">Peso</TableHead>
                            <TableHead className="text-right w-20">Rate</TableHead>
                            <TableHead className="text-right w-20">Subtotal</TableHead>
                            <TableHead className="w-10"></TableHead>
@@ -271,6 +274,12 @@ export function ItemsInOrder({ shipping_rates }: { shipping_rates: ShippingRate[
             />
             <ChargeDialog
                open={dialogState.type === "charge"}
+               setOpen={() => setDialogState({ type: "", index: 0 })}
+               form={form}
+               index={dialogState.index || 0}
+            />
+            <ChangeRateDialog
+               open={dialogState.type === "rate"}
                setOpen={() => setDialogState({ type: "", index: 0 })}
                form={form}
                index={dialogState.index || 0}
@@ -317,7 +326,7 @@ function InvoiceTotal({ form }: { form: any }) {
                </li>
                <li className="flex items-center justify-between font-semibold">
                   <span className="text-muted-foreground">Total</span>
-                  <span>$0.00</span>
+                  <span>${centsToDollars(form.getValues("total_in_cents")).toFixed(2) || 0.0}</span>
                </li>
             </ul>
          </div>

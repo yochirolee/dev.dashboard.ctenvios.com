@@ -37,20 +37,6 @@ export function isValidCubanCI(ci: string): boolean {
    return controlDigit === digits[10];
 }
 
-export function dollarsToCents(amount: number | string): number {
-   const num = typeof amount === "string" ? parseFloat(amount) : amount;
-   if (!Number.isFinite(num)) throw new Error("Monto inválido");
-   return num * 100;
-}
-
-export function centsToDollars(cents: number): number {
-   return cents / 100;
-}
-
-export function formatCents(cents: number, locale: string = "en-US", currency: string = "USD"): string {
-   return new Intl.NumberFormat(locale, { style: "currency", currency }).format(cents / 100);
-}
-
 export function formatFullName(
    firstName?: string,
    middleName?: string,
@@ -60,6 +46,25 @@ export function formatFullName(
    return [firstName, middleName, lastName, secondLastName].filter(Boolean).join(" ");
 }
 
+export function dollarsToCents(amount: number | string): number {
+   const num = typeof amount === "string" ? parseFloat(amount) : amount;
+   if (!Number.isFinite(num)) throw new Error("Monto invalido");
+   return Math.round(num * 100);
+}
+
+export function centsToDollars(cents: number): number {
+   return Math.round((cents / 100) * 100) / 100;
+}
+
+export function formatCents(cents: number, locale: string = "en-US", currency: string = "USD"): string {
+   return new Intl.NumberFormat(locale, {
+      style: "currency",
+      currency,
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+   }).format(cents / 100);
+}
+
 export const calculate_row_subtotal = (
    rate_in_cents: number,
    weight: number,
@@ -67,16 +72,23 @@ export const calculate_row_subtotal = (
    charge_fee_in_cents: number,
    insurance_fee_in_cents: number,
    rate_type: string
-) => {
+): number => {
    // Ensure all values are valid numbers
    const safeRateInCents = Number(rate_in_cents) || 0;
    const safeWeight = Number(weight) || 0;
    const safeCustomsFeeInCents = Number(customs_fee_in_cents) || 0;
-   const safeChargeFeeInCents = charge_fee_in_cents || 0;
-   const safeInsuranceFeeInCents = insurance_fee_in_cents || 0;
+   const safeChargeFeeInCents = Number(charge_fee_in_cents) || 0;
+   const safeInsuranceFeeInCents = Number(insurance_fee_in_cents) || 0;
+
    if (rate_type === "WEIGHT") {
-      return safeRateInCents * safeWeight + safeCustomsFeeInCents + safeChargeFeeInCents + safeInsuranceFeeInCents;
+      // Always return integer cents using ceil to round up any fractional cents
+      return Math.ceil(
+         safeRateInCents * safeWeight + safeCustomsFeeInCents + safeChargeFeeInCents + safeInsuranceFeeInCents
+      );
    } else {
-      return safeRateInCents + safeCustomsFeeInCents;
+      return Math.ceil(safeRateInCents + safeCustomsFeeInCents);
    }
 };
+
+
+
