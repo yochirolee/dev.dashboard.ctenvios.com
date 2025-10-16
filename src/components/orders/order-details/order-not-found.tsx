@@ -1,28 +1,27 @@
-import { useNavigate } from "react-router-dom";
-import { FileWarning } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardFooter } from "@/components/ui/card";
+import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@/components/ui/empty";
+import { FileWarning } from "lucide-react";
+import { useNavigate } from "react-router";
 
 export function OrderNotFound() {
-  const navigate = useNavigate();
-
-  return (
-    <Card className="flex justify-center items-center h-full">
-      <CardContent className="flex flex-col gap-4 items-center">
-        <FileWarning className="w-10 h-10 text-red-500" />
-        <h2 className="text-center font-bold">No invoice found</h2>
-        <p className="text-center text-muted-foreground">
-          Please try again later
-        </p>
-      </CardContent>
-      <CardFooter>
-        <div className="flex gap-4">
-          <Button variant="outline" onClick={() => navigate("/orders/list")}>
-            Go to orders
-          </Button>
-          <Button onClick={() => navigate("/orders/new")}>Create order</Button>
-        </div>
-      </CardFooter>
-    </Card>
-  );
+   const navigate = useNavigate();
+   return (
+      <Empty>
+         <EmptyHeader>
+            <EmptyMedia variant="icon">
+               <FileWarning />
+            </EmptyMedia>
+            <EmptyTitle>No Order Found!</EmptyTitle>
+            <EmptyDescription> The order you are looking for does not exist.</EmptyDescription>
+         </EmptyHeader>
+         <EmptyContent className="grid grid-cols-2 gap-2">
+            <Button onClick={() => navigate("/orders")} variant="outline" size="sm">
+               Go to Orders
+            </Button>
+            <Button onClick={() => navigate("/orders/new")} variant="default" size="sm">
+               Create Order
+            </Button>
+         </EmptyContent>
+      </Empty>
+   );
 }

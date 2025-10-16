@@ -6,8 +6,7 @@ import { Skeleton } from "../ui/skeleton";
 import { AgencyRates } from "./agency-rates";
 
 export default function AgencyServices({ agencyId }: { agencyId: number }) {
-   const { data: services, isLoading } = useAgencies.getServiceswithShippingRates(agencyId);
-  
+   const { data: services, isLoading } = useAgencies.getActivesServicesRates(agencyId);
 
    if (isLoading) return <Skeleton />;
 

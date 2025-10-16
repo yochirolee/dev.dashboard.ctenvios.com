@@ -8,7 +8,7 @@ import { Loader2, X } from "lucide-react";
 import { useShippingRates } from "@/hooks/use-shipping-rates";
 import type { ShippingRate } from "@/data/types";
 import { useAppStore } from "@/stores/app-store";
-import { centsToDollars, dollarsToCents } from "@/lib/utils";
+import { centsToDollars, dollarsToCents } from "@/lib/cents-utils";
 import { Switch } from "../ui/switch";
 import { Badge } from "../ui/badge";
 import { toast } from "sonner";

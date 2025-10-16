@@ -1,6 +1,6 @@
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { useInvoices } from "@/hooks/use-invoices";
-import { MapPin, Phone, User, Trash2, PrinterIcon, Plane, Ship, Edit, FileWarning, CreditCard } from "lucide-react";
+import { MapPin, Phone, User, Trash2, PrinterIcon, Plane, Ship, Edit, CreditCard } from "lucide-react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
@@ -8,25 +8,25 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 
 import { PaymentForm } from "@/components/orders/payments/payment-form";
-import { cn, centsToDollars, calculate_row_subtotal, formatFullName, formatCents } from "@/lib/utils";
-import { Card, CardContent, CardFooter } from "@/components/ui/card";
+import { cn } from "@/lib/utils";
+import { calculate_row_subtotal, formatFullName, formatCents } from "@/lib/cents-utils";
+import { Card } from "@/components/ui/card";
 import { Loading } from "@/components/shares/loading";
 import { OrderLog } from "@/components/orders/order/order-log";
-import type { OrderItem } from "@/data/types";
-
+import type { OrderItem, Payment } from "@/data/types";
+import { OrderNotFound } from "@/components/orders/order-details/order-not-found";
+import { PaymentsDetails } from "@/components/orders/payments/payments-details";
 const baseUrl = import.meta.env.VITE_API_URL;
 
 export default function OrdersDetailsPage() {
    const { invoiceId } = useParams();
-   const navigate = useNavigate();
+
    const { data, isLoading, error } = useInvoices.getById(Number(invoiceId));
-   const invoice = data?.rows[0] || null;
+
+   if (error) return <div>Error: {error.message}</div>;
+   const invoice = data || null;
 
    console.log(invoice, "invoice");
-
-   if (error) {
-      return <div>Error: {error.message}</div>;
-   }
 
    const subtotal = invoice?.items.reduce(
       (acc: number, item: OrderItem) =>
@@ -132,7 +132,7 @@ export default function OrdersDetailsPage() {
                   <div className=" flex w-full flex-col  justify-end text-center xl:text-end">
                      <h1 className="xl:text-xl text-end font-bold ">Invoice {invoice?.id}</h1>
                      <div className="flex items-center gap-2 text-end justify-end">
-                        <span className="xl:text-lg text-end">{total_weight?.toFixed(2) || 0} lbs</span>
+                        <span className="xl:text-lg text-end">{total_weight.toFixed(2)} lbs</span>
                         <span className="xl:text-lg text-end">Items: {invoice?.items?.length || 0}</span>
                      </div>
                      <time className="text-sm text-end text-muted-foreground">
@@ -221,29 +221,30 @@ export default function OrdersDetailsPage() {
                                  item?.insurance_fee_in_cents === 0 ? "text-muted-foreground" : ""
                               }`}
                            >
-                              ${centsToDollars(item?.insurance_fee_in_cents).toFixed(2)}
+                              {formatCents(item?.insurance_fee_in_cents)}
                            </TableCell>
                            <TableCell
-                              className={`text-right ${item?.charge_fee_in_cents === 0 ? "text-muted-foreground" : ""}`}
+                              className={`text-right ${
+                                 item?.charge_fee_in_cents === 0 ? "text-muted-foreground" : ""
+                              } ${item?.charge_fee_in_cents === 0 ? "text-muted-foreground" : ""}`}
                            >
-                              ${centsToDollars(item?.charge_fee_in_cents).toFixed(2)}
+                              {formatCents(item?.charge_fee_in_cents)}
                            </TableCell>
                            <TableCell
                               className={`text-right ${
                                  item?.customs_fee_in_cents === 0 ? "text-muted-foreground" : ""
                               }`}
                            >
-                              ${centsToDollars(item?.customs_fee_in_cents).toFixed(2)}
+                              {formatCents(item?.customs_fee_in_cents)}
                            </TableCell>
                            <TableCell
                               className={`text-right ${item?.rate_in_cents === 0 ? "text-muted-foreground" : ""}`}
                            >
-                              ${centsToDollars(item?.rate_in_cents).toFixed(2)}
+                              {formatCents(item?.rate_in_cents)}
                            </TableCell>
                            <TableCell className="text-right">{item?.weight?.toFixed(2)}</TableCell>
                            <TableCell className={`text-right ${item?.subtotal === 0 ? "text-muted-foreground" : ""}`}>
-                              $
-                              {centsToDollars(
+                              {formatCents(
                                  calculate_row_subtotal(
                                     item?.rate_in_cents,
                                     item?.weight,
@@ -252,7 +253,7 @@ export default function OrdersDetailsPage() {
                                     item?.insurance_fee_in_cents,
                                     item.rate.rate_type
                                  )
-                              ).toFixed(2)}
+                              )}
                            </TableCell>
                         </TableRow>
                      ))}
@@ -273,7 +274,7 @@ export default function OrdersDetailsPage() {
                      </span>
                   </div>
                   <div className="flex justify-end my-8 ">
-                     <ul className="flex flex-col w-1/2  xl:w-1/4 xl:mr-4 py-4 justify-end gap-2 border-t border-dashed  ">
+                     <ul className="flex flex-col w-1/2  xl:w-xs xl:mr-4 py-4 justify-end gap-2 border-t border-dashed  ">
                         <li className="flex items-center gap-4 justify-between">
                            <span className="text-muted-foreground">Subtotal</span>
                            <span>{formatCents(subtotal) ?? 0.0}</span>
@@ -281,12 +282,29 @@ export default function OrdersDetailsPage() {
 
                         <li className="flex items-center justify-between">
                            <span className="text-muted-foreground">Shipping</span>
-                           <span>${invoice?.shipping_fee_in_cents?.toFixed(2) ?? 0.0}</span>
+                           <span>
+                              {formatCents(
+                                 invoice?.items.reduce(
+                                    (acc: number, item: OrderItem) => acc + item?.delivery_fee_in_cents || 0,
+                                    0
+                                 )
+                              ) ?? 0.0}
+                           </span>
                         </li>
-                       
+
                         <li className="flex items-center justify-between">
-                           <span className="inline-flex items-center gap-2 text-muted-foreground">Payment Fee<CreditCard/> </span>
-                           <span>{formatCents(invoice?.charge_in_cents) ?? 0.0}</span>
+                           <span className="inline-flex items-center gap-2 text-muted-foreground">
+                              Payment Fee
+                              <CreditCard className="size-4" />
+                           </span>
+                           <span>
+                              {formatCents(
+                                 invoice?.payments.reduce(
+                                    (acc: number, payment: Payment) => acc + (payment?.charge_in_cents ?? 0),
+                                    0
+                                 )
+                              ) ?? 0.0}
+                           </span>
                         </li>
 
                         <li className="flex items-center justify-between font-semibold">
@@ -294,6 +312,8 @@ export default function OrdersDetailsPage() {
                            <span>{formatCents(invoice?.total_in_cents)}</span>
                         </li>
                         <Separator />
+                        <PaymentsDetails payments={invoice?.payments} />
+
                         <li className="flex text-sm items-center justify-between ">
                            <span className="text-muted-foreground">Paid</span>
                            <span
@@ -303,7 +323,7 @@ export default function OrdersDetailsPage() {
                                     : "text-muted-foreground"
                               )}
                            >
-                              {formatCents(invoice?.paid_in_cents) ?? 0.0}
+                              {formatCents(invoice?.paid_in_cents)}
                            </span>
                         </li>
                         <li className="flex text-sm items-center justify-between">
@@ -337,20 +357,6 @@ export default function OrdersDetailsPage() {
          </div>
       </div>
    ) : (
-      <Card className="flex justify-center items-center h-full">
-         <CardContent className="flex flex-col gap-4 items-center">
-            <FileWarning className="w-10 h-10 text-red-500" />
-            <h2 className="text-center font-bold">No invoice found</h2>
-            <p className="text-center text-muted-foreground">Please try again later</p>
-         </CardContent>
-         <CardFooter>
-            <div className="flex gap-4">
-               <Button variant="outline" onClick={() => navigate("/orders/list")}>
-                  Go to orders
-               </Button>
-               <Button onClick={() => navigate("/orders/new")}>Create order</Button>
-            </div>
-         </CardFooter>
-      </Card>
+      <OrderNotFound />
    );
 }

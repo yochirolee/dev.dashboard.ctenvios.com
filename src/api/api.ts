@@ -174,18 +174,8 @@ const api = {
       },
    },
    invoices: {
-      get: async (page: number | 1, limit: number | 25) => {
-         const response = await axiosInstance.get("/invoices", {
-            params: {
-               page: page + 1,
-               limit: limit,
-            },
-         });
-         return response.data;
-      },
-
       search: async (search: string, page: number | 1, limit: number | 20, startDate: string, endDate: string) => {
-         const response = await axiosInstance.get("/invoices/search", {
+         const response = await axiosInstance.get("/orders", {
             params: {
                search,
                page: page + 1,
@@ -197,26 +187,25 @@ const api = {
          return response.data;
       },
       getById: async (id: number) => {
-         const response = await axiosInstance.get(`/invoices/${id}`);
+         const response = await axiosInstance.get(`/orders/${id}`);
          return response.data;
       },
       create: async (data: Invoice) => {
-         const response = await axiosInstance.post("/invoices", data);
+         const response = await axiosInstance.post("/orders", data);
          return response.data;
       },
       getHistory: async (invoice_id: number) => {
-         const response = await axiosInstance.get(`/invoices/${invoice_id}/history`);
+         const response = await axiosInstance.get(`/orders/${invoice_id}/history`);
          return response.data;
       },
-      payments: {
-         create: async (invoice_id: number, data: Payment) => {
-            const response = await axiosInstance.post(`/payments/invoice/${invoice_id}`, data);
-            return response.data;
-         },
-         delete: async (invoice_id: number, payment_id: number) => {
-            const response = await axiosInstance.delete(`/invoices/${invoice_id}/payments/${payment_id}`);
-            return response.data;
-         },
+
+      payOrder: async (invoice_id: number, data: Payment) => {
+         const response = await axiosInstance.post(`/orders/${invoice_id}/payments`, data);
+         return response.data;
+      },
+      deletePayment: async (payment_id: number) => {
+         const response = await axiosInstance.delete(`/orders/${payment_id}/payments`);
+         return response.data;
       },
    },
 
@@ -298,12 +287,8 @@ const api = {
          const response = await axiosInstance.put(`/agencies/${id}`, data);
          return response.data;
       },
-      getServiceswithShippingRates: async (id: number, is_active?: boolean) => {
-         const response = await axiosInstance.get(`/agencies/${id}/services-with-rates`, {
-            params: {
-               ...(is_active !== undefined && { is_active }),
-            },
-         });
+      getActivesServicesRates: async (id: number) => {
+         const response = await axiosInstance.get(`/agencies/${id}/actives-services-rates`);
          return response.data;
       },
    },

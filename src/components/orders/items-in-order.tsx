@@ -11,18 +11,18 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
-import { invoiceSchema, type ShippingRate } from "@/data/types";
+import { invoiceSchema } from "@/data/types";
 import { useInvoices } from "@/hooks/use-invoices";
 import { Input } from "../ui/input";
 import { useAppStore } from "@/stores/app-store";
 import { Separator } from "../ui/separator";
 import { ChangeRateDialog, ChargeDialog, DiscountDialog, InsuranceFeeDialog } from "./order-dialogs";
-import { centsToDollars } from "@/lib/utils";
-import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
+import { formatCents } from "@/lib/cents-utils";
+import { calculateTotalDeliveryFee } from "@/lib/calculate_total_delivery";
 
 type FormValues = z.infer<typeof invoiceSchema>;
 
-export function ItemsInOrder({ shipping_rates }: { shipping_rates: ShippingRate[] }) {
+export function ItemsInOrder() {
    const navigate = useNavigate();
    const user = useAppStore((state) => state.user);
    const [items_count, setItemsCount] = useState(1);
@@ -48,12 +48,6 @@ export function ItemsInOrder({ shipping_rates }: { shipping_rates: ShippingRate[
          selectedService: state.selectedService,
       }))
    );
-
-   // Get the first rate from the rates array that type is WEIGHT
-   //divide rates by type WEIGHT and FIXED
-   const weight_rates = shipping_rates?.filter((rate) => rate.rate_type === "WEIGHT" && rate.min_weight == 1);
-   const rate = weight_rates?.[0];
-
    const form = useForm<FormValues>({
       resolver: zodResolver(invoiceSchema) as any,
       defaultValues: {
@@ -62,16 +56,14 @@ export function ItemsInOrder({ shipping_rates }: { shipping_rates: ShippingRate[
          agency_id: user?.agency_id || 0,
          user_id: user?.id || "",
          service_id: selectedService?.id || 0,
-         
-
          items: [
             {
                description: "",
                weight: undefined,
-               rate_in_cents: rate?.rate_in_cents || 0,
-               cost_in_cents: rate?.cost_in_cents || 0,
-               rate_id: rate?.id || undefined,
-               rate_type: rate?.rate_type || "WEIGHT",
+               rate_in_cents: 0,
+               cost_in_cents: 0,
+               rate_id: 0,
+               rate_type: "WEIGHT",
                insurance_fee_in_cents: 0,
                customs_fee_in_cents: 0,
                charge_fee_in_cents: 0,
@@ -100,17 +92,17 @@ export function ItemsInOrder({ shipping_rates }: { shipping_rates: ShippingRate[
             append({
                description: "",
                weight: undefined,
-               rate_id: rate?.id || 0,
-               cost_in_cents: rate?.cost_in_cents || 0,
-               rate_in_cents: rate?.rate_in_cents || 0,
-               rate_type: rate?.rate_type || "WEIGHT",
+               rate_id: 0,
+               cost_in_cents: 0,
+               rate_in_cents: 0,
+               rate_type: "WEIGHT",
                insurance_fee_in_cents: 0,
+               delivery_fee_in_cents: 0,
                customs_fee_in_cents: 0,
                charge_fee_in_cents: 0,
                customs_id: 0,
             });
          }
-
          // Focus on the first newly added item
          setTimeout(() => {
             const newItemIndex = fields.length; // This will be the index of the first new item
@@ -135,13 +127,14 @@ export function ItemsInOrder({ shipping_rates }: { shipping_rates: ShippingRate[
          setSelectedReceiver(null);
          setSelectedService(null);
          toast.success("Orden creada correctamente");
-
+         console.log(data, "data");
          navigate(`/orders/${data.id}`);
       },
       onError: (error) => {
          toast.error(error.response.data.message);
       },
    });
+   const total_delivery_fee = calculateTotalDeliveryFee();
 
    const handleSubmit = (data: FormValues) => {
       data.service_id = selectedService?.id || 0;
@@ -149,32 +142,27 @@ export function ItemsInOrder({ shipping_rates }: { shipping_rates: ShippingRate[
       data.user_id = user?.id || "";
       data.customer_id = selectedCustomer?.id || 0;
       data.receiver_id = selectedReceiver?.id || 0;
-      data.items = data.items.map((item) => ({
-         ...item,
-         rate_in_cents: item?.rate_in_cents || 0,
-         cost_in_cents: item?.cost_in_cents || 0,
-         customs_fee_in_cents: item?.customs_fee_in_cents || 0,
-         charge_fee_in_cents: item?.charge_fee_in_cents || 0,
-         insurance_fee_in_cents: item?.insurance_fee_in_cents || 0,
-      }));
-      console.log(data, "form DATA on submit");
-
+      data.total_delivery_fee_in_cents = total_delivery_fee;
+         toast("You submitted the following values:", {
+         description: (
+            <pre className="bg-code text-code-foreground mt-2 w-[320px] max-h-[800px] overflow-auto rounded-md p-4">
+               <code>{JSON.stringify(data, null, 2)}</code>
+            </pre>
+         ),
+         position: "bottom-right",
+         classNames: {
+            content: "flex flex-col gap-2",
+         },
+         style: {
+            "--border-radius": "calc(var(--radius)  + 4px)",
+         } as React.CSSProperties,
+      }); 
       createInvoice(data);
    };
 
    const handleOpenDialog = (type: "insurance" | "charge" | "rate", index: number) => {
-      console.log(type, index, "type and index");
       setDialogState({ type, index });
    };
-
-   if (shipping_rates?.length === 0) {
-      return (
-         <Alert>
-            <AlertTitle>No rates found</AlertTitle>
-            <AlertDescription>Please add a rate</AlertDescription>
-         </Alert>
-      );
-   }
 
    return (
       <>
@@ -291,6 +279,7 @@ export function ItemsInOrder({ shipping_rates }: { shipping_rates: ShippingRate[
 function InvoiceTotal({ form }: { form: any }) {
    const [open, setOpen] = useState(false);
    const total_weight = form.watch("items").reduce((acc: number, item: any) => acc + item?.weight || 0, 0);
+   const total_delivery = calculateTotalDeliveryFee();
    return (
       <div>
          <div className="mt-8 flex justify-end p-2 lg:pr-6">
@@ -302,12 +291,12 @@ function InvoiceTotal({ form }: { form: any }) {
                <Separator />
                <li className="flex items-center justify-between">
                   <span className="text-muted-foreground">Subtotal</span>
-                  <span>${centsToDollars(form.getValues("total_in_cents")).toFixed(2) || 0.0}</span>
+                  <span>{formatCents(form.getValues("total_in_cents"))}</span>
                </li>
 
                <li className="flex items-center justify-between">
                   <span className="text-muted-foreground">Shipping</span>
-                  <span>$0.00</span>
+                  <span>{formatCents(total_delivery)}</span>
                </li>
 
                <li className="flex items-center justify-between">
@@ -325,7 +314,7 @@ function InvoiceTotal({ form }: { form: any }) {
                </li>
                <li className="flex items-center justify-between font-semibold">
                   <span className="text-muted-foreground">Total</span>
-                  <span>${centsToDollars(form.getValues("total_in_cents")).toFixed(2) || 0.0}</span>
+                  <span>{formatCents(form.getValues("total_in_cents") + total_delivery)}</span>
                </li>
             </ul>
          </div>

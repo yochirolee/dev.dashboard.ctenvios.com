@@ -27,7 +27,7 @@ import { PlusCircle } from "lucide-react";
 import { useCustoms } from "@/hooks/use-customs";
 import type { Customs } from "@/data/types";
 import { customsRatesSchema } from "@/data/types";
-import { centsToDollars, dollarsToCents } from "@/lib/utils";
+import { centsToDollars, dollarsToCents } from "@/lib/cents-utils";
 import { useEffect } from "react";
 
 type FormData = z.input<typeof customsRatesSchema>;

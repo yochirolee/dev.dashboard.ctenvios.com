@@ -7,7 +7,7 @@ import {
 import { MoreVerticalIcon, PencilIcon, Trash2Icon } from "lucide-react";
 import { TableCell, TableHeader, TableHead, TableRow, TableBody, Table } from "@/components/ui/table";
 import type { ShippingRate } from "@/data/types";
-import { centsToDollars } from "@/lib/utils";
+import { centsToDollars } from "@/lib/cents-utils";
 import { Badge } from "../ui/badge";
 import { Switch } from "../ui/switch";
 import { useShippingRates } from "@/hooks/use-shipping-rates";

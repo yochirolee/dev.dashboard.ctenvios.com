@@ -23,72 +23,68 @@ import { ContainersPage } from "@/pages/logistics/containers-page";
 import { FlightsPage } from "@/pages/logistics/flights-page";
 
 export const AppRouter = () => {
-	
-	
-	
+   return (
+      <Routes>
+         <Route path="/login" element={<LoginPage />} />
+         {/* Protected routes */}
+         <Route element={<ProtectedRoute />}>
+            <Route path="/" element={<DashboardLayout />}>
+               {/* These are relative to /dashboard */}
+               <Route index element={<Home />} />
+               <Route path="orders">
+                  <Route index element={<Navigate to="list" replace />} />
+                  <Route path="list" element={<InvoicesPage />} />
+                  <Route path="new" element={<NewOrderPage />} />
+                  <Route path=":invoiceId/edit" element={<EditOrderPage />} />
+                  <Route path=":invoiceId" element={<InvoiceDetailsPage />} />
+               </Route>
+               <Route path="logistics">
+                  <Route path="dispatch" element={<DispatchPage />} />
+                  <Route path="containers" element={<ContainersPage />} />
+                  <Route path="flights" element={<FlightsPage />} />
+               </Route>
+               <Route path="settings">
+                  <Route index element={<Navigate to="providers" replace />} />
+                  <Route path="providers" element={<ProvidersServicesPage />} />
+                  <Route path="agencies" element={<AgenciesPage />} />
+                  <Route path="agencies/new" element={<NewAgencyPage />} />
+                  <Route path="customers" element={<CustomersPage />} />
+                  <Route path="receivers" element={<ReceiversPage />} />
+                  <Route path="users" element={<UserPage />} />
+                  <Route path="customs" element={<CustomsPage />} />
+               </Route>
+            </Route>
+         </Route>
 
-	return (
-		<Routes>
-			<Route path="/login" element={<LoginPage />} />
-			{/* Protected routes */}
-			<Route element={<ProtectedRoute />}>
-				<Route path="/" element={<DashboardLayout />}>
-					{/* These are relative to /dashboard */}
-					<Route index element={<Home />} />
-					<Route path="orders">
-						<Route index element={<Navigate to="list" replace />} />
-						<Route path="list" element={<InvoicesPage />} />
-						<Route path="new" element={<NewOrderPage />} />
-						<Route path=":invoiceId/edit" element={<EditOrderPage />} />
-						<Route path=":invoiceId" element={<InvoiceDetailsPage />} />
-					</Route>
-					<Route path="logistics">
-						<Route path="dispatch" element={<DispatchPage />} />
-						<Route path="containers" element={<ContainersPage />} />
-						<Route path="flights" element={<FlightsPage />} />
-					</Route>
-					<Route path="settings">
-						<Route index element={<Navigate to="providers" replace />} />
-						<Route path="providers" element={<ProvidersServicesPage />} />
-						<Route path="agencies" element={<AgenciesPage />} />
-						<Route path="agencies/new" element={<NewAgencyPage />} />
-						<Route path="customers" element={<CustomersPage />} />
-						<Route path="receivers" element={<ReceiversPage />} />
-						<Route path="users" element={<UserPage />} />
-						<Route path="customs" element={<CustomsPage />} />
-					</Route>
-				</Route>
-			</Route>
-
-			<Route path="*" element={<Navigate to="/login" replace />} />
-		</Routes>
-	);
+         <Route path="*" element={<Navigate to="/login" replace />} />
+      </Routes>
+   );
 };
 
 const Home = () => {
-	return (
-		<div className="@container/main  ">
-			<div className="flex flex-col">
-				<h3 className=" font-bold">Dashboard</h3>
-				<p className="text-sm text-gray-500 ">
-					Welcome to the dashboard. Here you can see your stats and analytics.
-				</p>
-			</div>
-			<div className="flex flex-col gap-4 py-4">
-				<div className="flex flex-col gap-2">
-					<div className="bg-muted py-2 md:p-4 rounded-lg">
-						<SectionCards />
-					</div>
-				</div>
-				<div className="grid auto-rows-min gap-4 md:grid-cols-1  xl:grid-cols-4">
-					<div className="grid xl:col-span-3">
-						<InteractiveChart />
-					</div>
-					<DashboardAreaChart />
-					<DashboardPieChart />
-					<DashboardBarChart />
-				</div>
-			</div>
-		</div>
-	);
+   return (
+      <div className="@container/main  ">
+         <div className="flex flex-col">
+            <h3 className=" font-bold">Dashboard</h3>
+            <p className="text-sm text-gray-500 ">
+               Welcome to the dashboard. Here you can see your stats and analytics.
+            </p>
+         </div>
+         <div className="flex flex-col gap-4 py-4">
+            <div className="flex flex-col gap-2">
+               <div className="bg-muted py-2 md:p-4 rounded-lg">
+                  <SectionCards />
+               </div>
+            </div>
+            <div className="grid auto-rows-min gap-4 md:grid-cols-1  xl:grid-cols-4">
+               <div className="grid xl:col-span-3">
+                  <InteractiveChart />
+               </div>
+               <DashboardAreaChart />
+               <DashboardPieChart />
+               <DashboardBarChart />
+            </div>
+         </div>
+      </div>
+   );
 };

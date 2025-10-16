@@ -11,7 +11,7 @@ import {
 } from "../ui/alert-dialog";
 import { Input } from "../ui/input";
 import { Select, SelectTrigger, SelectItem, SelectContent, SelectValue } from "../ui/select";
-import { centsToDollars, dollarsToCents } from "@/lib/utils";
+import { centsToDollars, dollarsToCents } from "@/lib/cents-utils";
 
 export const InsuranceFeeDialog = ({
    open,

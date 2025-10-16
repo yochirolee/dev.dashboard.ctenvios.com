@@ -1,7 +1,8 @@
 import * as React from "react";
 import { Check, ChevronsUpDown, Loader2 } from "lucide-react";
 
-import { cn, formatFullName } from "@/lib/utils";
+import { cn } from "@/lib/utils";
+import { formatFullName } from "@/lib/cents-utils";
 import { Button } from "@/components/ui/button";
 import {
 	Command,

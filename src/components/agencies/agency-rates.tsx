@@ -4,7 +4,7 @@ import {} from "@/components/ui/dropdown-menu";
 import { PencilIcon } from "lucide-react";
 import { TableCell, TableHeader, TableHead, TableRow, TableBody, Table } from "@/components/ui/table";
 import type { ShippingRate } from "@/data/types";
-import { centsToDollars } from "@/lib/utils";
+import { centsToDollars } from "@/lib/cents-utils";
 import { Badge } from "../ui/badge";
 import { Switch } from "../ui/switch";
 import { useShippingRates } from "@/hooks/use-shipping-rates";
@@ -24,6 +24,7 @@ export const AgencyRates = ({ rates }: { rates: ShippingRate[] }) => {
          <Table>
             <TableHeader>
                <TableRow>
+                  <TableHead>Id</TableHead>
                   <TableHead>Nombre</TableHead>
                   <TableHead>Tipo</TableHead>
                   <TableHead>Costo Agencia</TableHead>
@@ -58,6 +59,9 @@ const RateRow = ({ rate, handleUpdate }: {  rate: ShippingRate, handleUpdate: (r
 
    return (
       <TableRow key={rate.id} className="border-b-0">
+         <TableCell>
+            <p>{rate?.id}</p>
+         </TableCell>
          <TableCell>
             <p>{rate?.name}</p>
          </TableCell>

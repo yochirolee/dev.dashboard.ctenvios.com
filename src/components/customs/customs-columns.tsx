@@ -11,7 +11,7 @@ import {
 
 import type { Customs } from "@/data/types";
 import { Badge } from "../ui/badge";
-import { centsToDollars } from "@/lib/utils";
+import { centsToDollars } from "@/lib/cents-utils";
 
 export const customsColumns = (
 	handleEdit: (customsRate: Customs) => void,

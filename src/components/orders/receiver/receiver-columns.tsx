@@ -2,7 +2,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Checkbox } from "@/components/ui/checkbox";
 import { type ColumnDef } from "@tanstack/react-table";
 import { type Receiver } from "@/data/types";
-import { formatFullName } from "@/lib/utils";
+import { formatFullName } from "@/lib/cents-utils";
 
 export const receiversColumns: ColumnDef<Receiver>[] = [
 	{

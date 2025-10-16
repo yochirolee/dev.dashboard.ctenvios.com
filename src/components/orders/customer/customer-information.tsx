@@ -2,7 +2,7 @@ import { useInvoiceStore } from "@/stores/invoice-store";
 import { useShallow } from "zustand/react/shallow";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
-import { formatFullName } from "@/lib/utils";
+import { formatFullName } from "@/lib/cents-utils";
 
 export function CustomerInformation() {
 	const { selectedCustomer, setSelectedCustomer, setSelectedReceiver } = useInvoiceStore(

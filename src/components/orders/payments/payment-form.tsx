@@ -10,7 +10,8 @@ import { payment_methods } from "@/data/data";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useEffect, useState } from "react";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
-import { cn, centsToDollars, dollarsToCents } from "@/lib/utils";
+import { cn } from "@/lib/utils";
+import { centsToDollars, dollarsToCents } from "@/lib/cents-utils";
 import { paymentSchema } from "@/data/types";
 import { toast } from "sonner";
 import { type OrderInvoice } from "@/data/types";
@@ -20,7 +21,7 @@ import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/ca
 import { PaymentProcessing } from "./processing-payment";
 
 export const PaymentForm = ({ invoice }: { invoice: OrderInvoice }) => {
-   const balance = ((centsToDollars(invoice?.total_in_cents - invoice?.paid_in_cents))).toFixed(2);
+   const balance = centsToDollars(invoice?.total_in_cents - invoice?.paid_in_cents).toFixed(2);
 
    console.log(invoice, "invoice");
 
@@ -51,7 +52,7 @@ export const PaymentForm = ({ invoice }: { invoice: OrderInvoice }) => {
       form.setValue("charge_in_cents", 0);
    }
 
-   const { mutate: createPayment, isPending } = useInvoices.pay({
+   const { mutate: createPayment, isPending } = useInvoices.payOrder({
       onSuccess: () => {
          toast.success("Payment created successfully");
          form.reset({});
@@ -166,7 +167,10 @@ export const PaymentForm = ({ invoice }: { invoice: OrderInvoice }) => {
                   </div>
 
                   {isPending ? (
-                     <PaymentProcessing amount={amount} charge={centsToDollars(form.getValues("charge_in_cents") ?? 0)} />
+                     <PaymentProcessing
+                        amount={amount}
+                        charge={centsToDollars(form.getValues("charge_in_cents") ?? 0)}
+                     />
                   ) : (
                      <Button type="submit" disabled={isPending}>
                         Pagar

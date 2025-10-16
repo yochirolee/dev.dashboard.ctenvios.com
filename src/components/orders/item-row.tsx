@@ -1,17 +1,22 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Input } from "../ui/input";
 import { TableCell, TableRow } from "../ui/table";
 import { useWatch } from "react-hook-form";
 import CustomsFeeCombobox from "./customs-fee-combobox";
 import { Button } from "../ui/button";
 import { DollarSign, PencilIcon, PlusCircle, ShieldCheck, Trash2 } from "lucide-react";
-import { useState } from "react";
 import { DropdownMenu, DropdownMenuItem, DropdownMenuContent, DropdownMenuTrigger } from "../ui/dropdown-menu";
 
 import { Badge } from "../ui/badge";
 import { Switch } from "../ui/switch";
 import FixedRatesCombobox from "./fixed-rates-combobox";
-import { centsToDollars, calculate_row_subtotal } from "@/lib/utils";
+import { centsToDollars, calculate_row_subtotal } from "@/lib/cents-utils";
+import { useInvoiceStore } from "@/stores/invoice-store";
+import { useShallow } from "zustand/react/shallow";
+import { InputGroup, InputGroupInput } from "../ui/input-group";
+import { InputGroupAddon } from "../ui/input-group";
+import { Item } from "../ui/item";
+import { calculateTotalDeliveryFee } from "@/lib/calculate_total_delivery";
 
 function ItemRow({
    index,
@@ -31,9 +36,7 @@ function ItemRow({
       control: form.control,
       name: `items.${index}`, // escuchas todo el objeto item
    });
-
-   console.log(item, "item-row");
-
+   
    useEffect(() => {
       const subtotal = calculate_row_subtotal(
          item?.rate_in_cents,
@@ -62,47 +65,67 @@ function ItemRow({
       item?.rate_type || "WEIGHT",
    ]);
 
-   const [byRate, setByRate] = useState(false);
+   const [mode, setMode] = useState<"WEIGHT" | "FIXED">("WEIGHT");
+   const { shipping_rates } = useInvoiceStore(
+      useShallow((state) => ({
+         shipping_rates: state.shipping_rates,
+      }))
+   );
+
+   const activeWeightRate = shipping_rates?.filter((rate) => rate.rate_type === "WEIGHT")?.[0];
 
    useEffect(() => {
       form.setValue(`items.${index}.subtotal`, 0);
       form.setValue(`items.${index}.description`, "");
-   }, [byRate]);
+      form.setValue(`items.${index}.rate_id`, activeWeightRate?.id || 0);
+      form.setValue(`items.${index}.rate_in_cents`, activeWeightRate?.rate_in_cents || 0);
+      form.setValue(`items.${index}.cost_in_cents`, activeWeightRate?.cost_in_cents || 0);
+      form.setValue(`items.${index}.rate_type`, activeWeightRate?.rate_type || "WEIGHT");
+   }, [mode, shipping_rates]);
 
    const handleRemove = () => {
       // Use index for removal - React Hook Form's remove function expects the index
       remove(index);
    };
 
+   console.log(item, "item-row");
+
    return (
       <TableRow key={index}>
          <TableCell>{index + 1}</TableCell>
          <TableCell className=" flex justify-center items-center mt-2">
-            <Switch checked={byRate} onCheckedChange={() => setByRate(!byRate)} id="mode" />
+            <Switch
+               checked={mode === "FIXED"}
+               onCheckedChange={() => {
+                  setMode(mode === "WEIGHT" ? "FIXED" : "WEIGHT");
+                  form.setValue(`items.${index}.rate_type`, mode === "WEIGHT" ? "FIXED" : "WEIGHT");
+               }}
+               id="mode"
+            />
          </TableCell>
          <TableCell className="w-10">
-            {byRate ? (
-               <FixedRatesCombobox form={form} index={index} />
-            ) : (
+            {mode === "WEIGHT" ? (
                <CustomsFeeCombobox index={index} form={form} />
+            ) : (
+               <FixedRatesCombobox form={form} index={index} />
             )}
          </TableCell>
-         <TableCell className="flex items-center gap-2 ">
-            <div className="w-full relative gap-2">
-               <Input className="lg:w-full pr-40 w-auto" {...form.register(`items.${index}.description`)} />
-               <div className="absolute right-2 top-1/2 -translate-y-1/2">
-                  <div className="flex gap-2">
-                     {item.insurance_fee_in_cents > 0 && (
-                        <Badge variant="outline">Seguro: {centsToDollars(item.insurance_fee_in_cents).toFixed(2)}</Badge>
-                     )}
-                     {item.charge_fee_in_cents > 0 && (
-                        <Badge variant="outline" className="">
-                           Cargo: {centsToDollars(item.charge_fee_in_cents).toFixed(2)}
-                        </Badge>
-                     )}
-                  </div>
-               </div>
-            </div>
+         <TableCell className="inline-flex min-w-[300px] items-center gap-2 w-full">
+            <InputGroup>
+               <InputGroupInput placeholder="Descripción..." {...form.register(`items.${index}.description`)} />
+               <InputGroupAddon align="inline-end">
+                  {centsToDollars(item.delivery_fee_in_cents).toFixed(2)}
+                  {item.insurance_fee_in_cents > 0 && (
+                     <Badge variant="outline">Seguro: {centsToDollars(item.insurance_fee_in_cents).toFixed(2)}</Badge>
+                  )}
+                  {item.charge_fee_in_cents > 0 && (
+                     <Badge variant="outline" className="">
+                        Cargo: {centsToDollars(item.charge_fee_in_cents).toFixed(2)}
+                     </Badge>
+                  )}
+               </InputGroupAddon>
+            </InputGroup>
+
             <DropdownMenu>
                <DropdownMenuTrigger asChild>
                   <Button variant="ghost" size="icon">

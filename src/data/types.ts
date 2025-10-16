@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { isValidCubanCI } from "@/lib/utils";
+import { isValidCubanCI } from "@/lib/cents-utils";
 
 export const customerSchema = z.object({
    id: z.number().optional(),
@@ -110,6 +110,7 @@ export const itemsSchema = z.object({
    customs_fee_in_cents: z.number().min(0).optional(),
    insurance_fee_in_cents: z.number().min(0).optional(),
    charge_fee_in_cents: z.number().min(0).optional(),
+   delivery_fee_in_cents: z.number().min(0).optional(),
    rate_in_cents: z.number().min(0),
    cost_in_cents: z.number().min(0),
    rate_id: z.number().min(0),
@@ -125,6 +126,7 @@ export const invoiceSchema = z.object({
    items: z.array(itemsSchema).min(1, "La factura debe tener al menos 1 item"),
    charge_in_cents: z.number().min(0).optional(),
    total_in_cents: z.number().optional().default(0),
+   total_delivery_fee_in_cents: z.number().min(0).optional().default(0),
    paid_in_cents: z.number().min(0).optional().default(0),
    created_at: z.string().optional(),
    updated_at: z.string().optional(),
@@ -194,7 +196,7 @@ export const serviceSchema = z.object({
 export const userSchema = z
    .object({
       id: z.string().optional(),
-      email: z.string().email("Email inválido"),
+      email: z.string().email({ message: "Email inválido" }),
       image: z.string().url().optional(),
       password: z.string().min(8, "La contraseña debe tener al menos 8 caracteres"),
       repeat_password: z.string().min(8, "La contraseña debe tener al menos 8 caracteres"),
