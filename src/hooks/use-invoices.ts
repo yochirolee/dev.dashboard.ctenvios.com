@@ -45,7 +45,7 @@ export const useInvoices = {
          },
          onSuccess: async (data: any) => {
             await queryClient.invalidateQueries({ queryKey: ["get-order", data?.id] });
-            queryClient.invalidateQueries({ queryKey: ["get-orders-history", data?.id] });
+            await queryClient.invalidateQueries({ queryKey: ["get-invoices"] });
             options?.onSuccess?.();
          },
          onError: (error) => {
@@ -59,6 +59,7 @@ export const useInvoices = {
          mutationFn: (payment_id: number) => api.invoices.deletePayment(payment_id),
          onSuccess: async () => {
             await queryClient.invalidateQueries({ queryKey: ["get-order"] });
+            await queryClient.invalidateQueries({ queryKey: ["get-invoices"] });
             options?.onSuccess?.();
          },
          onError: (error) => {

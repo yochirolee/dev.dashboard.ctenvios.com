@@ -12,7 +12,6 @@ import { cn } from "@/lib/utils";
 import { calculate_row_subtotal, formatFullName, formatCents } from "@/lib/cents-utils";
 import { Card } from "@/components/ui/card";
 import { Loading } from "@/components/shares/loading";
-import { OrderLog } from "@/components/orders/order/order-log";
 import type { OrderItem, Payment } from "@/data/types";
 import { OrderNotFound } from "@/components/orders/order-details/order-not-found";
 import { PaymentsDetails } from "@/components/orders/payments/payments-details";
@@ -353,7 +352,7 @@ export default function OrdersDetailsPage() {
                </div>
             </Card>
 
-            <OrderLog invoiceId={invoice?.id} />
+           
          </div>
       </div>
    ) : (

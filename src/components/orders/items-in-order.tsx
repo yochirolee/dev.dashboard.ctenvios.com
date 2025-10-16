@@ -143,7 +143,7 @@ export function ItemsInOrder() {
       data.customer_id = selectedCustomer?.id || 0;
       data.receiver_id = selectedReceiver?.id || 0;
       data.total_delivery_fee_in_cents = total_delivery_fee;
-         toast("You submitted the following values:", {
+      /*     toast("You submitted the following values:", {
          description: (
             <pre className="bg-code text-code-foreground mt-2 w-[320px] max-h-[800px] overflow-auto rounded-md p-4">
                <code>{JSON.stringify(data, null, 2)}</code>
@@ -156,7 +156,7 @@ export function ItemsInOrder() {
          style: {
             "--border-radius": "calc(var(--radius)  + 4px)",
          } as React.CSSProperties,
-      }); 
+      });  */
       createInvoice(data);
    };
 
