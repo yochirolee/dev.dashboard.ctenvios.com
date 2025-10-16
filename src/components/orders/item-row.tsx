@@ -15,8 +15,6 @@ import { useInvoiceStore } from "@/stores/invoice-store";
 import { useShallow } from "zustand/react/shallow";
 import { InputGroup, InputGroupInput } from "../ui/input-group";
 import { InputGroupAddon } from "../ui/input-group";
-import { Item } from "../ui/item";
-import { calculateTotalDeliveryFee } from "@/lib/calculate_total_delivery";
 
 function ItemRow({
    index,

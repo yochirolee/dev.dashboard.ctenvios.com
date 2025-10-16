@@ -1,6 +1,6 @@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import type { OrderItem } from "@/data/types";
-import { centsToDollars, calculate_row_subtotal } from "@/lib/utils";
+import { formatCents, calculate_row_subtotal } from "@/lib/cents-utils";
 
 interface ItemsTableProps {
    items: OrderItem[];
@@ -26,18 +26,13 @@ export function ItemsTable({ items }: ItemsTableProps) {
                <TableRow key={index}>
                   <TableCell>{item.hbl}</TableCell>
                   <TableCell>{item.description}</TableCell>
-                  <TableCell className="text-right">
-                     ${centsToDollars(item.insurance_fee_in_cents || 0).toFixed(2)}
-                  </TableCell>
-                  <TableCell className="text-right">
-                     ${centsToDollars(item.delivery_fee_in_cents || 0).toFixed(2)}
-                  </TableCell>
-                  <TableCell className="text-right">${centsToDollars(item.customs_fee_in_cents).toFixed(2)}</TableCell>
-                  <TableCell className="text-right">${centsToDollars(item.rate_in_cents).toFixed(2)}</TableCell>
+                  <TableCell className="text-right">{formatCents(item.insurance_fee_in_cents)}</TableCell>
+                  <TableCell className="text-right">{formatCents(item.delivery_fee_in_cents)}</TableCell>
+                  <TableCell className="text-right">{formatCents(item.customs_fee_in_cents)}</TableCell>
+                  <TableCell className="text-right">{formatCents(item.rate_in_cents)}</TableCell>
                   <TableCell className="text-right">{item.weight.toFixed(2)}</TableCell>
                   <TableCell className="text-right">
-                     $
-                     {centsToDollars(
+                     {formatCents(
                         calculate_row_subtotal(
                            item.rate_in_cents,
                            item.weight,
@@ -46,7 +41,7 @@ export function ItemsTable({ items }: ItemsTableProps) {
                            item.insurance_fee_in_cents,
                            item.rate.rate_type
                         )
-                     ).toFixed(2)}
+                     )}
                   </TableCell>
                </TableRow>
             ))}
