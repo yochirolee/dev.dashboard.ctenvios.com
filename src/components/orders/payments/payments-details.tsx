@@ -5,6 +5,7 @@ import { Item, ItemMedia, ItemContent, ItemActions, ItemTitle } from "@/componen
 import { Spinner } from "@/components/ui/spinner";
 import { toast } from "sonner";
 import { useInvoices } from "@/hooks/use-invoices";
+import { InputGroupAddon, InputGroupButton } from "@/components/ui/input-group";
 
 export const PaymentsDetails = ({ payments }: { payments: Payment[] }) => {
    return (
@@ -41,7 +42,11 @@ const PaymentItem = ({ payment }: { payment: Payment }) => {
             {isDeleting ? (
                <Spinner className="size-4 text-muted-foreground" />
             ) : (
-               <Trash2 className="size-4 hover:text-red-500/80" onClick={() => deletePayment(payment?.id ?? 0)} />
+               <InputGroupAddon align="inline-end">
+                  <InputGroupButton variant="secondary" size="icon-xs" onClick={() => deletePayment(payment?.id ?? 0)}>
+                     <Trash2 />
+                  </InputGroupButton>
+               </InputGroupAddon>
             )}
          </ItemActions>
       </Item>
