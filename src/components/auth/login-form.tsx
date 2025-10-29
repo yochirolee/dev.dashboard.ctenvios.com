@@ -10,6 +10,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useAppStore } from "@/stores/app-store";
 import { useLoginMutation } from "@/hooks/use-users";
 import { Field, FieldError, FieldGroup, FieldLabel, FieldSeparator } from "../ui/field";
+import { useEffect } from "react";
 
 const formSchema = z.object({
    email: z.string().email({ message: "Please enter a valid email address" }),
@@ -33,9 +34,11 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
       login(values);
    };
 
-   if (session) {
-      navigate("/", { replace: true });
-   }
+  useEffect(() => {
+     if (session) {
+        navigate("/", { replace: true });
+     }
+  }, [session, navigate]);
 
    return (
       <div className={cn("flex flex-col gap-6", className)} {...props}>

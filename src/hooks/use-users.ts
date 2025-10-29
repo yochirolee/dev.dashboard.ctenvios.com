@@ -2,7 +2,7 @@ import api from "@/api/api";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { useAppStore } from "@/stores/app-store";
-import type { User } from "@/data/types";
+import type { Agency, User } from "@/data/types";
 import { useNavigate } from "react-router-dom";
 import { queryClient } from "@/lib/query-client";
 import { useOrderStore } from "@/stores/order-store";
@@ -40,13 +40,14 @@ export const useLoginMutation = () => {
    const navigate = useNavigate();
    return useMutation({
       mutationFn: async ({ email, password }: { email: string; password: string }) => {
-         const { session, user } = await api.users.signIn(email, password);
-         return { session, user };
+         const { session, user, agency } = await api.users.signIn(email, password);
+         return { session, user, agency };
       },
-      onSuccess: ({ session, user }) => {
-         const { setSession, setUser } = useAppStore.getState();
+      onSuccess: ({ session, user, agency }) => {
+         const { setSession, setUser, setAgency } = useAppStore.getState();
          setSession(session);
          setUser(user);
+         setAgency(agency as Agency);
          navigate("/", { replace: true });
       },
    });

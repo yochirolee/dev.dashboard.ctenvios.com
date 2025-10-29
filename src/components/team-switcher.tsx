@@ -8,40 +8,17 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  SidebarMenuSkeleton,
   
 } from "@/components/ui/sidebar"
 import { Building2 } from "lucide-react";
-import { useAgencies } from "@/hooks/use-agencies";
 import { useAppStore } from "@/stores/app-store";
 
 export function TeamSwitcher()
   {
 
 
-  const {user} = useAppStore();
-  const {data: agency,isLoading} = useAgencies.getById(user?.agency_id || 0);
+  const {  agency } = useAppStore();
   
-  if(!agency || isLoading) return (
-    <SidebarMenu>
-    <SidebarMenuItem>
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <SidebarMenuButton
-            size="lg"
-            className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
-          >
-            
-             <SidebarMenuSkeleton showIcon={true} className="" />
-            
-          
-          </SidebarMenuButton>
-        </DropdownMenuTrigger>
-      
-      </DropdownMenu>
-    </SidebarMenuItem>
-  </SidebarMenu>
-  );
  
   
   return (

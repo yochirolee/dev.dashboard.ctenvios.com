@@ -19,9 +19,6 @@ export const AgenciesPage = () => {
    const { data: agencies = [], isLoading, error } = useAgencies.get();
 
    const selectedAgency = agencies.find((agency: Agency) => agency.id === selectedAgencyId) ?? agencies[0] ?? null;
-   const users = useAgencies.getUsers(selectedAgency?.id);
-   const rates = useAgencies.getActivesServicesRates(selectedAgency?.id);
-   console.log(users, rates);
 
    if (isLoading) return <Skeleton className="h-[200px] w-full" />;
    if (error) return <div>Error loading agencies</div>;

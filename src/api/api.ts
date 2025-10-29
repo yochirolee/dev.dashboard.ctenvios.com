@@ -26,11 +26,8 @@ const createAgencyFormSchema = z.object({
 export type CreateAgencyFormSchema = z.infer<typeof createAgencyFormSchema>;
 
 const config = {
-   baseURL: import.meta.env.DEV ? "http://localhost:3000/api/v1" : "https://api-ctenvios-com.vercel.app/api/v1",
-   timeout: 10000,
-   headers: {
-      "Content-Type": "application/json",
-   },
+   baseURL: import.meta.env.VITE_API_URL,
+   headers: { "Content-Type": "application/json" },
 };
 
 export const axiosInstance = axios.create(config);
@@ -58,12 +55,21 @@ axiosInstance.interceptors.request.use(
 
 // Add response interceptor for better error handling with React Query
 axiosInstance.interceptors.response.use(
-   (response) => response,
-
+      (response) => {
+      console.log(`✅ ${response.config.method?.toUpperCase()} ${response.config.url}`, {
+         status: response.status,
+         hasData: !!response.data
+      });
+      return response;
+   },
    (error) => {
+      console.error(`❌ ${error.config.method?.toUpperCase()} ${error.config.url}`, {
+         status: error.response?.status,
+         hasData: !!error.response?.data
+      });
       // Handle 401 Unauthorized responses
       if (error.response?.status === 401) {
-         useAppStore.setState({ session: null });
+         useAppStore.setState({ session: null, user: null, agency: null });
          window.location.href = "/login";
       }
 
