@@ -1,5 +1,3 @@
-import { useState } from "react";
-import {} from "@/components/ui/dropdown-menu";
 import { PencilIcon } from "lucide-react";
 import { TableCell, TableHeader, TableHead, TableRow, TableBody, Table } from "@/components/ui/table";
 import type { ShippingRate } from "@/data/types";
@@ -9,14 +7,6 @@ import { Switch } from "../ui/switch";
 import { Button } from "../ui/button";
 
 export const AgencyRates = ({ rates }: { rates: ShippingRate[] }) => {
-   const [open, setOpen] = useState(false);
-   const [rateForUpdate, setRateForUpdate] = useState<ShippingRate | null>(null);
-
-   const handleUpdate = (rate: ShippingRate) => {
-      setRateForUpdate(rate);
-      setOpen(true);
-   };
-
    return (
       <>
          <Table>
@@ -34,7 +24,7 @@ export const AgencyRates = ({ rates }: { rates: ShippingRate[] }) => {
             </TableHeader>
             <TableBody>
                {rates?.map((rate: ShippingRate) => (
-                  <RateRow key={rate.id} rate={rate} handleUpdate={handleUpdate} />
+                  <RateRow key={rate.id} rate={rate} />
                ))}
             </TableBody>
          </Table>
@@ -42,12 +32,16 @@ export const AgencyRates = ({ rates }: { rates: ShippingRate[] }) => {
    );
 };
 
-const RateRow = ({ rate, handleUpdate }: { rate: ShippingRate; handleUpdate: (rate: ShippingRate) => void }) => {
+const RateRow = ({ rate }: { rate: ShippingRate }) => {
    const calculateProfit = (rate: ShippingRate) => {
       return rate?.price_in_cents - rate?.cost_in_cents;
    };
 
    const handleActivate = (rate: ShippingRate) => {
+      rate.is_active = !rate.is_active;
+   };
+
+   const handleUpdate = (rate: ShippingRate) => {
       rate.is_active = !rate.is_active;
    };
 

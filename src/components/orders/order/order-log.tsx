@@ -3,23 +3,19 @@ import { Card, CardDescription, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { useInvoices } from "@/hooks/use-orders";
+import { useOrders } from "@/hooks/use-orders";
 import { format } from "date-fns";
 import { Skeleton } from "@/components/ui/skeleton";
 
-export function OrderLog({ invoiceId }: { invoiceId: number }) {
-   const { data: events, isLoading } = useInvoices.getHistory(invoiceId);
-   if (isLoading) return;
-   <div className="col-span-1 xl:col-span-3 h-full">
-      <Skeleton />
-   </div>;
-   console.log(events, "events");
+export function OrderLog({ orderId }: { orderId: number }) {
+   const { data: events, isLoading } = useOrders.getHistory(orderId);
+   if (isLoading) return <Skeleton className="col-span-1 xl:col-span-3 h-full" />;
 
    return (
       <Card className=" col-span-1 xl:col-span-3 px-4 py-2">
          <div className="grid gap-0.5">
             <CardTitle className="group flex justify-between items-center gap-2 text-lg">
-               Order No. {invoiceId}
+               Order No. {orderId}
                <Button size="icon" variant="outline" className="h-6 w-6 transition-opacity group-hover:opacity-100">
                   <Copy className="h-3 w-3" />
                   <span className="sr-only">Copy Order ID</span>

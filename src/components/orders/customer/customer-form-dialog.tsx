@@ -123,7 +123,7 @@ const CustomerForm = ({
          setIsOpen(false);
          toast.success("Cliente actualizado correctamente");
          form.reset();
-         useInvoiceStore.setState({ selectedCustomer: data });
+         useOrderStore.setState({ selectedCustomer: data });
       },
    });
 
@@ -132,7 +132,7 @@ const CustomerForm = ({
          setIsOpen(false);
          toast.success("Cliente creado correctamente");
          form.reset();
-         useInvoiceStore.setState({ selectedCustomer: data });
+         useOrderStore.setState({ selectedCustomer: data });
       },
       onError: (error) => {
          toast.error(error.response.data.message);

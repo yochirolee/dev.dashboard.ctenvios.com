@@ -5,10 +5,9 @@ import { Item, ItemMedia, ItemContent, ItemActions, ItemTitle } from "@/componen
 import { Spinner } from "@/components/ui/spinner";
 import { toast } from "sonner";
 import { useOrders } from "@/hooks/use-orders";
-import { InputGroupAddon, InputGroupButton } from "@/components/ui/input-group";
+import { InputGroupAddon } from "@/components/ui/input-group";
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
 import zelleIcon from "/zelle-icon.svg";
-import { Button } from "@/components/ui/button";
 
 const paymentIcons = {
    CASH: <Banknote className="size-4" />,

@@ -175,6 +175,7 @@ export const agencySchema = z
 export const providerSchema = z.object({
    id: z.number().optional(),
    name: z.string().min(1, "El nombre es requerido"),
+   contact: z.string().optional(),
    address: z.string().min(1, "La dirección es requerida"),
    phone: z.string().min(10, "El teléfono debe tener al menos 10 dígitos"),
    email: z.string().email().optional(),

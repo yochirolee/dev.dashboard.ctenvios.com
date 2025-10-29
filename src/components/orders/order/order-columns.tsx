@@ -4,7 +4,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { type ColumnDef } from "@tanstack/react-table";
 import { format } from "date-fns";
 import { formatFullName } from "@/lib/cents-utils";
-import { CheckCircle2, Clock, CircleDashed, EllipsisVertical, FileText, Pencil, TagIcon, Trash } from "lucide-react";
+import {  EllipsisVertical, FileText, Pencil, TagIcon, Trash } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
    DropdownMenu,
@@ -14,7 +14,6 @@ import {
    DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Link } from "react-router-dom";
-import { FieldContent, FieldGroup, FieldLabel, Field } from "@/components/ui/field";
 
 // This type is used to define the shape of our data.
 // You can use a Zod schema here if you want.
