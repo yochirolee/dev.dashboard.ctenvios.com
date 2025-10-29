@@ -25,13 +25,13 @@ import { Separator } from "@/components/ui/separator";
 
 import { useProvinces } from "@/hooks/use-provinces";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { useInvoiceStore } from "@/stores/invoice-store";
+import { useOrderStore } from "@/stores/order-store";
 import { useShallow } from "zustand/react/shallow";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
 import { Field, FieldDescription, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
 
 export function ReceiverFormDialog() {
-   const { selectedReceiver } = useInvoiceStore(
+   const { selectedReceiver } = useOrderStore(
       useShallow((state) => ({
          selectedReceiver: state.selectedReceiver,
       }))
@@ -71,8 +71,7 @@ const ReceiverForm = ({
    setIsOpen: (isOpen: boolean) => void;
 }) => {
    const { data: provinces } = useProvinces();
-   const { setSelectedReceiver, selectedCustomer } = useInvoiceStore(
-      useShallow((state) => ({
+   const { setSelectedReceiver, selectedCustomer } = useOrderStore( useShallow((state) => ({
          selectedReceiver: state.selectedReceiver,
          setSelectedReceiver: state.setSelectedReceiver,
          selectedCustomer: state.selectedCustomer,

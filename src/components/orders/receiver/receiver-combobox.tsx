@@ -9,7 +9,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { useReceivers } from "@/hooks/use-receivers";
 import type { Receiver } from "@/data/types";
 import { useDebounce } from "use-debounce";
-import { useInvoiceStore } from "@/stores/invoice-store";
+import { useOrderStore } from "@/stores/order-store";
 import { useShallow } from "zustand/react/shallow";
 
 export function ReceiverCombobox() {
@@ -17,7 +17,7 @@ export function ReceiverCombobox() {
    const [searchQuery, setSearchQuery] = React.useState("");
    const [debouncedSearchQuery] = useDebounce(searchQuery, 500);
 
-   const { selectedReceiver, selectedCustomer, setSelectedReceiver } = useInvoiceStore(
+   const { selectedReceiver, selectedCustomer, setSelectedReceiver } = useOrderStore(
       useShallow((state) => ({
          selectedReceiver: state.selectedReceiver,
          selectedCustomer: state.selectedCustomer,

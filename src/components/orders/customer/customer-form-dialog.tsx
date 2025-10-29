@@ -17,7 +17,7 @@ import * as z from "zod";
 import { useCustomers } from "@/hooks/use-customers";
 import { type Customer } from "@/data/types";
 import { toast } from "sonner";
-import { useInvoiceStore } from "@/stores/invoice-store";
+import { useOrderStore } from "@/stores/order-store";
 import { useShallow } from "zustand/react/shallow";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Field, FieldLabel, FieldGroup, FieldError } from "@/components/ui/field";
@@ -40,7 +40,7 @@ type FormData = z.infer<typeof customerFormSchema>;
 
 export const CustomerFormDialog = React.memo(function CustomerFormDialog() {
    const [isOpen, setIsOpen] = useState(false);
-   const { selectedCustomer } = useInvoiceStore(
+   const { selectedCustomer } = useOrderStore(
       useShallow((state) => ({
          selectedCustomer: state.selectedCustomer,
       }))

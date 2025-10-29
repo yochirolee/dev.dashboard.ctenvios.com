@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useFormContext } from "react-hook-form";
-import { useInvoiceStore } from "@/stores/invoice-store";
+import { useOrderStore } from "@/stores/order-store";
 import { useShallow } from "zustand/react/shallow";
 import type { ShippingRate } from "@/data/types";
 import { useEffect } from "react";
@@ -15,23 +15,23 @@ const FixedRatesCombobox = React.memo(function FixedRatesCombobox({ form, index 
 
    const formContext = form || useFormContext();
    const { setValue } = formContext;
-   const { shipping_rates } = useInvoiceStore(
+   const { shipping_rates } = useOrderStore(
       useShallow((state) => ({
          shipping_rates: state.shipping_rates,
       }))
    );
    const [selectedRate, setSelectedRate] = React.useState<ShippingRate | null>(
-      shipping_rates?.filter((rate) => rate.rate_type === "FIXED")?.[0] || null
+      shipping_rates?.filter((rate) => rate.unit === "FIXED")?.[0] || null
    );
 
    console.log(shipping_rates, "shipping_rates on fixed rates combobox");
 
    useEffect(() => {
       setValue(`items.${index}.rate_id`, selectedRate?.id || 0);
-      setValue(`items.${index}.rate_in_cents`, selectedRate?.rate_in_cents || 0);
+      setValue(`items.${index}.price_in_cents`, selectedRate?.price_in_cents || 0);
       setValue(`items.${index}.description`, selectedRate?.description || "");
       setValue(`items.${index}.cost_in_cents`, selectedRate?.cost_in_cents || 0);
-      setValue(`items.${index}.rate_type`, selectedRate?.rate_type || "FIXED");
+      setValue(`items.${index}.unit`, selectedRate?.unit || "FIXED");
    }, [shipping_rates, selectedRate]);
 
    const handleUpdateRate = (rate: ShippingRate) => {
@@ -66,7 +66,7 @@ const FixedRatesCombobox = React.memo(function FixedRatesCombobox({ form, index 
                   <CommandEmpty>No se encontraron Tarifas.</CommandEmpty>
                   <CommandGroup>
                      {shipping_rates
-                        ?.filter((rate) => rate.rate_type === "FIXED")
+                        ?.filter((rate) => rate.unit === "FIXED")
                         ?.map((rate: ShippingRate) => (
                            <CommandItem
                               key={rate?.id}

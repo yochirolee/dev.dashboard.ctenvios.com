@@ -1,11 +1,11 @@
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
-import { useInvoiceStore } from "@/stores/invoice-store";
+import { useOrderStore } from "@/stores/order-store";
 import { useShallow } from "zustand/react/shallow";
-
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Plane, Ship } from "lucide-react";
 import type { Service, ShippingRate, Provider } from "@/data/types";
+import { EmptyServicesRates } from "../agencies/empty-services-rates";
 
 // Extended Service interface to match API response
 interface ServiceWithRates extends Service {
@@ -14,7 +14,7 @@ interface ServiceWithRates extends Service {
 }
 
 export function ServiceSelector({ services }: { services: ServiceWithRates[] }) {
-   const { setSelectedService, selectedService, selectedCustomer, selectedReceiver } = useInvoiceStore(
+   const { setSelectedService, selectedService, selectedCustomer, selectedReceiver } = useOrderStore(
       useShallow((state) => ({
          setSelectedService: state.setSelectedService,
          selectedService: state.selectedService,
@@ -32,6 +32,9 @@ export function ServiceSelector({ services }: { services: ServiceWithRates[] }) 
       }
    };
 
+   if (services?.length === 0) {
+      return <EmptyServicesRates />;
+   }
    return (
       <Card>
          <CardHeader>

@@ -11,7 +11,7 @@ import { Badge } from "../ui/badge";
 import { Switch } from "../ui/switch";
 import FixedRatesCombobox from "./fixed-rates-combobox";
 import { centsToDollars, calculate_row_subtotal } from "@/lib/cents-utils";
-import { useInvoiceStore } from "@/stores/invoice-store";
+import { useOrderStore } from "@/stores/order-store";
 import { useShallow } from "zustand/react/shallow";
 import { InputGroup, InputGroupInput } from "../ui/input-group";
 import { InputGroupAddon } from "../ui/input-group";
@@ -34,15 +34,15 @@ function ItemRow({
       control: form.control,
       name: `items.${index}`, // escuchas todo el objeto item
    });
-   
+
    useEffect(() => {
       const subtotal = calculate_row_subtotal(
-         item?.rate_in_cents,
+         item?.price_in_cents,
          item?.weight,
          item?.customs_fee_in_cents,
          item?.charge_fee_in_cents || 0,
          item?.insurance_fee_in_cents || 0,
-         item?.rate_type
+         item?.unit
       );
 
       form.setValue(`items.${index}.subtotal`, subtotal);
@@ -55,31 +55,32 @@ function ItemRow({
 
       form.setValue(`total_in_cents`, total);
    }, [
-      item?.rate_in_cents || 0,
+      item?.price_in_cents || 0,
       item?.weight || 0,
       item?.customs_fee_in_cents || 0,
       item?.charge_fee_in_cents || 0,
       item?.insurance_fee_in_cents || 0,
-      item?.rate_type || "WEIGHT",
+      item?.unit || "PER_LB",
    ]);
 
-   const [mode, setMode] = useState<"WEIGHT" | "FIXED">("WEIGHT");
-   const { shipping_rates } = useInvoiceStore(
+   const { shipping_rates } = useOrderStore(
       useShallow((state) => ({
          shipping_rates: state.shipping_rates,
       }))
    );
 
-   const activeWeightRate = shipping_rates?.filter((rate) => rate.rate_type === "WEIGHT")?.[0];
+   console.log(shipping_rates, "shipping_rates on item-row");
+
+   const activeWeightRate = shipping_rates?.filter((rate) => rate.unit === "PER_LB")?.[0];
 
    useEffect(() => {
       form.setValue(`items.${index}.subtotal`, 0);
       form.setValue(`items.${index}.description`, "");
       form.setValue(`items.${index}.rate_id`, activeWeightRate?.id || 0);
-      form.setValue(`items.${index}.rate_in_cents`, activeWeightRate?.rate_in_cents || 0);
+      form.setValue(`items.${index}.price_in_cents`, activeWeightRate?.price_in_cents || 0);
       form.setValue(`items.${index}.cost_in_cents`, activeWeightRate?.cost_in_cents || 0);
-      form.setValue(`items.${index}.rate_type`, activeWeightRate?.rate_type || "WEIGHT");
-   }, [mode, shipping_rates]);
+      form.setValue(`items.${index}.unit`, activeWeightRate?.unit || "PER_LB");
+   }, [shipping_rates]);
 
    const handleRemove = () => {
       // Use index for removal - React Hook Form's remove function expects the index
@@ -93,16 +94,15 @@ function ItemRow({
          <TableCell>{index + 1}</TableCell>
          <TableCell className=" flex justify-center items-center mt-2">
             <Switch
-               checked={mode === "FIXED"}
+               checked={item.unit === "FIXED"}
                onCheckedChange={() => {
-                  setMode(mode === "WEIGHT" ? "FIXED" : "WEIGHT");
-                  form.setValue(`items.${index}.rate_type`, mode === "WEIGHT" ? "FIXED" : "WEIGHT");
+                  form.setValue(`items.${index}.unit`, item.unit === "PER_LB" ? "FIXED" : "PER_LB");
                }}
                id="mode"
             />
          </TableCell>
          <TableCell className="w-10">
-            {mode === "WEIGHT" ? (
+            {item.unit === "PER_LB" ? (
                <CustomsFeeCombobox index={index} form={form} />
             ) : (
                <FixedRatesCombobox form={form} index={index} />
@@ -174,7 +174,7 @@ function ItemRow({
                }}
             />
          </TableCell>
-         <TableCell className="text-right">{centsToDollars(item.rate_in_cents).toFixed(2)}</TableCell>
+         <TableCell className="text-right">{centsToDollars(item.price_in_cents).toFixed(2)}</TableCell>
          <TableCell className="text-right">{centsToDollars(item.subtotal || 0).toFixed(2)}</TableCell>
 
          <TableCell className="w-10">

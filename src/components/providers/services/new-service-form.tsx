@@ -1,15 +1,22 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { Form, FormControl, FormItem, FormLabel, FormField } from "../ui/form";
-import { Input } from "../ui/input";
-import { Button } from "../ui/button";
+import { Form, FormControl, FormItem, FormLabel, FormField } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { Loader2, Plus } from "lucide-react";
 import { useServices } from "@/hooks/use-services";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import type { Provider } from "@/data/types";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "../ui/dialog";
+import {
+   Dialog,
+   DialogContent,
+   DialogDescription,
+   DialogHeader,
+   DialogTitle,
+   DialogTrigger,
+} from "@/components/ui/dialog";
 
 const formNewServiceSchema = z.object({
    name: z.string().min(1, { message: "El nombre del servicio es requerido" }),
@@ -22,14 +29,22 @@ const formNewServiceSchema = z.object({
 
 type FormNewServiceSchema = z.infer<typeof formNewServiceSchema>;
 
-export const NewServiceForm = ({ open, setOpen, provider }: { open: boolean; setOpen: (open: boolean) => void; provider: Provider }) => {
+export const NewServiceForm = ({
+   open,
+   setOpen,
+   provider,
+}: {
+   open: boolean;
+   setOpen: (open: boolean) => void;
+   provider: Provider;
+}) => {
    const form = useForm<FormNewServiceSchema>({
       resolver: zodResolver(formNewServiceSchema),
       defaultValues: {
          name: "",
          description: "",
          service_type: "MARITIME",
-         provider_id: provider.id,
+         provider_id: provider?.id ?? 0,
          forwarder_id: 1,
          is_active: true,
       },

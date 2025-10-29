@@ -1,17 +1,17 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Separator } from "../ui/separator";
-import type { Provider, Service, ShippingRate } from "@/data/types";
+import { Separator } from "../../ui/separator";
+import type { Product, Provider, Service } from "@/data/types";
 import { NewServiceForm } from "./new-service-form";
 import { useState } from "react";
 import { ServiceCard } from "./service-card";
 
-interface ServiceWithRates extends Service {
-   shipping_rates: ShippingRate[];
+interface ServiceWithProducts extends Service {
+   products: Product[];
 }
 
 interface ServicesListProps {
    provider: Provider;
-   services: ServiceWithRates[];
+   services: ServiceWithProducts[];
 }
 
 export default function ServicesList({ provider, services }: ServicesListProps) {
@@ -23,7 +23,7 @@ export default function ServicesList({ provider, services }: ServicesListProps) 
             <CardTitle>Servicios y Tarifas</CardTitle>
             <div className="flex items-center justify-between gap-2">
                <CardDescription>
-                  Aquí puedes ver los servicios y tarifas Bases. Puedes editar las tarifas de los servicios.
+                  Aquí puedes ver los servicios y productos. Puedes crear nuevos productos para los servicios.
                </CardDescription>
 
                <NewServiceForm open={open} setOpen={setOpen} provider={provider} />
@@ -31,7 +31,7 @@ export default function ServicesList({ provider, services }: ServicesListProps) 
          </CardHeader>
          <Separator />
          <CardContent>
-            {services?.map((service: ServiceWithRates) => (
+            {services?.map((service: ServiceWithProducts) => (
                <ServiceCard key={service?.id} service={service} provider={provider} />
             ))}
          </CardContent>

@@ -1,35 +1,35 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import api from "@/api/api";
-import type { Invoice, Payment } from "@/data/types";
+import type { Order, Payment } from "@/data/types";
 
-export const useInvoices = {
+export const useOrders = {
    search: (searchQuery: string, page: number, limit: number, startDate: string, endDate: string) => {
       return useQuery({
-         queryKey: ["get-invoices", "search", searchQuery, page, limit, startDate, endDate],
-         queryFn: () => api.invoices.search(searchQuery, page, limit, startDate, endDate),
+         queryKey: ["get-orders", "search", searchQuery, page, limit, startDate, endDate],
+         queryFn: () => api.orders.search(searchQuery, page, limit, startDate, endDate),
          staleTime: 1000 * 60 * 5,
       });
    },
    getById: (id: number) => {
       return useQuery({
-         queryKey: ["get-order", id],
-         queryFn: () => api.invoices.getById(id),
+         queryKey: ["get-orders", id],
+         queryFn: () => api.orders.getById(id),
          enabled: !!id,
       });
    },
    getHistory: (invoice_id: number) => {
       return useQuery({
-         queryKey: ["get-invoice-history", invoice_id],
-         queryFn: () => api.invoices.getHistory(invoice_id),
+         queryKey: ["get-orders-history", invoice_id],
+         queryFn: () => api.orders.getHistory(invoice_id),
          enabled: !!invoice_id,
       });
    },
-   create: (options?: { onSuccess?: (data: Invoice) => void; onError?: (error: any) => void }) => {
+   create: (options?: { onSuccess?: (data: Order) => void; onError?: (error: any) => void }) => {
       const queryClient = useQueryClient();
       return useMutation({
-         mutationFn: (data: Invoice) => api.invoices.create(data),
-         onSuccess: (data: Invoice) => {
-            queryClient.invalidateQueries({ queryKey: ["get-invoices"] });
+         mutationFn: (data: Order) => api.orders.create(data),
+         onSuccess: (data: Order) => {
+            queryClient.invalidateQueries({ queryKey: ["get-orders"] });
             options?.onSuccess?.(data);
          },
          onError: (error) => {
@@ -40,12 +40,12 @@ export const useInvoices = {
    payOrder: (options?: { onSuccess?: () => void; onError?: (error: any) => void }) => {
       const queryClient = useQueryClient();
       return useMutation({
-         mutationFn: ({ invoice_id, data }: { invoice_id: number; data: Payment }) => {
-            return api.invoices.payOrder(invoice_id, data);
+         mutationFn: ({ order_id, data }: { order_id: number; data: Payment }) => {
+            return api.orders.payOrder(order_id, data);
          },
          onSuccess: async (data: any) => {
             await queryClient.invalidateQueries({ queryKey: ["get-order", data?.id] });
-            await queryClient.invalidateQueries({ queryKey: ["get-invoices"] });
+            await queryClient.invalidateQueries({ queryKey: ["get-orders"] });
             options?.onSuccess?.();
          },
          onError: (error) => {
@@ -56,10 +56,10 @@ export const useInvoices = {
    deletePayment: (options?: { onSuccess?: () => void; onError?: (error: any) => void }) => {
       const queryClient = useQueryClient();
       return useMutation({
-         mutationFn: (payment_id: number) => api.invoices.deletePayment(payment_id),
+         mutationFn: (payment_id: number) => api.orders.deletePayment(payment_id),
          onSuccess: async () => {
             await queryClient.invalidateQueries({ queryKey: ["get-order"] });
-            await queryClient.invalidateQueries({ queryKey: ["get-invoices"] });
+            await queryClient.invalidateQueries({ queryKey: ["get-orders"] });
             options?.onSuccess?.();
          },
          onError: (error) => {

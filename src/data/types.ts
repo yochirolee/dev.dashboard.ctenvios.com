@@ -63,37 +63,22 @@ export const receiverSchema = z
       path: ["phone", "mobile"],
    });
 
-export const shippingRateSchema = z
-   .object({
-      id: z.number().optional(),
-      name: z.string(),
-      description: z.string().optional(),
-      agency_id: z.number().optional(),
-      service_id: z.number().optional(),
-      rate_id: z.number().optional(),
-      rate_in_cents: z.number().min(0, { message: "El precio de la agencia debe ser mayor a 0" }),
-      cost_in_cents: z.number().min(0, { message: "El precio de costo debe ser mayor a 0" }),
-      is_active: z.boolean(),
-      rate_type: z.enum(["WEIGHT", "FIXED"]),
-      min_weight: z.number().optional(),
-      max_weight: z.number().optional(),
-      is_base: z.boolean(),
-   })
-   .refine((data) => data.rate_in_cents >= data.cost_in_cents, {
-      message: "El precio público debe ser mayor o igual al precio de la agencia",
-      path: ["rate_in_cents"],
-   });
-export const productRateSchema = z.object({
-   id: z.number(),
+export const shippingRateSchema = z.object({
+   id: z.number().optional(),
+   product_id: z.number(),
    name: z.string(),
-   rate_in_cents: z.number().min(0, { message: "El precio de la agencia debe ser mayor a 0" }),
-   cost_in_cents: z.number().min(0, { message: "El precio de costo debe ser mayor a 0" }),
-   rate_id: z.number().min(0),
-   is_active: z.boolean().default(true),
-   agency_id: z.number(),
+   description: z.string(),
+   buyer_agency_id: z.number(),
+   seller_agency_id: z.number(),
    service_id: z.number(),
-   rate_type: z.enum(["WEIGHT", "FIXED"]),
+   price_in_cents: z.number(),
+   cost_in_cents: z.number(),
+   is_active: z.boolean(),
+   unit: z.enum(["PER_LB", "FIXED"]),
+   min_weight: z.number(),
+   max_weight: z.number(),
 });
+
 export const paymentSchema = z.object({
    id: z.number().optional(),
    amount_in_cents: z.number().min(0),
@@ -101,6 +86,19 @@ export const paymentSchema = z.object({
    method: z.string(),
    reference: z.string().min(0).optional(),
    notes: z.string().min(0).optional(),
+});
+export const productSchema = z.object({
+   id: z.number().optional(),
+   name: z.string().min(1, "El nombre es requerido"),
+   service_id: z.number().min(1),
+   provider_id: z.number().min(1),
+   description: z.string().min(1, "La descripción es requerida"),
+   unit: z.enum(["PER_LB", "FIXED"]),
+   type: z.enum(["SHIPPING", "CUSTOMS", "DELIVERY"]),
+   length: z.number().min(0).optional(),
+   width: z.number().min(0).optional(),
+   height: z.number().min(0).optional(),
+   is_active: z.boolean().default(true),
 });
 
 export const itemsSchema = z.object({
@@ -111,19 +109,19 @@ export const itemsSchema = z.object({
    insurance_fee_in_cents: z.number().min(0).optional(),
    charge_fee_in_cents: z.number().min(0).optional(),
    delivery_fee_in_cents: z.number().min(0).optional(),
-   rate_in_cents: z.number().min(0),
+   price_in_cents: z.number().min(0),
    cost_in_cents: z.number().min(0),
    rate_id: z.number().min(0),
-   rate_type: z.enum(["WEIGHT", "FIXED"]),
+   unit: z.enum(["PER_LB", "FIXED"]),
 });
-export const invoiceSchema = z.object({
+export const orderSchema = z.object({
    id: z.number().optional(),
    customer_id: z.number().min(0),
    receiver_id: z.number().min(0),
    agency_id: z.number().min(0),
    user_id: z.string().min(0),
    service_id: z.number().min(0),
-   items: z.array(itemsSchema).min(1, "La factura debe tener al menos 1 item"),
+   items: z.array(itemsSchema).min(1, "La orden debe tener al menos 1 item"),
    charge_in_cents: z.number().min(0).optional(),
    total_in_cents: z.number().optional().default(0),
    total_delivery_fee_in_cents: z.number().min(0).optional().default(0),
@@ -220,7 +218,7 @@ export type Customer =
      })
    | null;
 export type Item = z.infer<typeof itemsSchema>;
-export type Invoice = z.infer<typeof invoiceSchema>;
+export type Order = z.infer<typeof orderSchema>;
 export type Service = z.infer<typeof serviceSchema>;
 
 export interface Province {
@@ -242,9 +240,9 @@ export type User = z.infer<typeof userSchema>;
 
 export type ShippingRate = z.infer<typeof shippingRateSchema>;
 
-export type ProductRate = z.infer<typeof productRateSchema>;
+export type Product = z.infer<typeof productSchema>;
 
-export interface OrderInvoice {
+export interface OrderHistory {
    id: number;
    payment_status: string;
    agency: Agency;
@@ -263,18 +261,19 @@ export interface OrderInvoice {
    tax_in_cents: number;
    discount_in_cents: number;
 }
-export interface OrderItem {
+export interface OrderItems {
    id: number;
    hbl: string;
    description: string;
    weight: number;
-   rate_in_cents: number;
+   price_in_cents: number;
    rate_id: number;
-   rate_type: string;
+   unit: string;
    insurance_fee_in_cents: number;
    delivery_fee_in_cents: number;
    customs_fee_in_cents: number;
    customs_id: number;
    charge_fee_in_cents: number;
    rate: ShippingRate;
+   subtotal: number;
 }

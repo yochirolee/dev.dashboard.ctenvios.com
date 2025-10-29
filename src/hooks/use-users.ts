@@ -5,6 +5,7 @@ import { useAppStore } from "@/stores/app-store";
 import type { User } from "@/data/types";
 import { useNavigate } from "react-router-dom";
 import { queryClient } from "@/lib/query-client";
+import { useOrderStore } from "@/stores/order-store";
 
 export const useGetUsers = (page: number | 1, limit: number | 25) => {
    return useQuery({
@@ -57,6 +58,7 @@ export const useLogOut = () => {
       mutationFn: () => api.users.signOut(),
       onSuccess: () => {
          useAppStore.getState().clearAll();
+         useOrderStore.getState().clearAll();
          queryClient.clear();
          navigate("/login", { replace: true });
       },

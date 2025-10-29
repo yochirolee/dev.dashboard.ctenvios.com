@@ -5,7 +5,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Check, ChevronsUpDown, DollarSign } from "lucide-react";
-import { useInvoices } from "@/hooks/use-invoices";
+import { useOrders } from "@/hooks/use-orders";
 import { payment_methods } from "@/data/data";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useEffect, useState } from "react";
@@ -14,16 +14,14 @@ import { cn } from "@/lib/utils";
 import { centsToDollars, dollarsToCents } from "@/lib/cents-utils";
 import { paymentSchema } from "@/data/types";
 import { toast } from "sonner";
-import { type OrderInvoice } from "@/data/types";
+import { type Order } from "@/data/types";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { DialogDescription } from "@/components/ui/dialog";
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { PaymentProcessing } from "./processing-payment";
+import { Spinner } from "@/components/ui/spinner";
 
-export const PaymentForm = ({ invoice }: { invoice: OrderInvoice }) => {
-   const balance = centsToDollars(invoice?.total_in_cents - invoice?.paid_in_cents).toFixed(2);
-
-   console.log(invoice, "invoice");
+export const PaymentForm = ({ order }: { order: Order }) => {
+   const balance = centsToDollars(order?.total_in_cents - order?.paid_in_cents).toFixed(2);
 
    const form = useForm<z.infer<typeof paymentSchema>>({
       resolver: zodResolver(paymentSchema),
@@ -52,7 +50,7 @@ export const PaymentForm = ({ invoice }: { invoice: OrderInvoice }) => {
       form.setValue("charge_in_cents", 0);
    }
 
-   const { mutate: createPayment, isPending } = useInvoices.payOrder({
+   const { mutate: createPayment, isPending } = useOrders.payOrder({
       onSuccess: () => {
          toast.success("Payment created successfully");
          form.reset({});
@@ -66,7 +64,7 @@ export const PaymentForm = ({ invoice }: { invoice: OrderInvoice }) => {
    const onSubmit = (data: z.infer<typeof paymentSchema>) => {
       data.amount_in_cents = dollarsToCents(data.amount_in_cents);
       data.charge_in_cents = dollarsToCents(data.charge_in_cents ?? 0);
-      createPayment({ invoice_id: Number(invoice.id), data });
+      createPayment({ order_id: Number(order.id), data });
    };
 
    const [open, setOpen] = useState(false);
@@ -98,7 +96,7 @@ export const PaymentForm = ({ invoice }: { invoice: OrderInvoice }) => {
                   <CardHeader>
                      <CardDescription>Total de la factura</CardDescription>
                      <CardTitle className="text-2xl font-semibold text-muted-foreground tabular-nums @[250px]/card:text-3xl">
-                        ${centsToDollars(invoice?.total_in_cents)}
+                        ${centsToDollars(order?.total_in_cents)}
                      </CardTitle>
                   </CardHeader>
                </Card>
@@ -166,16 +164,15 @@ export const PaymentForm = ({ invoice }: { invoice: OrderInvoice }) => {
                      </div>
                   </div>
 
-                  {isPending ? (
-                     <PaymentProcessing
-                        amount={amount}
-                        charge={centsToDollars(form.getValues("charge_in_cents") ?? 0)}
-                     />
-                  ) : (
-                     <Button type="submit" disabled={isPending}>
-                        Pagar
-                     </Button>
-                  )}
+                  <Button type="submit" disabled={isPending}>
+                     {isPending ? (
+                        <div className="flex items-center gap-2">
+                           <Spinner /> Procesando...
+                        </div>
+                     ) : (
+                        "Pagar"
+                     )}
+                  </Button>
                </form>
             </Form>
          </DialogContent>

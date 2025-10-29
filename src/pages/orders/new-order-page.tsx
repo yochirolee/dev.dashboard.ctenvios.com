@@ -8,7 +8,7 @@ import { ReceiverFormDialog } from "@/components/orders/receiver/receiver-form-d
 import { CustomerFormDialog } from "@/components/orders/customer/customer-form-dialog";
 import { ItemsInOrder } from "@/components/orders/items-in-order";
 import { useShallow } from "zustand/react/shallow";
-import { useInvoiceStore } from "@/stores/invoice-store";
+import { useOrderStore } from "@/stores/order-store";
 import { useAppStore } from "@/stores/app-store";
 import { useAgencies } from "@/hooks/use-agencies";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -16,7 +16,7 @@ import { usePrefetch } from "@/hooks/use-prefetch";
 
 export function NewOrderPage() {
    usePrefetch.customsRates(0, 300);
-   const { selectedCustomer, selectedReceiver, selectedService } = useInvoiceStore(
+   const { selectedCustomer, selectedReceiver, selectedService } = useOrderStore(
       useShallow((state) => ({
          selectedCustomer: state.selectedCustomer,
          selectedReceiver: state.selectedReceiver,

@@ -14,6 +14,7 @@ import {
    DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Link } from "react-router-dom";
+import { FieldContent, FieldGroup, FieldLabel, Field } from "@/components/ui/field";
 
 // This type is used to define the shape of our data.
 // You can use a Zod schema here if you want.
@@ -323,23 +324,23 @@ const paymentStatus = (payment_status: string) => {
    switch (payment_status) {
       case "PAID":
          return (
-            <Badge className="bg-green-500/10 text-green-500/80">
-               <CheckCircle2 className="w-4 h-4 mr-1" />
-               Paid
+            <Badge className="w-fit  " variant="secondary">
+               <span className="  rounded-full bg-green-400/80 text-white text-xs h-1.5 ring-1 ring-green-500/40 w-1.5 flex items-center justify-center" />
+               <span className="ml-1 text-nowrap font-extralight text-muted-foreground text-xs">Paid</span>
             </Badge>
          );
       case "PARTIALLY_PAID":
          return (
-            <Badge className="bg-yellow-500/10 text-yellow-500/80">
-               <CircleDashed className="w-4 h-4 mr-1 " />
-               Partial
+            <Badge className="w-fit  " variant="secondary">
+               <span className="  rounded-full bg-yellow-400/80 text-white text-xs h-1.5 ring-1 ring-yellow-500/40 w-1.5 flex items-center justify-center" />
+               <span className="ml-1 text-nowrap font-extralight text-muted-foreground text-xs">Partial</span>
             </Badge>
          );
       default:
          return (
-            <Badge className="bg-red-500/10 text-red-500/80">
-               <Clock className="w-4 h-4 mr-1" />
-               Pending
+            <Badge className="w-fit  " variant="secondary">
+               <span className="  rounded-full bg-red-400/80 text-white text-xs h-1.5 ring-1 ring-red-500/40 w-1.5 flex items-center justify-center" />
+               <span className="ml-1 text-nowrap font-extralight text-muted-foreground text-xs">Pending</span>
             </Badge>
          );
    }

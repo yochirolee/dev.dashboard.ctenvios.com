@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { AgencyUpdateRatesForm } from "./agencies-update-rates-form";
 import {} from "@/components/ui/dropdown-menu";
 import { PencilIcon } from "lucide-react";
 import { TableCell, TableHeader, TableHead, TableRow, TableBody, Table } from "@/components/ui/table";
@@ -7,17 +6,16 @@ import type { ShippingRate } from "@/data/types";
 import { centsToDollars } from "@/lib/cents-utils";
 import { Badge } from "../ui/badge";
 import { Switch } from "../ui/switch";
-import { useShippingRates } from "@/hooks/use-shipping-rates";
 import { Button } from "../ui/button";
 
 export const AgencyRates = ({ rates }: { rates: ShippingRate[] }) => {
-	const [open, setOpen] = useState(false);
-	const [rateForUpdate, setRateForUpdate] = useState<ShippingRate | null>(null);
+   const [open, setOpen] = useState(false);
+   const [rateForUpdate, setRateForUpdate] = useState<ShippingRate | null>(null);
 
-	const handleUpdate = (rate: ShippingRate) => {
-		setRateForUpdate(rate);
-		setOpen(true);
-	};
+   const handleUpdate = (rate: ShippingRate) => {
+      setRateForUpdate(rate);
+      setOpen(true);
+   };
 
    return (
       <>
@@ -39,22 +37,18 @@ export const AgencyRates = ({ rates }: { rates: ShippingRate[] }) => {
                   <RateRow key={rate.id} rate={rate} handleUpdate={handleUpdate} />
                ))}
             </TableBody>
-		   </Table>
-		   <AgencyUpdateRatesForm key={`update-rate-form-${rateForUpdate?.id}`} rate={rateForUpdate} open={open} setOpen={setOpen} />
+         </Table>
       </>
    );
 };
 
-const RateRow = ({ rate, handleUpdate }: {  rate: ShippingRate, handleUpdate: (rate: ShippingRate) => void }) => {
-   const { mutate: updateRate } = useShippingRates.update();
-
+const RateRow = ({ rate, handleUpdate }: { rate: ShippingRate; handleUpdate: (rate: ShippingRate) => void }) => {
    const calculateProfit = (rate: ShippingRate) => {
-      return rate?.rate_in_cents - rate?.cost_in_cents;
+      return rate?.price_in_cents - rate?.cost_in_cents;
    };
 
    const handleActivate = (rate: ShippingRate) => {
       rate.is_active = !rate.is_active;
-      updateRate({ data: rate });
    };
 
    return (
@@ -66,13 +60,13 @@ const RateRow = ({ rate, handleUpdate }: {  rate: ShippingRate, handleUpdate: (r
             <p>{rate?.name}</p>
          </TableCell>
          <TableCell>
-            <Badge variant="outline">{rate?.rate_type}</Badge>
+            <Badge variant="outline">{rate?.unit}</Badge>
          </TableCell>
          <TableCell>
             <p>{centsToDollars(rate?.cost_in_cents)?.toFixed(2)} USD</p>
          </TableCell>
          <TableCell>
-            <p>{centsToDollars(rate?.rate_in_cents)?.toFixed(2)} USD</p>
+            <p>{centsToDollars(rate?.price_in_cents)?.toFixed(2)} USD</p>
          </TableCell>
          <TableCell>
             <p>
@@ -89,7 +83,6 @@ const RateRow = ({ rate, handleUpdate }: {  rate: ShippingRate, handleUpdate: (r
                <PencilIcon size={16} />
             </Button>
          </TableCell>
-        
       </TableRow>
    );
 };

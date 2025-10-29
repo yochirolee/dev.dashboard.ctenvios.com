@@ -1,12 +1,12 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { useInvoiceStore } from "@/stores/invoice-store";
+import { useOrderStore } from "@/stores/order-store";
 import { useShallow } from "zustand/react/shallow";
 import { formatFullName } from "@/lib/cents-utils";
 import { Separator } from "@/components/ui/separator";
 
 export function ReceiverInformation() {
-   const { selectedReceiver, setSelectedReceiver } = useInvoiceStore(
+   const { selectedReceiver, setSelectedReceiver } = useOrderStore(
       useShallow((state) => ({
          selectedReceiver: state.selectedReceiver,
          setSelectedReceiver: state.setSelectedReceiver,

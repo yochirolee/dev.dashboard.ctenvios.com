@@ -7,9 +7,10 @@ import {
    type Provider,
    type Service,
    type ShippingRate,
-   type Invoice,
+   type Order,
    type Payment,
    type User,
+   type Product,
    agencySchema,
    userSchema,
 } from "@/data/types";
@@ -173,7 +174,7 @@ const api = {
          return response.data;
       },
    },
-   invoices: {
+   orders: {
       search: async (search: string, page: number | 1, limit: number | 20, startDate: string, endDate: string) => {
          const response = await axiosInstance.get("/orders", {
             params: {
@@ -190,17 +191,17 @@ const api = {
          const response = await axiosInstance.get(`/orders/${id}`);
          return response.data;
       },
-      create: async (data: Invoice) => {
+      create: async (data: Order) => {
          const response = await axiosInstance.post("/orders", data);
          return response.data;
       },
-      getHistory: async (invoice_id: number) => {
-         const response = await axiosInstance.get(`/orders/${invoice_id}/history`);
+      getHistory: async (order_id: number) => {
+         const response = await axiosInstance.get(`/orders/${order_id}/history`);
          return response.data;
       },
 
-      payOrder: async (invoice_id: number, data: Payment) => {
-         const response = await axiosInstance.post(`/orders/${invoice_id}/payments`, data);
+      payOrder: async (order_id: number, data: Payment) => {
+         const response = await axiosInstance.post(`/orders/${order_id}/payments`, data);
          return response.data;
       },
       deletePayment: async (payment_id: number) => {
@@ -345,7 +346,7 @@ const api = {
          console.log(response.data, "response on create");
          return response.data;
       },
-      createBaseRate: async (data: ShippingRate) => {
+   /*    createBaseRate: async (data: ShippingRate) => {
          const response = await axiosInstance.post("/shipping-rates/base-rate", data);
          return response.data;
       },
@@ -361,7 +362,7 @@ const api = {
       delete: async (id: number) => {
          const response = await axiosInstance.delete(`/shipping-rates/${id}`);
          return response.data;
-      },
+      }, */
    },
    roles: {
       get: async () => {
@@ -376,6 +377,27 @@ const api = {
          return response.data;
       },
    },
+   products: {
+      get: async () => {
+         const response = await axiosInstance.get("/products");
+         return response.data;
+      },
+      create: async (data: Product) => {
+         const response = await axiosInstance.post("/products", data);
+         return response.data;
+      },
+      update: async (id: number, data: Product) => {
+         const response = await axiosInstance.put(`/products/${id}`, data);
+         return response.data;
+      }, 
+      delete: async (id: number) => {
+         const response = await axiosInstance.delete(`/products/${id}`);
+         return response.data;
+      },
+   },
+
+   
+   
 };
 
 export default api;

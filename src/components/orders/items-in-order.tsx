@@ -1,6 +1,6 @@
 import { useForm, useFieldArray } from "react-hook-form";
 import { useEffect, useState } from "react";
-import { useInvoiceStore } from "@/stores/invoice-store";
+import { useOrderStore } from "@/stores/order-store";
 import { useShallow } from "zustand/react/shallow";
 import { Table, TableRow, TableHeader, TableCaption, TableHead, TableBody } from "../ui/table";
 import { CardContent, CardHeader, CardTitle, Card } from "../ui/card";
@@ -11,8 +11,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
-import { invoiceSchema } from "@/data/types";
-import { useInvoices } from "@/hooks/use-invoices";
+import { orderSchema } from "@/data/types";
+import { useOrders } from "@/hooks/use-orders";
 import { Input } from "../ui/input";
 import { useAppStore } from "@/stores/app-store";
 import { Separator } from "../ui/separator";
@@ -20,7 +20,7 @@ import { ChangeRateDialog, ChargeDialog, DiscountDialog, InsuranceFeeDialog } fr
 import { formatCents } from "@/lib/cents-utils";
 import { calculateTotalDeliveryFee } from "@/lib/calculate_total_delivery";
 
-type FormValues = z.infer<typeof invoiceSchema>;
+type FormValues = z.infer<typeof orderSchema>;
 
 export function ItemsInOrder() {
    const navigate = useNavigate();
@@ -38,7 +38,7 @@ export function ItemsInOrder() {
       setSelectedCustomer,
       setSelectedReceiver,
       setSelectedService,
-   } = useInvoiceStore(
+   } = useOrderStore(
       useShallow((state) => ({
          selectedCustomer: state.selectedCustomer,
          selectedReceiver: state.selectedReceiver,
@@ -49,7 +49,7 @@ export function ItemsInOrder() {
       }))
    );
    const form = useForm<FormValues>({
-      resolver: zodResolver(invoiceSchema) as any,
+      resolver: zodResolver(orderSchema) as any,
       defaultValues: {
          customer_id: selectedCustomer?.id || 0,
          receiver_id: selectedReceiver?.id || 0,
@@ -60,10 +60,10 @@ export function ItemsInOrder() {
             {
                description: "",
                weight: undefined,
-               rate_in_cents: 0,
+               price_in_cents: 0,
                cost_in_cents: 0,
                rate_id: 0,
-               rate_type: "WEIGHT",
+               unit: "PER_LB",
                insurance_fee_in_cents: 0,
                customs_fee_in_cents: 0,
                charge_fee_in_cents: 0,
@@ -94,8 +94,8 @@ export function ItemsInOrder() {
                weight: undefined,
                rate_id: 0,
                cost_in_cents: 0,
-               rate_in_cents: 0,
-               rate_type: "WEIGHT",
+               price_in_cents: 0,
+               unit: "PER_LB",
                insurance_fee_in_cents: 0,
                delivery_fee_in_cents: 0,
                customs_fee_in_cents: 0,
@@ -120,7 +120,7 @@ export function ItemsInOrder() {
       setItemsCount(1);
    };
 
-   const { mutate: createInvoice, isPending: isCreatingInvoice } = useInvoices.create({
+      const { mutate: createOrder, isPending: isCreatingOrder } = useOrders.create({
       onSuccess: (data) => {
          form.reset();
          setSelectedCustomer(null);
@@ -143,7 +143,7 @@ export function ItemsInOrder() {
       data.customer_id = selectedCustomer?.id || 0;
       data.receiver_id = selectedReceiver?.id || 0;
       data.total_delivery_fee_in_cents = total_delivery_fee;
-      /*     toast("You submitted the following values:", {
+    /*       toast("You submitted the following values:", {
          description: (
             <pre className="bg-code text-code-foreground mt-2 w-[320px] max-h-[800px] overflow-auto rounded-md p-4">
                <code>{JSON.stringify(data, null, 2)}</code>
@@ -156,8 +156,8 @@ export function ItemsInOrder() {
          style: {
             "--border-radius": "calc(var(--radius)  + 4px)",
          } as React.CSSProperties,
-      });  */
-      createInvoice(data);
+      });  */ 
+      createOrder(data);
    };
 
    const handleOpenDialog = (type: "insurance" | "charge" | "rate", index: number) => {
@@ -222,7 +222,7 @@ export function ItemsInOrder() {
                            <TableHead>Description</TableHead>
                            <TableHead className="text-right w-20">Arancel</TableHead>
                            <TableHead className="text-right w-22">Peso</TableHead>
-                           <TableHead className="text-right w-20">Rate</TableHead>
+                           <TableHead className="text-right w-20">Precio</TableHead>
                            <TableHead className="text-right w-20">Subtotal</TableHead>
                            <TableHead className="w-10"></TableHead>
                         </TableRow>
@@ -242,13 +242,13 @@ export function ItemsInOrder() {
                </CardContent>
                <InvoiceTotal form={form} />
                <div className="flex justify-end m-10">
-                  <Button className="w-1/2 mt-4 mx-auto" type="submit" disabled={isCreatingInvoice}>
-                     {isCreatingInvoice ? (
+                  <Button className="w-1/2 mt-4 mx-auto" type="submit" disabled={isCreatingOrder}>
+                     {isCreatingOrder ? (
                         <>
-                           <Loader2 className="w-4 h-4 animate-spin" /> Facturando...
+                           <Loader2 className="w-4 h-4 animate-spin" /> Creando Orden...
                         </>
                      ) : (
-                        "Facturar"
+                        "Crear Orden"
                      )}
                   </Button>
                </div>

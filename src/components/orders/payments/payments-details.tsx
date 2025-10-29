@@ -1,25 +1,50 @@
 import type { Payment } from "@/data/types";
 import { formatCents } from "@/lib/cents-utils";
-import { CreditCard, Trash2 } from "lucide-react";
+import { CreditCard, Trash2, Banknote, CreditCardIcon } from "lucide-react";
 import { Item, ItemMedia, ItemContent, ItemActions, ItemTitle } from "@/components/ui/item";
 import { Spinner } from "@/components/ui/spinner";
 import { toast } from "sonner";
-import { useInvoices } from "@/hooks/use-invoices";
+import { useOrders } from "@/hooks/use-orders";
 import { InputGroupAddon, InputGroupButton } from "@/components/ui/input-group";
+import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
+import zelleIcon from "/zelle-icon.svg";
+import { Button } from "@/components/ui/button";
+
+const paymentIcons = {
+   CASH: <Banknote className="size-4" />,
+   CREDIT_CARD: <CreditCard className="size-4" />,
+   DEBIT_CARD: <CreditCard className="size-4" />,
+   TRANSFER: <Banknote className="size-4" />,
+   ZELLE: <img src={zelleIcon} alt="Zelle" className="size-4" />,
+   PAYPAL: <CreditCardIcon className="size-4" />,
+   OTHER: <CreditCardIcon className="size-4" />,
+};
 
 export const PaymentsDetails = ({ payments }: { payments: Payment[] }) => {
    return (
-      <div className="flex flex-col gap-2  rounded-md py-2  ">
-         <h3 className="text-sm font-medium">Pagos</h3>
-         {payments.map((payment: Payment) => (
-            <PaymentItem payment={payment} key={payment?.id} />
-         ))}
-      </div>
+      <Accordion type="single" collapsible className="w-full" defaultValue="item-1">
+         <AccordionItem value="payments">
+            <AccordionTrigger>
+               <div className="flex items-center  gap-2">
+                  <span>Pagos</span>
+                  <span className=" rounded-full bg-muted-foreground/10 text-muted-foreground font-extralight text-[11px] h-4 w-4 flex items-center justify-center">
+                     {payments?.length ?? 0}
+                  </span>
+               </div>
+            </AccordionTrigger>
+
+            <AccordionContent className="flex flex-col gap-4 text-balance">
+               {payments.map((payment: Payment) => (
+                  <PaymentItem payment={payment} key={payment?.id} />
+               ))}
+            </AccordionContent>
+         </AccordionItem>
+      </Accordion>
    );
 };
 
 const PaymentItem = ({ payment }: { payment: Payment }) => {
-   const { mutate: deletePayment, isPending: isDeleting } = useInvoices.deletePayment({
+   const { mutate: deletePayment, isPending: isDeleting } = useOrders.deletePayment({
       onSuccess: () => {
          toast.success("Payment deleted successfully");
       },
@@ -29,11 +54,9 @@ const PaymentItem = ({ payment }: { payment: Payment }) => {
    });
    return (
       <Item variant="outline" size="sm" key={payment?.id}>
-         <ItemMedia>
-            <CreditCard className="size-5" />
-         </ItemMedia>
+         <ItemMedia>{paymentIcons[payment?.method as keyof typeof paymentIcons]}</ItemMedia>
          <ItemContent>
-            <ItemTitle className="text-muted-foreground text-sm font-normal">
+            <ItemTitle className="text-muted-foreground text-sm font-light">
                <span>{formatCents(payment?.amount_in_cents + (payment?.charge_in_cents ?? 0))}</span>
                <span>{isDeleting ? "Deleting..." : "Pagado"}</span>
             </ItemTitle>
@@ -43,9 +66,7 @@ const PaymentItem = ({ payment }: { payment: Payment }) => {
                <Spinner className="size-4 text-muted-foreground" />
             ) : (
                <InputGroupAddon align="inline-end">
-                  <InputGroupButton variant="secondary" size="icon-xs" onClick={() => deletePayment(payment?.id ?? 0)}>
-                     <Trash2 />
-                  </InputGroupButton>
+                  <Trash2 className="size-4" onClick={() => deletePayment(payment?.id ?? 0)} />
                </InputGroupAddon>
             )}
          </ItemActions>

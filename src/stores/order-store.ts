@@ -6,7 +6,7 @@ interface ServiceWithRates extends Service {
    provider: Provider;
 }
 
-interface InvoiceStore {
+interface OrderStore {
    selectedCustomer: Customer | null;
    selectedReceiver: Receiver | null;
    selectedService: ServiceWithRates | null;
@@ -19,9 +19,10 @@ interface InvoiceStore {
    setSelectedService: (selectedService: ServiceWithRates | null) => void;
    setSelectedRate: (selectedRate: ShippingRate | null) => void;
    setShippingRates: (shipping_rates: ShippingRate[]) => void;
+   clearAll: () => void;
 }
 
-export const useInvoiceStore = create<InvoiceStore>((set) => ({
+export const useOrderStore = create<OrderStore>((set) => ({
    selectedCustomer: null,
    selectedReceiver: null,
    selectedService: null,
@@ -37,5 +38,14 @@ export const useInvoiceStore = create<InvoiceStore>((set) => ({
    setSelectedService: (selectedService: ServiceWithRates | null) => {
       set({ selectedService });
       set({ shipping_rates: selectedService?.shipping_rates || [] });
+   },
+   clearAll: () => {
+      set({
+         selectedCustomer: null,
+         selectedReceiver: null,
+         selectedService: null,
+         selectedRate: null,
+         shipping_rates: [] as ShippingRate[],
+      });
    },
 }));

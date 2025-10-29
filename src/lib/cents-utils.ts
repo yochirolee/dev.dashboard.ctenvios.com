@@ -67,37 +67,37 @@ export function formatCents(cents: number, locale: string = "en-US", currency: s
 }
 
 export const calculate_row_subtotal = (
-   rate_in_cents: number,
+   price_in_cents: number,
    weight: number,
    customs_fee_in_cents: number,
    charge_fee_in_cents: number,
    insurance_fee_in_cents: number,
-   rate_type: string
+   unit: string
 ): number => {
-   const safeRateInCents = rate_in_cents || 0;
+   const safePriceInCents = price_in_cents || 0;
    const safeWeight = weight || 0;
    const safeCustomsFeeInCents = customs_fee_in_cents || 0;
    const safeChargeFeeInCents = charge_fee_in_cents || 0;
    const safeInsuranceFeeInCents = insurance_fee_in_cents || 0;
 
-   if (rate_type === "WEIGHT") {
+   if (unit === "PER_LB") {
       return Math.ceil(
-         safeRateInCents * safeWeight + safeCustomsFeeInCents + safeChargeFeeInCents + safeInsuranceFeeInCents
+         safePriceInCents * safeWeight + safeCustomsFeeInCents + safeChargeFeeInCents + safeInsuranceFeeInCents
       );
    }
-   return Math.ceil(safeRateInCents + safeCustomsFeeInCents);
+   return Math.ceil(safePriceInCents + safeCustomsFeeInCents);
 };
 
 // Helper function for calculating order total (matches invoice calculation)
 export function calculateOrderTotal(items: any[]): number {
    return items.reduce((total, item) => {
       const itemSubtotal = calculate_row_subtotal(
-         item.rate_in_cents || 0,
+         item.price_in_cents || 0,
          item.weight || 0,
          item.customs_fee_in_cents || 0,
          item.charge_fee_in_cents || 0,
          item.insurance_fee_in_cents || 0,
-         (item.rate_type || "WEIGHT") as string
+         item.unit || "PER_LB"
       );
       return total + itemSubtotal;
    }, 0);

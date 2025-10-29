@@ -4,11 +4,21 @@ import { Separator } from "../ui/separator";
 import { Badge } from "../ui/badge";
 import { Skeleton } from "../ui/skeleton";
 import { AgencyRates } from "./agency-rates";
+import { Button } from "../ui/button";
+import { PlusCircle } from "lucide-react";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "../ui/dialog";
+import { AgencyCreateRatesForm } from "./agency-create-rates-form";
+import { useState } from "react";
+import { EmptyServicesRates } from "./empty-services-rates";
 
 export default function AgencyServices({ agencyId }: { agencyId: number }) {
    const { data: services, isLoading } = useAgencies.getActivesServicesRates(agencyId);
+   const [open, setOpen] = useState(false);
 
    if (isLoading) return <Skeleton />;
+   if (services?.length === 0) {
+      return <EmptyServicesRates />;
+   }
 
    return (
       <Card>
@@ -32,6 +42,20 @@ export default function AgencyServices({ agencyId }: { agencyId: number }) {
                            <p className="text-sm text-muted-foreground">{service?.description}</p>
                         </div>
                      </div>
+                     <Dialog open={open} onOpenChange={setOpen}>
+                        <DialogTrigger asChild>
+                           <Button variant="outline">
+                              <PlusCircle className="w-4 h-4" /> Crear tarifa
+                           </Button>
+                        </DialogTrigger>
+                        <DialogContent>
+                           <DialogHeader>
+                              <DialogTitle>Crear tarifa</DialogTitle>
+                              <DialogDescription>Crear una nueva tarifa para este servicio</DialogDescription>
+                           </DialogHeader>
+                           <AgencyCreateRatesForm service_id={service.id} buyer_agency_id={agencyId} />
+                        </DialogContent>
+                     </Dialog>
                   </div>
                   <AgencyRates rates={service.shipping_rates} />
                </div>

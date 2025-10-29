@@ -3,7 +3,7 @@ import { Card, CardDescription, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { useInvoices } from "@/hooks/use-invoices";
+import { useInvoices } from "@/hooks/use-orders";
 import { format } from "date-fns";
 import { Skeleton } from "@/components/ui/skeleton";
 

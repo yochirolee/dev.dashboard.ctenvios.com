@@ -12,7 +12,6 @@ import { AgenciesPage } from "@/pages/settings/agencies/agencies-page";
 import ProtectedRoute from "./protected-route";
 import InvoicesPage from "@/pages/orders/orders-page";
 import { UserPage } from "@/pages/settings/user-page";
-import InvoiceDetailsPage from "@/pages/orders/orders-details-page";
 import { CustomsPage } from "@/pages/settings/customs-page";
 import ProvidersServicesPage from "@/pages/settings/providers-services-page";
 import { EditOrderPage } from "@/pages/orders/edit-order-page";
@@ -21,6 +20,7 @@ import { NewAgencyPage } from "@/pages/settings/agencies/new-agency-page";
 import { DispatchPage } from "@/pages/logistics/dispatch-page";
 import { ContainersPage } from "@/pages/logistics/containers-page";
 import { FlightsPage } from "@/pages/logistics/flights-page";
+import OrderDetailsPage from "@/pages/orders/order-details-page";
 
 export const AppRouter = () => {
    return (
@@ -35,8 +35,8 @@ export const AppRouter = () => {
                   <Route index element={<Navigate to="list" replace />} />
                   <Route path="list" element={<InvoicesPage />} />
                   <Route path="new" element={<NewOrderPage />} />
-                  <Route path=":invoiceId/edit" element={<EditOrderPage />} />
-                  <Route path=":invoiceId" element={<InvoiceDetailsPage />} />
+                  <Route path=":orderId/edit" element={<EditOrderPage />} />
+                  <Route path=":orderId" element={<OrderDetailsPage />} />
                </Route>
                <Route path="logistics">
                   <Route path="dispatch" element={<DispatchPage />} />
