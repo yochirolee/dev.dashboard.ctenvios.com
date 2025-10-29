@@ -17,8 +17,11 @@ export const AgenciesPage = () => {
 
    const [selectedAgencyId, setSelectedAgencyId] = useState<number | null>(null);
    const { data: agencies = [], isLoading, error } = useAgencies.get();
-   // Derive the actual selected agency object
+
    const selectedAgency = agencies.find((agency: Agency) => agency.id === selectedAgencyId) ?? agencies[0] ?? null;
+   const users = useAgencies.getUsers(selectedAgency?.id);
+   const rates = useAgencies.getActivesServicesRates(selectedAgency?.id);
+   console.log(users, rates);
 
    if (isLoading) return <Skeleton className="h-[200px] w-full" />;
    if (error) return <div>Error loading agencies</div>;
@@ -61,7 +64,6 @@ export const AgenciesPage = () => {
                </div>
                <div className="col-span-3 space-y-4">
                   <AgencyServices agencyId={selectedAgency.id ?? 0} />
-                 
                </div>
             </div>
          )}

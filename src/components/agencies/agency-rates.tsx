@@ -46,7 +46,7 @@ const RateRow = ({ rate }: { rate: ShippingRate }) => {
    };
 
    return (
-      <TableRow key={rate.id} className="border-b-0">
+      <TableRow className="border-b-0">
          <TableCell>
             <p>{rate?.id}</p>
          </TableCell>

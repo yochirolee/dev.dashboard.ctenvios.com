@@ -48,11 +48,11 @@ export const useAgencies = {
          enabled: !!id,
       });
    },
-   getUsers: (id: number) => {
+   getUsers: (agency_id: number) => {
       return useQuery({
-         queryKey: ["get-agency-users", id],
-         queryFn: () => api.agencies.getUsers(id),
-         enabled: !!id,
+         queryKey: ["get-agency-users", agency_id],
+         queryFn: () => api.agencies.getUsers(agency_id),
+         enabled: !!agency_id,
       });
    },
 
@@ -61,6 +61,7 @@ export const useAgencies = {
          queryKey: ["get-actives-services-rates", agency_id],
          queryFn: () => api.agencies.getActivesServicesRates(agency_id),
          enabled: !!agency_id,
+         
       });
    },
 };

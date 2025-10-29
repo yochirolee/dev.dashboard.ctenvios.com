@@ -26,9 +26,7 @@ const createAgencyFormSchema = z.object({
 export type CreateAgencyFormSchema = z.infer<typeof createAgencyFormSchema>;
 
 const config = {
-   baseURL:
-      import.meta.env.VITE_API_URL ||
-      (import.meta.env.DEV ? "http://localhost:3000/api/v1" : "https://api-ctenvios-com.vercel.app/api/v1"),
+   baseURL: import.meta.env.DEV ? "http://localhost:3000/api/v1" : "https://api-ctenvios-com.vercel.app/api/v1",
    timeout: 10000,
    headers: {
       "Content-Type": "application/json",
@@ -346,7 +344,7 @@ const api = {
          console.log(response.data, "response on create");
          return response.data;
       },
-   /*    createBaseRate: async (data: ShippingRate) => {
+      /*    createBaseRate: async (data: ShippingRate) => {
          const response = await axiosInstance.post("/shipping-rates/base-rate", data);
          return response.data;
       },
@@ -389,15 +387,12 @@ const api = {
       update: async (id: number, data: Product) => {
          const response = await axiosInstance.put(`/products/${id}`, data);
          return response.data;
-      }, 
+      },
       delete: async (id: number) => {
          const response = await axiosInstance.delete(`/products/${id}`);
          return response.data;
       },
    },
-
-   
-   
 };
 
 export default api;
