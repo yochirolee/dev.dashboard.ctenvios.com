@@ -96,12 +96,13 @@ const ReceiverForm = ({
          passport: undefined,
       },
    });
+
    const ciQuery = useWatch({ control: form.control, name: "ci" });
 
    const { data: receiverByCI } = useReceivers.getByCI(ciQuery);
 
    useEffect(() => {
-      if (receiverByCI) {
+      if (receiverByCI && !selectedReceiver) {
          setSelectedReceiver(receiverByCI);
          setIsOpen(false);
          form.reset();
