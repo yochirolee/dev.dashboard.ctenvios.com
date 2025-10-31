@@ -55,17 +55,17 @@ axiosInstance.interceptors.request.use(
 
 // Add response interceptor for better error handling with React Query
 axiosInstance.interceptors.response.use(
-      (response) => {
+   (response) => {
       console.log(`✅ ${response.config.method?.toUpperCase()} ${response.config.url}`, {
          status: response.status,
-         hasData: !!response.data
+         hasData: !!response.data,
       });
       return response;
    },
    (error) => {
       console.error(`❌ ${error.config.method?.toUpperCase()} ${error.config.url}`, {
          status: error.response?.status,
-         hasData: !!error.response?.data
+         hasData: !!error.response?.data,
       });
       // Handle 401 Unauthorized responses
       if (error.response?.status === 401) {
@@ -292,8 +292,12 @@ const api = {
          const response = await axiosInstance.put(`/agencies/${id}`, data);
          return response.data;
       },
-      getActivesServicesRates: async (id: number) => {
-         const response = await axiosInstance.get(`/agencies/${id}/actives-services-rates`);
+      services: async (id: number) => {
+         const response = await axiosInstance.get(`/agencies/${id}/services`);
+         return response.data;
+      },
+      shippingRates: async (agency_id: number, service_id: number) => {
+         const response = await axiosInstance.get(`/agencies/${agency_id}/services/${service_id}/shipping-rates`);
          return response.data;
       },
    },
@@ -345,6 +349,10 @@ const api = {
       },
    },
    shippingRates: {
+      getByServiceIdAndAgencyId: async (service_id: number, agency_id: number) => {
+         const response = await axiosInstance.get(`/shipping-rates/service/${service_id}/agency/${agency_id}`);
+         return response.data;
+      },
       create: async (data: ShippingRate) => {
          const response = await axiosInstance.post("/shipping-rates", data);
          console.log(response.data, "response on create");

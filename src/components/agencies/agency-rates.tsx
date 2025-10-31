@@ -1,12 +1,41 @@
-import { PencilIcon } from "lucide-react";
+import { PencilIcon, TriangleAlertIcon } from "lucide-react";
 import { TableCell, TableHeader, TableHead, TableRow, TableBody, Table } from "@/components/ui/table";
 import type { ShippingRate } from "@/data/types";
 import { centsToDollars } from "@/lib/cents-utils";
 import { Badge } from "../ui/badge";
 import { Switch } from "../ui/switch";
 import { Button } from "../ui/button";
+import { EmptyServicesRates } from "./empty-services-rates";
+import { Spinner } from "../ui/spinner";
+import { Card } from "../ui/card";
+import { CardContent } from "../ui/card";
+import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
+import { useAgencies } from "@/hooks/use-agencies";
 
-export const AgencyRates = ({ rates }: { rates: ShippingRate[] }) => {
+export const AgencyRates = ({ serviceId, agencyId }: { serviceId: number; agencyId: number }) => {
+   const { data: rates, isLoading, isError } = useAgencies.getShippingRates(agencyId, serviceId);
+   if (isError) {
+      return (
+         <Alert className="flex items-center gap-2">
+            <TriangleAlertIcon className="size-4 mr-2" />
+            <div className="flex flex-col gap-2">
+               <AlertTitle>Ops! Algo salió mal</AlertTitle>
+               <AlertDescription>Error al cargar las tarifas. Por favor, intenta nuevamente.</AlertDescription>
+            </div>
+         </Alert>
+      );
+   }
+   if (isLoading)
+      return (
+         <Card className="flex justify-center items-center h-full border-0">
+            <CardContent>
+               <Spinner />
+            </CardContent>
+         </Card>
+      );
+   if (rates?.length === 0) {
+      return <EmptyServicesRates />;
+   }
    return (
       <>
          <Table>

@@ -69,18 +69,17 @@ function ItemRow({
       }))
    );
 
-   console.log(shipping_rates, "shipping_rates on item-row");
-
    const activeWeightRate = shipping_rates?.filter((rate) => rate.unit === "PER_LB")?.[0];
 
    useEffect(() => {
       form.setValue(`items.${index}.subtotal`, 0);
-      form.setValue(`items.${index}.description`, "");
+      form.setValue(`items.${index}.description`);
       form.setValue(`items.${index}.rate_id`, activeWeightRate?.id || 0);
       form.setValue(`items.${index}.price_in_cents`, activeWeightRate?.price_in_cents || 0);
       form.setValue(`items.${index}.cost_in_cents`, activeWeightRate?.cost_in_cents || 0);
+      form.setValue(`items.${index}.customs_fee_in_cents`, 0);
       form.setValue(`items.${index}.unit`, activeWeightRate?.unit || "PER_LB");
-   }, [shipping_rates]);
+   }, [item.unit]);
 
    const handleRemove = () => {
       // Use index for removal - React Hook Form's remove function expects the index
@@ -98,7 +97,7 @@ function ItemRow({
                onCheckedChange={() => {
                   form.setValue(`items.${index}.unit`, item.unit === "PER_LB" ? "FIXED" : "PER_LB");
                }}
-               id="mode"
+               id={`items.${index}.unit` + item.id}
             />
          </TableCell>
          <TableCell className="w-10">

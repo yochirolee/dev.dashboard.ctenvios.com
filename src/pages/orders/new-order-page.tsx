@@ -28,7 +28,11 @@ export function NewOrderPage() {
    const user = useAppStore((state) => state.user || null);
    const agencyId = user?.agency_id || 0;
 
-   const { data: services, isLoading: isLoadingServices } = useAgencies.getActivesServicesRates(agencyId);
+   const { data: services, isLoading: isLoadingServices } = useAgencies.getServices(agencyId);
+   const { data: shipping_rates } = useAgencies.getShippingRates(agencyId, selectedService?.id || 0);
+   if (shipping_rates) {
+      useOrderStore.setState({ shipping_rates: shipping_rates });
+   }
 
    return (
       <div className="space-y-4 ">

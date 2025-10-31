@@ -4,38 +4,68 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { useFormContext } from "react-hook-form";
+import { useFormContext, useWatch } from "react-hook-form";
 import { useOrderStore } from "@/stores/order-store";
 import { useShallow } from "zustand/react/shallow";
 import type { ShippingRate } from "@/data/types";
 import { useEffect } from "react";
 
-const FixedRatesCombobox = React.memo(function FixedRatesCombobox({ form, index }: { form: any; index: number }) {
+const FixedRatesCombobox = React.memo(function FixedRatesCombobox({
+   form,
+   index,
+   onSelect,
+}: {
+   form: any;
+   index: number;
+   onSelect?: (rate: ShippingRate) => void;
+}) {
    const [open, setOpen] = React.useState(false);
 
    const formContext = form || useFormContext();
-   const { setValue } = formContext;
+   const { setValue, control } = formContext;
    const { shipping_rates } = useOrderStore(
       useShallow((state) => ({
          shipping_rates: state.shipping_rates,
       }))
    );
-   const [selectedRate, setSelectedRate] = React.useState<ShippingRate | null>(
-      shipping_rates?.filter((rate) => rate.unit === "FIXED")?.[0] || null
-   );
 
-   console.log(shipping_rates, "shipping_rates on fixed rates combobox");
+   // Watch the rate_id from form to sync with form changes
+   const formRateId = useWatch({
+      control,
+      name: `items.${index}.rate_id`,
+   });
+
+   // Derive selectedRate from form value instead of local state
+   const selectedRate = React.useMemo(() => {
+      if (!formRateId) return null;
+      return shipping_rates?.find((rate) => rate.id === formRateId && rate.unit === "FIXED") || null;
+   }, [formRateId, shipping_rates]);
 
    useEffect(() => {
-      setValue(`items.${index}.rate_id`, selectedRate?.id || 0);
-      setValue(`items.${index}.price_in_cents`, selectedRate?.price_in_cents || 0);
-      setValue(`items.${index}.description`, selectedRate?.description || "");
-      setValue(`items.${index}.cost_in_cents`, selectedRate?.cost_in_cents || 0);
-      setValue(`items.${index}.unit`, selectedRate?.unit || "FIXED");
-   }, [shipping_rates, selectedRate]);
+      // Only update form if onSelect callback is not provided (default behavior)
+      if (!onSelect && selectedRate) {
+         setValue(`items.${index}.rate_id`, selectedRate?.id || 0);
+         setValue(`items.${index}.price_in_cents`, selectedRate?.price_in_cents || 0);
+         setValue(`items.${index}.description`, selectedRate?.description || "");
+         setValue(`items.${index}.cost_in_cents`, selectedRate?.cost_in_cents || 0);
+         setValue(`items.${index}.unit`, selectedRate?.unit || "FIXED");
+      }
+   }, [shipping_rates, selectedRate, onSelect]);
 
-   const handleUpdateRate = (rate: ShippingRate) => {
-      setSelectedRate(rate);
+   const handleUpdateRate = (rate: ShippingRate): void => {
+      // Always update form to keep it in sync
+      setValue(`items.${index}.rate_id`, rate?.id || 0);
+
+      // If onSelect callback is provided, use it
+      if (onSelect) {
+         onSelect(rate);
+      } else {
+         // Otherwise use default behavior with form.setValue for other fields
+         setValue(`items.${index}.price_in_cents`, rate?.price_in_cents || 0);
+         setValue(`items.${index}.description`, rate?.description || "");
+         setValue(`items.${index}.cost_in_cents`, rate?.cost_in_cents || 0);
+         setValue(`items.${index}.unit`, rate?.unit || "FIXED");
+      }
 
       setOpen(false);
    };

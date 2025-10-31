@@ -1,12 +1,12 @@
 import { useForm, useFieldArray } from "react-hook-form";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useOrderStore } from "@/stores/order-store";
 import { useShallow } from "zustand/react/shallow";
 import { Table, TableRow, TableHeader, TableCaption, TableHead, TableBody } from "../ui/table";
 import { CardContent, CardHeader, CardTitle, Card } from "../ui/card";
 import { Button } from "../ui/button";
-import { Trash, PackagePlus, Loader2, PlusCircle, Scale, BoxIcon } from "lucide-react";
-import ItemRow from "./item-row";
+import { Trash, PackagePlus, PlusCircle, Scale, BoxIcon } from "lucide-react";
+import ItemRow from "./item-row-reducer";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { toast } from "sonner";
@@ -19,6 +19,7 @@ import { Separator } from "../ui/separator";
 import { ChangeRateDialog, ChargeDialog, DiscountDialog, InsuranceFeeDialog } from "./order-dialogs";
 import { formatCents } from "@/lib/cents-utils";
 import { calculateTotalDeliveryFee } from "@/lib/calculate_total_delivery";
+import { Spinner } from "../ui/spinner";
 
 type FormValues = z.infer<typeof orderSchema>;
 
@@ -30,6 +31,9 @@ export function ItemsInOrder() {
       type: "" as "insurance" | "charge" | "rate" | "",
       index: 0 as number,
    });
+
+   // Registry to store dispatch functions for each item row
+   const dispatchRegistry = useRef<Map<number, React.Dispatch<any>>>(new Map());
 
    const {
       selectedCustomer,
@@ -91,7 +95,7 @@ export function ItemsInOrder() {
          for (let i = 0; i < itemsToAdd; i++) {
             append({
                description: "",
-               weight: undefined,
+               weight: 0,
                rate_id: 0,
                cost_in_cents: 0,
                price_in_cents: 0,
@@ -120,7 +124,7 @@ export function ItemsInOrder() {
       setItemsCount(1);
    };
 
-      const { mutate: createOrder, isPending: isCreatingOrder } = useOrders.create({
+   const { mutate: createOrder, isPending: isCreatingOrder } = useOrders.create({
       onSuccess: (data) => {
          form.reset();
          setSelectedCustomer(null);
@@ -143,7 +147,7 @@ export function ItemsInOrder() {
       data.customer_id = selectedCustomer?.id || 0;
       data.receiver_id = selectedReceiver?.id || 0;
       data.total_delivery_fee_in_cents = total_delivery_fee;
-    /*       toast("You submitted the following values:", {
+      /*       toast("You submitted the following values:", {
          description: (
             <pre className="bg-code text-code-foreground mt-2 w-[320px] max-h-[800px] overflow-auto rounded-md p-4">
                <code>{JSON.stringify(data, null, 2)}</code>
@@ -156,12 +160,17 @@ export function ItemsInOrder() {
          style: {
             "--border-radius": "calc(var(--radius)  + 4px)",
          } as React.CSSProperties,
-      });  */ 
+      });  */
+
       createOrder(data);
    };
 
    const handleOpenDialog = (type: "insurance" | "charge" | "rate", index: number) => {
       setDialogState({ type, index });
+   };
+
+   const registerDispatch = (index: number, dispatch: React.Dispatch<any>) => {
+      dispatchRegistry.current.set(index, dispatch);
    };
 
    return (
@@ -235,6 +244,7 @@ export function ItemsInOrder() {
                               form={form}
                               remove={remove}
                               openDialog={handleOpenDialog}
+                              registerDispatch={registerDispatch}
                            />
                         ))}
                      </TableBody>
@@ -244,9 +254,9 @@ export function ItemsInOrder() {
                <div className="flex justify-end m-10">
                   <Button className="w-1/2 mt-4 mx-auto" type="submit" disabled={isCreatingOrder}>
                      {isCreatingOrder ? (
-                        <>
-                           <Loader2 className="w-4 h-4 animate-spin" /> Creando Orden...
-                        </>
+                        <div className="flex items-center gap-2">
+                           <Spinner /> <span>Creando Orden...</span>
+                        </div>
                      ) : (
                         "Crear Orden"
                      )}
@@ -258,12 +268,14 @@ export function ItemsInOrder() {
                setOpen={() => setDialogState({ type: "", index: 0 })}
                form={form}
                index={dialogState.index || 0}
+               dispatch={dispatchRegistry.current.get(dialogState.index)}
             />
             <ChargeDialog
                open={dialogState.type === "charge"}
                setOpen={() => setDialogState({ type: "", index: 0 })}
                form={form}
                index={dialogState.index || 0}
+               dispatch={dispatchRegistry.current.get(dialogState.index)}
             />
             <ChangeRateDialog
                open={dialogState.type === "rate"}

@@ -22,6 +22,7 @@ export default function OrderDetailsPage() {
 
    const { data, isLoading, error } = useOrders.getById(Number(orderId));
 
+   
    if (error) return <div>Error: {error.message}</div>;
    const order = data || null;
 

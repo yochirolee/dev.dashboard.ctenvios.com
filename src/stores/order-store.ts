@@ -37,7 +37,6 @@ export const useOrderStore = create<OrderStore>((set) => ({
    },
    setSelectedService: (selectedService: ServiceWithRates | null) => {
       set({ selectedService });
-      set({ shipping_rates: selectedService?.shipping_rates || [] });
    },
    clearAll: () => {
       set({

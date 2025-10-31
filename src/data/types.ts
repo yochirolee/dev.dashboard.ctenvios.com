@@ -102,8 +102,8 @@ export const productSchema = z.object({
 });
 
 export const itemsSchema = z.object({
-   description: z.string().min(1),
-   weight: z.number().min(0).optional(),
+   description: z.string().min(1, "La descripción es requerida"),
+   weight: z.number().min(0, "El peso es requerido"),
    customs_id: z.number().min(0),
    customs_fee_in_cents: z.number().min(0).optional(),
    insurance_fee_in_cents: z.number().min(0).optional(),

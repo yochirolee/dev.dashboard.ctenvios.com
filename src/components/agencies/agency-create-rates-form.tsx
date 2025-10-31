@@ -12,6 +12,7 @@ import { Switch } from "../ui/switch";
 import { useAppStore } from "@/stores/app-store";
 import { useShippingRates } from "@/hooks/use-shipping-rates";
 import { Spinner } from "../ui/spinner";
+import { dollarsToCents } from "@/lib/cents-utils";
 
 const formSchema = z.object({
    product_id: z.number().min(1, { message: "El producto es requerido" }),
@@ -31,14 +32,14 @@ const formSchema = z.object({
 export const AgencyCreateRatesForm = ({
    service_id,
    buyer_agency_id,
+   setIsOpen,
 }: {
    service_id: number;
    buyer_agency_id: number;
+   setIsOpen: (isOpen: boolean) => void;
 }) => {
    const { data: products } = useProducts.get();
-   const { mutate: createRate, isPending } = useShippingRates.create(
-      
-   );
+   const { mutate: createRate, isPending } = useShippingRates.create(buyer_agency_id);
 
    const user = useAppStore();
    const seller_agency_id = user?.user?.agency_id;
@@ -65,18 +66,24 @@ export const AgencyCreateRatesForm = ({
 
    function onSubmit(data: z.infer<typeof formSchema>) {
       console.log(data);
-      createRate({
-         ...data,
-         description: data.description ?? "",
-      } as ShippingRate, {
-         onSuccess: () => {
-            toast.success("Tarifa creada correctamente");
-            form.reset();
-         },
-         onError: (error) => {
-            toast.error(error.message);
-         },
-      });
+      createRate(
+         {
+            ...data,
+            price_in_cents: dollarsToCents(data.price_in_cents),
+            cost_in_cents: dollarsToCents(data.cost_in_cents),
+            description: data.description ?? "",
+         } as ShippingRate,
+         {
+            onSuccess: () => {
+               toast.success("Tarifa creada correctamente");
+               form.reset();
+               setIsOpen(false);
+            },
+            onError: (error) => {
+               toast.error(error.message);
+            },
+         }
+      );
       /*       toast("You submitted the following values:", {
          description: (
             <pre className="bg-code text-code-foreground mt-2 w-[320px] overflow-x-auto rounded-md p-4">

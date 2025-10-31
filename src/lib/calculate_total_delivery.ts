@@ -7,7 +7,6 @@ export const calculateTotalDeliveryFee = () => {
    //if not return 18000
    const selectedReceiver = useOrderStore((state: any) => state.selectedReceiver);
    if (!selectedReceiver) return 0;
-   console.log(selectedReceiver, "selectedReceiver");
    if (
       selectedReceiver.province === "La Habana" ||
       selectedReceiver.province === "Artemisa" ||

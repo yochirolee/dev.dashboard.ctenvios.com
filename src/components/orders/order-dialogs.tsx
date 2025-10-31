@@ -18,11 +18,13 @@ export const InsuranceFeeDialog = ({
    setOpen,
    index,
    form,
+   dispatch,
 }: {
    open: boolean;
    setOpen: (open: boolean) => void;
    index: number;
    form: any;
+   dispatch?: React.Dispatch<any>;
 }) => {
    const [insuranceValue, setInsuranceValue] = useState<string>("");
 
@@ -34,7 +36,18 @@ export const InsuranceFeeDialog = ({
    }, [open, form, index]);
 
    const handleInsurance = () => {
-      form.setValue(`items.${index}.insurance_fee_in_cents`, dollarsToCents(parseFloat(insuranceValue || "0")));
+      const amountInCents = dollarsToCents(parseFloat(insuranceValue || "0"));
+
+      if (dispatch) {
+         // Use reducer dispatch if available
+         dispatch({
+            type: "SET_INSURANCE",
+            payload: { amount: amountInCents },
+         });
+      } else {
+         // Fallback to direct form update
+         form.setValue(`items.${index}.insurance_fee_in_cents`, amountInCents);
+      }
       setOpen(false);
    };
 
@@ -42,11 +55,8 @@ export const InsuranceFeeDialog = ({
       <AlertDialog open={open} onOpenChange={setOpen}>
          <AlertDialogContent>
             <AlertDialogHeader>
-               <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-               <AlertDialogDescription>
-                  This action cannot be undone. This will permanently delete your account and remove your data from our
-                  servers.
-               </AlertDialogDescription>
+               <AlertDialogTitle>Agregar Seguro</AlertDialogTitle>
+               <AlertDialogDescription>Agrega un seguro a este item.</AlertDialogDescription>
             </AlertDialogHeader>
 
             <Input
@@ -59,8 +69,8 @@ export const InsuranceFeeDialog = ({
             />
 
             <AlertDialogFooter>
-               <AlertDialogCancel>Cancel</AlertDialogCancel>
-               <AlertDialogAction onClick={() => handleInsurance()}>Continue</AlertDialogAction>
+               <AlertDialogCancel>Cancelar</AlertDialogCancel>
+               <AlertDialogAction onClick={() => handleInsurance()}>Agregar</AlertDialogAction>
             </AlertDialogFooter>
          </AlertDialogContent>
       </AlertDialog>
@@ -72,11 +82,13 @@ export const ChargeDialog = ({
    setOpen,
    index,
    form,
+   dispatch,
 }: {
    open: boolean;
    setOpen: (open: boolean) => void;
    index: number;
    form: any;
+   dispatch?: React.Dispatch<any>;
 }) => {
    const [chargeValue, setChargeValue] = useState<string>("");
 
@@ -88,7 +100,18 @@ export const ChargeDialog = ({
    }, [open, form, index]);
 
    const handleCharge = () => {
-      form.setValue(`items.${index}.charge_fee_in_cents`, dollarsToCents(parseFloat(chargeValue || "0")));
+      const amountInCents = dollarsToCents(parseFloat(chargeValue || "0"));
+
+      if (dispatch) {
+         // Use reducer dispatch if available
+         dispatch({
+            type: "SET_CHARGE",
+            payload: { amount: amountInCents },
+         });
+      } else {
+         // Fallback to direct form update
+         form.setValue(`items.${index}.charge_fee_in_cents`, amountInCents);
+      }
       setOpen(false);
    };
 
