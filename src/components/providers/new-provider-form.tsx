@@ -1,13 +1,12 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
-import { Form, FormControl, FormItem, FormLabel, FormField, FormMessage } from "../ui/form";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
 import { useProviders } from "@/hooks/use-providers";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
-import { Field, FieldContent, FieldError, FieldGroup, FieldLabel, FieldSeparator } from "../ui/field";
+import { Field, FieldError, FieldGroup, FieldLabel, FieldSeparator } from "../ui/field";
 import { ScrollArea } from "../ui/scroll-area";
 
 const formNewProviderSchema = z.object({
