@@ -1,4 +1,4 @@
-import { PencilIcon, TriangleAlertIcon } from "lucide-react";
+import { PencilIcon } from "lucide-react";
 import { TableCell, TableHeader, TableHead, TableRow, TableBody, Table } from "@/components/ui/table";
 import type { ShippingRate } from "@/data/types";
 import { centsToDollars } from "@/lib/cents-utils";

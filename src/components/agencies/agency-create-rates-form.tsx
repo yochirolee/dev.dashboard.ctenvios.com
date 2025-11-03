@@ -37,7 +37,7 @@ export const AgencyCreateRatesForm = ({
    setIsOpen: (isOpen: boolean) => void;
 }) => {
    const { data: products } = useProducts.get();
-   const { mutate: createRate, isPending } = useShippingRates.create(service_id, buyer_agency_id);
+   const { mutate: createRate, isPending } = useShippingRates.create();
 
    const user = useAppStore();
    const seller_agency_id = user?.agency?.id;
