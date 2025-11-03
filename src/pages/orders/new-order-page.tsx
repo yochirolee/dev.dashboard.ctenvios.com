@@ -13,6 +13,7 @@ import { useAppStore } from "@/stores/app-store";
 import { useAgencies } from "@/hooks/use-agencies";
 import { Skeleton } from "@/components/ui/skeleton";
 import { usePrefetch } from "@/hooks/use-prefetch";
+import { EmptyServicesRates } from "@/components/agencies/empty-services-rates";
 
 export function NewOrderPage() {
    usePrefetch.customsRates(0, 300);
@@ -28,14 +29,7 @@ export function NewOrderPage() {
    const user = useAppStore((state) => state.user || null);
    const agencyId = user?.agency_id || 0;
 
-   const { data: services, isLoading: isLoadingServices } = useAgencies.getServices(agencyId);
-   const { data: shipping_rates, isLoading: isLoadingShippingRates } = useAgencies.getShippingRates(
-      agencyId,
-      selectedService?.id || 0
-   );
-   if (shipping_rates && !isLoadingShippingRates) {
-      useOrderStore.setState({ shipping_rates: shipping_rates });
-   }
+   const { data: services, isLoading: isLoadingServices } = useAgencies.getActiveServicesWithRates(agencyId);
 
    return (
       <div className="space-y-4 ">
@@ -72,17 +66,16 @@ export function NewOrderPage() {
             </Card>
          </div>
          {selectedCustomer && selectedReceiver && (
-            <>
+            <div>
                {isLoadingServices ? (
                   <Skeleton />
+               ) : services?.length === 0 ? (
+                  <EmptyServicesRates />
                ) : (
-                  <>
-                        <ServiceSelector services={services || []} />
-                        
-                     {selectedService && shipping_rates?.length > 0 && !isLoadingShippingRates && <ItemsInOrder />}
-                  </>
+                  <ServiceSelector services={services || []} />
                )}
-            </>
+               {selectedService && <ItemsInOrder />}
+            </div>
          )}
       </div>
    );

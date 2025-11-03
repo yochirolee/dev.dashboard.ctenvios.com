@@ -51,7 +51,7 @@ export const CustomerFormDialog = React.memo(function CustomerFormDialog() {
          <DialogTrigger asChild>
             <Button variant="outline">
                {selectedCustomer ? <UserRoundPenIcon /> : <UserRoundPlus />}
-               <span className="hidden lg:block"> {selectedCustomer ? "Editar Cliente" : "Nuevo Cliente"}</span>
+               <span className="hidden xl:block"> {selectedCustomer ? "Editar Cliente" : "Nuevo Cliente"}</span>
             </Button>
          </DialogTrigger>
          <DialogContent className="sm:max-w-[550px] p-2  ">

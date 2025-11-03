@@ -54,7 +54,8 @@ type ItemAction =
    | {
         type: "SET_CHARGE";
         payload: { amount: number };
-     };
+   };
+   
 
 export function itemReducer(state: ItemState, action: ItemAction): ItemState {
    switch (action.type) {

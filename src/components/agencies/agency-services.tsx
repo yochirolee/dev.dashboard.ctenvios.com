@@ -12,7 +12,7 @@ import { EmptyServicesRates } from "./empty-services-rates";
 import { Spinner } from "../ui/spinner";
 
 export default function AgencyServices({ agencyId }: { agencyId: number }) {
-   const { data: services, isLoading } = useAgencies.getServices(agencyId);
+   const { data: services, isLoading } = useAgencies.getServicesWithRates(agencyId);
    console.log(services, "services");
    const [openDialogId, setOpenDialogId] = useState<number | null>(null);
 
@@ -40,47 +40,52 @@ export default function AgencyServices({ agencyId }: { agencyId: number }) {
          <CardContent className="space-y-4">
             {services?.map((service: any) => (
                <div key={service?.id} className="flex flex-col rounded-lg   bg-black/20">
-                  <Card>
-                     <CardHeader>
-                        <div className="flex items-center justify-between">
-                           <CardTitle className="flex flex-col">
-                              <div className="flex  gap-2">
-                                 <h1 className="text-lg font-bold">{service?.provider?.name}</h1>
-                                 <Badge variant="outline">{service?.service_type}</Badge>
-                              </div>
-                              <p className="text-sm text-muted-foreground">{service?.description}</p>
-                           </CardTitle>
-                           <CardDescription>
-                              <Dialog
-                                 open={openDialogId === service.id}
-                                 onOpenChange={(open) => setOpenDialogId(open ? service.id : null)}
-                              >
-                                 <DialogTrigger asChild>
-                                    <Button variant="outline">
-                                       <PlusCircle className="w-4 h-4" /> Crear tarifa
-                                    </Button>
-                                 </DialogTrigger>
-                                 <DialogContent>
-                                    <DialogHeader>
-                                       <DialogTitle>Crear tarifa</DialogTitle>
-                                       <DialogDescription>Crear una nueva tarifa para este servicio</DialogDescription>
-                                    </DialogHeader>
+                  {service?.is_active ? (
+                     <Card>
+                        <CardHeader>
+                           <div className="flex items-center justify-between">
+                              <CardTitle className="flex flex-col">
+                                 <div className="flex  gap-2">
+                                    <h1 className="text-lg font-bold">{service?.provider?.name}</h1>
+                                    <Badge variant="outline">{service?.service_type}</Badge>
+                                 </div>
+                                 <p className="text-sm text-muted-foreground">{service?.description}</p>
+                              </CardTitle>
+                              <CardDescription>
+                                 <Dialog
+                                    open={openDialogId === service.id}
+                                    onOpenChange={(open) => setOpenDialogId(open ? service.id : null)}
+                                 >
+                                    <DialogTrigger asChild>
+                                       <Button variant="outline">
+                                          <PlusCircle size={16} />
+                                          <span className="hidden lg:block">Crear tarifa</span>
+                                       </Button>
+                                    </DialogTrigger>
+                                    <DialogContent>
+                                       <DialogHeader>
+                                          <DialogTitle>Crear tarifa</DialogTitle>
+                                          <DialogDescription>
+                                             Crear una nueva tarifa para este servicio
+                                          </DialogDescription>
+                                       </DialogHeader>
 
-                                    <AgencyCreateRatesForm
-                                       service_id={service.id}
-                                       buyer_agency_id={agencyId}
-                                       setIsOpen={(open) => setOpenDialogId(open ? service.id : null)}
-                                    />
-                                 </DialogContent>
-                              </Dialog>
-                           </CardDescription>
-                        </div>
-                     </CardHeader>
+                                       <AgencyCreateRatesForm
+                                          service_id={service.id}
+                                          buyer_agency_id={agencyId}
+                                          setIsOpen={(open) => setOpenDialogId(open ? service.id : null)}
+                                       />
+                                    </DialogContent>
+                                 </Dialog>
+                              </CardDescription>
+                           </div>
+                        </CardHeader>
 
-                     <CardContent>
-                        <AgencyRates serviceId={service.id} agencyId={agencyId} />
-                     </CardContent>
-                  </Card>
+                        <CardContent>
+                           <AgencyRates shippingRates={service?.shipping_rates || []} />
+                        </CardContent>
+                     </Card>
+                  ) : null}
                </div>
             ))}
          </CardContent>

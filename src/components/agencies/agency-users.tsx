@@ -24,7 +24,7 @@ export default function AgencyUsers({ agency_id }: { agency_id: number }) {
 					<CardTitle className=" flex flex-col">
 						<p>Usuarios de la agencia</p>
 						<p className="text-sm text-muted-foreground">
-							Aquí puedes ver los usuarios de la agencia y agregar nuevos.
+							Listado de usuarios de la agencia.
 						</p>
 					</CardTitle>
 
@@ -32,7 +32,7 @@ export default function AgencyUsers({ agency_id }: { agency_id: number }) {
 				</div>
 			</CardHeader>
 			<Separator />
-			<CardContent className="flex flex-col gap-8">
+			<CardContent className="flex flex-col space-y-4">
 				{users?.map((user: any) => (
 					<div key={user.id} className="flex flex-wrap items-center gap-4">
 						<Avatar className="hidden h-9 w-9 sm:flex">

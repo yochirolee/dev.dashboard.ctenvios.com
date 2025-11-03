@@ -56,19 +56,19 @@ export const useAgencies = {
       });
    },
 
-   getServices: (agency_id: number) => {
+   getServicesWithRates: (agency_id: number) => {
       return useQuery({
-         queryKey: ["get-services", agency_id],
-         queryFn: () => api.agencies.services(agency_id),
+         queryKey: ["get-services-with-rates", agency_id],
+         queryFn: () => api.agencies.servicesWithRates(agency_id),
          enabled: !!agency_id,
          staleTime: 1000 * 60 * 60 * 24,
       });
    },
-   getShippingRates: (service_id: number, agency_id: number) => {
+   getActiveServicesWithRates: (agency_id: number) => {
       return useQuery({
-         queryKey: ["get-shipping-rates", service_id, agency_id],
-         queryFn: () => api.agencies.shippingRates(service_id, agency_id),
-         enabled: !!service_id && !!agency_id,
+         queryKey: ["get-active-services-with-rates", agency_id],
+         queryFn: () => api.agencies.getActiveServicesWithRates(agency_id),
+         enabled: !!agency_id,
          staleTime: 1000 * 60 * 60 * 24,
       });
    },

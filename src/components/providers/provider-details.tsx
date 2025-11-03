@@ -13,7 +13,7 @@ export const ProviderDetails = ({ providerId }: { providerId: number }) => {
    const { data: products } = useProducts.get();
    if (isPending)
       return (
-         <div className="space-y-4">
+         <div className="space-y-4 container max-w-screen-lg mx-auto">
             <Skeleton className="h-[200px] w-full" />
             <Skeleton className="h-[400px] w-full" />
          </div>

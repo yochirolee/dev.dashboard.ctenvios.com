@@ -292,12 +292,12 @@ const api = {
          const response = await axiosInstance.put(`/agencies/${id}`, data);
          return response.data;
       },
-      services: async (id: number) => {
-         const response = await axiosInstance.get(`/agencies/${id}/services`);
+      servicesWithRates: async (id: number) => {
+         const response = await axiosInstance.get(`/agencies/${id}/services-with-rates`);
          return response.data;
       },
-      shippingRates: async (agency_id: number, service_id: number) => {
-         const response = await axiosInstance.get(`/agencies/${agency_id}/services/${service_id}/shipping-rates`);
+      getActiveServicesWithRates: async (id: number) => {
+         const response = await axiosInstance.get(`/agencies/${id}/active-services-with-rates`);
          return response.data;
       },
    },
@@ -339,20 +339,12 @@ const api = {
          const response = await axiosInstance.post("/services", data);
          return response.data;
       },
-      get: async () => {
-         const response = await axiosInstance.get("/services");
-         return response.data;
-      },
-      getByAgencyId: async (agency_id: number) => {
-         const response = await axiosInstance.get(`/services/agency/${agency_id}`);
+      update: async (id: number, data: Service) => {
+         const response = await axiosInstance.put(`/services/${id}`, data);
          return response.data;
       },
    },
    shippingRates: {
-      getByServiceIdAndAgencyId: async (service_id: number, agency_id: number) => {
-         const response = await axiosInstance.get(`/shipping-rates/service/${service_id}/agency/${agency_id}`);
-         return response.data;
-      },
       create: async (data: ShippingRate) => {
          const response = await axiosInstance.post("/shipping-rates", data);
          console.log(response.data, "response on create");
@@ -362,23 +354,6 @@ const api = {
          const response = await axiosInstance.put(`/shipping-rates/${rate_id}`, data);
          return response.data;
       },
-      /*    createBaseRate: async (data: ShippingRate) => {
-         const response = await axiosInstance.post("/shipping-rates/base-rate", data);
-         return response.data;
-      },
-      updateBaseRate: async (data: ShippingRate) => {
-         const response = await axiosInstance.put(`/shipping-rates/base-rate/${data.id}`, data);
-         return response.data;
-      },
-      update: async (data: ShippingRate) => {
-         const response = await axiosInstance.put(`/shipping-rates/${data.id}`, data);
-         return response.data;
-      },
-
-      delete: async (id: number) => {
-         const response = await axiosInstance.delete(`/shipping-rates/${id}`);
-         return response.data;
-      }, */
    },
    roles: {
       get: async () => {

@@ -231,7 +231,7 @@ export const AgencyCreateRatesForm = ({
             <Button type="submit" form="form-create-rate">
                {isPending ? (
                   <>
-                     <Spinner className="w-4 h-4 animate-spin" /> <span>Creando tarifa...</span>
+                     <Spinner className="w-4 h-4 animate-spin" /> <span className="hidden md:block">Creando tarifa...</span>
                   </>
                ) : (
                   "Crear tarifa"

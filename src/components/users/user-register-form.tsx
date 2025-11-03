@@ -60,8 +60,7 @@ function UserRegisterFormContent({ agencyId, onClose }: { agencyId: number; onCl
    });
    const { data: roles } = useRoles.get();
 
-   console.log("new user register form");
-
+  
    const registerUser = useRegister();
    const onSubmit = (data: FormValues): void => {
       // Create updated data object with the correct agency_id
@@ -77,8 +76,7 @@ function UserRegisterFormContent({ agencyId, onClose }: { agencyId: number; onCl
       });
    };
 
-   console.log(form.formState.errors, "errors");
-
+ 
    return (
       <Form {...form}>
          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
@@ -166,9 +164,10 @@ function UserRegisterFormContent({ agencyId, onClose }: { agencyId: number; onCl
                <Label htmlFor="role">Rol</Label>
                <FormField
                   control={form.control}
+                  
                   name="role"
                   render={({ field }) => (
-                     <FormItem>
+                     <FormItem >
                         <Select onValueChange={field.onChange}>
                            <SelectTrigger>
                               <SelectValue placeholder="Selecciona un rol" aria-placeholder="Selecciona un rol" />

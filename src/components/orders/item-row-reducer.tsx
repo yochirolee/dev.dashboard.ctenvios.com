@@ -14,7 +14,7 @@ import { useShallow } from "zustand/react/shallow";
 import { InputGroup, InputGroupInput } from "../ui/input-group";
 import { InputGroupAddon } from "../ui/input-group";
 import { useItemReducer, type ItemState } from "@/hooks/use-item-reducer";
-import type { Customs } from "@/data/types";
+import type { Customs, ShippingRate } from "@/data/types";
 
 function ItemRowReducer({
    index,
@@ -34,9 +34,8 @@ function ItemRowReducer({
          shipping_rates: state.shipping_rates,
       }))
    );
-   
 
-   const activeWeightRate = shipping_rates?.filter((rate) => rate.unit === "PER_LB")?.[0];
+   const activeWeightRate = shipping_rates?.filter((rate: ShippingRate) => rate.unit === "PER_LB")?.[0];
 
    // Initialize reducer with current form values
    const initialState: ItemState = {
@@ -74,6 +73,13 @@ function ItemRowReducer({
 
       form.setValue(`total_in_cents`, total);
    }, [itemState, index, form]);
+
+   useEffect(() => {
+      dispatch({
+         type: "UPDATE_FIELD",
+         payload: { field: "price_in_cents", value: activeWeightRate?.price_in_cents || 0 },
+      });
+   }, [activeWeightRate?.price_in_cents]);
 
    const handleToggleUnit = (): void => {
       const newUnit = itemState.unit === "PER_LB" ? "FIXED" : "PER_LB";
@@ -119,9 +125,6 @@ function ItemRowReducer({
       remove(index);
    };
 
-   console.log(itemState, "item-row-reducer");
-   console.log(itemState.insurance_fee_in_cents, "insurance_fee_in_cents");
-
    return (
       <TableRow key={index}>
          <TableCell>{index + 1}</TableCell>
@@ -152,7 +155,6 @@ function ItemRowReducer({
                   }
                />
                <InputGroupAddon align="inline-end">
-                  {centsToDollars(itemState.delivery_fee_in_cents).toFixed(2)}
                   {itemState.insurance_fee_in_cents > 0 && (
                      <Badge variant="outline">
                         Seguro: {centsToDollars(itemState.insurance_fee_in_cents).toFixed(2)}
@@ -236,18 +238,20 @@ function ItemRowReducer({
          <TableCell className="text-right">{centsToDollars(itemState.subtotal || 0).toFixed(2)}</TableCell>
 
          <TableCell className="w-10">
-            <Button
-               type="button"
-               variant="ghost"
-               size="icon"
-               onClick={() => {
-                  if (index !== 0) {
-                     handleRemove();
-                  }
-               }}
-            >
-               <Trash2 />
-            </Button>
+            {index !== 0 && (
+               <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => {
+                     if (index !== 0) {
+                        handleRemove();
+                     }
+                  }}
+               >
+                  <Trash2 />
+               </Button>
+            )}
          </TableCell>
       </TableRow>
    );

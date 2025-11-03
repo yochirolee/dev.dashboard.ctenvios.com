@@ -5,78 +5,64 @@ import { centsToDollars } from "@/lib/cents-utils";
 import { Badge } from "../ui/badge";
 import { Switch } from "../ui/switch";
 import { EmptyServicesRates } from "./empty-services-rates";
-import { Spinner } from "../ui/spinner";
-import { Card } from "../ui/card";
-import { CardContent } from "../ui/card";
-import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
-import { useAgencies } from "@/hooks/use-agencies";
 import { AgencyUpdateRatesForm } from "./agency-update-rates-form";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "../ui/dialog";
 import { Button } from "../ui/button";
 import { useState } from "react";
+import { useShippingRates } from "@/hooks/use-shipping-rates";
+import { toast } from "sonner";
 
-export const AgencyRates = ({ serviceId, agencyId }: { serviceId: number; agencyId: number }) => {
-   const { data: rates, isLoading, isError } = useAgencies.getShippingRates(agencyId, serviceId);
-   if (isError) {
-      return (
-         <Alert className="flex items-center gap-2">
-            <TriangleAlertIcon className="size-4 mr-2" />
-            <div className="flex flex-col gap-2">
-               <AlertTitle>Ops! Algo salió mal</AlertTitle>
-               <AlertDescription>Error al cargar las tarifas. Por favor, intenta nuevamente.</AlertDescription>
-            </div>
-         </Alert>
-      );
-   }
-   if (isLoading)
-      return (
-         <Card className="flex justify-center items-center h-full border-0">
-            <CardContent>
-               <Spinner />
-            </CardContent>
-         </Card>
-      );
-   if (rates?.length === 0) {
-      return <EmptyServicesRates />;
-   }
+export const AgencyRates = ({ shippingRates }: { shippingRates: ShippingRate[] }) => {
+   if (shippingRates?.length === 0) return <EmptyServicesRates />;
    return (
-      <>
-         <Table>
-            <TableHeader>
-               <TableRow>
-                  <TableHead>Id</TableHead>
-                  <TableHead>Nombre</TableHead>
-                  <TableHead>Descripción</TableHead>
-                  <TableHead>Tipo</TableHead>
-                  <TableHead>Costo Agencia</TableHead>
-                  <TableHead>Venta al Público</TableHead>
-                  <TableHead>Profit</TableHead>
-                  <TableHead>Activo</TableHead>
-                  <TableHead className="w-10 text-right"></TableHead>
-               </TableRow>
-            </TableHeader>
-            <TableBody>
-               {rates?.map((rate: ShippingRate) => (
-                  <RateRow key={rate.id} rate={rate} />
-               ))}
-            </TableBody>
-         </Table>
-      </>
+      <Table>
+         <TableHeader>
+            <TableRow>
+               <TableHead>Id</TableHead>
+               <TableHead>Nombre</TableHead>
+               <TableHead>Descripción</TableHead>
+               <TableHead>Tipo</TableHead>
+               <TableHead>Costo Agencia</TableHead>
+               <TableHead>Venta al Público</TableHead>
+               <TableHead>Profit</TableHead>
+               <TableHead>Activo</TableHead>
+               <TableHead className="w-10 text-right"></TableHead>
+            </TableRow>
+         </TableHeader>
+         <TableBody>
+            {shippingRates?.map((rate: ShippingRate) => (
+               <RateRow key={rate.id} rate={rate} />
+            ))}
+         </TableBody>
+      </Table>
    );
 };
 
 const RateRow = ({ rate }: { rate: ShippingRate }) => {
    const [isOpen, setIsOpen] = useState(false);
+   const { mutate: updateRate } = useShippingRates.update(rate?.id as number);
    const calculateProfit = (rate: ShippingRate) => {
       return rate?.price_in_cents - rate?.cost_in_cents;
    };
 
    const handleActivate = (rate: ShippingRate) => {
       rate.is_active = !rate.is_active;
+      updateRate(rate as ShippingRate, {
+         onSuccess: () => {
+            toast.success("Tarifa actualizada correctamente");
+         },
+         onError: (error) => {
+            const errorMessage =
+               (error as any)?.response?.data?.error ||
+               (error as any)?.response?.data?.message ||
+               "Error al actualizar la tarifa";
+            toast.error(errorMessage);
+         },
+      });
    };
 
    return (
-      <TableRow className="border-b-0">
+      <TableRow>
          <TableCell>
             <p>{rate?.id}</p>
          </TableCell>
