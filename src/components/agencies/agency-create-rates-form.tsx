@@ -16,15 +16,13 @@ import { dollarsToCents } from "@/lib/cents-utils";
 
 const formSchema = z.object({
    product_id: z.number().min(1, { message: "El producto es requerido" }),
-   name: z.string().min(1, { message: "El nombre es requerido" }),
-   description: z.string().optional(),
    buyer_agency_id: z.number(),
    seller_agency_id: z.number(),
    service_id: z.number(),
    price_in_cents: z.number().min(0, { message: "El precio de la agencia debe ser mayor a 0" }),
    cost_in_cents: z.number().min(0, { message: "El precio de costo debe ser mayor a 0" }),
    is_active: z.boolean(),
-   unit: z.enum(["PER_LB", "FIXED"]),
+
    min_weight: z.number().optional(),
    max_weight: z.number().optional(),
 });
@@ -39,30 +37,27 @@ export const AgencyCreateRatesForm = ({
    setIsOpen: (isOpen: boolean) => void;
 }) => {
    const { data: products } = useProducts.get();
-   const { mutate: createRate, isPending } = useShippingRates.create(buyer_agency_id);
+   const { mutate: createRate, isPending } = useShippingRates.create(service_id, buyer_agency_id);
 
    const user = useAppStore();
-   const seller_agency_id = user?.user?.agency_id;
+   const seller_agency_id = user?.agency?.id;
+
    const form = useForm<z.infer<typeof formSchema>>({
       resolver: zodResolver(formSchema),
       defaultValues: {
          product_id: 0,
-         name: "",
-         description: "",
          service_id: service_id,
          buyer_agency_id: buyer_agency_id,
          seller_agency_id: seller_agency_id,
          price_in_cents: undefined,
          cost_in_cents: undefined,
          is_active: true,
-         unit: "PER_LB",
          min_weight: undefined,
          max_weight: undefined,
       },
    });
 
-   const selectedProduct = products?.find((product: Product) => product.id === form.watch("product_id"));
-   form.setValue("name", selectedProduct?.name ?? "");
+   console.log(form.formState.errors);
 
    function onSubmit(data: z.infer<typeof formSchema>) {
       console.log(data);
@@ -71,7 +66,6 @@ export const AgencyCreateRatesForm = ({
             ...data,
             price_in_cents: dollarsToCents(data.price_in_cents),
             cost_in_cents: dollarsToCents(data.cost_in_cents),
-            description: data.description ?? "",
          } as ShippingRate,
          {
             onSuccess: () => {
@@ -80,7 +74,12 @@ export const AgencyCreateRatesForm = ({
                setIsOpen(false);
             },
             onError: (error) => {
-               toast.error(error.message);
+            
+               const errorMessage =
+                  (error as any)?.response?.data?.error ||
+                  (error as any)?.response?.data?.message ||
+                  "Error al crear la tarifa";
+               toast.error(errorMessage);
             },
          }
       );
@@ -127,28 +126,7 @@ export const AgencyCreateRatesForm = ({
                   </Field>
                )}
             />
-            <Controller
-               name="name"
-               control={form.control}
-               render={({ field, fieldState }) => (
-                  <Field data-invalid={fieldState.invalid}>
-                     <FieldLabel htmlFor="form-create-rate-name">Nombre</FieldLabel>
-                     <Input type="text" {...field} placeholder="Nombre" />
-                     {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-                  </Field>
-               )}
-            />
-            <Controller
-               name="description"
-               control={form.control}
-               render={({ field, fieldState }) => (
-                  <Field data-invalid={fieldState.invalid}>
-                     <FieldLabel htmlFor="form-create-rate-description">Descripción</FieldLabel>
-                     <Input type="text" {...field} placeholder="Descripción" />
-                     {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-                  </Field>
-               )}
-            />
+
             <Field orientation="horizontal">
                <Controller
                   name="cost_in_cents"
@@ -163,7 +141,7 @@ export const AgencyCreateRatesForm = ({
                            onChange={(e) => field.onChange(e.target.value === "" ? 0 : Number(e.target.value))}
                            onBlur={field.onBlur}
                            name={field.name}
-                           placeholder="Precio en Cents"
+                           placeholder="Precio de Costo"
                         />
                         {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                      </Field>
@@ -182,7 +160,7 @@ export const AgencyCreateRatesForm = ({
                            onChange={(e) => field.onChange(e.target.value === "" ? 0 : Number(e.target.value))}
                            onBlur={field.onBlur}
                            name={field.name}
-                           placeholder="Precio en Cents"
+                           placeholder="Precio de Venta"
                         />
                         {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                      </Field>
@@ -191,38 +169,20 @@ export const AgencyCreateRatesForm = ({
             </Field>
             <Field orientation="horizontal">
                <Controller
-                  name="unit"
-                  control={form.control}
-                  render={({ field, fieldState }) => (
-                     <Field data-invalid={fieldState.invalid}>
-                        <FieldLabel htmlFor="form-create-rate-unit">Unidad</FieldLabel>
-                        <Select value={field.value} onValueChange={field.onChange} aria-invalid={fieldState.invalid}>
-                           <SelectTrigger>
-                              <SelectValue placeholder="Selecciona una unidad" />
-                           </SelectTrigger>
-                           <SelectContent>
-                              <SelectItem value="PER_LB">Por libra</SelectItem>
-                              <SelectItem value="FIXED">Fijo</SelectItem>
-                           </SelectContent>
-                        </Select>
-                        {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-                     </Field>
-                  )}
-               />
-               <Controller
                   name="is_active"
                   control={form.control}
                   render={({ field, fieldState }) => (
-                     <Field orientation="horizontal" data-invalid={fieldState.invalid} className="w-full">
+                     <Field orientation="horizontal" data-invalid={fieldState.invalid}>
                         <FieldContent>
                            <FieldLabel htmlFor="form-create-rate-is_active">Activo</FieldLabel>
                            <FieldDescription>La tarifa sera activa por defecto</FieldDescription>
-                           <Switch
-                              id="form-create-rate-is_active"
-                              checked={field.value}
-                              onCheckedChange={field.onChange}
-                           />
-                        </FieldContent>
+                        </FieldContent>{" "}
+                        <Switch
+                           className="mt-4"
+                           id="form-create-rate-is_active"
+                           checked={field.value}
+                           onCheckedChange={field.onChange}
+                        />
                      </Field>
                   )}
                />

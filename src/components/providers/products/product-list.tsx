@@ -1,8 +1,7 @@
 import type { Product } from "@/data/types";
 import { Badge } from "../../ui/badge";
 import { Table, TableHeader, TableHead, TableRow, TableBody, TableCell } from "../../ui/table";
-import { PencilIcon } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { ProductCardActions } from "./product-card-actions";
 
 export const ProductList = ({ products }: { products: Product[] }) => {
    return (
@@ -41,9 +40,7 @@ const ProductRow = ({ product }: { product: Product }) => {
             <Badge variant="secondary">{product?.unit}</Badge>
          </TableCell>
          <TableCell className="w-10 text-right">
-            <Button variant="outline">
-               <PencilIcon className="w-4 h-4" />
-            </Button>
+            <ProductCardActions />
          </TableCell>
       </TableRow>
    );

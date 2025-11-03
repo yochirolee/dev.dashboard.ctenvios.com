@@ -34,6 +34,7 @@ function ItemRowReducer({
          shipping_rates: state.shipping_rates,
       }))
    );
+   
 
    const activeWeightRate = shipping_rates?.filter((rate) => rate.unit === "PER_LB")?.[0];
 

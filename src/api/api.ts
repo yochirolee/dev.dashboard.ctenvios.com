@@ -358,6 +358,10 @@ const api = {
          console.log(response.data, "response on create");
          return response.data;
       },
+      update: async (rate_id: number, data: ShippingRate) => {
+         const response = await axiosInstance.put(`/shipping-rates/${rate_id}`, data);
+         return response.data;
+      },
       /*    createBaseRate: async (data: ShippingRate) => {
          const response = await axiosInstance.post("/shipping-rates/base-rate", data);
          return response.data;

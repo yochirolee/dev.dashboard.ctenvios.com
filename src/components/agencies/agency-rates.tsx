@@ -4,13 +4,16 @@ import type { ShippingRate } from "@/data/types";
 import { centsToDollars } from "@/lib/cents-utils";
 import { Badge } from "../ui/badge";
 import { Switch } from "../ui/switch";
-import { Button } from "../ui/button";
 import { EmptyServicesRates } from "./empty-services-rates";
 import { Spinner } from "../ui/spinner";
 import { Card } from "../ui/card";
 import { CardContent } from "../ui/card";
 import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
 import { useAgencies } from "@/hooks/use-agencies";
+import { AgencyUpdateRatesForm } from "./agency-update-rates-form";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "../ui/dialog";
+import { Button } from "../ui/button";
+import { useState } from "react";
 
 export const AgencyRates = ({ serviceId, agencyId }: { serviceId: number; agencyId: number }) => {
    const { data: rates, isLoading, isError } = useAgencies.getShippingRates(agencyId, serviceId);
@@ -43,6 +46,7 @@ export const AgencyRates = ({ serviceId, agencyId }: { serviceId: number; agency
                <TableRow>
                   <TableHead>Id</TableHead>
                   <TableHead>Nombre</TableHead>
+                  <TableHead>Descripción</TableHead>
                   <TableHead>Tipo</TableHead>
                   <TableHead>Costo Agencia</TableHead>
                   <TableHead>Venta al Público</TableHead>
@@ -62,15 +66,12 @@ export const AgencyRates = ({ serviceId, agencyId }: { serviceId: number; agency
 };
 
 const RateRow = ({ rate }: { rate: ShippingRate }) => {
+   const [isOpen, setIsOpen] = useState(false);
    const calculateProfit = (rate: ShippingRate) => {
       return rate?.price_in_cents - rate?.cost_in_cents;
    };
 
    const handleActivate = (rate: ShippingRate) => {
-      rate.is_active = !rate.is_active;
-   };
-
-   const handleUpdate = (rate: ShippingRate) => {
       rate.is_active = !rate.is_active;
    };
 
@@ -81,6 +82,9 @@ const RateRow = ({ rate }: { rate: ShippingRate }) => {
          </TableCell>
          <TableCell>
             <p>{rate?.name}</p>
+         </TableCell>
+         <TableCell>
+            <p>{rate?.description}</p>
          </TableCell>
          <TableCell>
             <Badge variant="outline">{rate?.unit}</Badge>
@@ -102,9 +106,20 @@ const RateRow = ({ rate }: { rate: ShippingRate }) => {
             <Switch checked={rate?.is_active} onCheckedChange={() => handleActivate(rate)} />
          </TableCell>
          <TableCell className="flex justify-end">
-            <Button variant="ghost" onClick={() => handleUpdate(rate)}>
-               <PencilIcon size={16} />
-            </Button>
+            <Dialog open={isOpen} onOpenChange={setIsOpen}>
+               <DialogTrigger asChild>
+                  <Button variant="ghost">
+                     <PencilIcon size={16} />
+                  </Button>
+               </DialogTrigger>
+               <DialogContent>
+                  <DialogHeader>
+                     <DialogTitle>Actualizar tarifa</DialogTitle>
+                     <DialogDescription>Actualiza la tarifa para este servicio</DialogDescription>
+                  </DialogHeader>
+                  <AgencyUpdateRatesForm rate={rate} setIsOpen={setIsOpen} />
+               </DialogContent>
+            </Dialog>
          </TableCell>
       </TableRow>
    );

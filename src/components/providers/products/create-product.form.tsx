@@ -3,7 +3,7 @@ import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
 import { Button } from "@/components/ui/button";
-import { Field, FieldContent, FieldDescription, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
+import { Field, FieldContent, FieldDescription, FieldError, FieldGroup, FieldLabel, FieldSeparator } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Select, SelectItem, SelectContent, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { productSchema, type Product } from "@/data/types";
@@ -165,9 +165,7 @@ export function CreateProductForm({
          </FieldGroup>
 
          <Field orientation="responsive" className="mt-6">
-            <Button type="button" variant="outline" onClick={() => form.reset()}>
-               Reset
-            </Button>
+            <FieldSeparator className="my-2" />
             <Button
                type="submit"
                form="form-create-product"

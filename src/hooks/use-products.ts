@@ -11,7 +11,7 @@ export const useProducts = {
       return useMutation({
          mutationFn: (data: Product) => api.products.create(data),
          onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["get-provider-by-id"] });
+            queryClient.invalidateQueries({ queryKey: ["get-products"] });
             options?.onSuccess?.();
          },
          onError: (error) => {

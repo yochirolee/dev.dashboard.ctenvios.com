@@ -4,7 +4,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { type ColumnDef } from "@tanstack/react-table";
 import { format } from "date-fns";
 import { formatFullName } from "@/lib/cents-utils";
-import {  EllipsisVertical, FileText, Pencil, TagIcon, Trash } from "lucide-react";
+import { EllipsisVertical, FileText, Pencil, TagIcon, Trash } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
    DropdownMenu,
@@ -47,7 +47,7 @@ export type Invoice = {
    };
    service: {
       id: number;
-      name: string;
+      service_type: "MARITIME" | "AIR";
    };
    payment_status: string;
    status: string;
@@ -130,26 +130,21 @@ export const orderColumns: ColumnDef<Invoice>[] = [
       header: "Agencia",
       cell: ({ row }) => {
          return (
-            <div className="max-w-[150px] truncate" title={row.original?.agency?.name}>
+            <div className="max-w-[1500px] truncate flex flex-col" title={row.original?.agency?.name}>
                <span className="text-sm">{row.original?.agency?.name}</span>
+               <div
+                  className="w-fit text-[10px] text-muted-foreground font-light"
+                  title={row.original?.service?.service_type}
+               >
+                  {row.original?.service?.service_type}
+               </div>
             </div>
          );
       },
       size: 150,
    },
 
-   {
-      accessorKey: "service",
-      header: "Servicio",
-      cell: ({ row }) => {
-         return (
-            <Badge variant="secondary" className="max-w-[120px] truncate" title={row.original?.service?.name}>
-               {row.original?.service?.name}
-            </Badge>
-         );
-      },
-      size: 120,
-   },
+
 
    {
       accessorKey: "customer",

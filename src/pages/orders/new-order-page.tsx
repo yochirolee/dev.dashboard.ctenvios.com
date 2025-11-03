@@ -29,8 +29,11 @@ export function NewOrderPage() {
    const agencyId = user?.agency_id || 0;
 
    const { data: services, isLoading: isLoadingServices } = useAgencies.getServices(agencyId);
-   const { data: shipping_rates } = useAgencies.getShippingRates(agencyId, selectedService?.id || 0);
-   if (shipping_rates) {
+   const { data: shipping_rates, isLoading: isLoadingShippingRates } = useAgencies.getShippingRates(
+      agencyId,
+      selectedService?.id || 0
+   );
+   if (shipping_rates && !isLoadingShippingRates) {
       useOrderStore.setState({ shipping_rates: shipping_rates });
    }
 
@@ -74,8 +77,9 @@ export function NewOrderPage() {
                   <Skeleton />
                ) : (
                   <>
-                     <ServiceSelector services={services || []} />
-                     {selectedService && <ItemsInOrder />}
+                        <ServiceSelector services={services || []} />
+                        
+                     {selectedService && shipping_rates?.length > 0 && !isLoadingShippingRates && <ItemsInOrder />}
                   </>
                )}
             </>

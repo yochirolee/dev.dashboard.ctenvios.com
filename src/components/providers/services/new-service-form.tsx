@@ -1,5 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
 import { Form, FormControl, FormItem, FormLabel, FormField } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
@@ -17,6 +17,9 @@ import {
    DialogTitle,
    DialogTrigger,
 } from "@/components/ui/dialog";
+import { FieldError, FieldGroup, FieldSeparator } from "@/components/ui/field";
+import { Field, FieldLabel } from "@/components/ui/field";
+import { Spinner } from "@/components/ui/spinner";
 
 const formNewServiceSchema = z.object({
    name: z.string().min(1, { message: "El nombre del servicio es requerido" }),
@@ -59,6 +62,8 @@ export const NewServiceForm = ({
          toast.error(error.response.data.message);
       },
    });
+
+   console.log(form.formState.errors);
    const onSubmit = (data: FormNewServiceSchema) => {
       createService(data);
    };
@@ -76,65 +81,67 @@ export const NewServiceForm = ({
                <DialogTitle>Crear Servicio</DialogTitle>
                <DialogDescription>Agrega un nuevo servicio para {provider?.name}</DialogDescription>
             </DialogHeader>
-            <Form {...form}>
-               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-                  <FormField
+            <form id="form-new-service" onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+               <FieldGroup>
+                  <Controller
                      control={form.control}
                      name="name"
-                     render={({ field }) => (
-                        <FormItem>
-                           <FormLabel>Nombre</FormLabel>
-                           <FormControl>
-                              <Input {...field} placeholder="Nombre del Servicio" />
-                           </FormControl>
-                        </FormItem>
+                     render={({ field, fieldState }) => (
+                        <Field data-invalid={fieldState.invalid}>
+                           <FieldLabel>Nombre</FieldLabel>
+                           <Input {...field} placeholder="Nombre del Servicio" />
+                        </Field>
                      )}
                   />
-                  <FormField
+               </FieldGroup>
+               <FieldGroup>
+                  <Controller
                      control={form.control}
                      name="description"
-                     render={({ field }) => (
-                        <FormItem>
-                           <FormLabel>Descripción</FormLabel>
-                           <FormControl>
-                              <Input {...field} placeholder="Descripción del servicio" />
-                           </FormControl>
-                        </FormItem>
+                     render={({ field, fieldState }) => (
+                        <Field data-invalid={fieldState.invalid}>
+                           <FieldLabel>Descripción</FieldLabel>
+                           <Input {...field} placeholder="Descripción del servicio" />
+                           {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                        </Field>
                      )}
                   />
-                  <FormField
+               </FieldGroup>
+               <FieldGroup>
+                  <Controller
                      control={form.control}
                      name="service_type"
-                     render={({ field }) => (
-                        <FormItem>
-                           <FormLabel>Tipo de servicio</FormLabel>
-                           <FormControl>
-                              <Select {...field} onValueChange={field.onChange} defaultValue={field.value}>
-                                 <SelectTrigger className="w-full">
-                                    <SelectValue placeholder="Selecciona un tipo de servicio" />
-                                 </SelectTrigger>
-                                 <SelectContent>
-                                    <SelectItem value="MARITIME">Marítimo</SelectItem>
-                                    <SelectItem value="AIR">Aéreo</SelectItem>
-                                 </SelectContent>
-                              </Select>
-                           </FormControl>
-                        </FormItem>
+                     render={({ field, fieldState }) => (
+                        <Field data-invalid={fieldState.invalid}>
+                           <FieldLabel>Tipo de servicio</FieldLabel>
+                           <Select {...field} onValueChange={field.onChange} defaultValue={field.value}>
+                              <SelectTrigger className="w-full">
+                                 <SelectValue placeholder="Selecciona un tipo de servicio" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                 <SelectItem value="MARITIME">Marítimo</SelectItem>
+                                 <SelectItem value="AIR">Aéreo</SelectItem>
+                              </SelectContent>
+                           </Select>
+                           {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                        </Field>
                      )}
                   />
-
-                  <Button type="submit" disabled={isPending}>
+               </FieldGroup>
+               <FieldSeparator className="my-2" />
+               <Field>
+                  <Button type="submit" form="form-new-service" disabled={isPending}>
                      {isPending ? (
                         <>
-                           <Loader2 className="w-4 h-4 animate-spin" />
-                           Guardando...
+                           <Spinner />
+                           Creando servicio...
                         </>
                      ) : (
                         "Crear Servicio"
                      )}
                   </Button>
-               </form>
-            </Form>
+               </Field>
+            </form>
          </DialogContent>
       </Dialog>
    );

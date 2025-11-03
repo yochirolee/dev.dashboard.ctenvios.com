@@ -20,10 +20,10 @@ export default function ServicesList({ provider, services }: ServicesListProps) 
    return (
       <Card>
          <CardHeader>
-            <CardTitle>Servicios y Tarifas</CardTitle>
+            <CardTitle>Servicios</CardTitle>
             <div className="flex items-center justify-between gap-2">
                <CardDescription>
-                  Aquí puedes ver los servicios y productos. Puedes crear nuevos productos para los servicios.
+                  Listado de servicios disponibles para {provider?.name}.
                </CardDescription>
 
                <NewServiceForm open={open} setOpen={setOpen} provider={provider} />
@@ -32,7 +32,7 @@ export default function ServicesList({ provider, services }: ServicesListProps) 
          <Separator />
          <CardContent>
             {services?.map((service: ServiceWithProducts) => (
-               <ServiceCard key={service?.id} service={service} provider={provider} />
+               <ServiceCard key={service?.id} service={service}/>
             ))}
          </CardContent>
       </Card>

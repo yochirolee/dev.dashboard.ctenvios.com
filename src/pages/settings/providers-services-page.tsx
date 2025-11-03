@@ -8,10 +8,9 @@ export default function ProvidersServicesPage() {
    const [selectedProviderId, setSelectedProviderId] = useState<number>(1);
    const [open, setOpen] = useState(false);
 
-   console.log(selectedProviderId);
    return (
       <>
-         <div className="flex  gap-2 items-center">
+         <div className="flex container max-w-screen-lg mx-auto gap-2 items-center">
             <ProvidersCombobox selectedProvider={selectedProviderId} setSelectedProvider={setSelectedProviderId} />
             <ShareDialog
                open={open}
