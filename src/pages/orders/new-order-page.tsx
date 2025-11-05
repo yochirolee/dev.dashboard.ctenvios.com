@@ -15,9 +15,6 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { usePrefetch } from "@/hooks/use-prefetch";
 import { EmptyServicesRates } from "@/components/agencies/empty-services-rates";
 import { ButtonGroup } from "@/components/ui/button-group";
-import { UserRoundPlus, UserRoundPlusIcon } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { DialogTrigger } from "@/components/ui/dialog";
 
 export function NewOrderPage() {
    usePrefetch.customsRates(0, 300);
