@@ -11,7 +11,7 @@ import type { Agency } from "@/data/types";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { PlusCircle } from "lucide-react";
-import { Field } from "@/components/ui/field";
+import { ButtonGroup } from "@/components/ui/button-group";
 
 export const AgenciesPage = () => {
    const navigate = useNavigate();
@@ -38,7 +38,7 @@ export const AgenciesPage = () => {
                <p className="text-sm text-gray-500 "> Listado de Agencias</p>
             </div>
             {agencies?.length > 0 && (
-               <Field orientation="horizontal">
+               <ButtonGroup orientation="horizontal" className="w-full">
                   <AgenciesCombobox
                      isLoading={isLoading}
                      agencies={agencies}
@@ -54,7 +54,7 @@ export const AgenciesPage = () => {
                   >
                      <PlusCircle size={16} /> <span className="hidden md:block">Nueva Agencia</span>
                   </Button>
-               </Field>
+               </ButtonGroup>
             )}
          </div>
 

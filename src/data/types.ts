@@ -138,6 +138,7 @@ export const customsRatesSchema = z.object({
    chapter: z.string().optional(),
    fee_type: z.enum(["UNIT", "WEIGHT", "VALUE"]).optional().default("UNIT"),
    fee_in_cents: z.number().min(0, "Fee must be greater than 0"),
+   custom_value: z.number().min(0, "Custom value must be greater than 0").optional().default(0),
    min_weight: z.number().optional().default(0),
    max_weight: z.number().optional().default(0),
    max_quantity: z.number().optional().default(0),

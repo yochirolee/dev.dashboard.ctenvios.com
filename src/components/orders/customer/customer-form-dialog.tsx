@@ -92,7 +92,6 @@ const CustomerForm = ({
    });
 
    useEffect(() => {
-      console.log("customer form dialog");
       if (selectedCustomer == null) {
          form.reset({
             first_name: "",
@@ -106,14 +105,14 @@ const CustomerForm = ({
          });
       } else {
          form.reset({
-            first_name: selectedCustomer.first_name,
-            email: selectedCustomer.email ? selectedCustomer.email : undefined,
-            mobile: selectedCustomer.mobile ? selectedCustomer.mobile : undefined,
-            middle_name: selectedCustomer.middle_name ? selectedCustomer.middle_name : undefined,
+            first_name: selectedCustomer?.first_name,
+            email: selectedCustomer.email ? selectedCustomer?.email : undefined,
+            mobile: selectedCustomer.mobile ? selectedCustomer?.mobile : undefined,
+            middle_name: selectedCustomer.middle_name ? selectedCustomer?.middle_name : undefined,
             last_name: selectedCustomer.last_name ? selectedCustomer.last_name : undefined,
-            second_last_name: selectedCustomer.second_last_name,
-            identity_document: selectedCustomer.identity_document ? selectedCustomer.identity_document : undefined,
-            address: selectedCustomer.address ? selectedCustomer.address : undefined,
+            second_last_name: selectedCustomer?.second_last_name,
+            identity_document: selectedCustomer?.identity_document ? selectedCustomer?.identity_document : undefined,
+            address: selectedCustomer?.address ? selectedCustomer?.address : undefined,
          });
       }
    }, [selectedCustomer, form]);
@@ -149,10 +148,10 @@ const CustomerForm = ({
 
    const onError = (errors: any) => {
       console.log("Form validation errors:", errors);
+      toast.error(errors.response.data.message);
    };
 
-   console.log(form.formState.errors, "errors");
-
+  
    return (
       <form id="customer-form" onSubmit={form.handleSubmit(onSubmit, onError)}>
          <ScrollArea className="h-[calc(100vh-200px)] lg:h-auto p-4 ">

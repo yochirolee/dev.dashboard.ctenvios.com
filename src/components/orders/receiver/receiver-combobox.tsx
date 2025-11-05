@@ -36,7 +36,7 @@ export function ReceiverCombobox() {
    return (
       <Popover open={open} onOpenChange={setOpen}>
          <PopoverTrigger asChild>
-            <Button variant="outline" role="combobox" aria-expanded={open} className="flex-1  justify-between">
+            <Button variant="outline" role="combobox" aria-expanded={open} className="lg:flex-1  justify-between">
                {selectedReceiver?.id
                   ? formatFullName(
                        selectedReceiver.first_name,
@@ -46,13 +46,13 @@ export function ReceiverCombobox() {
                     ) +
                     " - " +
                     (selectedReceiver.mobile || selectedReceiver.phone)
-                  : "Seleccionar cliente..."}
+                  : "Seleccionar Destinatario..."}
                <ChevronsUpDown className="opacity-50" />
             </Button>
          </PopoverTrigger>
          <PopoverContent className="p-0" style={{ width: "var(--radix-popover-trigger-width)" }}>
             <Command shouldFilter={false} className="w-full">
-               <CommandInput placeholder="Buscar cliente..." className="h-9" onValueChange={setSearchQuery} />
+               <CommandInput placeholder="Buscar Destinatario..." className="h-9" onValueChange={setSearchQuery} />
                <CommandList>
                   {isLoading ? (
                      <div className="flex p-2 items-center justify-center h-full">

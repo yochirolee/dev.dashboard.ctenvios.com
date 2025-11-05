@@ -14,6 +14,10 @@ import { useAgencies } from "@/hooks/use-agencies";
 import { Skeleton } from "@/components/ui/skeleton";
 import { usePrefetch } from "@/hooks/use-prefetch";
 import { EmptyServicesRates } from "@/components/agencies/empty-services-rates";
+import { ButtonGroup } from "@/components/ui/button-group";
+import { UserRoundPlus, UserRoundPlusIcon } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { DialogTrigger } from "@/components/ui/dialog";
 
 export function NewOrderPage() {
    usePrefetch.customsRates(0, 300);
@@ -43,10 +47,10 @@ export function NewOrderPage() {
                   <CardTitle>Cliente</CardTitle>
                </CardHeader>
                <CardContent className="flex flex-col  gap-2">
-                  <div className="flex flex-col lg:flex-row gap-2">
+                  <ButtonGroup orientation="horizontal" className="w-full">
                      <CustomerCombobox />
                      <CustomerFormDialog />
-                  </div>
+                  </ButtonGroup>
 
                   <CustomerInformation />
                </CardContent>
@@ -57,10 +61,10 @@ export function NewOrderPage() {
                   <CardTitle>Destinatario</CardTitle>
                </CardHeader>
                <CardContent className="flex flex-col gap-2">
-                  <div className="flex flex-col lg:flex-row gap-2">
+                  <ButtonGroup orientation="horizontal" className="w-full">
                      <ReceiverCombobox />
                      <ReceiverFormDialog />
-                  </div>
+                  </ButtonGroup>
                   <ReceiverInformation />
                </CardContent>
             </Card>

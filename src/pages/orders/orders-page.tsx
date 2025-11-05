@@ -9,6 +9,7 @@ import { useDebounce } from "use-debounce";
 import { Input } from "@/components/ui/input";
 import { DatePickerWithRange } from "@/components/dates/data-range-picker";
 import { useOrders } from "@/hooks/use-orders";
+import { ButtonGroup } from "@/components/ui/button-group";
 
 export default function OrdersPage() {
    const navigate = useNavigate();
@@ -42,7 +43,7 @@ export default function OrdersPage() {
                <h3 className=" font-bold">Ordenes</h3>
                <p className="text-sm text-gray-500 "> Listado de Ordenes</p>
             </div>
-            <div className="flex items-center gap-2">
+            <ButtonGroup orientation="horizontal">
                <Button onClick={() => navigate("/orders/new")} variant="outline">
                   <FilePlus2 size={16} />
                   <span className="hidden md:block">Nueva Orden</span>
@@ -51,7 +52,7 @@ export default function OrdersPage() {
                   <Printer size={16} />
                   <span className="hidden md:block">Imprimir</span>
                </Button>
-            </div>
+            </ButtonGroup>
          </div>
          <div className="flex flex-col gap-4">
             <div className="flex items-center gap-2">

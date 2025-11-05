@@ -41,7 +41,7 @@ export const CustomerCombobox = React.memo(function CustomerCombobox() {
    return (
       <Popover open={open} onOpenChange={setOpen}>
          <PopoverTrigger asChild>
-            <Button variant="outline" role="combobox" aria-expanded={open} className="flex-1 justify-between">
+            <Button variant="outline" role="combobox" aria-expanded={open} className="flex-1 justify-between ">
                {selectedCustomer?.id
                   ? [
                        selectedCustomer.first_name,

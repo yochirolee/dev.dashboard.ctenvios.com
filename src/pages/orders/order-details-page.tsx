@@ -1,6 +1,21 @@
-import { Link, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useOrders } from "@/hooks/use-orders";
-import { MapPin, Phone, User, Trash2, PrinterIcon, Plane, Ship, Edit, CreditCard } from "lucide-react";
+import {
+   MapPin,
+   Phone,
+   User,
+   Trash2Icon,
+   PrinterIcon,
+   Plane,
+   Ship,
+   CreditCard,
+   TagIcon,
+   Edit2Icon,
+   ArchiveIcon,
+   EllipsisVerticalIcon,
+   CogIcon,
+   FileWarning,
+} from "lucide-react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
@@ -11,20 +26,26 @@ import { PaymentForm } from "@/components/orders/payments/payment-form";
 import { cn } from "@/lib/utils";
 import { calculate_row_subtotal, formatFullName, formatCents } from "@/lib/cents-utils";
 import { Card } from "@/components/ui/card";
-import { Loading } from "@/components/shares/loading";
 import type { OrderItems, Payment } from "@/data/types";
 import { OrderNotFound } from "@/components/orders/order-details/order-not-found";
 import { PaymentsDetails } from "@/components/orders/payments/payments-details";
+import { ButtonGroup } from "@/components/ui/button-group";
+import {
+   DropdownMenu,
+   DropdownMenuContent,
+   DropdownMenuItem,
+   DropdownMenuTrigger,
+   DropdownMenuGroup,
+   DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu";
+import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@/components/ui/empty";
 const baseUrl = import.meta.env.VITE_API_URL;
 
 export default function OrderDetailsPage() {
    const { orderId } = useParams();
+   const navigate = useNavigate();
 
-   const { data, isLoading, error } = useOrders.getById(Number(orderId));
-
-   
-   if (error) return <div>Error: {error.message}</div>;
-   const order = data || null;
+   const { data: order, isLoading, error } = useOrders.getById(Number(orderId));
 
    const subtotal = order?.items.reduce(
       (acc: number, item: OrderItems) =>
@@ -41,11 +62,42 @@ export default function OrderDetailsPage() {
    );
 
    const total_weight = order?.items.reduce((acc: number, item: OrderItems) => acc + item?.weight || 0, 0);
+   const handlePrintOrder = () => {
+      window.open(`${baseUrl}/invoices/${orderId}/pdf`, "_blank");
+   };
+   const handlePrintLabels = () => {
+      window.open(`${baseUrl}/invoices/${orderId}/labels`, "_blank");
+   };
 
-   if (isLoading) return <Loading />;
+   if (isLoading)
+      return (
+         <Empty>
+            <EmptyHeader>
+               <EmptyMedia variant="icon">
+                  <CogIcon size={40} className="animate-spin" />
+               </EmptyMedia>
+               <EmptyTitle>Loading Order</EmptyTitle>
+               <EmptyDescription>Please wait while we load the order.</EmptyDescription>
+            </EmptyHeader>
+         </Empty>
+      );
+
+   if (error || !order)
+      return (
+         <Empty>
+            <EmptyHeader>
+               <EmptyMedia variant="icon">
+                  <FileWarning />
+               </EmptyMedia>
+               <EmptyTitle>Order Not Found</EmptyTitle>
+               <EmptyDescription>The order you are looking for does not exist.</EmptyDescription>
+            </EmptyHeader>
+         </Empty>
+      );
+
    return order ? (
       <div className="space-y-6 ">
-         <div className="flex flex-col gap-2 md:flex-row lg:justify-between lg:items-center print:hidden">
+         <div className="flex flex-col container mx-auto gap-2 md:flex-row lg:justify-between lg:items-center print:hidden">
             <div className="flex flex-col gap-2">
                <div className="flex items-center gap-2">
                   <div className="flex items-center gap-2">
@@ -74,32 +126,43 @@ export default function OrderDetailsPage() {
                   </div>
                </div>
             </div>
-            <div className="flex  items-center lg:justify-end gap-2">
-               <Link target="_blank" to={`${baseUrl}/invoices/${orderId}/pdf`}>
-                  <Button className="print:hidden bg-blue-600 hover:bg-blue-700 text-white">
-                     <PrinterIcon className=" h-4 w-4" />
-                     Print Invoice
-                  </Button>
-               </Link>
-               <Link target="_blank" to={`${baseUrl}/invoices/${orderId}/labels`}>
-                  <Button className="print:hidden bg-blue-600 hover:bg-blue-700 text-white">
-                     <PrinterIcon className=" h-4 w-4" />
-                     Print Labels
-                  </Button>
-               </Link>
+            <ButtonGroup>
+               <Button onClick={handlePrintOrder} variant="outline">
+                  <PrinterIcon className=" h-4 w-4" />
+                  Print Order
+               </Button>
 
-               <Separator orientation="vertical" className="min-h-6 ml-2" />
-               <div className="flex items-center ">
-                  <Link to={`/orders/${orderId}/edit`}>
-                     <Button variant="ghost" className="print:hidden">
-                        <Edit />
+               <Button onClick={handlePrintLabels} variant="outline">
+                  <TagIcon className=" h-4 w-4" />
+                  Print Labels
+               </Button>
+               <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                     <Button variant="outline" size="icon" aria-label="More Options">
+                        <EllipsisVerticalIcon />
                      </Button>
-                  </Link>
-                  <Button variant="ghost" className="print:hidden group hover:bg-red-500 hover:text-white">
-                     <Trash2 className="group-hover:text-red-400" />
-                  </Button>
-               </div>
-            </div>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-52">
+                     <DropdownMenuGroup>
+                        <DropdownMenuItem>
+                           <Edit2Icon />
+                           Edit
+                        </DropdownMenuItem>
+                        <DropdownMenuItem>
+                           <ArchiveIcon />
+                           Archive
+                        </DropdownMenuItem>
+                     </DropdownMenuGroup>
+                     <DropdownMenuSeparator />
+                     <DropdownMenuGroup>
+                        <DropdownMenuItem variant="destructive">
+                           <Trash2Icon />
+                           Trash
+                        </DropdownMenuItem>
+                     </DropdownMenuGroup>
+                  </DropdownMenuContent>
+               </DropdownMenu>
+            </ButtonGroup>
          </div>
          <Card className="p-4 container mx-auto print:shadow-none bg-card print:bg-white print:py-0 print:text-gray-500">
             <div className="flex flex-col xl:flex-row justify-between items-start ">
@@ -225,7 +288,9 @@ export default function OrderDetailsPage() {
                         >
                            {formatCents(item?.customs_fee_in_cents)}
                         </TableCell>
-                        <TableCell className={`text-right ${item?.price_in_cents === 0 ? "text-muted-foreground" : ""}`}>
+                        <TableCell
+                           className={`text-right ${item?.price_in_cents === 0 ? "text-muted-foreground" : ""}`}
+                        >
                            {formatCents(item?.price_in_cents)}
                         </TableCell>
                         <TableCell className="text-right">{item?.weight?.toFixed(2)}</TableCell>
