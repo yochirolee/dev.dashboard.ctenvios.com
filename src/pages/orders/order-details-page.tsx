@@ -1,4 +1,4 @@
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { useOrders } from "@/hooks/use-orders";
 import {
    MapPin,
@@ -43,7 +43,6 @@ const baseUrl = import.meta.env.VITE_API_URL;
 
 export default function OrderDetailsPage() {
    const { orderId } = useParams();
-   const navigate = useNavigate();
 
    const { data: order, isLoading, error } = useOrders.getById(Number(orderId));
 
