@@ -19,6 +19,7 @@ import { Link } from "react-router-dom";
 // You can use a Zod schema here if you want.
 export type Invoice = {
    id: number;
+   partner_order_id: string;
    agency: {
       id: number;
       name: string;
@@ -136,15 +137,18 @@ export const orderColumns: ColumnDef<Invoice>[] = [
                   className="w-fit text-[10px] text-muted-foreground font-light"
                   title={row.original?.service?.service_type}
                >
-                  {row.original?.service?.service_type}
+                  <div className="flex items-center gap-2">
+                     <span className="text-[10px] text-muted-foreground">{row.original?.service?.service_type}</span>
+                     {row.original?.partner_order_id && (
+                        <span className="text-[10px] text-muted-foreground">({row.original?.partner_order_id})</span>
+                     )}
+                  </div>
                </div>
             </div>
          );
       },
       size: 150,
    },
-
-
 
    {
       accessorKey: "customer",

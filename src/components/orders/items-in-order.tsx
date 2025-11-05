@@ -217,8 +217,8 @@ export function ItemsInOrder() {
                            <TableHead>Categoria</TableHead>
                            <TableHead>Description</TableHead>
                            <TableHead className="text-right w-20">Arancel</TableHead>
-                           <TableHead className="text-right w-22">Peso</TableHead>
                            <TableHead className="text-right w-20">Precio</TableHead>
+                           <TableHead className="text-right w-22">Peso</TableHead>
                            <TableHead className="text-right w-20">Subtotal</TableHead>
                            <TableHead className="w-10"></TableHead>
                         </TableRow>

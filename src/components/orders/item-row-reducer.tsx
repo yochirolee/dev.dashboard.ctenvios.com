@@ -191,8 +191,9 @@ function ItemRowReducer({
             </DropdownMenu>
          </TableCell>
          <TableCell className="text-right">{centsToDollars(itemState.customs_fee_in_cents).toFixed(2)}</TableCell>
+         <TableCell className="text-right">{centsToDollars(itemState.price_in_cents).toFixed(2)}</TableCell>
 
-         <TableCell>
+         <TableCell className="text-right">
             <Input
                name={`items.${index}.weight`}
                className="[&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none [-moz-appearance:textfield] text-right"
@@ -234,7 +235,6 @@ function ItemRowReducer({
                }}
             />
          </TableCell>
-         <TableCell className="text-right">{centsToDollars(itemState.price_in_cents).toFixed(2)}</TableCell>
          <TableCell className="text-right">{centsToDollars(itemState.subtotal || 0).toFixed(2)}</TableCell>
 
          <TableCell className="w-10">
