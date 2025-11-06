@@ -367,6 +367,10 @@ const api = {
 
          return response.data;
       },
+      getDailySalesByAgency: async () => {
+         const response = await axiosInstance.get("/analytics/daily-sales-by-agency");
+         return response.data;
+      },
    },
    products: {
       get: async () => {

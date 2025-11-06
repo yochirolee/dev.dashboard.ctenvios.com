@@ -8,4 +8,10 @@ export const useAnalytics = {
 			queryFn: () => api.analytics.getSales(),
 		});
 	},
+	getDailySalesByAgency: () => {
+		return useQuery({
+			queryKey: ["analytics", "daily-sales-by-agency"],
+			queryFn: () => api.analytics.getDailySalesByAgency(),
+		});
+	},
 };

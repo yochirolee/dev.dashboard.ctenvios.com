@@ -24,13 +24,13 @@ export const customerSchema = z.object({
 export const receiverSchema = z
    .object({
       id: z.number().optional(),
-      first_name: z.string().min(2, { message: "First name must be at least 2 characters long" }),
+      first_name: z.string().min(2, { message: "El nombre debe tener al menos 2 caracteres" }),
       middle_name: z.string().optional(),
-      last_name: z.string().min(2, { message: "Last name must be at least 2 characters long" }),
+      last_name: z.string().min(2, { message: "El apellido debe tener al menos 2 caracteres" }),
       second_last_name: z
          .string()
-         .min(2, { message: "Last name must be at least 2 characters long" })
-         .regex(/^[a-zA-Z]+$/, "Only letters are allowed"),
+         .min(2, { message: "El apellido debe tener al menos 2 caracteres" })
+         .regex(/^[a-zA-Z]+$/, "Solo se permiten letras"),
       email: z.string().email().or(z.literal("")).optional().nullable(),
       phone: z
          .string()
@@ -52,9 +52,9 @@ export const receiverSchema = z
          .refine(isValidCubanCI, {
             message: "El CI no es válido según su fecha o dígito de control",
          }),
-      province_id: z.number(),
+      province_id: z.number( {message: "La provincia es requerida"}),
       passport: z.string().nullable().optional(),
-      city_id: z.number(),
+      city_id: z.number({message: "La ciudad es requerida"}),
       city: z.string().optional(),
       province: z.string().optional(),
    })

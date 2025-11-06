@@ -28,7 +28,7 @@ const customerFormSchema = z.object({
    last_name: z.string().min(1, { message: "El apellido es requerido" }),
    second_last_name: z.string().optional(),
    mobile: z
-      .string()
+      .string( {message: "El movil es requerido"})
       .min(10, { message: "El movil debe tener 10 dígitos" })
       .max(10, { message: "El movil debe tener 10 dígitos" }),
    identity_document: z.string().optional(),
@@ -148,10 +148,8 @@ const CustomerForm = ({
 
    const onError = (errors: any) => {
       console.log("Form validation errors:", errors);
-      toast.error(errors.response.data.message);
    };
 
-  
    return (
       <form id="customer-form" onSubmit={form.handleSubmit(onSubmit, onError)}>
          <ScrollArea className="h-[calc(100vh-200px)] lg:h-auto p-4 ">
