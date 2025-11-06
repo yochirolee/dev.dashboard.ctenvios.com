@@ -147,7 +147,6 @@ export function ItemsInOrder() {
       data.customer_id = selectedCustomer?.id || 0;
       data.receiver_id = selectedReceiver?.id || 0;
       data.total_delivery_fee_in_cents = total_delivery_fee;
-     
 
       createOrder(data);
    };
@@ -161,118 +160,115 @@ export function ItemsInOrder() {
    };
 
    return (
-      <>
-         <Card>
-            <form onSubmit={form.handleSubmit(handleSubmit as any)}>
-               <CardHeader>
-                  <CardTitle className="flex justify-between items-center">
-                     <h3>Items in Order</h3>
-                     <div className="flex space-x-2 justify-end items-center">
-                        <Input
-                           className="w-18"
-                           type="number"
-                           min={1}
-                           value={items_count === 0 ? "" : items_count}
-                           onChange={(e) => {
-                              const val = e.target.value;
-                              if (val === "") {
-                                 setItemsCount(0); // Temporarily allow 0 to avoid breaking input
-                              } else {
-                                 const num = Number(val);
-                                 if (!isNaN(num) && num >= 1) {
-                                    setItemsCount(num);
-                                 }
+      <Card className="mt-4">
+         <form onSubmit={form.handleSubmit(handleSubmit as any)}>
+            <CardHeader>
+               <CardTitle className="flex justify-between items-center">
+                  <h3>Items in Order</h3>
+                  <div className="flex space-x-2 justify-end items-center">
+                     <Input
+                        className="w-18"
+                        type="number"
+                        min={1}
+                        value={items_count === 0 ? "" : items_count}
+                        onChange={(e) => {
+                           const val = e.target.value;
+                           if (val === "") {
+                              setItemsCount(0); // Temporarily allow 0 to avoid breaking input
+                           } else {
+                              const num = Number(val);
+                              if (!isNaN(num) && num >= 1) {
+                                 setItemsCount(num);
                               }
-                           }}
-                           onKeyDown={(e) => {
-                              if (e.key === "Enter") {
-                                 e.preventDefault();
-                                 handleAddItem();
-                              }
-                           }}
-                        />
+                           }
+                        }}
+                        onKeyDown={(e) => {
+                           if (e.key === "Enter") {
+                              e.preventDefault();
+                              handleAddItem();
+                           }
+                        }}
+                     />
 
-                        <Button onClick={handleAddItem} variant="ghost" type="button">
-                           <PackagePlus />
-                           <span className="hidden xl:block">Add Items</span>
-                        </Button>
-                        <Button onClick={handleRemoveAll} variant="ghost" type="button">
-                           <Trash />
-                           <span className="hidden xl:block">Delete All</span>
-                        </Button>
+                     <Button onClick={handleAddItem} variant="ghost" type="button">
+                        <PackagePlus />
+                        <span className="hidden xl:block">Add Items</span>
+                     </Button>
+                     <Button onClick={handleRemoveAll} variant="ghost" type="button">
+                        <Trash />
+                        <span className="hidden xl:block">Delete All</span>
+                     </Button>
+                  </div>
+               </CardTitle>
+            </CardHeader>
+            <CardContent>
+               <Table>
+                  <TableCaption>A list of your recent invoices.</TableCaption>
+                  <TableHeader>
+                     <TableRow>
+                        <TableHead className="w-4">No.</TableHead>
+                        <TableHead className="w-4">
+                           <div className="flex items-center gap-2">
+                              <Scale className="w-4 h-4" />/<BoxIcon className="w-4 h-4" />{" "}
+                           </div>
+                        </TableHead>
+                        <TableHead>Categoria</TableHead>
+                        <TableHead>Description</TableHead>
+                        <TableHead className="text-right w-20">Arancel</TableHead>
+                        <TableHead className="text-right w-20">Precio</TableHead>
+                        <TableHead className="text-right w-22">Peso</TableHead>
+                        <TableHead className="text-right w-20">Subtotal</TableHead>
+                        <TableHead className="w-10"></TableHead>
+                     </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                     {fields.map((field, index) => (
+                        <ItemRow
+                           key={field.id}
+                           index={index}
+                           form={form}
+                           remove={remove}
+                           openDialog={handleOpenDialog}
+                           registerDispatch={registerDispatch}
+                        />
+                     ))}
+                  </TableBody>
+               </Table>
+            </CardContent>
+            <InvoiceTotal form={form} />
+            <div className="flex justify-end m-10">
+               <Button className="w-1/2 mt-4 mx-auto" type="submit" disabled={isCreatingOrder}>
+                  {isCreatingOrder ? (
+                     <div className="flex items-center gap-2">
+                        <Spinner /> <span>Creando Orden...</span>
                      </div>
-                  </CardTitle>
-               </CardHeader>
-               <CardContent>
-                  <Table>
-                     <TableCaption>A list of your recent invoices.</TableCaption>
-                     <TableHeader>
-                        <TableRow>
-                           <TableHead className="w-4">No.</TableHead>
-                           <TableHead className="w-4">
-                              <div className="flex items-center gap-2">
-                                 <Scale className="w-4 h-4" />/<BoxIcon className="w-4 h-4" />{" "}
-                              </div>
-                           </TableHead>
-                           <TableHead>Categoria</TableHead>
-                           <TableHead>Description</TableHead>
-                           <TableHead className="text-right w-20">Arancel</TableHead>
-                           <TableHead className="text-right w-20">Precio</TableHead>
-                           <TableHead className="text-right w-22">Peso</TableHead>
-                           <TableHead className="text-right w-20">Subtotal</TableHead>
-                           <TableHead className="w-10"></TableHead>
-                        </TableRow>
-                     </TableHeader>
-                     <TableBody>
-                        {fields.map((field, index) => (
-                           <ItemRow
-                              key={field.id}
-                              index={index}
-                              form={form}
-                              remove={remove}
-                              openDialog={handleOpenDialog}
-                              registerDispatch={registerDispatch}
-                              
-                           />
-                        ))}
-                     </TableBody>
-                  </Table>
-               </CardContent>
-               <InvoiceTotal form={form} />
-               <div className="flex justify-end m-10">
-                  <Button className="w-1/2 mt-4 mx-auto" type="submit" disabled={isCreatingOrder}>
-                     {isCreatingOrder ? (
-                        <div className="flex items-center gap-2">
-                           <Spinner /> <span>Creando Orden...</span>
-                        </div>
-                     ) : (
-                        "Crear Orden"
-                     )}
-                  </Button>
-               </div>
-            </form>
-            <InsuranceFeeDialog
-               open={dialogState.type === "insurance"}
-               setOpen={() => setDialogState({ type: "", index: 0 })}
-               form={form}
-               index={dialogState.index || 0}
-               dispatch={dispatchRegistry.current.get(dialogState.index)}
-            />
-            <ChargeDialog
-               open={dialogState.type === "charge"}
-               setOpen={() => setDialogState({ type: "", index: 0 })}
-               form={form}
-               index={dialogState.index || 0}
-               dispatch={dispatchRegistry.current.get(dialogState.index)}
-            />
-            <ChangeRateDialog
-               open={dialogState.type === "rate"}
-               setOpen={() => setDialogState({ type: "", index: 0 })}
-               form={form}
-               index={dialogState.index || 0}
-            />
-         </Card>
-      </>
+                  ) : (
+                     "Crear Orden"
+                  )}
+               </Button>
+            </div>
+         </form>
+         <InsuranceFeeDialog
+            open={dialogState.type === "insurance"}
+            setOpen={() => setDialogState({ type: "", index: 0 })}
+            form={form}
+            index={dialogState.index || 0}
+            dispatch={dispatchRegistry.current.get(dialogState.index)}
+         />
+         <ChargeDialog
+            open={dialogState.type === "charge"}
+            setOpen={() => setDialogState({ type: "", index: 0 })}
+            form={form}
+            index={dialogState.index || 0}
+            dispatch={dispatchRegistry.current.get(dialogState.index)}
+         />
+         <ChangeRateDialog
+            open={dialogState.type === "rate"}
+            setOpen={() => setDialogState({ type: "", index: 0 })}
+            form={form}
+            index={dialogState.index || 0}
+         />
+      </Card>
    );
 }
 
