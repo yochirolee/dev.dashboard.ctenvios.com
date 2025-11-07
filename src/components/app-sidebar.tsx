@@ -1,164 +1,188 @@
 import * as React from "react";
-import {
-	BoxIcon,
-	FileBox,
-	HomeIcon,
-	Settings2,
-	Sparkles,
-	Warehouse,
-} from "lucide-react";
+import { BoxIcon, FileBox, HomeIcon, Settings2, Sparkles, Warehouse, type LucideIcon } from "lucide-react";
 
 import { NavMain } from "@/components/nav-main";
 import { NavUser } from "@/components/nav-user";
 import { TeamSwitcher } from "@/components/team-switcher";
-import {
-	Sidebar,
-	SidebarContent,
-	SidebarFooter,
-	SidebarHeader,
-	SidebarRail,
-} from "@/components/ui/sidebar";
-import { Link } from "react-router-dom";
+import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarRail } from "@/components/ui/sidebar";
+import { Link, useLocation } from "react-router-dom";
 import { Button } from "./ui/button";
-import { useLocation } from "react-router-dom";
-import { NavMarketplace } from "./nav-marketplace";
-// This is sample data.
-const data = {
-	user: {
-		name: "yleecruz",
-		email: "yleecruz@gmail.com",
-		avatar: "/avatars/shadcn.jpg",
-	},
-	
-	navMain: [
-		{
-			title: "Ordenes",
-			url: "#",
-			icon: FileBox,
-			isActive: true,
-			items: [
-				{
-					title: "Crear Orden",
-					url: "/orders/new",
-				},
-				{
-					title: "Ordenes",
-					url: "/orders/list",
-				},
-			],
-		},
-		{
-			title: "Logistica",
-			url: "#",
-			icon: Warehouse,
-			items: [
-				{
-					title: "Despachos",
-					url: "/logistics/dispatch",
-				},
-				{
-					title: "Contenedores",
-					url: "/logistics/containers",
-				},
-				{
-					title: "Vuelos",
-					url: "/logistics/flights",
-				},
-			],
-		},
-		{
-			title: "Settings",
-			url: "#",
-			icon: Settings2,
-			items: [
-				{
-					title: "Providers",
-					url: "/settings/providers",
-				},
-				{
-					title: "Agencies",
-					url: "/settings/agencies",
-				},
-				{
-					title: "Customers",
-					url: "/settings/customers",
-				},
-				{
-					title: "Receivers",
-					url: "/settings/receivers",
-				},
-				{
-					title: "Aranceles",
-					url: "/settings/customs",
-				},
-				{
-					title: "Usuarios",
-					url: "/settings/users",
-				},
-			],
-		},
-	],
+import { useAppStore } from "@/stores/app-store";
 
-	marketplace: [
-		{
-			title: "Sales",
-			url: "#",
-			icon: Sparkles,
+interface SidebarSubItem {
+   title: string;
+   url: string;
+   allowedRoles?: string[];
+}
 
-			items: [
-				{
-					title: "Crear Orden",
-					url: "/orders/new",
-				},
-				{
-					title: "Ordenes",
-					url: "/orders/list",
-				},
-			],
-		},
-		{
-			title: "Manage Products",
-			url: "#",
-			icon: BoxIcon,
-			items: [
-				{
-					title: "Providers",
-					url: "/settings/providers",
-				},
-				{
-					title: "Agencies",
-					url: "/settings/agencies",
-				},
-			],
-		},
-	],
-};
+interface SidebarItem {
+   title: string;
+   url: string;
+   icon?: LucideIcon;
+   isActive?: boolean;
+   allowedRoles?: string[];
+   items?: SidebarSubItem[];
+}
+
+const navMainItems: SidebarItem[] = [
+   {
+      title: "Ordenes",
+      url: "#",
+      icon: FileBox,
+      isActive: true,
+      items: [
+         { title: "Crear Orden", url: "/orders/new" },
+         { title: "Ordenes", url: "/orders/list" },
+      ],
+   },
+   {
+      title: "Logistica",
+      url: "#",
+      icon: Warehouse,
+      allowedRoles: ["ROOT", "ADMINISTRATOR"],
+      items: [
+         {
+            title: "Despachos",
+            url: "/logistics/dispatch",
+            allowedRoles: ["ROOT", "ADMINISTRATOR"],
+         },
+         {
+            title: "Contenedores",
+            url: "/logistics/containers",
+            allowedRoles: ["ROOT", "ADMINISTRATOR"],
+         },
+         {
+            title: "Vuelos",
+            url: "/logistics/flights",
+            allowedRoles: ["ROOT", "ADMINISTRATOR"],
+         },
+      ],
+   },
+   {
+      title: "Settings",
+      url: "#",
+      icon: Settings2,
+      allowedRoles: ["ROOT", "ADMINISTRATOR"],
+      items: [
+         {
+            title: "Providers",
+            url: "/settings/providers",
+            allowedRoles: ["ROOT", "ADMINISTRATOR"],
+         },
+         {
+            title: "Agencies",
+            url: "/settings/agencies",
+            allowedRoles: ["ROOT", "ADMINISTRATOR"],
+         },
+         {
+            title: "Customers",
+            url: "/settings/customers",
+            allowedRoles: ["ROOT", "ADMINISTRATOR"],
+         },
+         {
+            title: "Receivers",
+            url: "/settings/receivers",
+            allowedRoles: ["ROOT", "ADMINISTRATOR"],
+         },
+         {
+            title: "Aranceles",
+            url: "/settings/customs",
+            allowedRoles: ["ROOT", "ADMINISTRATOR"],
+         },
+         {
+            title: "Usuarios",
+            url: "/settings/users",
+            allowedRoles: ["ROOT", "ADMINISTRATOR"],
+         },
+      ],
+   },
+];
+
+const marketplaceItems: SidebarItem[] = [
+   {
+      title: "Sales",
+      url: "#",
+      icon: Sparkles,
+      items: [
+         { title: "Crear Orden", url: "/orders/new" },
+         { title: "Ordenes", url: "/orders/list" },
+      ],
+   },
+   {
+      title: "Manage Products",
+      url: "#",
+      icon: BoxIcon,
+      allowedRoles: ["ROOT", "ADMINISTRATOR"],
+      items: [
+         {
+            title: "Providers",
+            url: "/settings/providers",
+            allowedRoles: ["ROOT", "ADMINISTRATOR"],
+         },
+         {
+            title: "Agencies",
+            url: "/settings/agencies",
+            allowedRoles: ["ROOT", "ADMINISTRATOR"],
+         },
+      ],
+   },
+];
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-	const location = useLocation();
+   const location = useLocation();
+   const { user } = useAppStore();
+   const role = user?.role ?? null;
 
-	return (
-		<Sidebar collapsible="icon" {...props}>
-			<SidebarHeader>
-				<TeamSwitcher  />
-			</SidebarHeader>
-			<SidebarContent className="[scrollbar-color:--alpha(var(--foreground)/20%)_transparent] [scrollbar-width:thin]">
-				<Link to="/" className="mx-2">
-					<Button
-						variant={location.pathname === "/" ? "secondary" : "ghost"}
-						className="w-full justify-start "
-					>
-						<HomeIcon className="mr-2 h-4 w-4" />
-						Inicio
-					</Button>
-				</Link>
-				<NavMain items={data.navMain} />
-				<NavMarketplace items={data.marketplace} />
-			</SidebarContent>
-			<SidebarFooter>
-				<NavUser />
-			</SidebarFooter>
-			<SidebarRail />
-		</Sidebar>
-	);
+   const filterByRole = React.useCallback(
+      (items: SidebarItem[]): SidebarItem[] =>
+         items
+            .filter((item) => {
+               if (!item.allowedRoles?.length) {
+                  return true;
+               }
+               return role ? item.allowedRoles.includes(role) : false;
+            })
+            .map((item) => {
+               const visibleSubItems = item.items?.filter((subItem) => {
+                  if (!subItem.allowedRoles?.length) {
+                     return true;
+                  }
+                  return role ? subItem.allowedRoles.includes(role) : false;
+               });
+               return {
+                  ...item,
+                  items: visibleSubItems,
+               };
+            })
+            .filter((item) => {
+               if (!item.items) {
+                  return true;
+               }
+               return item.items.length > 0;
+            }),
+      [role]
+   );
+
+   const filteredNavMain = React.useMemo(() => filterByRole(navMainItems), [filterByRole]);
+
+   return (
+      <Sidebar collapsible="icon" {...props}>
+         <SidebarHeader>
+            <TeamSwitcher />
+         </SidebarHeader>
+         <SidebarContent className="[scrollbar-color:--alpha(var(--foreground)/20%)_transparent] [scrollbar-width:thin]">
+            <Link to="/" className="mx-2">
+               <Button variant={location.pathname === "/" ? "secondary" : "ghost"} className="w-full justify-start ">
+                  <HomeIcon className="mr-2 h-4 w-4" />
+                  Inicio
+               </Button>
+            </Link>
+            <NavMain items={filteredNavMain} />
+         </SidebarContent>
+         <SidebarFooter>
+            <NavUser />
+         </SidebarFooter>
+         <SidebarRail />
+      </Sidebar>
+   );
 }

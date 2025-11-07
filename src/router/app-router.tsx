@@ -17,11 +17,13 @@ import { ContainersPage } from "@/pages/logistics/containers-page";
 import { FlightsPage } from "@/pages/logistics/flights-page";
 import OrderDetailsPage from "@/pages/orders/order-details-page";
 import { HomePage } from "@/pages/home-page";
+import { UnauthorizedPage } from "@/pages/unauthorized-page";
 
 export const AppRouter = () => {
    return (
       <Routes>
          <Route path="/login" element={<LoginPage />} />
+         <Route path="/unauthorized" element={<UnauthorizedPage />} />
          {/* Protected routes */}
          <Route element={<ProtectedRoute />}>
             <Route path="/" element={<DashboardLayout />}>
@@ -34,20 +36,24 @@ export const AppRouter = () => {
                   <Route path=":orderId/edit" element={<EditOrderPage />} />
                   <Route path=":orderId" element={<OrderDetailsPage />} />
                </Route>
-               <Route path="logistics">
-                  <Route path="dispatch" element={<DispatchPage />} />
-                  <Route path="containers" element={<ContainersPage />} />
-                  <Route path="flights" element={<FlightsPage />} />
+               <Route element={<ProtectedRoute allowedRoles={["ROOT", "ADMINISTRATOR"]} />}>
+                  <Route path="logistics">
+                     <Route path="dispatch" element={<DispatchPage />} />
+                     <Route path="containers" element={<ContainersPage />} />
+                     <Route path="flights" element={<FlightsPage />} />
+                  </Route>
                </Route>
-               <Route path="settings">
-                  <Route index element={<Navigate to="providers" replace />} />
-                  <Route path="providers" element={<ProvidersServicesPage />} />
-                  <Route path="agencies" element={<AgenciesPage />} />
-                  <Route path="agencies/new" element={<NewAgencyPage />} />
-                  <Route path="customers" element={<CustomersPage />} />
-                  <Route path="receivers" element={<ReceiversPage />} />
-                  <Route path="users" element={<UserPage />} />
-                  <Route path="customs" element={<CustomsPage />} />
+               <Route element={<ProtectedRoute allowedRoles={["ROOT", "ADMINISTRATOR"]} />}>
+                  <Route path="settings">
+                     <Route index element={<Navigate to="providers" replace />} />
+                     <Route path="providers" element={<ProvidersServicesPage />} />
+                     <Route path="agencies" element={<AgenciesPage />} />
+                     <Route path="agencies/new" element={<NewAgencyPage />} />
+                     <Route path="customers" element={<CustomersPage />} />
+                     <Route path="receivers" element={<ReceiversPage />} />
+                     <Route path="users" element={<UserPage />} />
+                     <Route path="customs" element={<CustomsPage />} />
+                  </Route>
                </Route>
             </Route>
          </Route>
@@ -56,5 +62,3 @@ export const AppRouter = () => {
       </Routes>
    );
 };
-
-

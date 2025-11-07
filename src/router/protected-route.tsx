@@ -1,17 +1,29 @@
 // src/components/PrivateRoute.tsx
+import type { ReactElement } from "react";
 import { Navigate, Outlet } from "react-router-dom";
 import { useAppStore } from "@/stores/app-store";
 
-const ProtectedRoute = () => {
-	const { session } = useAppStore();
+interface ProtectedRouteProps {
+   allowedRoles?: string[];
+}
 
-	// Redirect to login if not authenticated
-	if (!session) {
-		return <Navigate to="/login" replace />;
-	}
+const ProtectedRoute = ({ allowedRoles }: ProtectedRouteProps): ReactElement => {
+   const { session, user } = useAppStore();
 
-	// Render protected content if authenticated
-	return <Outlet />;
+   if (!session) {
+      return <Navigate to="/login" replace />;
+   }
+
+   if (allowedRoles?.length) {
+      const userRole = user?.role;
+      const isAllowed = userRole ? allowedRoles.includes(userRole) : false;
+
+      if (!isAllowed) {
+         return <Navigate to="/unauthorized" replace />;
+      }
+   }
+
+   return <Outlet />;
 };
 
 export default ProtectedRoute;
