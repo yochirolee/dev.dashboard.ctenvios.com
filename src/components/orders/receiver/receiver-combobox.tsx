@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Check, ChevronsUpDown, Loader2 } from "lucide-react";
+import { Check, ChevronsUpDown } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { formatFullName } from "@/lib/cents-utils";
@@ -11,6 +11,7 @@ import type { Receiver } from "@/data/types";
 import { useDebounce } from "use-debounce";
 import { useOrderStore } from "@/stores/order-store";
 import { useShallow } from "zustand/react/shallow";
+import { Spinner } from "@/components/ui/spinner";
 
 export function ReceiverCombobox() {
    const [open, setOpen] = React.useState(false);
@@ -36,27 +37,25 @@ export function ReceiverCombobox() {
    return (
       <Popover open={open} onOpenChange={setOpen}>
          <PopoverTrigger asChild>
-            <Button variant="outline" role="combobox" aria-expanded={open} className="lg:flex-1  justify-between">
+            <Button variant="outline" role="combobox" aria-expanded={open} className="flex-1 justify-between">
                {selectedReceiver?.id
                   ? formatFullName(
                        selectedReceiver.first_name,
                        selectedReceiver.middle_name,
                        selectedReceiver.last_name,
                        selectedReceiver.second_last_name
-                    ) +
-                    " - " +
-                    (selectedReceiver.mobile || selectedReceiver.phone)
+                    )
                   : "Seleccionar Destinatario..."}
                <ChevronsUpDown className="opacity-50" />
             </Button>
          </PopoverTrigger>
          <PopoverContent className="p-0" style={{ width: "var(--radix-popover-trigger-width)" }}>
-            <Command shouldFilter={false} className="w-full">
-               <CommandInput placeholder="Buscar Destinatario..." className="h-9" onValueChange={setSearchQuery} />
+            <Command shouldFilter={false}>
+               <CommandInput placeholder="Buscar Destinatario..." className="h-9 " onValueChange={setSearchQuery} />
                <CommandList>
                   {isLoading ? (
                      <div className="flex p-2 items-center justify-center h-full">
-                        <Loader2 className="animate-spin" />
+                        <Spinner />
                      </div>
                   ) : (
                      <CommandEmpty>No se encontraron destinatarios.</CommandEmpty>

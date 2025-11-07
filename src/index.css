@@ -138,6 +138,14 @@
 		-moz-appearance: textfield;
 		appearance: textfield;
 	}
+	input[type="number"].number-spinner {
+		-moz-appearance: number-input;
+		appearance: auto;
+	}
+	input[type="number"].number-spinner::-webkit-inner-spin-button,
+	input[type="number"].number-spinner::-webkit-outer-spin-button {
+		-webkit-appearance: auto;
+	}
 }
 
 @theme inline {

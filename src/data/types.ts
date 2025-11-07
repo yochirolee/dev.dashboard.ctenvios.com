@@ -102,6 +102,7 @@ export const productSchema = z.object({
 });
 
 export const itemsSchema = z.object({
+   hbl: z.string().optional(),
    description: z.string().min(1, "La descripción es requerida"),
    weight: z.number().min(0, "El peso es requerido"),
    customs_id: z.number().min(0),
@@ -111,6 +112,7 @@ export const itemsSchema = z.object({
    delivery_fee_in_cents: z.number().min(0).optional(),
    price_in_cents: z.number().min(0),
    cost_in_cents: z.number().min(0),
+   status: z.enum(["PENDING", "RECEIVED", "DISPATCHED", "DELIVERED", "CANCELLED"]).optional().default("PENDING"),
    rate_id: z.number().min(0),
    unit: z.enum(["PER_LB", "FIXED"]),
 });

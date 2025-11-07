@@ -167,7 +167,7 @@ export function ItemsInOrder() {
                   <h3>Items in Order</h3>
                   <div className="flex space-x-2 justify-end items-center">
                      <Input
-                        className="w-18"
+                        className="w-18 number-spinner"
                         type="number"
                         min={1}
                         value={items_count === 0 ? "" : items_count}

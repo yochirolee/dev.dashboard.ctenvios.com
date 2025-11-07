@@ -40,6 +40,22 @@ export const dispatchColumns: ColumnDef<Item>[] = [
       },
    },
    {
+      accessorKey: "status",
+      header: "Status",
+      cell: ({ row }) => {
+         const status = row.original?.status;
+         const color = status === "RECEIVED" ? "bg-green-400/80 ring-green-500/40" : "bg-red-400/80 ring-red-500/40";
+         return (
+            <Badge className="w-fit  " variant="secondary">
+               <span
+                  className={`  rounded-full bg-${color}-400/80 text-white text-xs h-1.5 ring-1 ring-${color}-500/40 w-1.5 flex items-center justify-center`}
+               />
+               <span className="ml-1 text-nowrap font-extralight text-muted-foreground text-xs">Received</span>
+            </Badge>
+         );
+      },
+   },
+   {
       accessorKey: "agency.name",
       header: "Agencia",
       cell: ({ row }) => {

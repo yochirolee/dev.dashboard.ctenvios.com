@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Check, ChevronsUpDown, Loader2 } from "lucide-react";
+import { Check, ChevronsUpDown } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { formatFullName } from "@/lib/cents-utils";
@@ -11,6 +11,7 @@ import type { Customer } from "@/data/types";
 
 import { useOrderStore } from "@/stores/order-store";
 import { useShallow } from "zustand/react/shallow";
+import { Spinner } from "@/components/ui/spinner";
 
 export const CustomerCombobox = React.memo(function CustomerCombobox() {
    const [open, setOpen] = React.useState(false);
@@ -41,18 +42,14 @@ export const CustomerCombobox = React.memo(function CustomerCombobox() {
    return (
       <Popover open={open} onOpenChange={setOpen}>
          <PopoverTrigger asChild>
-            <Button variant="outline" role="combobox" aria-expanded={open} className="flex-1 justify-between ">
+            <Button variant="outline" role="combobox" aria-expanded={open} className="flex-1 justify-between">
                {selectedCustomer?.id
-                  ? [
+                  ? formatFullName(
                        selectedCustomer.first_name,
                        selectedCustomer.middle_name,
                        selectedCustomer.last_name,
-                       selectedCustomer.second_last_name,
-                    ]
-                       .filter(Boolean)
-                       .join(" ") +
-                    " - " +
-                    selectedCustomer.mobile
+                       selectedCustomer.second_last_name
+                    )
                   : "Seleccionar cliente..."}
                <ChevronsUpDown className="opacity-50" />
             </Button>
@@ -63,7 +60,7 @@ export const CustomerCombobox = React.memo(function CustomerCombobox() {
                <CommandList>
                   {isLoading ? (
                      <div className="flex p-2 items-center justify-center h-full">
-                        <Loader2 className="animate-spin" />
+                        <Spinner />
                      </div>
                   ) : (
                      <CommandEmpty>No se encontraron clientes.</CommandEmpty>

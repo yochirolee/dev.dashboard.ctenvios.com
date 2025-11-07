@@ -40,7 +40,7 @@ export const DispatchPage = () => {
             </div>
             <ItemsList />
          </div>
-         <ReceiveDispatch items={data.rows} />
+         <ReceiveDispatch items={data.rows} pagination={pagination} setPagination={setPagination} isLoading={isLoading} />
       </div>
    );
 };

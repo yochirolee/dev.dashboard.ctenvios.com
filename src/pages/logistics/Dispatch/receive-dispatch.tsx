@@ -11,7 +11,7 @@ import { toast } from "sonner";
 import z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { Field, FieldContent, FieldError } from "@/components/ui/field";
+import { Field, FieldContent } from "@/components/ui/field";
 
 const searchForm = z.object({
    hbl: z.string().min(1),
@@ -50,18 +50,23 @@ const SearchFormComponent = ({
    );
 };
 
-export const ReceiveDispatch = ({ items }: { items: Item[] }) => {
+export const ReceiveDispatch = ({
+   items,
+   pagination,
+   setPagination,
+   isLoading,
+}: {
+   items: Item[];
+   pagination: PaginationState;
+   setPagination: (pagination: PaginationState) => void;
+   isLoading: boolean;
+}) => {
    const [data, setData] = useState<Item[]>([]);
-   const [isLoading, setIsLoading] = useState(false);
-   const [pagination, setPagination] = useState<PaginationState>({
-      pageIndex: 0,
-      pageSize: 25,
-   });
 
    const handleSearch = (formData: z.infer<typeof searchForm>) => {
       const item = items.find((item) => item.hbl === formData.hbl);
       if (item) {
-         setData([...data, item]);
+         setData([...data, { ...item, status: "RECEIVED" }]);
       } else {
          toast.error(`Item ${formData.hbl} not found`);
       }

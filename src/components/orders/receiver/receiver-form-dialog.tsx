@@ -49,7 +49,7 @@ export function ReceiverFormDialog() {
                </span>
             </Button>
          </DialogTrigger>
-         <DialogContent className="sm:max-w-[550px] p-2 h-auto ">
+         <DialogContent className="sm:max-w-[550px] p-2 h-auto max-h-[calc(100vh-100px)] overflow-y-auto">
             <DialogHeader className="px-4">
                <DialogTitle>{selectedReceiver ? "Editar Destinatario" : "Nuevo Destinatario"}</DialogTitle>
                <DialogDescription>
@@ -71,7 +71,8 @@ const ReceiverForm = ({
    setIsOpen: (isOpen: boolean) => void;
 }) => {
    const { data: provinces } = useProvinces();
-   const { setSelectedReceiver, selectedCustomer } = useOrderStore( useShallow((state) => ({
+   const { setSelectedReceiver, selectedCustomer } = useOrderStore(
+      useShallow((state) => ({
          selectedReceiver: state.selectedReceiver,
          setSelectedReceiver: state.setSelectedReceiver,
          selectedCustomer: state.selectedCustomer,
