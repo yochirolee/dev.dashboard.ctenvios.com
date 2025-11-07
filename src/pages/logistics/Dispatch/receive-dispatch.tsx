@@ -5,7 +5,6 @@ import { DataTable } from "@/components/ui/data-table";
 import { dispatchColumns } from "./dispatch-columns";
 import { Loader2, Search } from "lucide-react";
 import { useState } from "react";
-import type { Item } from "@/data/types";
 import type { PaginationState } from "@tanstack/react-table";
 import { toast } from "sonner";
 import z from "zod";
@@ -70,7 +69,7 @@ export const ReceiveDispatch = ({
          setData([...data, { ...item, status: "RECEIVED" } as DispatchItem]);
       } else {
          toast.error(`Item ${formData.hbl} not found`);
-      } 
+      }
    };
    return (
       <div className="col-span-12 md:col-span-9 p-4 space-y-4">
