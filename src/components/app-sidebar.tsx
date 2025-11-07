@@ -1,5 +1,5 @@
 import * as React from "react";
-import { BoxIcon, FileBox, HomeIcon, Settings2, Sparkles, Warehouse, type LucideIcon } from "lucide-react";
+import {  FileBox, HomeIcon, Settings2, Warehouse, type LucideIcon } from "lucide-react";
 
 import { NavMain } from "@/components/nav-main";
 import { NavUser } from "@/components/nav-user";
