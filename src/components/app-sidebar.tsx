@@ -98,35 +98,6 @@ const navMainItems: SidebarItem[] = [
    },
 ];
 
-const marketplaceItems: SidebarItem[] = [
-   {
-      title: "Sales",
-      url: "#",
-      icon: Sparkles,
-      items: [
-         { title: "Crear Orden", url: "/orders/new" },
-         { title: "Ordenes", url: "/orders/list" },
-      ],
-   },
-   {
-      title: "Manage Products",
-      url: "#",
-      icon: BoxIcon,
-      allowedRoles: ["ROOT", "ADMINISTRATOR"],
-      items: [
-         {
-            title: "Providers",
-            url: "/settings/providers",
-            allowedRoles: ["ROOT", "ADMINISTRATOR"],
-         },
-         {
-            title: "Agencies",
-            url: "/settings/agencies",
-            allowedRoles: ["ROOT", "ADMINISTRATOR"],
-         },
-      ],
-   },
-];
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
    const location = useLocation();
