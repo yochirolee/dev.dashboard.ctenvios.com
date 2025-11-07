@@ -13,20 +13,19 @@ export const ProviderDetails = ({ providerId }: { providerId: number }) => {
    const { data: products } = useProducts.get();
    if (isPending)
       return (
-         <div className="space-y-4 container max-w-screen-lg mx-auto">
+         <div className="space-y-4 container max-w-screen-xl mx-auto">
             <Skeleton className="h-[200px] w-full" />
             <Skeleton className="h-[400px] w-full" />
          </div>
       );
    return (
-      <div className="space-y-4 container max-w-screen-lg mx-auto">
+      <div className="space-y-4 container max-w-screen-xl mx-auto">
          <ProviderCardDetails provider={provider as Provider} />
          <ServicesList provider={provider as Provider} services={provider?.services as unknown as []} />
          <Card>
             <CardHeader>
                <CardTitle>Productos</CardTitle>
                <CardDescription>Listado de productos disponibles para {provider?.name}.</CardDescription>
-               
             </CardHeader>
             <Separator />
             <CardContent>

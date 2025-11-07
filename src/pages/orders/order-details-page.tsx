@@ -95,7 +95,7 @@ export default function OrderDetailsPage() {
       );
 
    return order ? (
-      <div className="space-y-6 ">
+      <div className="space-y-4 container max-w-screen-xl mx-auto">
          <div className="flex flex-col container mx-auto gap-2 md:flex-row lg:justify-between lg:items-center print:hidden">
             <div className="flex flex-col gap-2">
                <div className="flex items-center gap-2">
@@ -395,7 +395,6 @@ export default function OrderDetailsPage() {
                   <PaymentForm order={order} />
                ) : null}
             </div>
-
             <div className=" text-center text-gray-500 text-xs">
                <p>{order?.agency?.website}</p>
                <p>Thank you for your business!</p>

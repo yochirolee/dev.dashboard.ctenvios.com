@@ -66,6 +66,7 @@ export type Invoice = {
 };
 
 const baseUrl = import.meta.env.VITE_API_URL;
+const oldBaseUrl = "https://systemcaribetravel.com/ordenes/factura_print.php?id=";
 
 export const orderColumns: ColumnDef<Invoice>[] = [
    {
@@ -140,7 +141,13 @@ export const orderColumns: ColumnDef<Invoice>[] = [
                   <div className="flex items-center gap-2">
                      <span className="text-[10px] text-muted-foreground">{row.original?.service?.service_type}</span>
                      {row.original?.partner_order_id && (
-                        <span className="text-[10px] text-muted-foreground">({row.original?.partner_order_id})</span>
+                        <Link
+                           className="text-[10px] text-muted-foreground"
+                           target="_blank"
+                           to={`${oldBaseUrl}${row.original?.partner_order_id}`}
+                        >
+                           ({row.original?.partner_order_id})
+                        </Link>
                      )}
                   </div>
                </div>

@@ -390,6 +390,12 @@ const api = {
          return response.data;
       },
    },
+   items: {
+      get: async () => {
+         const response = await axiosInstance.get("/tracking");
+         return response.data;
+      },
+   },
 };
 
 export default api;

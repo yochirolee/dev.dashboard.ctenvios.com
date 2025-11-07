@@ -52,9 +52,9 @@ export const receiverSchema = z
          .refine(isValidCubanCI, {
             message: "El CI no es válido según su fecha o dígito de control",
          }),
-      province_id: z.number( {message: "La provincia es requerida"}),
+      province_id: z.number({ message: "La provincia es requerida" }),
       passport: z.string().nullable().optional(),
-      city_id: z.number({message: "La ciudad es requerida"}),
+      city_id: z.number({ message: "La ciudad es requerida" }),
       city: z.string().optional(),
       province: z.string().optional(),
    })
@@ -83,7 +83,7 @@ export const paymentSchema = z.object({
    id: z.number().optional(),
    amount_in_cents: z.number().min(0),
    charge_in_cents: z.number().min(0).optional(),
-   method: z.string(),
+   method: z.string().min(1, "You must select a payment method to continue."),
    reference: z.string().min(0).optional(),
    notes: z.string().min(0).optional(),
 });

@@ -1,25 +1,23 @@
-import { useForm, useFormContext, useWatch } from "react-hook-form";
+import { useState, useEffect } from "react";
+import { useForm, useWatch } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Check, ChevronsUpDown, DollarSign } from "lucide-react";
+import { DollarSign } from "lucide-react";
 import { useOrders } from "@/hooks/use-orders";
-import { payment_methods } from "@/data/data";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { useEffect, useState } from "react";
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
-import { cn } from "@/lib/utils";
+import { PaymentMethodCombobox } from "./payment-methods-combobox";
 import { centsToDollars, dollarsToCents } from "@/lib/cents-utils";
 import { paymentSchema } from "@/data/types";
 import { toast } from "sonner";
 import { type Order } from "@/data/types";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { DialogDescription } from "@/components/ui/dialog";
-import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Spinner } from "@/components/ui/spinner";
-
+import { Separator } from "@/components/ui/separator";
+import { payment_methods } from "@/data/data";
 export const PaymentForm = ({ order }: { order: Order }) => {
    const balance = centsToDollars(order?.total_in_cents - order?.paid_in_cents).toFixed(2);
 
@@ -28,7 +26,7 @@ export const PaymentForm = ({ order }: { order: Order }) => {
       defaultValues: {
          amount_in_cents: Number(balance),
          charge_in_cents: 0,
-         method: payment_methods[0].value,
+         method: payment_methods[0].id,
          reference: undefined,
          notes: undefined,
       },
@@ -74,7 +72,7 @@ export const PaymentForm = ({ order }: { order: Order }) => {
          charge_in_cents: 0,
          reference: undefined,
          notes: undefined,
-         method: payment_methods[0].value as "CREDIT_CARD" | "DEBIT_CARD" | "CASH" | "ZELLE" | "OTHER",
+         method: payment_methods[0].id,
       });
    }, [open, form]);
 
@@ -91,28 +89,22 @@ export const PaymentForm = ({ order }: { order: Order }) => {
                <DialogTitle>Pagar</DialogTitle>
                <DialogDescription>Pagar la factura</DialogDescription>
             </DialogHeader>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-               <Card className="@container/card">
-                  <CardHeader>
-                     <CardDescription>Total de la factura</CardDescription>
-                     <CardTitle className="text-2xl font-semibold text-muted-foreground tabular-nums @[250px]/card:text-3xl">
-                        ${centsToDollars(order?.total_in_cents)}
-                     </CardTitle>
-                  </CardHeader>
-               </Card>
-               <Card className="@container/card">
-                  <CardHeader>
-                     <CardDescription>Pendiente de Pago</CardDescription>
-                     <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
-                        ${balance}
-                     </CardTitle>
-                  </CardHeader>
-               </Card>
-            </div>
-            <Form {...form}>
-               <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col space-y-8">
-                  <PaymentMethodCombobox />
 
+            <Card className="flex flex-row justify-evenly">
+               <div className="flex flex-col items-center  gap-2">
+                  <span className="font-medium text-muted-foreground">Total de la factura</span>
+                  <span className="font-medium text-muted-foreground">${centsToDollars(order?.total_in_cents)}</span>
+               </div>
+               <Separator orientation="vertical" />
+               <div className="flex flex-col items-center  gap-2">
+                  <span className="font-medium">Pendiente de pago</span>
+                  <span className="font-medium">${balance}</span>
+               </div>
+            </Card>
+
+            <Form {...form}>
+               <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col space-y-6">
+                  <PaymentMethodCombobox />
                   <FormField
                      control={form.control}
                      name="reference"
@@ -149,20 +141,23 @@ export const PaymentForm = ({ order }: { order: Order }) => {
                         </FormItem>
                      )}
                   />
-                  <div className="flex flex-col  justify-end  gap-2">
-                     <div className="flex  justify-between gap-2">
-                        <span className="font-medium justify-end">Cargo por tarjeta:</span>{" "}
-                        <span className="font-medium justify-end">
-                           ${form.getValues("charge_in_cents")?.toFixed(2) ?? 0.0}
-                        </span>
-                     </div>
-                     <div className="flex  justify-between gap-2">
-                        <span className="font-medium ">Total a pagar:</span>{" "}
-                        <span className="font-medium ">
-                           ${(amount + (form.getValues("charge_in_cents") ?? 0)).toFixed(2)}
-                        </span>
-                     </div>
-                  </div>
+                  <Card className="flex flex-col  justify-end  gap-2">
+                     <CardContent className="space-y-2">
+                        <div className="flex  justify-between ">
+                           <span className="text-sm text-muted-foreground">Payment fee:</span>{" "}
+                           <span className="text-muted-foreground text-sm ">
+                              ${form.getValues("charge_in_cents")?.toFixed(2) ?? 0.0}
+                           </span>
+                        </div>
+                        <Separator />
+                        <div className="flex  justify-between ">
+                           <span className="font-medium ">Total Final:</span>{" "}
+                           <span className="font-medium ">
+                              ${(amount + (form.getValues("charge_in_cents") ?? 0)).toFixed(2)}
+                           </span>
+                        </div>
+                     </CardContent>
+                  </Card>
 
                   <Button type="submit" disabled={isPending}>
                      {isPending ? (
@@ -177,60 +172,5 @@ export const PaymentForm = ({ order }: { order: Order }) => {
             </Form>
          </DialogContent>
       </Dialog>
-   );
-};
-
-const PaymentMethodCombobox = () => {
-   const form = useFormContext();
-   const [open, setOpen] = useState(false);
-   return (
-      <FormField
-         control={form.control}
-         name="method"
-         render={({ field }) => (
-            <FormItem>
-               <FormLabel>Método de pago</FormLabel>
-
-               <Popover open={open} onOpenChange={setOpen}>
-                  <PopoverTrigger asChild>
-                     <Button variant="outline" role="combobox" aria-expanded={open} className="w-full justify-between">
-                        {field.value
-                           ? payment_methods.find((payment_method) => payment_method.value === field.value)?.label
-                           : "Select payment method"}
-                        <ChevronsUpDown className="opacity-50" />
-                     </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-[200px] p-0">
-                     <Command>
-                        <CommandInput placeholder="Search payment method..." className="h-9" />
-                        <CommandList>
-                           <CommandEmpty>No payment method found.</CommandEmpty>
-                           <CommandGroup>
-                              {payment_methods.map((method) => (
-                                 <CommandItem
-                                    key={method.value}
-                                    value={method.value}
-                                    onSelect={(currentValue) => {
-                                       form.setValue(field.name, currentValue);
-                                       setOpen(false);
-                                    }}
-                                 >
-                                    {method.label}
-                                    <Check
-                                       className={cn(
-                                          "ml-auto",
-                                          field.value === method.value ? "opacity-100" : "opacity-0"
-                                       )}
-                                    />
-                                 </CommandItem>
-                              ))}
-                           </CommandGroup>
-                        </CommandList>
-                     </Command>
-                  </PopoverContent>
-               </Popover>
-            </FormItem>
-         )}
-      />
    );
 };

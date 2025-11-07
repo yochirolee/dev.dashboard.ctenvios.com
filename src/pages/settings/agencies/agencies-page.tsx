@@ -23,15 +23,15 @@ export const AgenciesPage = () => {
 
    if (isLoading)
       return (
-         <div className="space-y-4 container max-w-screen-lg mx-auto">
+         <div className="space-y-4 container max-w-screen-xl mx-auto">
             <Skeleton className="h-[200px] w-full" />
             <Skeleton className="h-[400px] w-full" />
          </div>
       )
-   if (error) return <div className="space-y-4 container max-w-screen-lg mx-auto">Error loading agencies</div>;
+   if (error) return <div className="space-y-4 container max-w-screen-xl mx-auto">Error loading agencies</div>;
 
    return (
-      <div className="flex flex-col container max-w-screen-lg mx-auto gap-4 items-center">
+      <div className="flex flex-col container max-w-screen-xl mx-auto gap-4 items-center">
          <div className="flex flex-col gap-2 w-full">
             <div className="flex flex-col">
                <h3 className=" font-bold">Agencias</h3>
