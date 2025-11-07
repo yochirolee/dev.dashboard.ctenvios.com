@@ -12,6 +12,7 @@ import z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { Field, FieldContent } from "@/components/ui/field";
+import type { DispatchItem } from "../dispatch-page";
 
 const searchForm = z.object({
    hbl: z.string().min(1),
@@ -56,20 +57,20 @@ export const ReceiveDispatch = ({
    setPagination,
    isLoading,
 }: {
-   items: Item[];
+   items: DispatchItem[];
    pagination: PaginationState;
    setPagination: (pagination: PaginationState) => void;
    isLoading: boolean;
 }) => {
-   const [data, setData] = useState<Item[]>([]);
+   const [data, setData] = useState<DispatchItem[]>([]);
 
    const handleSearch = (formData: z.infer<typeof searchForm>) => {
-      const item = items.find((item) => item.hbl === formData.hbl);
+      const item = items.find((item: DispatchItem) => item.hbl === formData.hbl);
       if (item) {
-         setData([...data, { ...item, status: "RECEIVED" }]);
+         setData([...data, { ...item, status: "RECEIVED" } as DispatchItem]);
       } else {
          toast.error(`Item ${formData.hbl} not found`);
-      }
+      } 
    };
    return (
       <div className="col-span-12 md:col-span-9 p-4 space-y-4">

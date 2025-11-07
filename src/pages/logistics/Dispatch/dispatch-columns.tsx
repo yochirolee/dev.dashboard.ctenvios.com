@@ -1,9 +1,9 @@
 import { type ColumnDef } from "@tanstack/react-table";
-import { type Item } from "@/data/types";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
+import type { DispatchItem } from "../dispatch-page";
 
-export const dispatchColumns: ColumnDef<Item>[] = [
+export const dispatchColumns: ColumnDef<DispatchItem>[] = [
    {
       id: "select",
       header: ({ table }) => (

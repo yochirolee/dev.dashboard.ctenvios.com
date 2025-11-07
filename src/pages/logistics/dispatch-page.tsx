@@ -1,5 +1,5 @@
 import { Input } from "@/components/ui/input";
-import {  Search } from "lucide-react";
+import { Search } from "lucide-react";
 import { ItemsList } from "./items-list";
 
 import { useState } from "react";
@@ -8,8 +8,22 @@ import api from "@/api/api";
 import type { PaginationState } from "@tanstack/react-table";
 
 import { ReceiveDispatch } from "./Dispatch/receive-dispatch";
+import type { Agency, Item } from "@/data/types";
 
-
+export interface DispatchItem extends Item {
+   status: "PENDING" | "RECEIVED" | "DISPATCHED" | "DELIVERED" | "CANCELLED";
+   hbl: string;
+   description: string;
+   weight: number;
+   price_in_cents: number;
+   cost_in_cents: number;
+   rate_id: number;
+   unit: "PER_LB" | "FIXED";
+   insurance_fee_in_cents: number;
+   customs_fee_in_cents: number;
+   charge_fee_in_cents: number;
+   agency: Agency;
+}
 
 const useItems = () => {
    const { data, isLoading } = useQuery({
@@ -40,7 +54,12 @@ export const DispatchPage = () => {
             </div>
             <ItemsList />
          </div>
-         <ReceiveDispatch items={data.rows} pagination={pagination} setPagination={setPagination} isLoading={isLoading} />
+         <ReceiveDispatch
+            items={data.rows}
+            pagination={pagination}
+            setPagination={setPagination}
+            isLoading={isLoading}
+         />
       </div>
    );
 };

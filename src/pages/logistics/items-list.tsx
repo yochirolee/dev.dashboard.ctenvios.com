@@ -5,9 +5,10 @@ import type { Agency, Item } from "@/data/types";
 import { useQuery } from "@tanstack/react-query";
 import api from "@/api/api";
 import ItemComponent from "./item";
+import type { DispatchItem } from "./dispatch-page";
 
 export function ItemsList() {
-   const [selectedItem, setSelectedItem] = useState<Item | null>(null);
+   const [selectedItem, setSelectedItem] = useState<DispatchItem | null>(null);
    const { data, isLoading } = useQuery({
       queryKey: ["items"],
       queryFn: () => api.items.get(),
@@ -18,11 +19,11 @@ export function ItemsList() {
    return (
       <ScrollArea className="h-[calc(100vh-10rem)] w-full">
          <div className="flex flex-col gap-2 p-4 pt-0">
-            {items.map((item: Item & { agency: Agency }) => (
+            {items.map((item: DispatchItem & { agency: Agency }) => (
                <ItemComponent
                   key={item.hbl}
-                  item={item as Item & { agency: Agency }}
-                  selectedItem={selectedItem as (Item & { agency: Agency }) | null}
+                  item={item as DispatchItem & { agency: Agency }}
+                  selectedItem={selectedItem as (DispatchItem  ) | null}
                   setSelectedItem={setSelectedItem}
                />
             ))}

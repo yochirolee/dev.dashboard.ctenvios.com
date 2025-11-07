@@ -1,21 +1,11 @@
 import { cn } from "@/lib/utils";
-import { type Agency, type Item } from "@/data/types";
 import { Badge } from "@/components/ui/badge";
+import type { DispatchItem } from "./dispatch-page";
 
 interface ItemComponentProps {
-   item: Item & {
-      agency: Agency;
-   };
-   selectedItem:
-      | (Item & {
-           agency: Agency;
-        })
-      | null;
-   setSelectedItem: (
-      item: Item & {
-         agency: Agency;
-      }
-   ) => void;
+   item: DispatchItem;
+   selectedItem: DispatchItem | null;
+   setSelectedItem: (item: DispatchItem) => void;
 }
 
 export default function ItemComponent({ item, selectedItem, setSelectedItem }: ItemComponentProps) {
@@ -43,7 +33,9 @@ export default function ItemComponent({ item, selectedItem, setSelectedItem }: I
                   <div className="flex flex-col items-center gap-2">
                      {item.agency?.name}
                      <Badge className="w-fit  " variant="secondary">
-                        <span className="ml-1 text-nowrap font-extralight text-muted-foreground text-xs">{(item?.status)}</span>
+                        <span className="ml-1 text-nowrap font-extralight text-muted-foreground text-xs">
+                           {item?.status}
+                        </span>
                      </Badge>
                   </div>
                </div>
