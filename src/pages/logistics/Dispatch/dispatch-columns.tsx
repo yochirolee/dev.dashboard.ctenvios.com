@@ -5,13 +5,14 @@ import { formatCents } from "@/lib/cents-utils";
 import { format } from "date-fns";
 import type { Agency, User } from "@/data/types";
 
-interface ColumnDispatchItem {
+export interface ColumnDispatchItem {
    id: number;
    sender_agency: Agency;
    receiver_agency: Agency;
    user: User;
    weight: number;
    total_in_cents: number;
+   status: "PENDING" | "RECEIVED" | "DISPATCHED" | "DELIVERED" | "CANCELLED";
    created_at: string;
    _count: {
       items: number;

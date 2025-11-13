@@ -12,6 +12,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { Field, FieldContent } from "@/components/ui/field";
 import type { DispatchItem } from "../create-dispatch-page";
+import { type ColumnDispatchItem } from "./dispatch-columns";
 
 const searchForm = z.object({
    hbl: z.string().min(1),
@@ -90,7 +91,7 @@ export const ReceiveDispatch = ({
          </div>
          <DataTable
             columns={dispatchColumns}
-            data={{ rows: data , total: data.length }}
+            data={{ rows: data as unknown as ColumnDispatchItem[], total: data.length }}
             pagination={pagination}
             setPagination={setPagination}
             isLoading={isLoading}
