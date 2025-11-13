@@ -4,7 +4,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { type ColumnDef } from "@tanstack/react-table";
 import { format } from "date-fns";
 import { formatFullName } from "@/lib/cents-utils";
-import { EllipsisVertical, FileText, Pencil, TagIcon, Trash } from "lucide-react";
+import { EllipsisVertical, FileText, Pencil, TagIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
    DropdownMenu,

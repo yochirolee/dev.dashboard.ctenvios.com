@@ -3,32 +3,11 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import { formatCents } from "@/lib/cents-utils";
 import { format } from "date-fns";
+import type { DispatchItem } from "../create-dispatch-page";
 
-export interface Dispatch {
-   id: number;
-   status: "PENDING" | "RECEIVED" | "DISPATCHED" | "DELIVERED" | "CANCELLED";
-   sender_agency: {
-      id: number;
-      name: string;
-   };
-   receiver_agency: {
-      id: number;
-      name: string;
-   };
-   user: {
-      id: number;
-      name: string;
-   };
-   weight: number;
-   total_in_cents: number;
-   created_at: string;
-   updated_at: string;
-   _count: {
-      items: number;
-   };
-}
 
-export const dispatchColumns: ColumnDef<Dispatch>[] = [
+
+export const dispatchColumns: ColumnDef<DispatchItem>[] = [
    {
       id: "select",
       header: ({ table }) => (

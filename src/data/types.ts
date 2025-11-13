@@ -286,5 +286,29 @@ export interface OrderItems {
    charge_fee_in_cents: number;
    rate: ShippingRate;
    subtotal: number;
-   
+}
+
+/// DISPATCH
+export interface Dispatch {
+   id: number;
+   status: "PENDING" | "RECEIVED" | "DISPATCHED" | "DELIVERED" | "CANCELLED";
+   sender_agency: {
+      id: number;
+      name: string;
+   };
+   receiver_agency: {
+      id: number;
+      name: string;
+   };
+   user: {
+      id: number;
+      name: string;
+   };
+   weight: number;
+   total_in_cents: number;
+   created_at: string;
+   updated_at: string;
+   _count: {
+      items: number;
+   };
 }

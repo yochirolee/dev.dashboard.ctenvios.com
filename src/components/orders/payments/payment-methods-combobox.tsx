@@ -1,4 +1,3 @@
-import { FormField, FormItem, FormLabel } from "@/components/ui/form";
 import { useState } from "react";
 import { Controller, useFormContext } from "react-hook-form";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -24,8 +23,15 @@ export const PaymentMethodCombobox = () => {
                <FieldContent>
                   <Popover open={open} onOpenChange={setOpen}>
                      <PopoverTrigger asChild>
-                        <Button variant="outline" role="combobox" aria-expanded={open} className="w-full justify-between">
-                           {field.value ? payment_methods.find((payment_method) => payment_method.id === field.value)?.title : "Select payment method"}
+                        <Button
+                           variant="outline"
+                           role="combobox"
+                           aria-expanded={open}
+                           className="w-full justify-between"
+                        >
+                           {field.value
+                              ? payment_methods.find((payment_method) => payment_method.id === field.value)?.title
+                              : "Select payment method"}
                            <ChevronsUpDown className="opacity-50" />
                         </Button>
                      </PopoverTrigger>
@@ -36,17 +42,30 @@ export const PaymentMethodCombobox = () => {
                               <CommandEmpty>No payment method found.</CommandEmpty>
                               <CommandGroup>
                                  {payment_methods.map((method) => (
-                                    <CommandItem key={method.id} value={method.id} onSelect={(currentValue) => {
-                                       form.setValue(field.name, currentValue);
-                                       setOpen(false);
-                                    }}>
-                                       <ItemMedia variant="icon"><method.icon className="size-4" /></ItemMedia>
+                                    <CommandItem
+                                       key={method.id}
+                                       value={method.id}
+                                       onSelect={(currentValue) => {
+                                          form.setValue(field.name, currentValue);
+                                          setOpen(false);
+                                       }}
+                                    >
+                                       <ItemMedia variant="icon">
+                                          <method.icon className="size-4" />
+                                       </ItemMedia>
                                        <FieldContent className="flex flex-col gap-2">
                                           <FieldTitle>{method.title}</FieldTitle>
-                                          <FieldDescription className="text-muted-foreground text-xs font-light">{method.description}</FieldDescription>
+                                          <FieldDescription className="text-muted-foreground text-xs font-light">
+                                             {method.description}
+                                          </FieldDescription>
                                        </FieldContent>
 
-                                       <Check className={cn("ml-auto", field.value === method.id ? "opacity-100" : "opacity-0")} />
+                                       <Check
+                                          className={cn(
+                                             "ml-auto",
+                                             field.value === method.id ? "opacity-100" : "opacity-0"
+                                          )}
+                                       />
                                        {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                                     </CommandItem>
                                  ))}

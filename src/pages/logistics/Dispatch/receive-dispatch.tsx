@@ -90,7 +90,7 @@ export const ReceiveDispatch = ({
          </div>
          <DataTable
             columns={dispatchColumns}
-            data={{ rows: data, total: data.length }}
+            data={{ rows: data , total: data.length }}
             pagination={pagination}
             setPagination={setPagination}
             isLoading={isLoading}
