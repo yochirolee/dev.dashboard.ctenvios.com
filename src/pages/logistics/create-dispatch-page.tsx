@@ -8,21 +8,21 @@ import api from "@/api/api";
 import type { PaginationState } from "@tanstack/react-table";
 
 import { ReceiveDispatch } from "./Dispatch/receive-dispatch";
-import type { Agency, Item, User } from "@/data/types";
+import type { Agency, Item } from "@/data/types";
 
 export interface DispatchItem extends Item {
-   id: number;
-   sender_agency: Agency;
-   receiver_agency: Agency;
-   user: User;
    status: "PENDING" | "RECEIVED" | "DISPATCHED" | "DELIVERED" | "CANCELLED";
+   hbl: string;
+   description: string;
    weight: number;
-   total_in_cents: number;
-   created_at: string;
-   updated_at: string;
-   _count: {
-      items: number;
-   };
+   price_in_cents: number;
+   cost_in_cents: number;
+   rate_id: number;
+   unit: "PER_LB" | "FIXED";
+   insurance_fee_in_cents: number;
+   customs_fee_in_cents: number;
+   charge_fee_in_cents: number;
+   agency: Agency;
 }
 
 const useItems = () => {

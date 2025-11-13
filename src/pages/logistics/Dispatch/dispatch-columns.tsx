@@ -3,11 +3,22 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import { formatCents } from "@/lib/cents-utils";
 import { format } from "date-fns";
-import type { DispatchItem } from "../create-dispatch-page";
+import type { Agency, User } from "@/data/types";
 
+interface ColumnDispatchItem {
+   id: number;
+   sender_agency: Agency;
+   receiver_agency: Agency;
+   user: User;
+   weight: number;
+   total_in_cents: number;
+   created_at: string;
+   _count: {
+      items: number;
+   };
+}
 
-
-export const dispatchColumns: ColumnDef<DispatchItem>[] = [
+export const dispatchColumns: ColumnDef<ColumnDispatchItem>[] = [
    {
       id: "select",
       header: ({ table }) => (
