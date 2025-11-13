@@ -1,6 +1,5 @@
 import * as React from "react";
-import {  FileBox, HomeIcon, Settings2, Warehouse, type LucideIcon } from "lucide-react";
-
+import { FileBox, HomeIcon, Settings2, Warehouse, type LucideIcon } from "lucide-react";
 import { NavMain } from "@/components/nav-main";
 import { NavUser } from "@/components/nav-user";
 import { TeamSwitcher } from "@/components/team-switcher";
@@ -97,7 +96,6 @@ const navMainItems: SidebarItem[] = [
       ],
    },
 ];
-
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
    const location = useLocation();

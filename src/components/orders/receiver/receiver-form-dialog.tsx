@@ -49,7 +49,7 @@ export function ReceiverFormDialog() {
                </span>
             </Button>
          </DialogTrigger>
-         <DialogContent className="sm:max-w-[550px] p-2 h-auto max-h-[calc(100vh-100px)] overflow-y-auto">
+         <DialogContent className="sm:max-w-[550px]">
             <DialogHeader className="px-4">
                <DialogTitle>{selectedReceiver ? "Editar Destinatario" : "Nuevo Destinatario"}</DialogTitle>
                <DialogDescription>
@@ -186,7 +186,7 @@ const ReceiverForm = ({
    return (
       <form id="receiver-form" onSubmit={form.handleSubmit(onSubmit)}>
          <ScrollArea className="h-[calc(100vh-200px)] p-4">
-            <FieldGroup className="">
+            <FieldGroup className="my-2">
                <Field orientation="vertical">
                   <Controller
                      control={form.control}

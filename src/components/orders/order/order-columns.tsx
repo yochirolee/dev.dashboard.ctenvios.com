@@ -14,6 +14,7 @@ import {
    DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Link } from "react-router-dom";
+import { DeleteOrderDialog } from "@/pages/orders/delete-order-dialog";
 
 // This type is used to define the shape of our data.
 // You can use a Zod schema here if you want.
@@ -311,9 +312,8 @@ export const orderColumns: ColumnDef<Invoice>[] = [
                            Editar
                         </DropdownMenuItem>
                      </Link>
-                     <DropdownMenuItem className="text-destructive">
-                        <Trash className="w-4 h-4 mr-2" />
-                        Eliminar
+                     <DropdownMenuItem className="text-destructive" asChild>
+                        <DeleteOrderDialog order_id={row.original.id} />
                      </DropdownMenuItem>
                   </DropdownMenuContent>
                </DropdownMenu>

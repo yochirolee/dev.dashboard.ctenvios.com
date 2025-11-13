@@ -126,6 +126,7 @@ export function ItemsInOrder() {
 
    const { mutate: createOrder, isPending: isCreatingOrder } = useOrders.create({
       onSuccess: (data) => {
+         console.log(data, "data in order creation");
          form.reset();
          setSelectedCustomer(null);
          setSelectedReceiver(null);

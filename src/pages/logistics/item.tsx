@@ -1,6 +1,6 @@
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
-import type { DispatchItem } from "./dispatch-page";
+import type { DispatchItem } from "./create-dispatch-page";
 
 interface ItemComponentProps {
    item: DispatchItem;

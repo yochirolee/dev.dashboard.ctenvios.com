@@ -1,11 +1,10 @@
 import { useState, useEffect } from "react";
-import { useForm, useWatch } from "react-hook-form";
+import { Controller, useForm, useWatch } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
+import { Form } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
-import { DollarSign } from "lucide-react";
+import { DollarSign, DollarSignIcon } from "lucide-react";
 import { useOrders } from "@/hooks/use-orders";
 import { PaymentMethodCombobox } from "./payment-methods-combobox";
 import { centsToDollars, dollarsToCents } from "@/lib/cents-utils";
@@ -18,6 +17,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Spinner } from "@/components/ui/spinner";
 import { Separator } from "@/components/ui/separator";
 import { payment_methods } from "@/data/data";
+import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/input-group";
+import { Field, FieldError, FieldLabel } from "@/components/ui/field";
 export const PaymentForm = ({ order }: { order: Order }) => {
    const balance = centsToDollars(order?.total_in_cents - order?.paid_in_cents).toFixed(2);
 
@@ -55,6 +56,7 @@ export const PaymentForm = ({ order }: { order: Order }) => {
          setOpen(false);
       },
       onError: (error: any) => {
+         console.log(error, "error in payment creation");
          toast.error(error.response.data.message);
       },
    });
@@ -105,40 +107,45 @@ export const PaymentForm = ({ order }: { order: Order }) => {
             <Form {...form}>
                <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col space-y-6">
                   <PaymentMethodCombobox />
-                  <FormField
+                  <Controller
                      control={form.control}
                      name="reference"
-                     render={({ field }) => (
-                        <FormItem>
-                           <FormLabel>Referencia de pago</FormLabel>
-                           <FormControl>
-                              <Input {...field} placeholder="Referencia de pago" />
-                           </FormControl>
-                        </FormItem>
+                     render={({ field, fieldState }) => (
+                        <Field>
+                           <FieldLabel>Referencia de pago</FieldLabel>
+                           <InputGroup>
+                              <InputGroupInput
+                                 className="text-right"
+                                 placeholder="Referencia de pago"
+                                 {...field}
+                                 data-invalid={fieldState.invalid}
+                              />
+                           </InputGroup>
+                           {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                        </Field>
                      )}
                   />
-                  <FormField
+                  <Controller
                      control={form.control}
                      name="amount_in_cents"
-                     render={({ field }) => (
-                        <FormItem>
-                           <FormLabel>Amount</FormLabel>
-
-                           <Input
-                              {...form.register(`amount_in_cents`, {
-                                 valueAsNumber: true,
-                              })}
-                              placeholder="0.00"
-                              type="number"
-                              min={0}
-                              max={Number(balance) + (form.getValues("charge_in_cents") ?? 0)}
-                              step={0.01}
-                              className="[&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none [-moz-appearance:textfield] text-right"
-                              onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
-                           />
-
-                           <FormMessage />
-                        </FormItem>
+                     render={({ field, fieldState }) => (
+                        <Field>
+                           <FieldLabel>Monto a pagar</FieldLabel>
+                           <InputGroup>
+                              <InputGroupInput
+                                 className="text-right"
+                                 placeholder="Monto a pagar"
+                                 {...field}
+                                 data-invalid={fieldState.invalid}
+                                 type="number"
+                                 onChange={(e) => field.onChange(e.target.valueAsNumber)}
+                              />
+                              <InputGroupAddon>
+                                 <DollarSignIcon />
+                              </InputGroupAddon>
+                           </InputGroup>
+                           {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                        </Field>
                      )}
                   />
                   <Card className="flex flex-col  justify-end  gap-2">

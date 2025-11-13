@@ -1,9 +1,34 @@
 import { type ColumnDef } from "@tanstack/react-table";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
-import type { DispatchItem } from "../dispatch-page";
+import { formatCents } from "@/lib/cents-utils";
+import { format } from "date-fns";
 
-export const dispatchColumns: ColumnDef<DispatchItem>[] = [
+export interface Dispatch {
+   id: number;
+   status: "PENDING" | "RECEIVED" | "DISPATCHED" | "DELIVERED" | "CANCELLED";
+   sender_agency: {
+      id: number;
+      name: string;
+   };
+   receiver_agency: {
+      id: number;
+      name: string;
+   };
+   user: {
+      id: number;
+      name: string;
+   };
+   weight: number;
+   total_in_cents: number;
+   created_at: string;
+   updated_at: string;
+   _count: {
+      items: number;
+   };
+}
+
+export const dispatchColumns: ColumnDef<Dispatch>[] = [
    {
       id: "select",
       header: ({ table }) => (
@@ -26,15 +51,12 @@ export const dispatchColumns: ColumnDef<DispatchItem>[] = [
    },
 
    {
-      accessorKey: "hbl",
-      header: "Envia",
+      accessorKey: "id",
+      header: "ID",
       cell: ({ row }) => {
          return (
             <div className="flex flex-col items-start gap-2 min-w-0">
-               <span className="text-sm">{row.original?.hbl}</span>
-               <div className="text-xs text-muted-foreground truncate" title={row.original?.description}>
-                  {row.original?.description}
-               </div>
+               <span className="text-sm">{row.original?.id.toString()}</span>
             </div>
          );
       },
@@ -50,29 +72,74 @@ export const dispatchColumns: ColumnDef<DispatchItem>[] = [
                <span
                   className={`  rounded-full bg-${color}-400/80 text-white text-xs h-1.5 ring-1 ring-${color}-500/40 w-1.5 flex items-center justify-center`}
                />
-               <span className="ml-1 text-nowrap font-extralight text-muted-foreground text-xs">Received</span>
+               <span className="ml-1 text-nowrap font-extralight text-muted-foreground text-xs">{status}</span>
             </Badge>
          );
       },
    },
    {
-      accessorKey: "agency.name",
-      header: "Agencia",
+      accessorKey: "sender_agency.name",
+      header: "Sender Agency",
       cell: ({ row }) => {
          return (
-            <div className="flex flex-col items-start gap-2 min-w-0" title={row.original?.agency?.name}>
-               <Badge variant="outline">{row.original?.agency?.name}</Badge>
+            <div className="flex flex-col items-start gap-2 min-w-0" title={row.original?.sender_agency?.name}>
+               <Badge variant="outline">{row.original?.sender_agency?.name}</Badge>
+            </div>
+         );
+      },
+   },
+   {
+      accessorKey: "receiver_agency.name",
+      header: "Receiver Agency",
+      cell: ({ row }) => {
+         return (
+            <div className="flex flex-col items-start gap-2 min-w-0" title={row.original?.receiver_agency?.name}>
+               <Badge variant="outline">{row.original?.receiver_agency?.name}</Badge>
+            </div>
+         );
+      },
+   },
+
+   {
+      accessorKey: "_count",
+      header: "Count",
+      cell: ({ row }) => {
+         return (
+            <div className="flex items-center gap-2 min-w-0">
+               <span className="text-sm">{row.original?._count?.items ?? 0}</span>
             </div>
          );
       },
    },
    {
       accessorKey: "weight",
-      header: "Peso",
+      header: "Weight",
       cell: ({ row }) => {
          return (
             <div className="flex items-center gap-2 min-w-0">
-               <span className="text-sm">{parseFloat(row.original?.weight.toString()).toFixed(2)} lbs</span>
+               <span className="text-sm">{row.original?.weight.toString()} lbs</span>
+            </div>
+         );
+      },
+   },
+   {
+      accessorKey: "total_in_cents",
+      header: "Total",
+      cell: ({ row }) => {
+         return (
+            <div className="flex items-center gap-2 min-w-0">
+               <span className="text-sm">{formatCents(row.original?.total_in_cents)}</span>
+            </div>
+         );
+      },
+   },
+   {
+      accessorKey: "created_at",
+      header: "Created At",
+      cell: ({ row }) => {
+         return (
+            <div className="flex items-center gap-2 min-w-0">
+               <span className="text-sm">{format(row.original?.created_at, "dd/MM/yyyy")}</span>
             </div>
          );
       },

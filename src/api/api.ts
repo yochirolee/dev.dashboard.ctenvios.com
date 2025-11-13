@@ -13,6 +13,7 @@ import {
    type Product,
    agencySchema,
    userSchema,
+   type Discount,
 } from "@/data/types";
 import { useAppStore } from "@/stores/app-store";
 import { toast } from "sonner";
@@ -212,6 +213,18 @@ const api = {
          const response = await axiosInstance.delete(`/orders/${payment_id}/payments`);
          return response.data;
       },
+      delete: async (order_id: number) => {
+         const response = await axiosInstance.delete(`/orders/${order_id}`);
+         return response.data;
+      },
+      deleteDiscount: async (discount_id: number) => {
+         const response = await axiosInstance.delete(`/orders/${discount_id}/discounts`);
+         return response.data;
+      },
+      createDiscount: async (order_id: number, data: Discount) => {
+         const response = await axiosInstance.post(`/orders/${order_id}/discounts`, data);
+         return response.data;
+      },
    },
 
    users: {
@@ -393,6 +406,17 @@ const api = {
    items: {
       get: async () => {
          const response = await axiosInstance.get("/tracking");
+         return response.data;
+      },
+   },
+   dispatch: {
+      get: async (page: number | 1, limit: number | 25) => {
+         const response = await axiosInstance.get("/dispatches", {
+            params: {
+               page: page + 1,
+               limit: limit,
+            },
+         });
          return response.data;
       },
    },

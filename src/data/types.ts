@@ -87,6 +87,14 @@ export const paymentSchema = z.object({
    reference: z.string().min(0).optional(),
    notes: z.string().min(0).optional(),
 });
+export const discountSchema = z.object({
+   id: z.number().optional(),
+   discount_in_cents: z.number().min(0),
+   description: z.string().min(0).optional(),
+   type: z.enum(["CASH", "PERCENT", "RATE"]),
+   rate: z.number().optional(),
+});
+export type Discount = z.infer<typeof discountSchema>;
 export const productSchema = z.object({
    id: z.number().optional(),
    name: z.string().min(1, "El nombre es requerido"),
@@ -278,4 +286,5 @@ export interface OrderItems {
    charge_fee_in_cents: number;
    rate: ShippingRate;
    subtotal: number;
+   
 }

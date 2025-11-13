@@ -4,7 +4,6 @@ import {
    MapPin,
    Phone,
    User,
-   Trash2Icon,
    PrinterIcon,
    Plane,
    Ship,
@@ -15,6 +14,7 @@ import {
    EllipsisVerticalIcon,
    CogIcon,
    FileWarning,
+   FileTextIcon,
 } from "lucide-react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
@@ -39,12 +39,16 @@ import {
    DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@/components/ui/empty";
+import { DeleteOrderDialog } from "./delete-order-dialog";
+import { DiscountsDetails } from "@/components/orders/discounts/discounts.details";
 const baseUrl = import.meta.env.VITE_API_URL;
 
 export default function OrderDetailsPage() {
    const { orderId } = useParams();
 
    const { data: order, isLoading, error } = useOrders.getById(Number(orderId));
+
+   console.log(order, "Order Details Page");
 
    const subtotal = order?.items.reduce(
       (acc: number, item: OrderItems) =>
@@ -66,6 +70,9 @@ export default function OrderDetailsPage() {
    };
    const handlePrintLabels = () => {
       window.open(`${baseUrl}/invoices/${orderId}/labels`, "_blank");
+   };
+   const handlePrintHbl = () => {
+      window.open(`${baseUrl}/invoices/${orderId}/hbl-pdf`, "_blank");
    };
 
    if (isLoading)
@@ -135,6 +142,11 @@ export default function OrderDetailsPage() {
                   <TagIcon className=" h-4 w-4" />
                   Print Labels
                </Button>
+               <Button onClick={handlePrintHbl} variant="outline">
+                  <FileTextIcon className=" h-4 w-4" />
+                  Print HBL
+               </Button>
+
                <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                      <Button variant="outline" size="icon" aria-label="More Options">
@@ -154,9 +166,8 @@ export default function OrderDetailsPage() {
                      </DropdownMenuGroup>
                      <DropdownMenuSeparator />
                      <DropdownMenuGroup>
-                        <DropdownMenuItem variant="destructive">
-                           <Trash2Icon />
-                           Trash
+                        <DropdownMenuItem asChild>
+                           <DeleteOrderDialog order_id={Number(orderId)} asRedirect={true} />
                         </DropdownMenuItem>
                      </DropdownMenuGroup>
                   </DropdownMenuContent>
@@ -323,8 +334,8 @@ export default function OrderDetailsPage() {
                      {order?.payment_status}
                   </span>
                </div>
-               <div className="flex justify-end  ">
-                  <ul className="flex flex-col w-full lg:w-1/2  xl:w-xs xl:mr-4 py-4 justify-end gap-2 border-t border-dashed  ">
+               <div className="flex w-full  justify-end  ">
+                  <ul className="flex flex-col w-full p-2 lg:w-1/3 justify-end gap-2 border-t border-dashed  ">
                      <li className="flex items-center gap-4 justify-between">
                         <span className="text-muted-foreground">Subtotal</span>
                         <span>{formatCents(subtotal) ?? 0.0}</span>
@@ -341,6 +352,7 @@ export default function OrderDetailsPage() {
                            ) ?? 0.0}
                         </span>
                      </li>
+                     <DiscountsDetails discounts={order?.discounts ?? []} order_id={Number(order?.id)} />
 
                      <li className="flex items-center justify-between">
                         <span className="inline-flex items-center gap-2 text-muted-foreground">
@@ -362,20 +374,9 @@ export default function OrderDetailsPage() {
                         <span>{formatCents(order?.total_in_cents)}</span>
                      </li>
                      <Separator />
-                     <PaymentsDetails payments={order?.payments} />
+                     <PaymentsDetails order={order} />
 
-                     <li className="flex text-sm items-center justify-between ">
-                        <span className="text-muted-foreground">Paid</span>
-                        <span
-                           className={cn(
-                              order?.payment_status === "PAID" && "text-muted-foreground"
-                                 ? "text-green-500/80"
-                                 : "text-muted-foreground"
-                           )}
-                        >
-                           {formatCents(order?.paid_in_cents)}
-                        </span>
-                     </li>
+                    
                      <li className="flex text-sm items-center justify-between">
                         <span className="text-muted-foreground">Balance</span>
                         <span

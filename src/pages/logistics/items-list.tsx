@@ -4,7 +4,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { useQuery } from "@tanstack/react-query";
 import api from "@/api/api";
 import ItemComponent from "./item";
-import type { DispatchItem } from "./dispatch-page";
+import type { DispatchItem } from "./create-dispatch-page";
 
 export function ItemsList() {
    const [selectedItem, setSelectedItem] = useState<DispatchItem | null>(null);

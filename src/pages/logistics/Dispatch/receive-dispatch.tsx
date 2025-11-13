@@ -11,7 +11,7 @@ import z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { Field, FieldContent } from "@/components/ui/field";
-import type { DispatchItem } from "../dispatch-page";
+import type { DispatchItem } from "../create-dispatch-page";
 
 const searchForm = z.object({
    hbl: z.string().min(1),

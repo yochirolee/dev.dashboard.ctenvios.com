@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import api from "@/api/api";
-import type { Order, Payment } from "@/data/types";
+import type { Discount, Order, Payment } from "@/data/types";
 
 export const useOrders = {
    search: (searchQuery: string, page: number, limit: number, startDate: string, endDate: string) => {
@@ -43,8 +43,7 @@ export const useOrders = {
          mutationFn: ({ order_id, data }: { order_id: number; data: Payment }) => {
             return api.orders.payOrder(order_id, data);
          },
-         onSuccess: async (data: any) => {
-            await queryClient.invalidateQueries({ queryKey: ["get-order", data?.id] });
+         onSuccess: async () => {
             await queryClient.invalidateQueries({ queryKey: ["get-orders"] });
             options?.onSuccess?.();
          },
@@ -58,7 +57,47 @@ export const useOrders = {
       return useMutation({
          mutationFn: (payment_id: number) => api.orders.deletePayment(payment_id),
          onSuccess: async () => {
-            await queryClient.invalidateQueries({ queryKey: ["get-order"] });
+            await queryClient.invalidateQueries({ queryKey: ["get-orders"] });
+            options?.onSuccess?.();
+         },
+         onError: (error) => {
+            options?.onError?.(error);
+         },
+      });
+   },
+   delete: (options?: { onSuccess?: () => void; onError?: (error: any) => void }) => {
+      const queryClient = useQueryClient();
+      return useMutation({
+         mutationFn: (order_id: number) => api.orders.delete(order_id),
+         onSuccess: async () => {
+            await queryClient.invalidateQueries({ queryKey: ["get-orders"] });
+            options?.onSuccess?.();
+         },
+         onError: (error) => {
+            options?.onError?.(error);
+         },
+      });
+   },
+
+   //need to improve the revalidation of the order
+   addDiscount: (order_id: number, options?: { onSuccess?: () => void; onError?: (error: any) => void }) => {
+      const queryClient = useQueryClient();
+      return useMutation({
+         mutationFn: (data: Discount) => api.orders.createDiscount(order_id, data),
+         onSuccess: async () => {
+            await queryClient.invalidateQueries({ queryKey: ["get-orders"] });
+            options?.onSuccess?.();
+         },
+         onError: (error) => {
+            options?.onError?.(error);
+         },
+      });
+   },
+   deleteDiscount: (options?: { onSuccess?: () => void; onError?: (error: any) => void }) => {
+      const queryClient = useQueryClient();
+      return useMutation({
+         mutationFn: (discount_id: number) => api.orders.deleteDiscount(discount_id),
+         onSuccess: async () => {
             await queryClient.invalidateQueries({ queryKey: ["get-orders"] });
             options?.onSuccess?.();
          },

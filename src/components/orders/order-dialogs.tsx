@@ -193,9 +193,9 @@ export const ChangeRateDialog = ({
 };
 
 const discountOptions = [
-   { label: "cash", value: "cash" },
-   { label: "percent", value: "percent" },
-   { label: "rate", value: "rate" },
+   { label: "Efectivo", value: "CASH" },
+   { label: "Porcentaje", value: "PERCENT" },
+   { label: "Tarifa", value: "RATE" },
 ];
 
 export const DiscountDialog = ({

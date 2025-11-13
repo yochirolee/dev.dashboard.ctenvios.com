@@ -30,6 +30,8 @@ export default function OrdersPage() {
       date?.toISOString() || ""
    );
 
+  
+
    const handleClearFilters = () => {
       setSearchQuery("");
       setPagination({ pageIndex: 0, pageSize: 20 });
