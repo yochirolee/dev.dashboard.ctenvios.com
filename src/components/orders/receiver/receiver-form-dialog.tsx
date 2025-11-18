@@ -71,6 +71,8 @@ const ReceiverForm = ({
    setIsOpen: (isOpen: boolean) => void;
 }) => {
    const { data: provinces } = useProvinces();
+
+   console.log(provinces, "provinces");
    const { setSelectedReceiver, selectedCustomer } = useOrderStore(
       useShallow((state) => ({
          selectedReceiver: state.selectedReceiver,
@@ -371,7 +373,7 @@ const ReceiverForm = ({
                      render={({ field, fieldState }) => (
                         <Field data-invalid={fieldState.invalid}>
                            <FieldLabel htmlFor="province_id">Provincia</FieldLabel>
-                           <Popover open={isProvinceOpen} onOpenChange={setIsProvinceOpen}>
+                           <Popover modal={true} open={isProvinceOpen} onOpenChange={setIsProvinceOpen}>
                               <PopoverTrigger asChild>
                                  <Button
                                     variant="outline"
@@ -392,7 +394,7 @@ const ReceiverForm = ({
                                     <CommandInput placeholder="Buscar Provincia..." className="h-9" />
                                     <CommandList>
                                        <CommandEmpty>No Provincias encontradas.</CommandEmpty>
-                                       <CommandGroup>
+                                       <CommandGroup className="max-h-60 overflow-y-auto">
                                           {provinces?.map((province: Province) => (
                                              <CommandItem
                                                 value={province.name}
@@ -427,7 +429,7 @@ const ReceiverForm = ({
                      render={({ field, fieldState }) => (
                         <Field data-invalid={fieldState.invalid}>
                            <FieldLabel htmlFor="city_id">Municipio</FieldLabel>
-                           <Popover open={isCityOpen} onOpenChange={setIsCityOpen}>
+                           <Popover modal={true} open={isCityOpen} onOpenChange={setIsCityOpen}>
                               <PopoverTrigger asChild>
                                  <Button
                                     variant="outline"
