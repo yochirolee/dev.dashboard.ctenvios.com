@@ -4,18 +4,14 @@ import { DataTable } from "@/components/ui/data-table";
 import { useReceivers } from "@/hooks/use-receivers";
 import { useDebounce } from "use-debounce";
 import { Loader2, Search } from "lucide-react";
-import type { PaginationState } from "@tanstack/react-table";
-import { useState } from "react";
 import { ButtonGroup } from "@/components/ui/button-group";
 import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/input-group";
 import { ReceiverFormDialog } from "@/components/orders/receiver/receiver-form-dialog";
+import usePagination from "@/hooks/use-pagination";
 export const ReceiversPage = () => {
    const [searchQuery, setSearchQuery] = React.useState("");
    const [debouncedSearchQuery] = useDebounce(searchQuery, 500);
-   const [pagination, setPagination] = useState<PaginationState>({
-      pageIndex: 0,
-      pageSize: 25,
-   });
+   const { pagination, setPagination } = usePagination();
    const { data: receivers, isLoading } = useReceivers.search(
       debouncedSearchQuery,
       pagination.pageIndex,

@@ -98,7 +98,6 @@ export type Discount = z.infer<typeof discountSchema>;
 export const productSchema = z.object({
    id: z.number().optional(),
    name: z.string().min(1, "El nombre es requerido"),
-   service_id: z.number().min(1),
    provider_id: z.number().min(1),
    description: z.string().min(1, "La descripción es requerida"),
    unit: z.enum(["PER_LB", "FIXED"]),

@@ -6,10 +6,27 @@ export const useProducts = {
    get: () => {
       return useQuery({ queryKey: ["get-products"], queryFn: api.products.get });
    },
-   create: (options?: { onSuccess?: () => void; onError?: (error: any) => void }) => {
+   create: ( options?: { onSuccess?: () => void; onError?: (error: any) => void }) => {
       const queryClient = useQueryClient();
       return useMutation({
          mutationFn: (data: Product) => api.products.create(data),
+         onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["get-products"] });
+            options?.onSuccess?.();
+         },
+         onError: (error) => {
+            options?.onError?.(error);
+         },
+      });
+   },
+   addService: (
+      product_id: number,
+      service_id: number,
+      options?: { onSuccess?: () => void; onError?: (error: any) => void }
+   ) => {
+      const queryClient = useQueryClient();
+      return useMutation({
+         mutationFn: () => api.products.addService(product_id, service_id),
          onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["get-products"] });
             options?.onSuccess?.();

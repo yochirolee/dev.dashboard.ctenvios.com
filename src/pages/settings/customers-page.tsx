@@ -1,21 +1,17 @@
-import React, { useState } from "react";
+import React from "react";
 import { columns } from "@/components/orders/customer/columns";
 import { DataTable } from "@/components/ui/data-table";
 import { useCustomers } from "@/hooks/use-customers";
 import { useDebounce } from "use-debounce";
 import { Loader2, Search } from "lucide-react";
 import { CustomerFormDialog } from "@/components/orders/customer/customer-form-dialog";
-import type { PaginationState } from "@tanstack/react-table";
 import { ButtonGroup } from "@/components/ui/button-group";
 import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/input-group";
-
+import usePagination from "@/hooks/use-pagination";
 export const CustomersPage = () => {
    const [searchQuery, setSearchQuery] = React.useState("");
    const [debouncedSearchQuery] = useDebounce(searchQuery, 500);
-   const [pagination, setPagination] = useState<PaginationState>({
-      pageIndex: 0,
-      pageSize: 25,
-   });
+   const { pagination, setPagination } = usePagination();
    const { data, isLoading } = useCustomers.search(debouncedSearchQuery, pagination.pageIndex, pagination.pageSize);
 
    return (

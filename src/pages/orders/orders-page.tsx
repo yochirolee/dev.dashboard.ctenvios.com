@@ -4,23 +4,19 @@ import { DataTable } from "@/components/ui/data-table";
 import { orderColumns } from "@/components/orders/order/order-columns";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import type { PaginationState } from "@tanstack/react-table";
 import { useDebounce } from "use-debounce";
 import { Input } from "@/components/ui/input";
 import { DatePickerWithRange } from "@/components/dates/data-range-picker";
 import { useOrders } from "@/hooks/use-orders";
 import { ButtonGroup } from "@/components/ui/button-group";
-
+import usePagination from "@/hooks/use-pagination";
 export default function OrdersPage() {
    const navigate = useNavigate();
 
    const [searchQuery, setSearchQuery] = useState("");
    const [debouncedSearchQuery] = useDebounce(searchQuery, 500);
    const [date, setDate] = useState<Date | undefined>(undefined);
-   const [pagination, setPagination] = useState<PaginationState>({
-      pageIndex: 0,
-      pageSize: 20,
-   });
+   const { pagination, setPagination } = usePagination();
 
    const { data, isLoading, isFetching } = useOrders.search(
       debouncedSearchQuery,
@@ -30,11 +26,11 @@ export default function OrdersPage() {
       date?.toISOString() || ""
    );
 
-  
+   console.log(data, "data");
 
    const handleClearFilters = () => {
       setSearchQuery("");
-      setPagination({ pageIndex: 0, pageSize: 20 });
+      setPagination(pagination);
       setDate(undefined);
    };
 

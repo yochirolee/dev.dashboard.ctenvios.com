@@ -31,7 +31,6 @@ export function NewOrderPage() {
    const agencyId = user?.agency_id || 0;
 
    const { data: services, isLoading: isLoadingServices } = useAgencies.getActiveServicesWithRates(agencyId);
-
    return (
       <div className="space-y-4 ">
          <div className="flex flex-col">

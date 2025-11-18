@@ -341,6 +341,13 @@ const paymentStatus = (payment_status: string) => {
                <span className="ml-1 text-nowrap font-extralight text-muted-foreground text-xs">Partial</span>
             </Badge>
          );
+      case "FULL_DISCOUNT":
+         return (
+            <Badge className="w-fit  " variant="secondary">
+               <span className="  rounded-full bg-sky-400/50 text-white text-xs h-1.5 ring-1 ring-sky-500/40 w-1.5 flex items-center justify-center" />
+               <span className="ml-1 text-nowrap font-extralight text-muted-foreground text-xs">Discounted</span>
+            </Badge>
+         );
       default:
          return (
             <Badge className="w-fit  " variant="secondary">

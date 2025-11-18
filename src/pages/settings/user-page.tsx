@@ -4,15 +4,10 @@ import { Input } from "@/components/ui/input";
 import { userColumns } from "@/components/users/users-columns";
 import { useGetUsers } from "@/hooks/use-users";
 import { toast } from "sonner";
-import { useState } from "react";
-import type { PaginationState } from "@tanstack/react-table";
-
+import usePagination from "@/hooks/use-pagination";
 export const UserPage = () => {
-	const [pagination, setPagination] = useState<PaginationState>({
-		pageIndex: 0,
-		pageSize: 25,
-	});
-	const { data: users, isLoading } = useGetUsers(pagination.pageIndex, pagination.pageSize);
+	const { pagination, setPagination } = usePagination();
+	const { data: users, isLoading } = useGetUsers(pagination.pageIndex , pagination.pageSize);
 	const handleDeleteUser = () => {
 		toast.success("Usuario eliminado correctamente", {
 			description: "El usuario ha sido eliminado correctamente",

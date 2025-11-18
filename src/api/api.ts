@@ -402,6 +402,10 @@ const api = {
          const response = await axiosInstance.delete(`/products/${id}`);
          return response.data;
       },
+      addService: async (product_id: number, service_id: number) => {
+         const response = await axiosInstance.post(`/products/${product_id}/connect-service`, { service_id });
+         return response.data;
+      },
    },
    items: {
       get: async () => {

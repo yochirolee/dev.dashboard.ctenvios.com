@@ -5,19 +5,16 @@ import { customsColumns } from "@/components/customs/customs-columns";
 import { useCustoms } from "@/hooks/use-customs";
 import { NewCustomsForm } from "@/components/customs/new-customs-form";
 import { useState } from "react";
-import type { PaginationState } from "@tanstack/react-table";
 import type { Customs } from "@/data/types";
 import { AlertDeleteDialog } from "@/components/customs/alert-delete-dialog";
 import { useDebounce } from "use-debounce";
 import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/input-group";
 import { ButtonGroup } from "@/components/ui/button-group";
+import usePagination from "@/hooks/use-pagination";
 export const CustomsPage = () => {
    const [searchQuery, setSearchQuery] = React.useState("");
    const [debouncedSearchQuery] = useDebounce(searchQuery, 500);
-   const [pagination, setPagination] = useState<PaginationState>({
-      pageIndex: 0,
-      pageSize: 25,
-   });
+   const { pagination, setPagination } = usePagination();
    const { data, isLoading } = useCustoms.search(debouncedSearchQuery, pagination.pageIndex, pagination.pageSize);
 
    console.log(data, "data");
