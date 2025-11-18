@@ -8,7 +8,6 @@ import { ServiceCardActions } from "./service-card-actions";
 import { useServices } from "@/hooks/use-services";
 import { toast } from "sonner";
 import { ProductList } from "../products/product-list";
-import { EmptyProducts } from "../products/empty-products";
 import { Separator } from "../../ui/separator";
 import { CreateProductForm } from "../products/create-product-form";
 
@@ -61,11 +60,7 @@ export const ServiceCard = ({ service }: { service: ServiceWithProducts }) => {
                   <CardTitle>Productos</CardTitle>
                   <CardDescription>Listado de productos disponibles para {service?.name}.</CardDescription>
                </div>
-               <CreateProductForm
-                  providerId={service?.provider_id ?? 0}
-                  setOpen={setOpen}
-                  open={open}
-               />
+               <CreateProductForm providerId={service?.provider_id ?? 0} setOpen={setOpen} open={open} />
             </div>
             <ProductList serviceId={service?.id ?? 0} />
          </CardContent>
