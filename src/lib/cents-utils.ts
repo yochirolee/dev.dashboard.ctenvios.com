@@ -75,7 +75,7 @@ export const calculate_row_subtotal = (
    unit: string
 ): number => {
    const safePriceInCents = price_in_cents || 0;
-   const safeWeight = weight || 0;
+   const safeWeight = Number(weight) || 0;
    const safeCustomsFeeInCents = customs_fee_in_cents || 0;
    const safeChargeFeeInCents = charge_fee_in_cents || 0;
    const safeInsuranceFeeInCents = insurance_fee_in_cents || 0;
@@ -93,7 +93,7 @@ export function calculateOrderTotal(items: any[]): number {
    return items.reduce((total, item) => {
       const itemSubtotal = calculate_row_subtotal(
          item.price_in_cents || 0,
-         item.weight || 0,
+         Number(item.weight) || 0,
          item.customs_fee_in_cents || 0,
          item.charge_fee_in_cents || 0,
          item.insurance_fee_in_cents || 0,

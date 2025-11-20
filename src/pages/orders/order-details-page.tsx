@@ -50,7 +50,7 @@ export default function OrderDetailsPage() {
 
    console.log(order, "Order Details Page");
 
-   const subtotal = order?.items.reduce(
+   const subtotal = order?.order_items.reduce(
       (acc: number, item: OrderItems) =>
          acc +
          calculate_row_subtotal(
@@ -64,7 +64,7 @@ export default function OrderDetailsPage() {
       0
    );
 
-   const total_weight = order?.items.reduce((acc: number, item: OrderItems) => acc + item?.weight || 0, 0);
+   const total_weight = order?.order_items.reduce((acc: number, item: OrderItems) => acc + Number(item?.weight) || 0, 0);
    const handlePrintOrder = () => {
       window.open(`${baseUrl}/invoices/${orderId}/pdf`, "_blank");
    };
@@ -197,7 +197,7 @@ export default function OrderDetailsPage() {
                <div className=" flex w-full flex-col  justify-end text-center xl:text-end">
                   <h1 className="xl:text-xl text-end font-bold ">Order {order?.id}</h1>
                   <div className="flex items-center gap-2 text-end justify-end">
-                     <span className="xl:text-lg text-end">{total_weight} lbs</span>
+                     <span className="xl:text-lg text-end">{total_weight?.toFixed(2)} lbs</span>
                      <span className="xl:text-lg text-end">Items: {order?.items?.length || 0}</span>
                   </div>
                   <time className="text-sm text-end text-muted-foreground">
@@ -277,7 +277,7 @@ export default function OrderDetailsPage() {
                   </TableRow>
                </TableHeader>
                <TableBody>
-                  {order?.items.map((item: OrderItems, index: number) => (
+                  {order?.order_items.map((item: OrderItems, index: number) => (
                      <TableRow key={index}>
                         <TableCell className="">{item?.hbl}</TableCell>
                         <TableCell className="">{item?.description}</TableCell>
@@ -304,8 +304,17 @@ export default function OrderDetailsPage() {
                            {formatCents(item?.price_in_cents)}
                         </TableCell>
                         <TableCell className="text-right">{Number(item?.weight)}</TableCell>
-                        <TableCell className={`text-right ${item?.subtotal === 0 ? "text-muted-foreground" : ""}`}>
-                           {formatCents(item?.subtotal)}
+                        <TableCell className="text-right">
+                           {formatCents(
+                              calculate_row_subtotal(
+                                 item?.price_in_cents,
+                                 item?.weight,
+                                 item?.customs_fee_in_cents,
+                                 item?.charge_fee_in_cents,
+                                 item?.insurance_fee_in_cents,
+                                 item?.unit
+                              )
+                           )}
                         </TableCell>
                      </TableRow>
                   ))}
@@ -336,7 +345,7 @@ export default function OrderDetailsPage() {
                         <span className="text-muted-foreground">Shipping</span>
                         <span>
                            {formatCents(
-                              order?.items.reduce(
+                              order?.order_items.reduce(
                                  (acc: number, item: OrderItems) => acc + item?.delivery_fee_in_cents || 0,
                                  0
                               )
@@ -367,7 +376,6 @@ export default function OrderDetailsPage() {
                      <Separator />
                      <PaymentsDetails order={order} />
 
-                    
                      <li className="flex text-sm items-center justify-between">
                         <span className="text-muted-foreground">Balance</span>
                         <span

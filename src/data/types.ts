@@ -108,7 +108,7 @@ export const productSchema = z.object({
    is_active: z.boolean().default(true),
 });
 
-export const itemsSchema = z.object({
+export const orderItemSchema = z.object({
    description: z.string().min(1, "La descripción es requerida"),
    weight: z.number().min(0, "El peso es requerido"),
    customs_id: z.number().min(0),
@@ -128,7 +128,7 @@ export const orderSchema = z.object({
    agency_id: z.number().min(0),
    user_id: z.string().min(0),
    service_id: z.number().min(0),
-   items: z.array(itemsSchema).min(1, "La orden debe tener al menos 1 item"),
+   order_items: z.array(orderItemSchema).min(1, "La orden debe tener al menos 1 item"),
    charge_in_cents: z.number().min(0).optional(),
    total_in_cents: z.number().optional().default(0),
    total_delivery_fee_in_cents: z.number().min(0).optional().default(0),
@@ -226,7 +226,7 @@ export type Customer =
         setSelectedCustomer: (customer: Customer) => void;
      })
    | null;
-export type Item = z.infer<typeof itemsSchema>;
+export type OrderItem = z.infer<typeof orderItemSchema>;
 export type Order = z.infer<typeof orderSchema>;
 export type Service = z.infer<typeof serviceSchema>;
 
@@ -258,7 +258,7 @@ export interface OrderHistory {
    customer: Customer;
    receiver: Receiver;
    service: Service;
-   items: Item[];
+   order_items: OrderItem[];
    total_in_cents: number;
    paid_in_cents: number;
    created_at: string;
@@ -308,6 +308,6 @@ export interface Dispatch {
    created_at: string;
    updated_at: string;
    _count: {
-      items: number;
+      order_items: number;
    };
 }

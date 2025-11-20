@@ -11,7 +11,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
-import { orderSchema } from "@/data/types";
+import { orderSchema, type OrderItem } from "@/data/types";
 import { useOrders } from "@/hooks/use-orders";
 import { Input } from "../ui/input";
 import { useAppStore } from "@/stores/app-store";
@@ -60,7 +60,7 @@ export function ItemsInOrder() {
          agency_id: user?.agency_id || 0,
          user_id: user?.id || "",
          service_id: selectedService?.id || 0,
-         items: [
+         order_items: [
             {
                description: "",
                weight: undefined,
@@ -79,7 +79,7 @@ export function ItemsInOrder() {
 
    const { fields, append, remove } = useFieldArray({
       control: form.control,
-      name: "items",
+      name: "order_items",
    });
 
    useEffect(() => {
@@ -110,7 +110,7 @@ export function ItemsInOrder() {
          // Focus on the first newly added item
          setTimeout(() => {
             const newItemIndex = fields.length; // This will be the index of the first new item
-            const input = document.querySelector<HTMLInputElement>(`input[name="items.${newItemIndex}.description"]`);
+            const input = document.querySelector<HTMLInputElement>(`input[name="order_items.${newItemIndex}.description"]`);
             input?.focus();
          }, 0);
       }
@@ -123,6 +123,8 @@ export function ItemsInOrder() {
       }
       setItemsCount(1);
    };
+
+   console.log(form.formState.errors, "errors");
 
    const { mutate: createOrder, isPending: isCreatingOrder } = useOrders.create({
       onSuccess: (data) => {
@@ -275,7 +277,7 @@ export function ItemsInOrder() {
 
 function InvoiceTotal({ form }: { form: any }) {
    const [open, setOpen] = useState(false);
-   const total_weight = form.watch("items").reduce((acc: number, item: any) => acc + item?.weight || 0, 0);
+   const total_weight = form.watch("order_items").reduce((acc: number, item: OrderItem) => acc + Number(item?.weight) || 0, 0);
    const total_delivery = calculateTotalDeliveryFee();
    return (
       <div>

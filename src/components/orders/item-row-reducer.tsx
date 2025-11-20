@@ -39,18 +39,18 @@ function ItemRowReducer({
 
    // Initialize reducer with current form values
    const initialState: ItemState = {
-      description: form.getValues(`items.${index}.description`) || "",
-      weight: form.getValues(`items.${index}.weight`),
-      price_in_cents: form.getValues(`items.${index}.price_in_cents`) || activeWeightRate?.price_in_cents || 0,
-      cost_in_cents: form.getValues(`items.${index}.cost_in_cents`) || activeWeightRate?.cost_in_cents || 0,
-      rate_id: form.getValues(`items.${index}.rate_id`) || activeWeightRate?.id || 0,
-      unit: form.getValues(`items.${index}.unit`) || "PER_LB",
-      insurance_fee_in_cents: form.getValues(`items.${index}.insurance_fee_in_cents`) || 0,
-      customs_fee_in_cents: form.getValues(`items.${index}.customs_fee_in_cents`) || 0,
-      charge_fee_in_cents: form.getValues(`items.${index}.charge_fee_in_cents`) || 0,
-      customs_id: form.getValues(`items.${index}.customs_id`) || 0,
-      subtotal: form.getValues(`items.${index}.subtotal`) || 0,
-      delivery_fee_in_cents: form.getValues(`items.${index}.delivery_fee_in_cents`) || 0,
+      description: form.getValues(`order_items.${index}.description`) || "",
+      weight: form.getValues(`order_items.${index}.weight`),
+      price_in_cents: form.getValues(`order_items.${index}.price_in_cents`) || activeWeightRate?.price_in_cents || 0,
+      cost_in_cents: form.getValues(`order_items.${index}.cost_in_cents`) || activeWeightRate?.cost_in_cents || 0,
+      rate_id: form.getValues(`order_items.${index}.rate_id`) || activeWeightRate?.id || 0,
+      unit: form.getValues(`order_items.${index}.unit`) || "PER_LB",
+      insurance_fee_in_cents: form.getValues(`order_items.${index}.insurance_fee_in_cents`) || 0,
+      customs_fee_in_cents: form.getValues(`order_items.${index}.customs_fee_in_cents`) || 0,
+      charge_fee_in_cents: form.getValues(`order_items.${index}.charge_fee_in_cents`) || 0,
+      customs_id: form.getValues(`order_items.${index}.customs_id`) || 0,
+      subtotal: form.getValues(`order_items.${index}.subtotal`) || 0,
+      delivery_fee_in_cents: form.getValues(`order_items.${index}.delivery_fee_in_cents`) || 0,
    };
 
    const [itemState, dispatch] = useItemReducer(initialState);
@@ -64,9 +64,9 @@ function ItemRowReducer({
 
    // Sync reducer state back to react-hook-form
    useEffect(() => {
-      form.setValue(`items.${index}`, itemState);
+      form.setValue(`order_items.${index}`, itemState);
       // Calculate total from all items
-      const items = form.getValues("items") || [];
+      const items = form.getValues("order_items") || [];
       const total = items.reduce((acc: number, currentItem: any) => {
          return acc + (Number(currentItem?.subtotal) || 0);
       }, 0);
@@ -132,7 +132,7 @@ function ItemRowReducer({
             <Switch
                checked={itemState.unit === "FIXED"}
                onCheckedChange={handleToggleUnit}
-               id={`items.${index}.unit-reducer`}
+               id={`order_items.${index}.unit-reducer`}
             />
          </TableCell>
          <TableCell className="w-10">
@@ -195,7 +195,7 @@ function ItemRowReducer({
 
          <TableCell className="text-right">
             <Input
-               name={`items.${index}.weight`}
+               name={`order_items.${index}.weight`}
                className="[&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none [-moz-appearance:textfield] text-right"
                value={itemState.weight || ""}
                onChange={(e) => {
@@ -217,7 +217,7 @@ function ItemRowReducer({
                      // Focus on the next item's weight input
                      const nextIndex = index + 1;
                      const nextInput = document.querySelector<HTMLInputElement>(
-                        `input[name="items.${nextIndex}.weight"]`
+                        `input[name="order_items.${nextIndex}.weight"]`
                      );
                      if (nextInput) {
                         nextInput.focus();
