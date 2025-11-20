@@ -22,7 +22,7 @@ type PackageItem = {
 
 export const CreateDispatchPage = () => {
    // State
-   const [manifestId, setManifestId] = useState("M-2024-001");
+   const manifestId = "M-2024-001";
    const [expectedPackages, setExpectedPackages] = useState<PackageItem[]>([]);
    const [scannedPackages, setScannedPackages] = useState<
       { hbl: string; status: ScanStatus; timestamp: Date; description?: string }[]
@@ -39,13 +39,13 @@ export const CreateDispatchPage = () => {
 
    const agency_id = useAppStore.getState().agency?.id;
 
-   const { data: items, isLoading: isLoadingItems } = useAgencies.getItems(agency_id ?? 0);
+   const { data: items } = useAgencies.getItems(agency_id ?? 0);
 
    console.log(items);
    useEffect(() => {
       if (items) {
          setExpectedPackages(
-            items.map((item:PackageItem) => ({
+            items.map((item: PackageItem) => ({
                hbl: item.hbl,
                description: item.description,
                weight: item.weight,
