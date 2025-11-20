@@ -45,7 +45,7 @@ export const CreateDispatchPage = () => {
    useEffect(() => {
       if (items) {
          setExpectedPackages(
-            items.map((item) => ({
+            items.map((item:PackageItem) => ({
                hbl: item.hbl,
                description: item.description,
                weight: item.weight,

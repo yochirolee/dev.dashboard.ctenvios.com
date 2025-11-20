@@ -5,7 +5,7 @@ import { useShallow } from "zustand/react/shallow";
 import { Table, TableRow, TableHeader, TableCaption, TableHead, TableBody } from "../ui/table";
 import { CardContent, CardHeader, CardTitle, Card } from "../ui/card";
 import { Button } from "../ui/button";
-import { Trash, PackagePlus, PlusCircle, Scale, BoxIcon } from "lucide-react";
+import { Trash, PackagePlus, Scale, BoxIcon } from "lucide-react";
 import ItemRow from "./item-row-reducer";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
