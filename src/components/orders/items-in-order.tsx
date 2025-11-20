@@ -292,23 +292,10 @@ function InvoiceTotal({ form }: { form: any }) {
                </li>
 
                <li className="flex items-center justify-between">
-                  <span className="text-muted-foreground">Shipping</span>
+                  <span className="text-muted-foreground">Delivery</span>
                   <span>{formatCents(total_delivery)}</span>
                </li>
 
-               <li className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                     <span className="text-muted-foreground">Discount</span>
-                     <Button onClick={() => setOpen(true)} type="button" variant="ghost" size="icon" className="ml-2">
-                        <PlusCircle />
-                     </Button>
-                  </div>
-                  <span>$0.00</span>
-               </li>
-               <li className="flex items-center justify-between">
-                  <span className="text-muted-foreground">Fee</span>
-                  <span>$0.00</span>
-               </li>
                <li className="flex items-center justify-between font-semibold">
                   <span className="text-muted-foreground">Total</span>
                   <span>{formatCents(form.getValues("total_in_cents") + total_delivery)}</span>

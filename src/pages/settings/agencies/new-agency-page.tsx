@@ -317,9 +317,7 @@ export function NewAgencyPage() {
                                        <FormControl>
                                           <Input {...field} placeholder="Website" autoComplete="off" />
                                        </FormControl>
-                                       <FormDescription className="text-xs text-muted-foreground">
-                                          Puedes dejarlo vacío si no aplica.
-                                       </FormDescription>
+                                   
                                        <FormMessage />
                                     </FormItem>
                                  )}

@@ -17,13 +17,12 @@ import { ContainersPage } from "@/pages/logistics/containers-page";
 import { FlightsPage } from "@/pages/logistics/flights-page";
 import OrderDetailsPage from "@/pages/orders/order-details-page";
 import { HomePage } from "@/pages/home-page";
-import { UnauthorizedPage } from "@/pages/unauthorized-page";
+import { CreateDispatchPage } from "@/pages/logistics/create-dispatch-page";
 
 export const AppRouter = () => {
    return (
       <Routes>
          <Route path="/login" element={<LoginPage />} />
-         <Route path="/unauthorized" element={<UnauthorizedPage />} />
          {/* Protected routes */}
          <Route element={<ProtectedRoute />}>
             <Route path="/" element={<DashboardLayout />}>
@@ -38,7 +37,13 @@ export const AppRouter = () => {
                </Route>
                <Route element={<ProtectedRoute allowedRoles={["ROOT", "ADMINISTRATOR"]} />}>
                   <Route path="logistics">
-                     <Route path="dispatch" element={<DispatchPage />} />
+                     //child routes for dispatch
+                     <Route index element={<Navigate to="dispatch" replace />} />
+                     <Route path="dispatch">
+                        <Route index element={<Navigate to="list" replace />} />
+                        <Route path="list" element={<DispatchPage />} />
+                        <Route path="create" element={<CreateDispatchPage />} />
+                     </Route>
                      <Route path="containers" element={<ContainersPage />} />
                      <Route path="flights" element={<FlightsPage />} />
                   </Route>

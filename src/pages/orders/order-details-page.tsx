@@ -197,7 +197,7 @@ export default function OrderDetailsPage() {
                <div className=" flex w-full flex-col  justify-end text-center xl:text-end">
                   <h1 className="xl:text-xl text-end font-bold ">Order {order?.id}</h1>
                   <div className="flex items-center gap-2 text-end justify-end">
-                     <span className="xl:text-lg text-end">{total_weight.toFixed(2)} lbs</span>
+                     <span className="xl:text-lg text-end">{total_weight} lbs</span>
                      <span className="xl:text-lg text-end">Items: {order?.items?.length || 0}</span>
                   </div>
                   <time className="text-sm text-end text-muted-foreground">
@@ -303,18 +303,9 @@ export default function OrderDetailsPage() {
                         >
                            {formatCents(item?.price_in_cents)}
                         </TableCell>
-                        <TableCell className="text-right">{item?.weight?.toFixed(2)}</TableCell>
+                        <TableCell className="text-right">{Number(item?.weight)}</TableCell>
                         <TableCell className={`text-right ${item?.subtotal === 0 ? "text-muted-foreground" : ""}`}>
-                           {formatCents(
-                              calculate_row_subtotal(
-                                 item?.price_in_cents,
-                                 item?.weight,
-                                 item?.customs_fee_in_cents,
-                                 item?.charge_fee_in_cents,
-                                 item?.insurance_fee_in_cents,
-                                 item.unit
-                              )
-                           )}
+                           {formatCents(item?.subtotal)}
                         </TableCell>
                      </TableRow>
                   ))}

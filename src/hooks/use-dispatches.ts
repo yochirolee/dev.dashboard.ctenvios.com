@@ -8,4 +8,5 @@ export const useDispatches = {
          queryFn: () => api.dispatch.get(0, 25),
       });
    },
+   
 };

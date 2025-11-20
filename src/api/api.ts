@@ -313,6 +313,10 @@ const api = {
          const response = await axiosInstance.get(`/agencies/${id}/active-services-with-rates`);
          return response.data;
       },
+      getItems: async (agency_id: number) => {
+         const response = await axiosInstance.get(`/agencies/${agency_id}/items`);
+         return response.data;
+      },
    },
    customs: {
       get: async (page: number | 1, limit: number | 25) => {
@@ -407,12 +411,7 @@ const api = {
          return response.data;
       },
    },
-   items: {
-      get: async () => {
-         const response = await axiosInstance.get("/tracking");
-         return response.data;
-      },
-   },
+
    dispatch: {
       get: async (page: number | 1, limit: number | 25) => {
          const response = await axiosInstance.get("/dispatches", {

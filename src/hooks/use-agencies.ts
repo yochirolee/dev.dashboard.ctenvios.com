@@ -72,4 +72,12 @@ export const useAgencies = {
          staleTime: 1000 * 60 * 60 * 24,
       });
    },
+   getItems: (agency_id: number) => {
+      return useQuery({
+         queryKey: ["get-items", agency_id],
+         queryFn: () => api.agencies.getItems(agency_id),
+         enabled: !!agency_id,
+         staleTime: 1000 * 60 * 60 * 24,
+      });
+   },
 };
