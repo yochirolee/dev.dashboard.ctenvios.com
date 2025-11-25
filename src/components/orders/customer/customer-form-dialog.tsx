@@ -28,7 +28,7 @@ const customerFormSchema = z.object({
    last_name: z.string().min(1, { message: "El apellido es requerido" }),
    second_last_name: z.string().optional(),
    mobile: z
-      .string( {message: "El movil es requerido"})
+      .string({ message: "El movil es requerido" })
       .min(10, { message: "El movil debe tener 10 dígitos" })
       .max(10, { message: "El movil debe tener 10 dígitos" }),
    identity_document: z.string().optional(),
@@ -54,7 +54,7 @@ export const CustomerFormDialog = React.memo(function CustomerFormDialog() {
                <span className="hidden xl:block"> {selectedCustomer ? "Editar Cliente" : "Nuevo Cliente"}</span>
             </Button>
          </DialogTrigger>
-         <DialogContent className="sm:max-w-[550px] p-2  ">
+         <DialogContent className="sm:max-w-[550px] p-4  ">
             <DialogHeader className="px-4">
                <DialogTitle>{selectedCustomer ? "Editar Cliente" : "Nuevo Cliente"}</DialogTitle>
                <DialogDescription>
@@ -152,8 +152,8 @@ const CustomerForm = ({
 
    return (
       <form id="customer-form" onSubmit={form.handleSubmit(onSubmit, onError)}>
-         <ScrollArea className="h-[calc(100vh-200px)] lg:h-auto p-4 ">
-            <FieldGroup>
+         <ScrollArea className=" h-[calc(100vh-200px)] xl:h-auto p-4">
+            <FieldGroup className="my-2">
                <Controller
                   name="mobile"
                   control={form.control}

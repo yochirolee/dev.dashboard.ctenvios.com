@@ -22,13 +22,11 @@ type PackageItem = {
 
 export const CreateDispatchPage = () => {
    // State
-   const manifestId = "M-2024-001";
    const [expectedPackages, setExpectedPackages] = useState<PackageItem[]>([]);
    const [scannedPackages, setScannedPackages] = useState<
       { hbl: string; status: ScanStatus; timestamp: Date; description?: string }[]
    >([]);
    const [currentInput, setCurrentInput] = useState("");
-   const [isSetupMode, setIsSetupMode] = useState(true);
    const [lastScanStatus, setLastScanStatus] = useState<{
       hbl: string;
       status: ScanStatus;
@@ -55,7 +53,7 @@ export const CreateDispatchPage = () => {
          setScannedPackages([]);
          setLastScanStatus(null);
          setCurrentInput("");
-         setIsSetupMode(false);
+
          inputRef.current?.focus();
       }
    }, [items]);
@@ -117,76 +115,9 @@ export const CreateDispatchPage = () => {
    const progress = totalExpected > 0 ? (totalScanned / totalExpected) * 100 : 0;
    const missingCount = totalExpected - totalScanned;
 
-   // Auto-focus management
-   useEffect(() => {
-      if (!isSetupMode) {
-         const interval = setInterval(() => {
-            if (document.activeElement !== inputRef.current) {
-               // Optional: keep focus on input for dedicated scanning stations
-               // inputRef.current?.focus()
-            }
-         }, 1000);
-         return () => clearInterval(interval);
-      }
-   }, [isSetupMode]);
-
    return (
       <div className="flex flex-col">
          <main className="flex-1">
-            {/*   {isSetupMode ? (
-               <div className="max-w-2xl mx-auto mt-10">
-                  <Card className="border-primary/20 shadow-lg shadow-primary/5">
-                     <CardHeader>
-                        <CardTitle className="text-2xl">Inbound Shipment Setup</CardTitle>
-                        <CardDescription>Configure the expected manifest to begin scanning.</CardDescription>
-                     </CardHeader>
-                     <CardContent className="space-y-6">
-                        <div className="space-y-2">
-                           <label className="text-sm font-medium">Manifest ID</label>
-                           <Input
-                              value={manifestId}
-                              onChange={(e) => setManifestId(e.target.value)}
-                              className="font-mono"
-                           />
-                        </div>
-
-                        <div className="grid grid-cols-2 gap-4">
-                           <Button
-                              variant="outline"
-                              className="h-32 flex flex-col gap-2 border-dashed border-2 hover:border-primary hover:bg-primary/5 transition-all"
-                              onClick={() => generateDemoManifest(20)}
-                           >
-                              <Package className="h-8 w-8 text-primary" />
-                              <span className="font-bold">Small Batch (20)</span>
-                              <span className="text-xs text-muted-foreground">Quick Demo</span>
-                           </Button>
-                           <Button
-                              variant="outline"
-                              className="h-32 flex flex-col gap-2 border-dashed border-2 hover:border-primary hover:bg-primary/5 transition-all"
-                              onClick={() => generateDemoManifest(100)}
-                           >
-                              <ClipboardList className="h-8 w-8 text-secondary" />
-                              <span className="font-bold">Full Shipment (100)</span>
-                              <span className="text-xs text-muted-foreground">Standard Load</span>
-                           </Button>
-                        </div>
-
-                        <div className="relative">
-                           <div className="absolute inset-0 flex items-center">
-                              <span className="w-full border-t" />
-                           </div>
-                           <div className="relative flex justify-center text-xs uppercase">
-                              <span className="bg-card px-2 text-muted-foreground">Or upload manifest</span>
-                           </div>
-                        </div>
-
-                        <Button className="w-full" disabled>
-                           Upload CSV / JSON
-                        </Button>
-                     </CardContent>
-                  </Card>
-               </div>
-            ) : ( */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 ">
                {/* Left Column: Scanning & Stats */}
                <div className="lg:col-span-2 flex flex-col gap-6">
@@ -279,13 +210,13 @@ export const CreateDispatchPage = () => {
                   {/* Recent Activity Log */}
                   <Card className="flex-1 flex flex-col min-h-0">
                      <CardHeader className="pb-2">
-                        <CardTitle className="text-lg">Recent Activity</CardTitle>
+                        <CardTitle className="text-lg">Actividad Reciente</CardTitle>
                      </CardHeader>
                      <CardContent className="flex-1 overflow-hidden p-0">
                         <ScrollArea className="h-[calc(100vh-200px)]">
                            <div className="divide-y divide-border">
                               {scannedPackages.length === 0 ? (
-                                 <div className="p-8 text-center text-muted-foreground">No packages scanned yet</div>
+                                 <div className="p-8 text-center text-muted-foreground">No hay paquetes escaneados</div>
                               ) : (
                                  scannedPackages.map((pkg) => (
                                     <div
@@ -336,84 +267,40 @@ export const CreateDispatchPage = () => {
                <div className="lg:col-span-1 flex flex-col h-full">
                   <Card className="h-full flex flex-col">
                      <CardHeader>
-                        <CardTitle>Manifest Details</CardTitle>
-                        <CardDescription>ID: {manifestId}</CardDescription>
+                        <CardTitle>Paquetes a Despachar</CardTitle>
                      </CardHeader>
                      <CardContent className="flex-1 p-0 flex flex-col min-h-0">
-                        <Tabs defaultValue="pending" className="flex-1 flex flex-col">
-                           <div className="px-4">
-                              <TabsList className="w-full grid grid-cols-2">
-                                 <TabsTrigger value="pending">Pending ({missingCount})</TabsTrigger>
-                                 <TabsTrigger value="completed">Verified ({totalScanned})</TabsTrigger>
-                              </TabsList>
+                        <div className="p-2 px-4">
+                           <div className="relative">
+                              <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+                              <Input placeholder="Buscar Paquete..." className="pl-8" />
                            </div>
-
-                           <div className="p-2 px-4">
-                              <div className="relative">
-                                 <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-                                 <Input placeholder="Search manifest..." className="pl-8" />
-                              </div>
-                           </div>
-
-                           <TabsContent value="pending" className="flex-1 min-h-0 mt-0">
-                              <ScrollArea className="h-[calc(100vh-200px)]">
-                                 <div className="p-4 space-y-2">
-                                    {expectedPackages
-                                       .filter((p) => p.status === "pending")
-                                       .map((pkg) => (
-                                          <div
-                                             key={pkg.hbl}
-                                             className="flex items-center justify-between p-3 rounded-lg border border-border"
-                                          >
-                                             <div className="flex items-center gap-3">
-                                                <Box className="h-4 w-4 text-muted-foreground" />
-                                                <span className="font-mono text-sm">{pkg.hbl}</span>
-                                                <span className="text-xs text-muted-foreground">{pkg.description}</span>
-                                             </div>
-                                             <Badge variant="secondary" className="text-[10px]">
-                                                WAITING
-                                             </Badge>
-                                          </div>
-                                       ))}
-                                    {expectedPackages.filter((p) => p.status === "pending").length === 0 && (
-                                       <div className="text-center py-10 text-muted-foreground">
-                                          <CheckCircle2 className="h-10 w-10 mx-auto mb-2 text-green-500" />
-                                          <p>All packages verified!</p>
+                        </div>
+                        <ScrollArea className="h-full">
+                           <div className="p-4 space-y-2">
+                              {expectedPackages
+                                 .filter((p) => p.status === "scanned")
+                                 .map((pkg) => (
+                                    <div
+                                       key={pkg.hbl}
+                                       className="flex items-center justify-between p-3 rounded-lg border border-green-500/20 bg-green-500/5"
+                                    >
+                                       <div className="flex items-center gap-3">
+                                          <CheckCircle2 className="h-4 w-4 text-green-500" />
+                                          <span className=" text-sm">{pkg.hbl}</span>
+                                          <span className="text-xs text-muted-foreground">{pkg.description}</span>
                                        </div>
-                                    )}
-                                 </div>
-                              </ScrollArea>
-                           </TabsContent>
-
-                           <TabsContent value="completed" className="flex-1 min-h-0 mt-0">
-                              <ScrollArea className="h-full">
-                                 <div className="p-4 space-y-2">
-                                    {expectedPackages
-                                       .filter((p) => p.status === "scanned")
-                                       .map((pkg) => (
-                                          <div
-                                             key={pkg.hbl}
-                                             className="flex items-center justify-between p-3 rounded-lg border border-green-500/20 bg-green-500/5"
-                                          >
-                                             <div className="flex items-center gap-3">
-                                                <CheckCircle2 className="h-4 w-4 text-green-500" />
-                                                <span className=" text-sm">{pkg.hbl}</span>
-                                                <span className="text-xs text-muted-foreground">{pkg.description}</span>
-                                             </div>
-                                             <span className="text-xs text-muted-foreground">
-                                                {pkg.scannedAt?.toLocaleTimeString()}
-                                             </span>
-                                          </div>
-                                       ))}
-                                 </div>
-                              </ScrollArea>
-                           </TabsContent>
-                        </Tabs>
+                                       <span className="text-xs text-muted-foreground">
+                                          {pkg.scannedAt?.toLocaleTimeString()}
+                                       </span>
+                                    </div>
+                                 ))}
+                           </div>
+                        </ScrollArea>
                      </CardContent>
                   </Card>
                </div>
             </div>
-            {/*   )} */}
          </main>
       </div>
    );

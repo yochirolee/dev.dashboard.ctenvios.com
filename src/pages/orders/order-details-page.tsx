@@ -48,8 +48,6 @@ export default function OrderDetailsPage() {
 
    const { data: order, isLoading, error } = useOrders.getById(Number(orderId));
 
-   console.log(order, "Order Details Page");
-
    const subtotal = order?.order_items.reduce(
       (acc: number, item: OrderItems) =>
          acc +
@@ -64,7 +62,10 @@ export default function OrderDetailsPage() {
       0
    );
 
-   const total_weight = order?.order_items.reduce((acc: number, item: OrderItems) => acc + Number(item?.weight) || 0, 0);
+   const total_weight = order?.order_items.reduce(
+      (acc: number, item: OrderItems) => acc + Number(item?.weight) || 0,
+      0
+   );
    const handlePrintOrder = () => {
       window.open(`${baseUrl}/invoices/${orderId}/pdf`, "_blank");
    };
@@ -132,19 +133,19 @@ export default function OrderDetailsPage() {
                   </div>
                </div>
             </div>
-            <ButtonGroup>
+            <ButtonGroup orientation="horizontal" className="mx-auto md:mx-0">
                <Button onClick={handlePrintOrder} variant="outline">
                   <PrinterIcon className=" h-4 w-4" />
-                  Print Order
+                  Order
                </Button>
 
                <Button onClick={handlePrintLabels} variant="outline">
                   <TagIcon className=" h-4 w-4" />
-                  Print Labels
+                  Labels
                </Button>
                <Button onClick={handlePrintHbl} variant="outline">
                   <FileTextIcon className=" h-4 w-4" />
-                  Print HBL
+                  HBL
                </Button>
 
                <DropdownMenu>

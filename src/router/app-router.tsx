@@ -17,7 +17,7 @@ import { ContainersPage } from "@/pages/logistics/containers-page";
 import { FlightsPage } from "@/pages/logistics/flights-page";
 import OrderDetailsPage from "@/pages/orders/order-details-page";
 import { HomePage } from "@/pages/home-page";
-import { CreateDispatchPage } from "@/pages/logistics/create-dispatch-page";
+import { CreateDispatchPage } from "@/pages/logistics/Dispatch/create-dispatch-page";
 
 export const AppRouter = () => {
    return (

@@ -5,7 +5,7 @@ import { useState } from "react";
 import type { PaginationState } from "@tanstack/react-table";
 import { ButtonGroup } from "@/components/ui/button-group";
 import { Button } from "@/components/ui/button";
-import { PlusCircle } from "lucide-react";
+import {  PackageOpen, PackagePlus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 export const DispatchPage = () => {
@@ -29,8 +29,12 @@ export const DispatchPage = () => {
             </div>
             <ButtonGroup orientation="horizontal" className="w-fit">
                <Button variant="outline" onClick={() => navigate("/logistics/dispatch/create")}>
-                  <PlusCircle size={16} />
-                  <span className="hidden md:block">Nuevo Despacho</span>
+                  <PackagePlus size={16} />
+                  <span className="hidden md:block">Crear</span>
+               </Button>
+               <Button variant="outline" onClick={() => navigate("/logistics/dispatch/create")}>
+                  <PackageOpen size={16} />
+                  <span className="hidden md:block">Recibir</span>
                </Button>
             </ButtonGroup>
          </div>

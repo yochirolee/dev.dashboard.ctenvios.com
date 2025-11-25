@@ -72,7 +72,6 @@ const ReceiverForm = ({
 }) => {
    const { data: provinces } = useProvinces();
 
-   console.log(provinces, "provinces");
    const { setSelectedReceiver, selectedCustomer } = useOrderStore(
       useShallow((state) => ({
          selectedReceiver: state.selectedReceiver,
@@ -235,6 +234,61 @@ const ReceiverForm = ({
                   />
                </Field>
                <Separator />
+
+               <Field orientation="horizontal">
+                  <Controller
+                     control={form.control}
+                     name="first_name"
+                     render={({ field, fieldState }) => (
+                        <Field data-invalid={fieldState.invalid}>
+                           <FieldLabel htmlFor="first_name">Nombre</FieldLabel>
+
+                           <Input {...field} />
+
+                           {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                        </Field>
+                     )}
+                  />
+
+                  <Controller
+                     control={form.control}
+                     name="middle_name"
+                     render={({ field, fieldState }) => (
+                        <Field data-invalid={fieldState.invalid}>
+                           <FieldLabel htmlFor="middle_name">Segundo Nombre (Opcional)</FieldLabel>
+
+                           <Input {...field} />
+
+                           {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                        </Field>
+                     )}
+                  />
+               </Field>
+               <Field orientation="horizontal">
+                  <Controller
+                     control={form.control}
+                     name="last_name"
+                     render={({ field, fieldState }) => (
+                        <Field data-invalid={fieldState.invalid}>
+                           <FieldLabel htmlFor="last_name">Apellido</FieldLabel>
+                           <Input {...field} />
+                           {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                        </Field>
+                     )}
+                  />
+
+                  <Controller
+                     control={form.control}
+                     name="second_last_name"
+                     render={({ field, fieldState }) => (
+                        <Field data-invalid={fieldState.invalid}>
+                           <FieldLabel htmlFor="second_last_name">Segundo Apellido</FieldLabel>
+                           <Input {...field} />
+                           {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                        </Field>
+                     )}
+                  />
+               </Field>
                <Field orientation="horizontal">
                   <Controller
                      control={form.control}
@@ -310,62 +364,6 @@ const ReceiverForm = ({
                   />
                </Field>
                <Separator />
-
-               <Field orientation="horizontal">
-                  <Controller
-                     control={form.control}
-                     name="first_name"
-                     render={({ field, fieldState }) => (
-                        <Field data-invalid={fieldState.invalid}>
-                           <FieldLabel htmlFor="first_name">Nombre</FieldLabel>
-
-                           <Input {...field} />
-
-                           {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-                        </Field>
-                     )}
-                  />
-
-                  <Controller
-                     control={form.control}
-                     name="middle_name"
-                     render={({ field, fieldState }) => (
-                        <Field data-invalid={fieldState.invalid}>
-                           <FieldLabel htmlFor="middle_name">Segundo Nombre (Opcional)</FieldLabel>
-
-                           <Input {...field} />
-
-                           {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-                        </Field>
-                     )}
-                  />
-               </Field>
-               <Field orientation="horizontal">
-                  <Controller
-                     control={form.control}
-                     name="last_name"
-                     render={({ field, fieldState }) => (
-                        <Field data-invalid={fieldState.invalid}>
-                           <FieldLabel htmlFor="last_name">Apellido</FieldLabel>
-                           <Input {...field} />
-                           {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-                        </Field>
-                     )}
-                  />
-
-                  <Controller
-                     control={form.control}
-                     name="second_last_name"
-                     render={({ field, fieldState }) => (
-                        <Field data-invalid={fieldState.invalid}>
-                           <FieldLabel htmlFor="second_last_name">Segundo Apellido</FieldLabel>
-                           <Input {...field} />
-                           {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-                        </Field>
-                     )}
-                  />
-               </Field>
-
                <Field orientation="horizontal">
                   <Controller
                      control={form.control}
