@@ -96,11 +96,7 @@ export const orderColumns: ColumnDef<Order>[] = [
       header: "Orden",
       cell: ({ row }) => {
          return (
-            <Link
-               className="flex items-center gap-2"
-               target="_blank"
-               to={`${baseUrl}/invoices/${row.original?.id}/pdf`}
-            >
+            <Link className="flex items-center gap-2" target="_blank" to={`${baseUrl}/orders/${row.original?.id}/pdf`}>
                <FileBoxIcon size={16} className="shrink-0" />
                <span className="font-medium">{row.original?.id}</span>
             </Link>
@@ -117,7 +113,7 @@ export const orderColumns: ColumnDef<Order>[] = [
                <Link
                   className="flex items-center gap-2"
                   target="_blank"
-                  to={`${baseUrl}/invoices/${row.original?.id}/labels`}
+                  to={`${baseUrl}/orders/${row.original?.id}/labels-pdf`}
                >
                   <span>{row?.original?._count?.order_items || 0}</span>
                   <TagIcon size={16} />

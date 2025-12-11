@@ -67,13 +67,13 @@ export default function OrderDetailsPage() {
       0
    );
    const handlePrintOrder = () => {
-      window.open(`${baseUrl}/invoices/${orderId}/pdf`, "_blank");
+      window.open(`${baseUrl}/orders/${orderId}/pdf`, "_blank");
    };
    const handlePrintLabels = () => {
-      window.open(`${baseUrl}/invoices/${orderId}/labels`, "_blank");
+      window.open(`${baseUrl}/orders/${orderId}/labels-pdf`, "_blank");
    };
    const handlePrintHbl = () => {
-      window.open(`${baseUrl}/invoices/${orderId}/hbl-pdf`, "_blank");
+      window.open(`${baseUrl}/orders/${orderId}/hbls-pdf`, "_blank");
    };
 
    if (isLoading)
