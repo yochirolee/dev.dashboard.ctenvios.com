@@ -27,17 +27,20 @@ export const ReceiveDispatchPage = () => {
 
    const handleScan = (e?: React.FormEvent) => {
       e?.preventDefault();
-      if (!currentInput.trim()) return;
+      if (!currentInput.trim())
+         setLastScanStatus({
+            hbl: currentInput.trim(),
+            tracking_number: currentInput.trim(),
+            status: "surplus",
+            errorMessage: "No se encontró el paquete",
+         });
+      return;
    };
 
-   const { data } = useDispatches.getParcelsByDispatchId(
-      dispatchId ?? 0,
-      20,
-      parcelStatus.RECEIVED_IN_DISPATCH
-   );
+   const { data } = useDispatches.getParcelsByDispatchId(dispatchId ?? 0, 20, parcelStatus.RECEIVED_IN_DISPATCH);
 
    const parcelsInDispatch = data?.pages.flatMap((page) => page?.rows ?? []) ?? [];
-  
+
    console.log(parcelsInDispatch, "parcelsInDispatch");
 
    return (

@@ -4,7 +4,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { type ColumnDef } from "@tanstack/react-table";
 import { format } from "date-fns";
 import { formatFullName } from "@/lib/cents-utils";
-import { EllipsisVertical, FileBoxIcon, FileText, Pencil, TagIcon } from "lucide-react";
+import { EllipsisVertical, FileBoxIcon, Pencil, TagIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
    DropdownMenu,
@@ -69,7 +69,7 @@ export type Order = {
 const baseUrl = import.meta.env.VITE_API_URL;
 const oldBaseUrl = "https://systemcaribetravel.com/ordenes/factura_print.php?id=";
 
-   export const orderColumns: ColumnDef<Order>[] = [
+export const orderColumns: ColumnDef<Order>[] = [
    {
       id: "select",
       header: ({ table }) => (
