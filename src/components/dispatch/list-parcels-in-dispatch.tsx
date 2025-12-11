@@ -128,7 +128,7 @@ export const ParcelsInDispatch = ({
                                        <CheckCircle2 className="h-4 w-4 text-green-500" />
                                     </div>
                                     <div className="flex flex-col gap-1">
-                                       <div className="flex items-center gap-2">
+                                       <div className="flex-col md:flex-row items-center gap-2">
                                           <span className=" text-sm">{pkg.tracking_number}</span>
                                           <Badge variant="outline">Orden: {pkg.order_id}</Badge>
                                        </div>
