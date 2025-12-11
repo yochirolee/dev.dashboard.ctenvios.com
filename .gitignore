@@ -24,3 +24,6 @@ dist-ssr
 *.sw?
 #env files
 .env*.local
+
+#doc to study
+src/doc-to-study/*
