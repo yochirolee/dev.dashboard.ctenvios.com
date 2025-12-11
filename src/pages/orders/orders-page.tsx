@@ -10,9 +10,9 @@ import { DatePickerWithRange } from "@/components/dates/data-range-picker";
 import { useOrders } from "@/hooks/use-orders";
 import { ButtonGroup } from "@/components/ui/button-group";
 import usePagination from "@/hooks/use-pagination";
+
 export default function OrdersPage() {
    const navigate = useNavigate();
-
    const [searchQuery, setSearchQuery] = useState("");
    const [debouncedSearchQuery] = useDebounce(searchQuery, 500);
    const [date, setDate] = useState<Date | undefined>(undefined);
@@ -26,13 +26,13 @@ export default function OrdersPage() {
       date?.toISOString() || ""
    );
 
-   console.log(data, "data");
-
    const handleClearFilters = () => {
       setSearchQuery("");
       setPagination(pagination);
       setDate(undefined);
    };
+
+   console.log(data);
 
    return (
       <div className="flex flex-col gap-4">

@@ -14,6 +14,7 @@ import {
    agencySchema,
    userSchema,
    type Discount,
+   type ParcelStatus,
 } from "@/data/types";
 import { useAppStore } from "@/stores/app-store";
 import { toast } from "sonner";
@@ -57,17 +58,9 @@ axiosInstance.interceptors.request.use(
 // Add response interceptor for better error handling with React Query
 axiosInstance.interceptors.response.use(
    (response) => {
-      console.log(`✅ ${response.config.method?.toUpperCase()} ${response.config.url}`, {
-         status: response.status,
-         hasData: !!response.data,
-      });
       return response;
    },
    (error) => {
-      console.error(`❌ ${error.config.method?.toUpperCase()} ${error.config.url}`, {
-         status: error.response?.status,
-         hasData: !!error.response?.data,
-      });
       // Handle 401 Unauthorized responses
       if (error.response?.status === 401) {
          useAppStore.setState({ session: null, user: null, agency: null });
@@ -313,10 +306,7 @@ const api = {
          const response = await axiosInstance.get(`/agencies/${id}/active-services-with-rates`);
          return response.data;
       },
-      getItems: async (agency_id: number) => {
-         const response = await axiosInstance.get(`/agencies/${agency_id}/items`);
-         return response.data;
-      },
+     
    },
    customs: {
       get: async (page: number | 1, limit: number | 25) => {
@@ -420,6 +410,56 @@ const api = {
                limit: limit,
             },
          });
+         return response.data;
+      },
+
+      getById: async (dispatch_id: number) => {
+         const response = await axiosInstance.get(`/dispatches/${dispatch_id}`);
+         return response.data;
+      },
+      create: async () => {
+         const response = await axiosInstance.post("/dispatches");
+         return response.data;
+      },
+      deleteDispatch: async (dispatch_id: number) => {
+         const response = await axiosInstance.delete(`/dispatches/${dispatch_id}`);
+         return response.data;
+      },
+      addParcel: async (dispatch_id: number, hbl: string) => {
+         const response = await axiosInstance.post(`/dispatches/${dispatch_id}/add-parcel`, { hbl });
+         return response.data;
+      },
+      removeParcel: async (dispatch_id: number, hbl: string) => {
+         console.log(dispatch_id, hbl, "dispatch_id and hbl on remove parcel");
+         const response = await axiosInstance.delete(`/dispatches/${dispatch_id}/remove-parcel/${hbl}`);
+         return response.data;
+      },
+      readyForDispatch: async (page: number = 1, limit: number = 20) => {
+         const response = await axiosInstance.get(`/dispatches/ready-for-dispatch`, {
+            params: {
+               page,
+               limit,
+            },
+         });
+         return response.data;
+      },
+      getParcelsByDispatchId: async (
+         dispatch_id: number,
+         page: number = 1,
+         limit: number = 20,
+         status?: ParcelStatus
+      ) => {
+         const response = await axiosInstance.get(`/dispatches/${dispatch_id}/parcels`, {
+            params: {
+               page,
+               limit,
+               status,
+            },
+         });
+         return response.data;
+      },
+      finishDispatch: async (dispatch_id: number) => {
+         const response = await axiosInstance.post(`/dispatches/${dispatch_id}/complete-dispatch`);
          return response.data;
       },
    },

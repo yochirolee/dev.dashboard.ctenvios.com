@@ -45,7 +45,7 @@ export function ReceiverFormDialog() {
             <Button variant="outline">
                {selectedReceiver ? <UserRoundPenIcon /> : <UserRoundPlus />}
                <span className="hidden xl:block">
-                  {selectedReceiver ? "Editar Destinatario" : "Nuevo Destinatario"}
+                  {selectedReceiver ? "Editar" : "Crear"}
                </span>
             </Button>
          </DialogTrigger>

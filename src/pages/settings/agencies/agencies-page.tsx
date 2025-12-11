@@ -25,7 +25,7 @@ export const AgenciesPage = () => {
             <Skeleton className="h-[200px] w-full" />
             <Skeleton className="h-[400px] w-full" />
          </div>
-      )
+      );
    if (error) return <div className="space-y-4 container max-w-screen-xl mx-auto">Error loading agencies</div>;
 
    return (
@@ -50,7 +50,7 @@ export const AgenciesPage = () => {
                         navigate("/settings/agencies/new");
                      }}
                   >
-                     <PlusCircle size={16} /> <span className="hidden md:block">Nueva Agencia</span>
+                     <PlusCircle size={16} /> <span className="hidden md:block">Crear Agencia</span>
                   </Button>
                </ButtonGroup>
             )}

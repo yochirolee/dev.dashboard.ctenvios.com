@@ -4,7 +4,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { type ColumnDef } from "@tanstack/react-table";
 import { format } from "date-fns";
 import { formatFullName } from "@/lib/cents-utils";
-import { EllipsisVertical, FileText, Pencil, TagIcon } from "lucide-react";
+import { EllipsisVertical, FileBoxIcon, FileText, Pencil, TagIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
    DropdownMenu,
@@ -18,7 +18,7 @@ import { DeleteOrderDialog } from "@/pages/orders/delete-order-dialog";
 
 // This type is used to define the shape of our data.
 // You can use a Zod schema here if you want.
-export type Invoice = {
+export type Order = {
    id: number;
    partner_order_id: string;
    agency: {
@@ -62,14 +62,14 @@ export type Invoice = {
       name: string;
    };
    _count: {
-      items: number;
+      order_items: number;
    };
 };
 
 const baseUrl = import.meta.env.VITE_API_URL;
 const oldBaseUrl = "https://systemcaribetravel.com/ordenes/factura_print.php?id=";
 
-export const orderColumns: ColumnDef<Invoice>[] = [
+   export const orderColumns: ColumnDef<Order>[] = [
    {
       id: "select",
       header: ({ table }) => (
@@ -93,7 +93,7 @@ export const orderColumns: ColumnDef<Invoice>[] = [
 
    {
       accessorKey: "id",
-      header: "Factura",
+      header: "Orden",
       cell: ({ row }) => {
          return (
             <Link
@@ -101,7 +101,7 @@ export const orderColumns: ColumnDef<Invoice>[] = [
                target="_blank"
                to={`${baseUrl}/invoices/${row.original?.id}/pdf`}
             >
-               <FileText size={16} className="shrink-0" />
+               <FileBoxIcon size={16} className="shrink-0" />
                <span className="font-medium">{row.original?.id}</span>
             </Link>
          );
@@ -119,7 +119,7 @@ export const orderColumns: ColumnDef<Invoice>[] = [
                   target="_blank"
                   to={`${baseUrl}/invoices/${row.original?.id}/labels`}
                >
-                  <span>{row?.original?._count.items}</span>
+                  <span>{row?.original?._count?.order_items || 0}</span>
                   <TagIcon size={16} />
                </Link>
             </Badge>
@@ -301,7 +301,7 @@ export const orderColumns: ColumnDef<Invoice>[] = [
                   <DropdownMenuContent align="end">
                      <Link to={`/orders/${row.original.id}`}>
                         <DropdownMenuItem>
-                           <FileText className="w-4 h-4 mr-2" />
+                           <FileBoxIcon className="w-4 h-4 mr-2" />
                            Details
                         </DropdownMenuItem>
                      </Link>

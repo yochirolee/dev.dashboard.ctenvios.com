@@ -288,9 +288,34 @@ export interface OrderItems {
 }
 
 /// DISPATCH
+export const dispatchStatus = {
+   DRAFT: "DRAFT",
+   DISPACHED: "DISPACHED",
+   RECEIVED: "RECEIVED",
+   DISCREPANCY: "DISCREPANCY",
+   CANCELLED: "CANCELLED",
+} as const;
+export const paymentStatus = {
+   PENDING: "PENDING",
+   PAID: "PAID",
+   PARTIALLY_PAID: "PARTIALLY_PAID",
+   CANCELLED: "CANCELLED",
+} as const;
+
+export const parcelStatus = {
+   IN_AGENCY: "IN_AGENCY",
+   IN_PALLLET: "IN_PALLLET",
+   IN_DISPATCH: "IN_DISPATCH",
+   RECEIVED_IN_DISPATCH: "RECEIVED_IN_DISPATCH",
+   IN_CONTAINER: "IN_CONTAINER",
+} as const;
+export type ParcelStatus = (typeof parcelStatus)[keyof typeof parcelStatus];
+export type DispatchStatus = (typeof dispatchStatus)[keyof typeof dispatchStatus];
+export type PaymentStatus = (typeof paymentStatus)[keyof typeof paymentStatus];
+
 export interface Dispatch {
    id: number;
-   status: "PENDING" | "RECEIVED" | "DISPATCHED" | "DELIVERED" | "CANCELLED";
+   status: DispatchStatus;
    sender_agency: {
       id: number;
       name: string;
@@ -303,10 +328,28 @@ export interface Dispatch {
       id: number;
       name: string;
    };
+   declared_parcels_count: number;
+   received_parcels_count: number;
+   declared_weight: number;
    weight: number;
-   total_in_cents: number;
+   declared_cost_in_cents: number;
+   cost_in_cents: number;
+   payment_status: PaymentStatus;
+
    created_at: string;
    updated_at: string;
+   created_by: {
+      id: number;
+      name: string;
+   };
+   received_by: {
+      id: number;
+      name: string;
+   };
+   paid_by: {
+      id: number;
+      name: string;
+   };
    _count: {
       order_items: number;
    };

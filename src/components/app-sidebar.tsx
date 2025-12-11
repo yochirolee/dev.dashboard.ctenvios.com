@@ -38,12 +38,12 @@ const navMainItems: SidebarItem[] = [
       title: "Logistica",
       url: "#",
       icon: Warehouse,
-      allowedRoles: ["ROOT", "ADMINISTRATOR"],
+      allowedRoles: ["ROOT", "ADMINISTRATOR", "AGENCY_ADMIN"],
       items: [
          {
             title: "Despachos",
             url: "/logistics/dispatch",
-            allowedRoles: ["ROOT", "ADMINISTRATOR"],
+            allowedRoles: ["ROOT", "ADMINISTRATOR", "AGENCY_ADMIN"],
          },
          {
             title: "Contenedores",
@@ -61,7 +61,7 @@ const navMainItems: SidebarItem[] = [
       title: "Settings",
       url: "#",
       icon: Settings2,
-      allowedRoles: ["ROOT", "ADMINISTRATOR"],
+      allowedRoles: ["ROOT", "ADMINISTRATOR", "AGENCY_ADMIN"],
       items: [
          {
             title: "Providers",
@@ -71,7 +71,7 @@ const navMainItems: SidebarItem[] = [
          {
             title: "Agencies",
             url: "/settings/agencies",
-            allowedRoles: ["ROOT", "ADMINISTRATOR"],
+            allowedRoles: ["ROOT", "ADMINISTRATOR", "AGENCY_ADMIN"],
          },
          {
             title: "Customers",

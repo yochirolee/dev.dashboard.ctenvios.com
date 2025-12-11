@@ -17,8 +17,7 @@ export const CustomsPage = () => {
    const { pagination, setPagination } = usePagination();
    const { data, isLoading } = useCustoms.search(debouncedSearchQuery, pagination.pageIndex, pagination.pageSize);
 
-   console.log(data, "data");
-
+   
    const [customsRate, setCustomsRate] = useState<Customs | undefined>(undefined);
    const [open, setOpen] = useState(false);
    const [openDeleteDialog, setOpenDeleteDialog] = useState(false);

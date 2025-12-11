@@ -12,12 +12,13 @@ import ProvidersServicesPage from "@/pages/settings/providers-services-page";
 import { EditOrderPage } from "@/pages/orders/edit-order-page";
 import { ReceiversPage } from "@/pages/settings/receiver-page";
 import { NewAgencyPage } from "@/pages/settings/agencies/new-agency-page";
-import { DispatchPage } from "@/pages/logistics/dispatch-page";
 import { ContainersPage } from "@/pages/logistics/containers-page";
 import { FlightsPage } from "@/pages/logistics/flights-page";
 import OrderDetailsPage from "@/pages/orders/order-details-page";
 import { HomePage } from "@/pages/home-page";
 import { CreateDispatchPage } from "@/pages/logistics/Dispatch/create-dispatch-page";
+import { ReceiveDispatchPage } from "@/pages/logistics/Dispatch/receive-dispatch-page";
+import { DispatchPageLists } from "@/pages/logistics/dispatch-page-list";
 
 export const AppRouter = () => {
    return (
@@ -35,20 +36,20 @@ export const AppRouter = () => {
                   <Route path=":orderId/edit" element={<EditOrderPage />} />
                   <Route path=":orderId" element={<OrderDetailsPage />} />
                </Route>
-               <Route element={<ProtectedRoute allowedRoles={["ROOT", "ADMINISTRATOR"]} />}>
+               <Route element={<ProtectedRoute allowedRoles={["ROOT", "ADMINISTRATOR", "AGENCY_ADMIN"]} />}>
                   <Route path="logistics">
-                     //child routes for dispatch
                      <Route index element={<Navigate to="dispatch" replace />} />
                      <Route path="dispatch">
                         <Route index element={<Navigate to="list" replace />} />
-                        <Route path="list" element={<DispatchPage />} />
-                        <Route path="create" element={<CreateDispatchPage />} />
+                        <Route path="list" element={<DispatchPageLists />} />
+                        <Route path="create/:dispatchId" element={<CreateDispatchPage />} />
+                        <Route path="receive/" element={<ReceiveDispatchPage />} />
                      </Route>
                      <Route path="containers" element={<ContainersPage />} />
                      <Route path="flights" element={<FlightsPage />} />
                   </Route>
                </Route>
-               <Route element={<ProtectedRoute allowedRoles={["ROOT", "ADMINISTRATOR"]} />}>
+               <Route element={<ProtectedRoute allowedRoles={["ROOT", "ADMINISTRATOR", "AGENCY_ADMIN"]} />}>
                   <Route path="settings">
                      <Route index element={<Navigate to="providers" replace />} />
                      <Route path="providers" element={<ProvidersServicesPage />} />

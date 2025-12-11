@@ -38,8 +38,8 @@ export function DeleteOrderDialog({ order_id, asRedirect }: { order_id: number; 
    return (
       <AlertDialog>
          <AlertDialogTrigger asChild>
-            <Button variant="ghost" className=" w-full flex justify-start items-center gap-2  ">
-               <TrashIcon className="size-4 text-destructive mr-2" />
+            <Button variant="ghost" className=" w-full flex justify-start items-center gap-4  ">
+               <TrashIcon className="size-4 text-destructive -ml-1 " />
                Eliminar
             </Button>
          </AlertDialogTrigger>

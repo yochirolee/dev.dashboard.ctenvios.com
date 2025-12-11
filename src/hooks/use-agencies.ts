@@ -1,6 +1,6 @@
 //user agencies hooks
-import { useMutation, useQuery } from "@tanstack/react-query";
 import api from "@/api/api";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { type Agency, agencySchema, userSchema } from "@/data/types";
 import { queryClient } from "@/lib/query-client";
 import { z } from "zod";
@@ -68,14 +68,6 @@ export const useAgencies = {
       return useQuery({
          queryKey: ["get-active-services-with-rates", agency_id],
          queryFn: () => api.agencies.getActiveServicesWithRates(agency_id),
-         enabled: !!agency_id,
-         staleTime: 1000 * 60 * 60 * 24,
-      });
-   },
-   getItems: (agency_id: number) => {
-      return useQuery({
-         queryKey: ["get-items", agency_id],
-         queryFn: () => api.agencies.getItems(agency_id),
          enabled: !!agency_id,
          staleTime: 1000 * 60 * 60 * 24,
       });
