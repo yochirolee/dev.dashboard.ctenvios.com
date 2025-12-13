@@ -8,7 +8,7 @@ import { useAppStore } from "@/stores/app-store";
 export function PartnersLogsPage() {
    const { pagination, setPagination } = usePagination();
    const { data, isLoading } = useShape({
-      url: `http://localhost:3000/api/v1/electric/shape`,
+      url: `https://api.ctenvios.com/v1/shape`,
       params: {
          table: `"PartnerLog"`,
          orderBy: `"id"`,
