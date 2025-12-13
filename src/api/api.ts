@@ -306,7 +306,6 @@ const api = {
          const response = await axiosInstance.get(`/agencies/${id}/active-services-with-rates`);
          return response.data;
       },
-     
    },
    customs: {
       get: async (page: number | 1, limit: number | 25) => {
@@ -451,7 +450,7 @@ const api = {
       ) => {
          const response = await axiosInstance.get(`/dispatches/${dispatch_id}/parcels`, {
             params: {
-               page,
+               page: page + 1,
                limit,
                status,
             },
@@ -460,6 +459,57 @@ const api = {
       },
       finishDispatch: async (dispatch_id: number) => {
          const response = await axiosInstance.post(`/dispatches/${dispatch_id}/complete-dispatch`);
+         return response.data;
+      },
+   },
+   logs: {
+      getAppLogs: async (
+         page: number = 1,
+         limit: number = 20,
+         filters?: {
+            level?: string;
+            source?: string;
+            status_code?: number;
+            user_id?: string;
+            path?: string;
+            method?: string;
+            startDate?: Date;
+            endDate?: Date;
+         }
+      ) => {
+         const params: Record<string, string | number> = {
+            page: page + 1,
+            limit,
+         };
+
+         if (filters) {
+            if (filters.level) params.level = filters.level;
+            if (filters.source) params.source = filters.source;
+            if (filters.status_code !== undefined) params.status_code = filters.status_code;
+            if (filters.user_id) params.user_id = filters.user_id;
+            if (filters.path) params.path = filters.path;
+            if (filters.method) params.method = filters.method;
+            if (filters.startDate) params.startDate = filters.startDate.toISOString();
+            if (filters.endDate) params.endDate = filters.endDate.toISOString();
+         }
+
+         const response = await axiosInstance.get(`/logs`, {
+            params,
+         });
+         return response.data;
+      },
+      toggleAppLogs: async (currentAppLogsStatus: boolean) => {
+         const response = await axiosInstance.put(`/config/logging-status`, {
+            enabled: !currentAppLogsStatus,
+         });
+         return response.data;
+      },
+      logStatus: async () => {
+         const response = await axiosInstance.get(`/config/logging-status`);
+         return response.data;
+      },
+      deleteAllLogs: async () => {
+         const response = await axiosInstance.delete(`/logs`);
          return response.data;
       },
    },

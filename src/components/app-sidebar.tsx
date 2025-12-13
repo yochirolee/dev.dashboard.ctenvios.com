@@ -1,5 +1,5 @@
 import * as React from "react";
-import { FileBox, HomeIcon, Settings2, Warehouse, type LucideIcon } from "lucide-react";
+import { FileBox, FileStack, HomeIcon, Settings2, Warehouse, type LucideIcon } from "lucide-react";
 import { NavMain } from "@/components/nav-main";
 import { NavUser } from "@/components/nav-user";
 import { TeamSwitcher } from "@/components/team-switcher";
@@ -7,6 +7,7 @@ import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarRail } fr
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "./ui/button";
 import { useAppStore } from "@/stores/app-store";
+import { NavConfig } from "./nav-config";
 
 interface SidebarSubItem {
    title: string;
@@ -95,6 +96,28 @@ const navMainItems: SidebarItem[] = [
          },
       ],
    },
+  
+];
+
+const navConfigItems: SidebarItem[] = [
+   {
+      title: "Logs",
+      url: "#",
+      icon: FileStack,
+      allowedRoles: ["ROOT", "ADMINISTRATOR", "AGENCY_ADMIN"],
+      items: [
+         {
+            title: "App Logs",
+            url: "/logs/app-logs",
+            allowedRoles: ["ROOT", "ADMINISTRATOR"],
+         },
+         {
+            title: "Partners Logs",
+            url: "/logs/partners-logs",
+            allowedRoles: ["ROOT", "ADMINISTRATOR"],
+         },
+      ],
+   },
 ];
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
@@ -133,7 +156,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
    );
 
    const filteredNavMain = React.useMemo(() => filterByRole(navMainItems), [filterByRole]);
-
+   const filteredNavConfig = React.useMemo(() => filterByRole(navConfigItems), [filterByRole]);
    return (
       <Sidebar collapsible="icon" {...props}>
          <SidebarHeader>
@@ -147,6 +170,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                </Button>
             </Link>
             <NavMain items={filteredNavMain} />
+            <NavConfig items={filteredNavConfig} />
          </SidebarContent>
          <SidebarFooter>
             <NavUser />

@@ -13,27 +13,27 @@ import {
 } from "@/components/ui/sidebar";
 import { cn } from "@/lib/utils";
 
-interface NavMarketplaceSubItem {
+interface NavConfigSubItem {
    title: string;
    url: string;
    allowedRoles?: string[];
 }
 
-interface NavMarketplaceItem {
+interface NavConfigItem {
    title: string;
    url: string;
    icon?: LucideIcon;
    isActive?: boolean;
    allowedRoles?: string[];
-   items?: NavMarketplaceSubItem[];
+   items?: NavConfigSubItem[];
 }
 
-export function NavMarketplace({ items }: { items: NavMarketplaceItem[] }) {
+export function NavConfig({ items }: { items: NavConfigItem[] }) {
    const location = useLocation();
 
    return (
       <SidebarGroup>
-         <SidebarGroupLabel>Marketplace</SidebarGroupLabel>
+         <SidebarGroupLabel>Config and Logs</SidebarGroupLabel>
          <SidebarMenu>
             {items.map((item) => (
                <Collapsible key={item.title} asChild defaultOpen={item.isActive} className="group/collapsible">

@@ -98,7 +98,7 @@ export const orderColumns: ColumnDef<Order>[] = [
          return (
             <Link className="flex items-center gap-2" target="_blank" to={`${baseUrl}/orders/${row.original?.id}/pdf`}>
                <FileBoxIcon size={16} className="shrink-0" />
-               <span className="font-medium">{row.original?.id}</span>
+               <span className="font-mono text-xs text-muted-foreground ">{row.original?.id}</span>
             </Link>
          );
       },
@@ -109,7 +109,7 @@ export const orderColumns: ColumnDef<Order>[] = [
       header: "Labels",
       cell: ({ row }) => {
          return (
-            <Badge variant="secondary" className="flex items-center gap-2 w-fit">
+            <Badge variant="secondary" className="flex items-center gap-2 w-fit font-mono text-xs text-muted-foreground ">
                <Link
                   className="flex items-center gap-2"
                   target="_blank"
@@ -178,7 +178,7 @@ export const orderColumns: ColumnDef<Order>[] = [
                   <div className="truncate text-sm font-medium" title={fullName}>
                      {fullName}
                   </div>
-                  <div className="text-xs text-muted-foreground truncate" title={customer?.mobile}>
+                  <div className="font-mono text-xs text-muted-foreground truncate" title={customer?.mobile}>
                      {customer?.mobile}
                   </div>
                </div>
@@ -211,7 +211,7 @@ export const orderColumns: ColumnDef<Order>[] = [
                   <div className="truncate text-sm font-medium" title={fullName}>
                      {fullName}
                   </div>
-                  <div className="text-xs text-muted-foreground truncate" title={receiver?.mobile}>
+                  <div className="font-mono text-xs text-muted-foreground truncate" title={receiver?.mobile}>
                      {receiver?.mobile}
                   </div>
                </div>
@@ -250,8 +250,10 @@ export const orderColumns: ColumnDef<Order>[] = [
       cell: ({ row }) => {
          return (
             <div className="text-sm whitespace-nowrap flex flex-col ">
-               <span className="text-xs ">{format(new Date(row.original?.created_at), "dd/MM/yyyy HH:mm a")}</span>
-               <span className="text-xs text-muted-foreground">{row.original?.user?.name}</span>
+               <span className="font-mono text-xs text-muted-foreground ">
+                  {format(new Date(row.original?.created_at), "dd/MM/yyyy HH:mm a")}
+               </span>
+               <span className=" text-xs text-muted-foreground ">{row.original?.user?.name}</span>
             </div>
          );
       },
@@ -272,9 +274,9 @@ export const orderColumns: ColumnDef<Order>[] = [
       header: "Total",
       cell: ({ row }) => {
          return (
-            <div className="text-right font-medium whitespace-nowrap flex flex-col items-end">
+            <div className="text-right font-mono text-sm text-mute whitespace-nowrap flex flex-col items-end">
                ${(row.original?.total_in_cents / 100).toFixed(2)}
-               <span className="text-xs text-muted-foreground">
+               <span className="font-mono text-xs text-muted-foreground">
                   {(row.original?.total_in_cents - row.original?.paid_in_cents) / 100 !== 0 &&
                      ` ${((row.original?.total_in_cents - row.original?.paid_in_cents) / 100).toFixed(2)}`}
                </span>
