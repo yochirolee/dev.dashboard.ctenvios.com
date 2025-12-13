@@ -19,8 +19,8 @@ import { HomePage } from "@/pages/home-page";
 import { CreateDispatchPage } from "@/pages/logistics/Dispatch/create-dispatch-page";
 import { ReceiveDispatchPage } from "@/pages/logistics/Dispatch/receive-dispatch-page";
 import { DispatchPageLists } from "@/pages/logistics/dispatch-page-list";
-import AppLogsPage from "../pages/logs/app-logs-page";
-import PartnersLogsPage from "../pages/logs/partners-logs-page";
+import AppLogsPage from "@/pages/logs/app-logs-page";
+import PartnersLogsPage from "@/pages/logs/partners-logs-page";
 
 export const AppRouter = () => {
    return (
