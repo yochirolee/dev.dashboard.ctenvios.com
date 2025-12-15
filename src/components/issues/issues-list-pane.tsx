@@ -1,6 +1,6 @@
 import { formatDistanceToNow } from "date-fns";
 import { cn } from "@/lib/utils";
-import { MoreHorizontal, MessageSquare, Paperclip, UserCheck, Package } from "lucide-react";
+import {  MessageSquare, Paperclip, UserCheck, Package } from "lucide-react";
 import type { Issue } from "@/data/types";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";

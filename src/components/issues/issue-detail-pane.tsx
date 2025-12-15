@@ -1,16 +1,5 @@
 import { useIssues } from "@/hooks/use-issues";
-import {
-   CheckCircle2,
-   Edit2,
-   Lock,
-   Paperclip,
-   Trash2,
-   FileWarning,
-   MoreVertical,
-   Smile,
-   Mic,
-   Check,
-} from "lucide-react";
+import { CheckCircle2, Edit2, Lock, Paperclip, FileWarning, MoreVertical, Mic, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
 import { Textarea } from "@/components/ui/textarea";

@@ -53,10 +53,11 @@ type FormValues = z.infer<typeof formSchema>;
 
 interface CreateIssueFormProps {
    initialOrderId?: number;
+   initialParcelId?: number;
    onSuccess?: () => void;
 }
 
-export function CreateIssueForm({ initialOrderId, onSuccess }: CreateIssueFormProps) {
+export function CreateIssueForm({ initialOrderId, initialParcelId, onSuccess }: CreateIssueFormProps) {
    const navigate = useNavigate();
    const [orderIdInput, setOrderIdInput] = useState<string>(initialOrderId?.toString() || "");
    const [selectedParcelIds, setSelectedParcelIds] = useState<number[]>([]);
@@ -97,9 +98,16 @@ export function CreateIssueForm({ initialOrderId, onSuccess }: CreateIssueFormPr
          if (currentOrderId !== order.id) {
             form.setValue("order_id", order.id, { shouldValidate: false, shouldDirty: false });
          }
+         // Pre-select initial parcel if provided and order is loaded
+         if (initialParcelId && order.order_items) {
+            const parcelExists = order.order_items.some((item: OrderItems) => item.id === initialParcelId);
+            if (parcelExists && !selectedParcelIds.includes(initialParcelId)) {
+               setSelectedParcelIds([initialParcelId]);
+            }
+         }
       }
       // eslint-disable-next-line react-hooks/exhaustive-deps
-   }, [order?.id]);
+   }, [order?.id, initialParcelId]);
 
    // Update form when selected parcels change - use JSON string comparison to avoid reference issues
    const prevSelectedParcelIdsStringRef = useRef<string>("");
