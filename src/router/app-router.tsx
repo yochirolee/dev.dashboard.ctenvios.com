@@ -21,6 +21,8 @@ import { ReceiveDispatchPage } from "@/pages/logistics/Dispatch/receive-dispatch
 import { DispatchPageLists } from "@/pages/logistics/dispatch-page-list";
 import { AppLogsPage } from "@/pages/app-logs/app-logs-page";
 import { PartnersLogsPage } from "@/pages/app-logs/partners-logs-page";
+import IssuesPage from "@/pages/issues/issues-page";
+import NewIssuePage from "@/pages/issues/new-issue-page";
 
 export const AppRouter = () => {
    return (
@@ -69,6 +71,11 @@ export const AppRouter = () => {
                      <Route path="app-logs" element={<AppLogsPage />} />
                      <Route path="partners-logs" element={<PartnersLogsPage />} />
                   </Route>
+               </Route>
+               <Route path="issues">
+                  <Route index element={<IssuesPage />} />
+                  <Route path="new" element={<NewIssuePage />} />
+                  <Route path=":issueId" element={<IssuesPage />} />
                </Route>
             </Route>
          </Route>

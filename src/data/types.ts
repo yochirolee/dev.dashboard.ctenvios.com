@@ -313,6 +313,149 @@ export type ParcelStatus = (typeof parcelStatus)[keyof typeof parcelStatus];
 export type DispatchStatus = (typeof dispatchStatus)[keyof typeof dispatchStatus];
 export type PaymentStatus = (typeof paymentStatus)[keyof typeof paymentStatus];
 
+// Issue Types
+export const issueType = {
+   BUG: "BUG",
+   FEATURE_REQUEST: "FEATURE_REQUEST",
+   QUESTION: "QUESTION",
+   COMPLAINT: "COMPLAINT",
+   OTHER: "OTHER",
+} as const;
+
+export const issuePriority = {
+   LOW: "LOW",
+   MEDIUM: "MEDIUM",
+   HIGH: "HIGH",
+   URGENT: "URGENT",
+} as const;
+
+export const issueStatus = {
+   OPEN: "OPEN",
+   IN_PROGRESS: "IN_PROGRESS",
+   RESOLVED: "RESOLVED",
+   CLOSED: "CLOSED",
+} as const;
+
+export type IssueType = (typeof issueType)[keyof typeof issueType];
+export type IssuePriority = (typeof issuePriority)[keyof typeof issuePriority];
+export type IssueStatus = (typeof issueStatus)[keyof typeof issueStatus];
+
+export interface IssueComment {
+   id: number;
+   content: string;
+   is_internal: boolean;
+   created_at: string;
+   updated_at: string;
+   user: {
+      id: string;
+      name: string;
+      email: string;
+   };
+}
+
+export interface IssueAttachment {
+   id: number;
+   file_url: string;
+   file_name: string;
+   file_type: string;
+   file_size?: number;
+   description?: string;
+   created_at: string;
+   created_by: {
+      id: string;
+      name: string;
+   };
+}
+
+export interface Issue {
+   id: number;
+   title: string;
+   description: string;
+   type: IssueType;
+   priority: IssuePriority;
+   status: IssueStatus;
+   order_id?: number;
+   parcel_id?: number;
+   affected_parcel_ids?: number[];
+   order_item_hbl?: string;
+   assigned_to_id?: string;
+   assigned_to?: {
+      id: string;
+      name: string;
+      email: string;
+   };
+   created_by: {
+      id: string;
+      name: string;
+      email: string;
+   };
+   resolution_notes?: string;
+   created_at: string;
+   updated_at: string;
+   comments?: IssueComment[];
+   attachments?: IssueAttachment[];
+   order?: {
+      id: number;
+      partner_order_id?: string;
+   };
+   parcel?: {
+      id: number;
+      hbl: string;
+   };
+   _count?: {
+      comments?: number;
+      attachments?: number;
+   };
+}
+
+export const createIssueSchema = z
+   .object({
+      title: z.string().min(1, "Title is required"),
+      description: z.string().min(1, "Description is required"),
+      type: z.nativeEnum(issueType).optional(),
+      priority: z.nativeEnum(issuePriority).optional(),
+      order_id: z.number().positive().optional(),
+      parcel_id: z.number().positive().optional(),
+      affected_parcel_ids: z.array(z.number().positive()).optional(),
+      order_item_hbl: z.string().optional(),
+      assigned_to_id: z.string().uuid().optional(),
+   })
+   .refine(
+      (data) => data.order_id || data.parcel_id || (data.affected_parcel_ids && data.affected_parcel_ids.length > 0),
+      { message: "Either order_id, parcel_id, or affected_parcel_ids must be provided" }
+   )
+   .refine((data) => !data.affected_parcel_ids || data.order_id, {
+      message: "affected_parcel_ids requires order_id",
+   });
+
+export const updateIssueSchema = z.object({
+   title: z.string().min(1).optional(),
+   description: z.string().min(1).optional(),
+   type: z.nativeEnum(issueType).optional(),
+   priority: z.nativeEnum(issuePriority).optional(),
+   status: z.nativeEnum(issueStatus).optional(),
+   assigned_to_id: z.string().uuid().nullable().optional(),
+   resolution_notes: z.string().optional(),
+});
+
+export const addCommentSchema = z.object({
+   content: z.string().min(1, "Content is required"),
+   is_internal: z.boolean().optional(),
+});
+
+export const addAttachmentSchema = z.object({
+   file_url: z.string().url("Invalid file URL"),
+   file_name: z.string().min(1, "File name is required"),
+   file_type: z.string().min(1, "File type is required"),
+   file_size: z.number().positive().optional(),
+   description: z.string().optional(),
+});
+
+export type CreateIssueInput = z.infer<typeof createIssueSchema>;
+export type UpdateIssueInput = z.infer<typeof updateIssueSchema>;
+export type AddCommentInput = z.infer<typeof addCommentSchema>;
+export type AddAttachmentInput = z.infer<typeof addAttachmentSchema>;
+
 export interface Dispatch {
    id: number;
    status: DispatchStatus;

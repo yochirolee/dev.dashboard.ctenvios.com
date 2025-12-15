@@ -7,8 +7,9 @@ import { useAppStore } from "@/stores/app-store";
 
 export function PartnersLogsPage() {
    const { pagination, setPagination } = usePagination();
+   const apiBaseUrl = import.meta.env.VITE_API_URL || "http://localhost:3000/api/v1";
    const { data, isLoading } = useShape({
-      url: `https://api.ctenvios.com/v1/shape`,
+      url: `${apiBaseUrl}/electric/shape`,
       params: {
          table: `"PartnerLog"`,
          orderBy: `"id"`,
