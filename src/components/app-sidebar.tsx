@@ -1,5 +1,5 @@
 import * as React from "react";
-import { FileBox, FileStack, HomeIcon, Settings2, Warehouse, type LucideIcon } from "lucide-react";
+import { AlertCircle, FileBox, FileStack, HomeIcon, Settings2, Warehouse, type LucideIcon } from "lucide-react";
 import { NavMain } from "@/components/nav-main";
 import { NavUser } from "@/components/nav-user";
 import { TeamSwitcher } from "@/components/team-switcher";
@@ -8,6 +8,7 @@ import { Link, useLocation } from "react-router-dom";
 import { Button } from "./ui/button";
 import { useAppStore } from "@/stores/app-store";
 import { NavConfig } from "./nav-config";
+import { NavIssues } from "./nav-issues";
 
 interface SidebarSubItem {
    title: string;
@@ -23,6 +24,7 @@ interface SidebarItem {
    allowedRoles?: string[];
    items?: SidebarSubItem[];
 }
+
 
 const navMainItems: SidebarItem[] = [
    {
@@ -96,7 +98,6 @@ const navMainItems: SidebarItem[] = [
          },
       ],
    },
-  
 ];
 
 const navConfigItems: SidebarItem[] = [
@@ -115,6 +116,22 @@ const navConfigItems: SidebarItem[] = [
             title: "Partners Logs",
             url: "/logs/partners-logs",
             allowedRoles: ["ROOT", "ADMINISTRATOR"],
+         },
+      ],
+   },
+];
+
+const navIssuesItems: SidebarItem[] = [
+   {
+      title: "Issues",
+      url: "#",
+      icon: AlertCircle,
+      allowedRoles: ["ROOT", "ADMINISTRATOR", "AGENCY_ADMIN"],
+      items: [
+         {
+            title: "Reclamaciones",
+            url: "/issues",
+            allowedRoles: ["ROOT", "ADMINISTRATOR", "AGENCY_ADMIN"],
          },
       ],
    },
@@ -157,6 +174,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
    const filteredNavMain = React.useMemo(() => filterByRole(navMainItems), [filterByRole]);
    const filteredNavConfig = React.useMemo(() => filterByRole(navConfigItems), [filterByRole]);
+   const filteredNavIssues = React.useMemo(() => filterByRole(navIssuesItems), [filterByRole]);
    return (
       <Sidebar collapsible="icon" {...props}>
          <SidebarHeader>
@@ -170,6 +188,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                </Button>
             </Link>
             <NavMain items={filteredNavMain} />
+            <NavIssues items={filteredNavIssues} />
             <NavConfig items={filteredNavConfig} />
          </SidebarContent>
          <SidebarFooter>
