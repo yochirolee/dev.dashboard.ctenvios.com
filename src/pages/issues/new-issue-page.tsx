@@ -7,7 +7,7 @@ export default function NewIssuePage() {
    const parcelId = searchParams.get("parcel_id");
 
    return (
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-4 p-2 md:p-4 container max-w-screen-xl mx-auto">
          <div className="flex flex-col">
             <h3 className="font-bold">Create New Issue</h3>
             <p className="text-sm text-gray-500">Report a new issue or problem</p>

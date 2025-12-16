@@ -1,6 +1,6 @@
-import { formatDistanceToNow } from "date-fns";
 import { cn } from "@/lib/utils";
-import {  MessageSquare, Paperclip, UserCheck, Package } from "lucide-react";
+import { formatRelativeTime } from "@/lib/format-relative-time";
+import {  Paperclip, UserCheck, Package } from "lucide-react";
 import type { Issue } from "@/data/types";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
@@ -8,6 +8,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { ScrollArea } from "../ui/scroll-area";
 import { Badge } from "../ui/badge";
 import { Link } from "react-router-dom";
+import { Spinner } from "../ui/spinner";
 
 interface IssuesListPaneProps {
    issues: Issue[];
@@ -48,35 +49,19 @@ export function IssuesListPane({
    if (isLoading) {
       return (
          <div className="flex items-center justify-center h-full">
-            <div className="text-sm text-muted-foreground">Loading issues...</div>
+            <Spinner className="w-4 h-4" />
          </div>
       );
    }
-
-   // Helper to format relative time
-   const formatRelativeTime = (date: Date): string => {
-      const now = new Date();
-      const diffInHours = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60));
-
-      if (diffInHours < 1) return "Just now";
-      if (diffInHours < 24) return `${diffInHours} hour${diffInHours > 1 ? "s" : ""}`;
-      if (diffInHours < 48) return "Yesterday";
-      const diffInDays = Math.floor(diffInHours / 24);
-      if (diffInDays < 7) return `${diffInDays} day${diffInDays > 1 ? "s" : ""}`;
-      if (diffInDays < 14) return "1 week";
-      return formatDistanceToNow(date, { addSuffix: true });
-   };
 
    return (
       <div className="flex flex-col h-full overflow-hidden">
          {/* Issues List - Scrollable */}
          <div className="flex-1 min-h-0 overflow-y-auto">
-            <ScrollArea >
+            <ScrollArea>
                {issues.map((issue) => {
                   const isSelected = selectedIssueId === issue.id;
-                  const commentCount = issue._count?.comments || 0;
                   const attachmentCount = issue._count?.attachments || 0;
-                  const hasUnread = commentCount > 0 && issue.status !== "RESOLVED" && issue.status !== "CLOSED";
 
                   const creatorName = issue.created_by?.name || "Unknown";
                   const creatorInitials = creatorName
@@ -109,7 +94,6 @@ export function IssuesListPane({
 
                   const previewText = issue.description || "No description";
                   const orderId = issue.order_id;
-                  const parcelId = issue.parcel_id;
 
                   return (
                      <button
@@ -122,7 +106,7 @@ export function IssuesListPane({
                      >
                         <div className="flex items-start gap-3">
                            {/* Avatar */}
-                           <Avatar className="w-10 h-10 shrink-0">
+                           <Avatar className="w-8 h-8 shrink-0">
                               <AvatarFallback className="bg-primary/10 text-primary text-sm font-semibold">
                                  {creatorInitials}
                               </AvatarFallback>
@@ -132,26 +116,21 @@ export function IssuesListPane({
                            <div className="flex-1 min-w-0 space-y-2">
                               {/* Header: Title and Status */}
                               <div className="flex items-start justify-between gap-2">
-                                 <div className="flex items-center gap-2 flex-1 min-w-0">
-                                    <span className="text-xs font-mono text-muted-foreground shrink-0">
-                                       #{issue.id}
-                                    </span>
-                                    <h3 className="font-semibold text-sm text-foreground line-clamp-1 flex-1">
-                                       {issue.title}
-                                    </h3>
+                                 <div className="flex flex-col">
+                                    <span className="text-xs text-muted-foreground font-medium">{creatorName}</span>
+                                    <div className="flex items-center gap-2 flex-1 min-w-0">
+                                       <span className="text-xs font-mono text-muted-foreground shrink-0">
+                                          #{issue.id}
+                                       </span>
+                                       <h3 className="font-semibold text-sm text-foreground line-clamp-1 flex-1">
+                                          {issue.title}
+                                       </h3>
+                                    </div>
                                  </div>
                                  <div className="flex items-center gap-2 shrink-0">
-                                    {commentCount > 0 && (
-                                       <div
-                                          className={cn(
-                                             "flex items-center gap-1 text-xs",
-                                             hasUnread ? "text-primary font-medium" : "text-muted-foreground"
-                                          )}
-                                       >
-                                          <MessageSquare className="w-3.5 h-3.5" />
-                                          <span>{commentCount}</span>
-                                       </div>
-                                    )}
+                                    <Badge variant="outline" className={cn("text-[10px] font-medium", priorityColor)}>
+                                       {issue.priority}
+                                    </Badge>
                                     <Badge
                                        variant="outline"
                                        className={cn("text-[10px] font-medium shrink-0", statusColor)}
@@ -167,45 +146,30 @@ export function IssuesListPane({
                               </p>
 
                               {/* Metadata Row: Priority, Type, and Related Items */}
-                              <div className="flex items-center gap-2 flex-wrap">
-                                 <Badge variant="outline" className={cn("text-[10px] font-medium", priorityColor)}>
-                                    {issue.priority}
-                                 </Badge>
-                                 <Badge variant="outline" className="text-[10px] font-medium">
-                                    {issue.type}
-                                 </Badge>
-
-                                 {orderId && (
-                                    <Link
-                                       className="inline-flex items-center gap-1 text-xs text-primary hover:underline"
-                                       target="_blank"
-                                       to={`/orders/${orderId}`}
-                                       onClick={(e) => e.stopPropagation()}
-                                    >
-                                       <Package className="w-3 h-3" />
-                                       Order #{orderId}
-                                    </Link>
-                                 )}
-
-                                 {parcelId && (
-                                    <span className="inline-flex items-center gap-1 text-xs text-muted-foreground">
-                                       <Package className="w-3 h-3" />
-                                       Parcel #{parcelId}
-                                    </span>
-                                 )}
+                              <div className="flex items-center justify-between gap-2 flex-wrap">
+                                 <div className="flex items-center gap-2">
+                                    <Badge variant="outline" className="text-[10px] font-medium">
+                                       {issue.type}
+                                    </Badge>
+                                    {orderId && (
+                                       <Link
+                                          className="inline-flex items-center gap-1 text-xs text-primary hover:underline"
+                                          target="_blank"
+                                          to={`/orders/${orderId}`}
+                                          onClick={(e) => e.stopPropagation()}
+                                       >
+                                          <Package className="w-3 h-3" />
+                                          Order #{orderId}
+                                       </Link>
+                                    )}{" "}
+                                 </div>
+                                 <span className="text-xs text-muted-foreground shrink-0 ">
+                                    {formatRelativeTime(new Date(issue.created_at))}
+                                 </span>
                               </div>
 
                               {/* Footer: Creator, Assignment, Activity, and Actions */}
-                              <div className="space-y-1.5 pt-1">
-                                 {/* First Row: Creator and Date */}
-                                 <div className="flex items-center justify-between gap-3">
-                                    <span className="text-xs text-muted-foreground font-medium">{creatorName}</span>
-                                    <span className="text-xs text-muted-foreground shrink-0">
-                                       {formatRelativeTime(new Date(issue.created_at))}
-                                    </span>
-                                 </div>
-
-                                 {/* Second Row: Assignment, Activity, and Actions */}
+                              <div className="flex justify-end">
                                  <div className="flex items-center justify-end gap-3">
                                     {/* Assigned To */}
                                     {assignedToName && (
@@ -222,8 +186,6 @@ export function IssuesListPane({
                                           <span>{attachmentCount}</span>
                                        </div>
                                     )}
-
-                                  
                                  </div>
                               </div>
                            </div>

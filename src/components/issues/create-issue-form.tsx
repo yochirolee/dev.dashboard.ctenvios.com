@@ -1,5 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Controller, useForm, useFieldArray } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
 import { Button } from "@/components/ui/button";
@@ -18,8 +18,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { issueType, issuePriority } from "@/data/types";
 import { useIssues } from "@/hooks/use-issues";
 import { useOrders } from "@/hooks/use-orders";
-import { Loader2, Plus, X, Paperclip } from "lucide-react";
-import { ScrollArea } from "@/components/ui/scroll-area";
+import { Loader2 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useState, useEffect, useRef } from "react";
@@ -29,11 +28,6 @@ import { Spinner } from "@/components/ui/spinner";
 import { cn } from "@/lib/utils";
 import type { OrderItems } from "@/data/types";
 
-const addCommentSchema = z.object({
-   content: z.string().min(1, "Content is required"),
-   is_internal: z.boolean().optional(),
-});
-
 const formSchema = z
    .object({
       title: z.string().min(1, "Title is required"),
@@ -42,8 +36,6 @@ const formSchema = z
       priority: z.nativeEnum(issuePriority).optional(),
       order_id: z.number().positive("Order ID is required"),
       affected_parcel_ids: z.array(z.number().positive()).min(1, "At least one parcel must be selected"),
-      comments: z.array(addCommentSchema).optional(),
-      images: z.array(z.instanceof(File)).optional(),
    })
    .refine((data) => data.order_id && data.affected_parcel_ids.length > 0, {
       message: "Order ID and at least one parcel must be selected",
@@ -61,15 +53,12 @@ export function CreateIssueForm({ initialOrderId, initialParcelId, onSuccess }: 
    const navigate = useNavigate();
    const [orderIdInput, setOrderIdInput] = useState<string>(initialOrderId?.toString() || "");
    const [selectedParcelIds, setSelectedParcelIds] = useState<number[]>([]);
-   const [imageFiles, setImageFiles] = useState<File[]>([]);
 
    const {
       data: orderParcels,
       isLoading: isLoadingParcels,
       error: orderParcelsError,
    } = useOrders.getParcelsByOrderId(Number(orderIdInput) || 0);
-   const addCommentMutation = useIssues.addComment({});
-   const addAttachmentMutation = useIssues.addAttachment({});
 
    const form = useForm<FormValues>({
       resolver: zodResolver(formSchema),
@@ -80,18 +69,7 @@ export function CreateIssueForm({ initialOrderId, initialParcelId, onSuccess }: 
          priority: undefined,
          order_id: initialOrderId,
          affected_parcel_ids: [],
-         comments: [],
-         images: [],
       },
-   });
-
-   const {
-      fields: commentFields,
-      append: appendComment,
-      remove: removeComment,
-   } = useFieldArray({
-      control: form.control,
-      name: "comments",
    });
 
    // Update form when order changes
@@ -125,16 +103,6 @@ export function CreateIssueForm({ initialOrderId, initialParcelId, onSuccess }: 
       // eslint-disable-next-line react-hooks/exhaustive-deps
    }, [selectedParcelIds]);
 
-   // Update form when images change
-   const prevImageFilesRef = useRef<File[]>([]);
-   useEffect(() => {
-      if (prevImageFilesRef.current.length !== imageFiles.length) {
-         form.setValue("images", imageFiles, { shouldValidate: false, shouldDirty: false });
-         prevImageFilesRef.current = [...imageFiles];
-      }
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-   }, [imageFiles]);
-
    const handleSelectAllParcels = () => {
       if (!orderParcels?.parcels) return;
       const allParcelIds = orderParcels.parcels.map((item: OrderItems) => item.id);
@@ -142,59 +110,8 @@ export function CreateIssueForm({ initialOrderId, initialParcelId, onSuccess }: 
       setSelectedParcelIds(newIds);
    };
 
-   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-      const files = Array.from(event.target.files || []);
-      const imageFiles = files.filter((file) => file.type.startsWith("image/"));
-      setImageFiles((prev) => [...prev, ...imageFiles]);
-   };
-
-   const removeImage = (index: number) => {
-      setImageFiles((prev) => prev.filter((_, i) => i !== index));
-   };
-
-   // Convert File to base64 or upload to get URL
-   const uploadImageAndGetUrl = async (file: File): Promise<string> => {
-      // For now, convert to base64 data URL
-      // In production, you'd upload to a file storage service and get a URL
-      return new Promise((resolve, reject) => {
-         const reader = new FileReader();
-         reader.onloadend = () => {
-            resolve(reader.result as string);
-         };
-         reader.onerror = reject;
-         reader.readAsDataURL(file);
-      });
-   };
-
    const createIssueMutation = useIssues.create({
       onSuccess: async (data) => {
-         // Upload images and create attachments
-         if (imageFiles.length > 0) {
-            for (const imageFile of imageFiles) {
-               const fileUrl = await uploadImageAndGetUrl(imageFile);
-               await addAttachmentMutation.mutateAsync({
-                  id: data.id,
-                  data: {
-                     file_url: fileUrl,
-                     file_name: imageFile.name,
-                     file_type: imageFile.type,
-                     file_size: imageFile.size,
-                     description: `Image attachment: ${imageFile.name}`,
-                  },
-               });
-            }
-         }
-
-         // Add comments if any
-         if (form.getValues("comments") && form.getValues("comments")!.length > 0) {
-            for (const comment of form.getValues("comments")!) {
-               await addCommentMutation.mutateAsync({
-                  id: data.id,
-                  data: { content: comment.content, is_internal: comment.is_internal || false },
-               });
-            }
-         }
-
          toast.success("Issue created successfully");
          onSuccess?.();
          navigate(`/issues/${data.id}`);
@@ -218,8 +135,8 @@ export function CreateIssueForm({ initialOrderId, initialParcelId, onSuccess }: 
    const orderItems = orderParcels?.parcels || [];
 
    return (
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-         <ScrollArea className="h-[calc(100vh-200px)] pr-4">
+      <Card className="p-4 ">
+         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 ">
             <FieldGroup>
                {/* Order ID Input */}
                <Field>
@@ -299,14 +216,10 @@ export function CreateIssueForm({ initialOrderId, initialParcelId, onSuccess }: 
                            </div>
                         ))}
                      </div>
-                     {selectedParcelIds.length === 0 && (
-                        <p className="text-sm text-destructive mt-2">Please select at least one parcel</p>
-                     )}
+                    
                      <FieldError>{form.formState.errors.affected_parcel_ids?.message}</FieldError>
                   </Card>
                )}
-
-               <FieldSeparator />
 
                <Field>
                   <FieldLabel>Title *</FieldLabel>
@@ -323,8 +236,6 @@ export function CreateIssueForm({ initialOrderId, initialParcelId, onSuccess }: 
                      <FieldError>{form.formState.errors.description?.message}</FieldError>
                   </FieldContent>
                </Field>
-
-               <FieldSeparator />
 
                <div className="grid grid-cols-2 gap-4">
                   <Field>
@@ -377,153 +288,33 @@ export function CreateIssueForm({ initialOrderId, initialParcelId, onSuccess }: 
                      </FieldContent>
                   </Field>
                </div>
-
-               <FieldSeparator />
-
-               {/* Comments Section */}
-               <Card className="p-4">
-                  <div className="flex items-center justify-between mb-4">
-                     <div>
-                        <FieldLabel>Comments</FieldLabel>
-                        <FieldDescription>Add initial comments to the issue</FieldDescription>
-                     </div>
-                     <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        onClick={() => appendComment({ content: "", is_internal: false })}
-                     >
-                        <Plus className="w-4 h-4 mr-2" />
-                        Add Comment
-                     </Button>
-                  </div>
-
-                  {commentFields.length === 0 ? (
-                     <p className="text-sm text-muted-foreground text-center py-4">No comments added</p>
-                  ) : (
-                     <div className="space-y-3">
-                        {commentFields.map((field, index) => (
-                           <Card key={field.id} className="p-3">
-                              <div className="flex items-start justify-between gap-2">
-                                 <div className="flex-1 space-y-2">
-                                    <Textarea
-                                       {...form.register(`comments.${index}.content`)}
-                                       placeholder="Comment content"
-                                       rows={2}
-                                    />
-                                    <div className="flex items-center gap-2">
-                                       <Controller
-                                          control={form.control}
-                                          name={`comments.${index}.is_internal`}
-                                          render={({ field: checkboxField }) => (
-                                             <label className="flex items-center gap-2 text-sm cursor-pointer">
-                                                <input
-                                                   type="checkbox"
-                                                   checked={checkboxField.value || false}
-                                                   onChange={(e) => checkboxField.onChange(e.target.checked)}
-                                                   className="rounded"
-                                                />
-                                                <span>Internal only</span>
-                                             </label>
-                                          )}
-                                       />
-                                    </div>
-                                 </div>
-                                 <Button type="button" variant="ghost" size="icon" onClick={() => removeComment(index)}>
-                                    <X className="w-4 h-4" />
-                                 </Button>
-                              </div>
-                           </Card>
-                        ))}
-                     </div>
-                  )}
-               </Card>
-
-               {/* Image Upload Section */}
-               <Card className="p-4">
-                  <div className="flex items-center justify-between mb-4">
-                     <div>
-                        <FieldLabel>Images</FieldLabel>
-                        <FieldDescription>Upload images related to the issue</FieldDescription>
-                     </div>
-                     <div>
-                        <input
-                           type="file"
-                           accept="image/*"
-                           multiple
-                           onChange={handleImageUpload}
-                           className="hidden"
-                           id="image-upload"
-                        />
-                        <Button
-                           type="button"
-                           variant="outline"
-                           size="sm"
-                           onClick={() => document.getElementById("image-upload")?.click()}
-                        >
-                           <Paperclip className="w-4 h-4 mr-2" />
-                           Upload Images
-                        </Button>
-                     </div>
-                  </div>
-
-                  {imageFiles.length === 0 ? (
-                     <p className="text-sm text-muted-foreground text-center py-4">No images uploaded</p>
-                  ) : (
-                     <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                        {imageFiles.map((file, index) => (
-                           <div key={`${file.name}-${file.size}-${index}`} className="relative group">
-                              <div className="aspect-square rounded-lg overflow-hidden border bg-muted">
-                                 <img
-                                    src={URL.createObjectURL(file)}
-                                    alt={file.name}
-                                    className="w-full h-full object-cover"
-                                 />
-                              </div>
-                              <Button
-                                 type="button"
-                                 variant="destructive"
-                                 size="icon"
-                                 className="absolute top-2 right-2 h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
-                                 onClick={() => removeImage(index)}
-                              >
-                                 <X className="w-3 h-3" />
-                              </Button>
-                              <p className="text-xs text-muted-foreground mt-1 truncate" title={file.name}>
-                                 {file.name}
-                              </p>
-                           </div>
-                        ))}
-                     </div>
-                  )}
-               </Card>
             </FieldGroup>
-         </ScrollArea>
 
-         <div className="flex justify-end gap-2 pt-4 border-t">
-            <Button
-               type="button"
-               variant="outline"
-               onClick={() => {
-                  onSuccess?.();
-                  navigate("/issues");
-               }}
-            >
-               Cancel
-            </Button>
-            <Button
-               type="submit"
-               disabled={
-                  createIssueMutation.isPending ||
-                  !orderParcels ||
-                  !orderParcels.parcels ||
-                  selectedParcelIds.length === 0
-               }
-            >
-               {createIssueMutation.isPending && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
-               Create Issue
-            </Button>
-         </div>
-      </form>
+            <div className="flex justify-end gap-2 pt-4 border-t p-2 md:p-4">
+               <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => {
+                     onSuccess?.();
+                     navigate("/issues");
+                  }}
+               >
+                  Cancel
+               </Button>
+               <Button
+                  type="submit"
+                  disabled={
+                     createIssueMutation.isPending ||
+                     !orderParcels ||
+                     !orderParcels.parcels ||
+                     selectedParcelIds.length === 0
+                  }
+               >
+                  {createIssueMutation.isPending && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+                  Create Issue
+               </Button>
+            </div>
+         </form>
+      </Card>
    );
 }
