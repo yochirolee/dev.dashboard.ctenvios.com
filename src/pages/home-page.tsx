@@ -6,7 +6,7 @@ import { DashboardBarChart } from "@/components/charts/bar-chart";
 import { AgenciesSalesChart } from "@/components/charts/agencies-sales-chart";
 export function HomePage() {
    return (
-      <div className="@container/main  ">
+      <div className="@container/main p-2 md:p-4">
          <div className="flex flex-col">
             <h3 className=" font-bold">Dashboard</h3>
             <p className="text-sm text-gray-500 ">

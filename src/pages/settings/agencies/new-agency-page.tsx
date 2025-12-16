@@ -197,7 +197,7 @@ export function NewAgencyPage() {
    const handleBack = () => setStep((s) => Math.max(s - 1, 0));
 
    return (
-      <div className="space-y-4">
+      <div className="space-y-4 p-2 md:p-4">
          {/* Progress */}
          <div className="flex items-center justify-center">
             {Array.from({ length: totalSteps }).map((_, index) => (

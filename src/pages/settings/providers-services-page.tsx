@@ -10,7 +10,7 @@ export default function ProvidersServicesPage() {
    const [open, setOpen] = useState(false);
 
    return (
-      <div className="flex flex-col container max-w-screen-xl mx-auto gap-4 items-center">
+      <div className="flex flex-col container max-w-screen-xl mx-auto gap-4 items-center p-2 md:p-4">
          <div className="flex flex-col gap-2 w-full">
             <div className="flex flex-col">
                <h3 className=" font-bold">Proveedores</h3>

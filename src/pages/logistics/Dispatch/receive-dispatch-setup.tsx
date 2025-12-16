@@ -34,7 +34,7 @@ export const ReceiveDispatchSetup = ({ setDispatchId }: { setDispatchId: (dispat
    };
 
    return (
-      <div className="flex flex-col">
+      <div className="flex flex-col p-2 md:p-4">
          <main className="flex-1">
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-4">
                <div className="lg:col-span-2 flex flex-col gap-6">

@@ -84,7 +84,7 @@ export const CreateDispatchPage = () => {
    };
 
    return (
-      <div className="flex flex-col">
+      <div className="flex flex-col p-2 md:p-4">
          <main className="flex-1">
             <div className="flex flex-col">
                <h3 className=" font-bold">Crear Despacho</h3>

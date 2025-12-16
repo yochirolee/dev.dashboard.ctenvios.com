@@ -33,7 +33,7 @@ export const CustomsPage = () => {
    };
 
    return (
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-4 p-2 md:p-4">
          <div className="flex flex-col ">
             <h3 className=" font-bold">Aranceles Aduanales</h3>
             <p className="text-sm text-gray-500 "> Listado de Aranceles Aduanales</p>

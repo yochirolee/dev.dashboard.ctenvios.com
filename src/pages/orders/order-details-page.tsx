@@ -103,7 +103,7 @@ export default function OrderDetailsPage() {
       );
 
    return order ? (
-      <div className="space-y-4 container max-w-screen-xl mx-auto">
+      <div className="space-y-4 container max-w-screen-xl mx-auto p-2 md:p-4">
          <div className="flex flex-col container mx-auto gap-2 md:flex-row lg:justify-between lg:items-center print:hidden">
             <div className="flex flex-col gap-2">
                <div className="flex items-center gap-2">

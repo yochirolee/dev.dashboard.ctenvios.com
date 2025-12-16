@@ -31,6 +31,10 @@ interface NavConfigItem {
 export function NavConfig({ items }: { items: NavConfigItem[] }) {
    const location = useLocation();
 
+   if (items.length === 0) {
+      return null;
+   }
+
    return (
       <SidebarGroup>
          <SidebarGroupLabel>Config and Logs</SidebarGroupLabel>

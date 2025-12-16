@@ -31,6 +31,10 @@ interface NavIssuesItem {
 export function NavIssues({ items }: { items: NavIssuesItem[] }) {
    const location = useLocation();
 
+   if (items.length === 0) {
+      return null;
+   }
+
    return (
       <SidebarGroup>
          <SidebarGroupLabel>Reclamaciones</SidebarGroupLabel>

@@ -30,6 +30,7 @@ import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@/
 import { CogIcon, FileText } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { useAppStore } from "@/stores/app-store";
+import { IssueOrderDetails } from "./issue-order-details";
 
 interface IssueDetailPaneProps {
    issueId: number;
@@ -47,6 +48,8 @@ export function IssueDetailPane({ issueId }: IssueDetailPaneProps) {
 
    const { data: issue, isLoading, error } = useIssues.getById(issueId);
    const { data: comments } = useIssues.getComments(issueId);
+
+   console.log(issue, "issue");
 
    const addCommentMutation = useIssues.addComment({
       onSuccess: () => {
@@ -166,7 +169,7 @@ export function IssueDetailPane({ issueId }: IssueDetailPaneProps) {
       .slice(0, 2);
 
    return (
-      <div className="flex flex-col h-full  bg-background overflow-hidden">
+      <div className="flex flex-col h-full   bg-background overflow-hidden">
          {/* Header - Chat Style */}
          <div className="flex flex-col border-b shrink-0 bg-muted/30">
             <div className="flex items-center justify-between p-3">
@@ -183,10 +186,7 @@ export function IssueDetailPane({ issueId }: IssueDetailPaneProps) {
                      </div>
                   </div>
                </div>
-               <div className="col-span-2 text-right text-xs mr-2 flex items-center gap-1">
-                  <span className="text-muted-foreground font-medium shrink-0">Created:</span>
-                  <span className="text-foreground">{format(new Date(issue.created_at), "dd/MM/yyyy hh:mm a")}</span>
-               </div>
+
                <div className="flex items-center gap-1 shrink-0">
                   <Button variant="ghost" size="icon" className="h-9 w-9" onClick={() => setEditDialogOpen(true)}>
                      <Edit2 className="w-4 h-4" />
@@ -203,205 +203,211 @@ export function IssueDetailPane({ issueId }: IssueDetailPaneProps) {
                </div>
             </div>
             {/* Issue Metadata */}
-            <div className="px-2 py-1.5 border-t border-border/50">
+            <div className="flex justify-between items-center gap-2 bg-muted/30 px-2 py-1.5 border-t border-border/50">
                <div className="grid grid-cols-2 gap-x-2 gap-y-1 text-xs">
-                  <div>
-                     <div className="flex items-center gap-1">
-                        <span className="text-muted-foreground font-medium shrink-0">Order:</span>
-                        <span className="text-foreground truncate">#{issue.order_id}</span>
-                     </div>
-                     <div className="flex items-center gap-1">
-                        <span className="text-muted-foreground font-medium shrink-0">Parcel:</span>
-                        <span className="text-foreground truncate">#{issue.parcel_id}</span>
-                     </div>
+                  <div className="col-span-2 flex items-center gap-1 min-w-0">
+                     <span className="text-muted-foreground font-medium shrink-0">Title:</span>
+                     <span className="text-foreground truncate">{issue.title}</span>
                   </div>
-                  <div>
-                     <div className="col-span-2 flex items-center gap-1 min-w-0">
-                        <span className="text-muted-foreground font-medium shrink-0">Title:</span>
-                        <span className="text-foreground truncate">{issue.title}</span>
+                  {issue.description && (
+                     <div className="col-span-2 flex items-start gap-1 min-w-0">
+                        <span className="text-muted-foreground font-medium shrink-0">Description:</span>
+                        <p className="text-foreground line-clamp-2 leading-tight min-w-0 flex-1">{issue.description}</p>
                      </div>
-                     {issue.description && (
-                        <div className="col-span-2 flex items-start gap-1 min-w-0">
-                           <span className="text-muted-foreground font-medium shrink-0">Description:</span>
-                           <p className="text-foreground line-clamp-2 leading-tight min-w-0 flex-1">
-                              {issue.description}
-                           </p>
-                        </div>
-                     )}
-                  </div>
+                  )}
+               </div>
+               <div className="col-span-2 text-right text-xs mr-2 flex items-center gap-1">
+                  <span className="text-muted-foreground font-medium shrink-0">Created:</span>
+                  <span className="text-foreground">{format(new Date(issue.created_at), "dd/MM/yyyy hh:mm a")}</span>
                </div>
             </div>
          </div>
 
-         {/* Content Area */}
-         <div className="flex-1 min-h-0 flex flex-col overflow-hidden">
-            {/* Issue Description as First Message */}
+         <div className="grid grid-cols-2 h-full  bg-background overflow-hidden">
+            {/* Content Area */}
+            <div className="flex-1 min-h-0 border-r flex flex-col overflow-hidden">
+               {/* Issue Description as First Message */}
 
-            {/* Comments Section - Chat History (Scrollable) */}
-            <div className="flex-1 min-h-0  overflow-y-auto p-4 bg-background">
-               <div className="space-y-3">
-                  {issueComments.map((comment: IssueComment, index: number) => {
-                     const isCurrentUser = currentUser?.id === comment.user.id;
-                     const showAvatar = !isCurrentUser;
-                     const showName = !isCurrentUser && issueComments.length > 1;
-                     const prevComment = index > 0 ? issueComments[index - 1] : null;
-                     const showDateSeparator =
-                        !prevComment ||
-                        format(new Date(comment.created_at), "dd/MM/yyyy") !==
-                           format(new Date(prevComment.created_at), "dd/MM/yyyy");
+               {/* Comments Section - Chat History (Scrollable) */}
+               <div className="flex-1 min-h-0  overflow-y-auto p-4 bg-background">
+                  <div className="space-y-3">
+                     {issueComments.map((comment: IssueComment, index: number) => {
+                        const isCurrentUser = currentUser?.id === comment.user.id;
+                        const showAvatar = !isCurrentUser;
+                        const showName = !isCurrentUser && issueComments.length > 1;
+                        const prevComment = index > 0 ? issueComments[index - 1] : null;
+                        const showDateSeparator =
+                           !prevComment ||
+                           format(new Date(comment.created_at), "dd/MM/yyyy") !==
+                              format(new Date(prevComment.created_at), "dd/MM/yyyy");
 
-                     return (
-                        <div key={comment.id}>
-                           {/* Date Separator */}
-                           {showDateSeparator && (
-                              <div className="flex justify-center my-4">
-                                 <div className="bg-muted/50 px-3 py-1 rounded-full text-xs text-muted-foreground">
-                                    {comment.created_at ? format(new Date(comment.created_at), "dd MMMM yyyy") : ""}
+                        return (
+                           <div key={comment.id}>
+                              {/* Date Separator */}
+                              {showDateSeparator && (
+                                 <div className="flex justify-center my-4">
+                                    <div className="bg-muted/50 px-3 py-1 rounded-full text-xs text-muted-foreground">
+                                       {comment.created_at ? format(new Date(comment.created_at), "dd MMMM yyyy") : ""}
+                                    </div>
                                  </div>
-                              </div>
-                           )}
-
-                           {/* Message */}
-                           <div
-                              className={cn(
-                                 "flex gap-2 group",
-                                 isCurrentUser ? "flex-row-reverse" : "flex-row",
-                                 comment.is_internal && "opacity-75"
                               )}
-                           >
-                              {/* Avatar - Only show for received messages */}
-                              {showAvatar && (
-                                 <Avatar className="w-6 h-6 shrink-0">
-                                    <AvatarFallback className="text-xs bg-muted">
-                                       {comment.user.name.charAt(0).toUpperCase()}
-                                    </AvatarFallback>
-                                 </Avatar>
-                              )}
-                              {!showAvatar && <div className="w-8 shrink-0" />}
 
-                              {/* Message Bubble */}
+                              {/* Message */}
                               <div
                                  className={cn(
-                                    "flex flex-col max-w-[75%] md:max-w-[60%]",
-                                    isCurrentUser ? "items-end" : "items-start"
+                                    "flex gap-2 group",
+                                    isCurrentUser ? "flex-row-reverse" : "flex-row",
+                                    comment.is_internal && "opacity-75"
                                  )}
                               >
-                                 {/* Sender Name - Only for received messages */}
-                                 {showName && (
-                                    <span className="text-xs text-muted-foreground mb-1 px-1">{comment.user.name}</span>
+                                 {/* Avatar - Only show for received messages */}
+                                 {showAvatar && (
+                                    <Avatar className="w-6 h-6 shrink-0">
+                                       <AvatarFallback className="text-xs bg-muted">
+                                          {comment.user.name.charAt(0).toUpperCase()}
+                                       </AvatarFallback>
+                                    </Avatar>
                                  )}
+                                 {!showAvatar && <div className="w-8 shrink-0" />}
 
-                                 {/* Message Content */}
+                                 {/* Message Bubble */}
                                  <div
                                     className={cn(
-                                       "rounded-lg px-3 py-2 relative",
-                                       isCurrentUser
-                                          ? "bg-primary text-primary-foreground"
-                                          : "bg-muted/80 text-foreground",
-                                       comment.is_internal && "border border-dashed border-muted-foreground/30"
+                                       "flex flex-col max-w-[75%] md:max-w-[60%]",
+                                       isCurrentUser ? "items-end" : "items-start"
                                     )}
                                  >
-                                    {/* Internal Badge */}
-                                    {comment.is_internal && (
-                                       <div className="flex items-center gap-1 mb-1">
-                                          <Lock className="w-3 h-3 opacity-60" />
-                                          <span className="text-xs opacity-60">Internal</span>
-                                       </div>
+                                    {/* Sender Name - Only for received messages */}
+                                    {showName && (
+                                       <span className="text-xs text-muted-foreground mb-1 px-1">
+                                          {comment.user.name}
+                                       </span>
                                     )}
 
-                                    {/* Message Text */}
-                                    <p className="text-sm whitespace-pre-wrap break-words leading-relaxed">
-                                       {comment.content}
-                                    </p>
-                                 </div>
+                                    {/* Message Content */}
+                                    <div
+                                       className={cn(
+                                          "rounded-lg px-3 py-2 relative",
+                                          isCurrentUser
+                                             ? "bg-primary text-primary-foreground"
+                                             : "bg-muted/80 text-foreground",
+                                          comment.is_internal && "border border-dashed border-muted-foreground/30"
+                                       )}
+                                    >
+                                       {/* Internal Badge */}
+                                       {comment.is_internal && (
+                                          <div className="flex items-center gap-1 mb-1">
+                                             <Lock className="w-3 h-3 opacity-60" />
+                                             <span className="text-xs opacity-60">Internal</span>
+                                          </div>
+                                       )}
 
-                                 {/* Timestamp and Status - Below bubble */}
-                                 <div
-                                    className={cn(
-                                       "flex items-center gap-1 mt-1 px-1",
-                                       isCurrentUser ? "justify-end" : "justify-start"
-                                    )}
-                                 >
-                                    <span className="text-[10px] text-muted-foreground">
-                                       {comment.created_at ? format(new Date(comment.created_at), "hh:mm a") : "N/A"}
-                                    </span>
-                                    {isCurrentUser && <Check className="w-3 h-3 text-green-500" />}
+                                       {/* Message Text */}
+                                       <p className="text-sm whitespace-pre-wrap break-words leading-relaxed">
+                                          {comment.content}
+                                       </p>
+                                    </div>
+
+                                    {/* Timestamp and Status - Below bubble */}
+                                    <div
+                                       className={cn(
+                                          "flex items-center gap-1 mt-1 px-1",
+                                          isCurrentUser ? "justify-end" : "justify-start"
+                                       )}
+                                    >
+                                       <span className="text-[10px] text-muted-foreground">
+                                          {comment.created_at ? format(new Date(comment.created_at), "hh:mm a") : "N/A"}
+                                       </span>
+                                       {isCurrentUser && <Check className="w-3 h-3 text-green-500" />}
+                                    </div>
                                  </div>
                               </div>
                            </div>
+                        );
+                     })}
+                     {issueComments.length === 0 && (
+                        <div className="text-center py-16 text-muted-foreground">
+                           <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-muted/50 flex items-center justify-center">
+                              <FileText className="w-8 h-8 opacity-50" />
+                           </div>
+                           <p className="text-sm font-medium">No comments yet</p>
+                           <p className="text-xs mt-1">Start the conversation!</p>
                         </div>
-                     );
-                  })}
-                  {issueComments.length === 0 && (
-                     <div className="text-center py-16 text-muted-foreground">
-                        <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-muted/50 flex items-center justify-center">
-                           <FileText className="w-8 h-8 opacity-50" />
-                        </div>
-                        <p className="text-sm font-medium">No comments yet</p>
-                        <p className="text-xs mt-1">Start the conversation!</p>
+                     )}
+                  </div>
+               </div>
+
+               {/* Comment Input - Chat Style */}
+               <div className="border-t  bg-background p-2.5 shrink-0">
+                  <div className="flex items-center gap-2">
+                     {/* Left Icons */}
+                     <div className="flex items-center gap-0 shrink-0">
+                        <Button variant="ghost" size="icon" className="h-9 w-9 rounded-full">
+                           <Paperclip className="w-4 h-4 text-muted-foreground" />
+                        </Button>
+                        <Button variant="ghost" size="icon" className="h-9 w-9 rounded-full">
+                           <Mic className="w-4 h-4 text-muted-foreground" />
+                        </Button>
                      </div>
-                  )}
-               </div>
-            </div>
 
-            {/* Comment Input - Chat Style */}
-            <div className="border-t bg-background p-3 shrink-0">
-               <div className="flex items-center gap-2">
-                  {/* Left Icons */}
-                  <div className="flex items-center gap-0 shrink-0">
-                     <Button variant="ghost" size="icon" className="h-9 w-9 rounded-full">
-                        <Paperclip className="w-4 h-4 text-muted-foreground" />
-                     </Button>
-                     <Button variant="ghost" size="icon" className="h-9 w-9 rounded-full">
-                        <Mic className="w-4 h-4 text-muted-foreground" />
-                     </Button>
-                  </div>
+                     {/* Input Field */}
+                     <div className="flex-1 relative">
+                        <Textarea
+                           value={commentText}
+                           onChange={(e) => setCommentText(e.target.value)}
+                           placeholder="Type a message..."
+                           rows={1}
+                           className="min-h-[4px] max-h-32 resize-none border-0 bg-muted/50 rounded-lg pr-20 text-sm py-3 focus-visible:ring-0"
+                           onKeyDown={(e) => {
+                              if (e.key === "Enter" && !e.shiftKey) {
+                                 e.preventDefault();
+                                 handleAddComment();
+                              }
+                           }}
+                        />
+                        {/* Internal Toggle */}
+                        <Button
+                           variant="ghost"
+                           size="icon"
+                           className={cn(
+                              "absolute bottom-2 right-2 h-7 w-7 rounded-full",
+                              isInternal && "bg-muted text-foreground"
+                           )}
+                           onClick={() => setIsInternal(!isInternal)}
+                           title="Toggle internal comment"
+                        ></Button>
+                     </div>
 
-                  {/* Input Field */}
-                  <div className="flex-1 relative">
-                     <Textarea
-                        value={commentText}
-                        onChange={(e) => setCommentText(e.target.value)}
-                        placeholder="Type a message..."
-                        rows={1}
-                        className="min-h-[44px] max-h-32 resize-none border-0 bg-muted/50 rounded-lg pr-20 text-sm py-3 focus-visible:ring-0"
-                        onKeyDown={(e) => {
-                           if (e.key === "Enter" && !e.shiftKey) {
-                              e.preventDefault();
-                              handleAddComment();
-                           }
-                        }}
-                     />
-                     {/* Internal Toggle */}
+                     {/* Send Button */}
                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className={cn(
-                           "absolute bottom-2 right-2 h-7 w-7 rounded-full",
-                           isInternal && "bg-muted text-foreground"
-                        )}
-                        onClick={() => setIsInternal(!isInternal)}
-                        title="Toggle internal comment"
+                        onClick={handleAddComment}
+                        disabled={!commentText.trim() || addCommentMutation.isPending}
+                        className="h-9 px-6 shrink-0 bg-muted hover:bg-muted/80 rounded-lg text-foreground font-medium"
                      >
-                        <Lock className="w-3.5 h-3.5 text-muted-foreground" />
+                        {addCommentMutation.isPending ? <CogIcon className="w-4 h-4 animate-spin" /> : "Send"}
                      </Button>
                   </div>
-
-                  {/* Send Button */}
-                  <Button
-                     onClick={handleAddComment}
-                     disabled={!commentText.trim() || addCommentMutation.isPending}
-                     className="h-9 px-6 shrink-0 bg-muted hover:bg-muted/80 rounded-lg text-foreground font-medium"
-                  >
-                     {addCommentMutation.isPending ? <CogIcon className="w-4 h-4 animate-spin" /> : "Send"}
-                  </Button>
                </div>
             </div>
+
+            <IssueOrderDetails order_id={issue.order_id} affected_parcels={issue.affected_parcels || []} />
          </div>
 
          {/* Edit Dialog */}
          <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
             <DialogContent>
+               <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-1">
+                     <span className="text-muted-foreground font-medium shrink-0">Parcel:</span>
+                     <span className="text-foreground truncate">#{issue.parcel_id}</span>
+                  </div>
+               </div>
+               <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-1">
+                     <span className="text-muted-foreground font-medium shrink-0">Title:</span>
+                     <span className="text-foreground truncate">{issue.title}</span>
+                  </div>
+               </div>
                <DialogHeader>
                   <DialogTitle>Edit Issue</DialogTitle>
                   <DialogDescription>Update issue details</DialogDescription>

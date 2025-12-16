@@ -71,7 +71,7 @@ console.log(data, "data");
          </Empty>
       );
    return (
-      <div className="flex flex-col gap-4 w-full">
+      <div className="flex flex-col gap-4 w-full p-2 md:p-4">
          <div className="flex w-full flex-row justify-between items-center">
             <div className="flex flex-col">
                <h3 className=" font-bold">Despachos</h3>

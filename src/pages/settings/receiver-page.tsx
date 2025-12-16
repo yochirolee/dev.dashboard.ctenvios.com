@@ -19,35 +19,33 @@ export const ReceiversPage = () => {
    );
 
    return (
-      <div>
+      <div className="flex flex-col gap-4 p-2 md:p-4">
+         <div className="flex flex-col ">
+            <h3 className=" font-bold">Destinatarios</h3>
+            <p className="text-sm text-gray-500 "> Listado de Destinatarios</p>
+         </div>
          <div className="flex flex-col gap-4">
-            <div className="flex flex-col ">
-               <h3 className=" font-bold">Destinatarios</h3>
-               <p className="text-sm text-gray-500 "> Listado de Destinatarios</p>
-            </div>
-            <div className="flex flex-col gap-4">
-               <ButtonGroup orientation="horizontal" className="w-full lg:w-md">
-                  <InputGroup>
-                     <InputGroupInput
-                        type="search"
-                        placeholder="Buscar Destinatario..."
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                     />
-                     <InputGroupAddon>
-                        {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
-                     </InputGroupAddon>
-                  </InputGroup>
-                  <ReceiverFormDialog />
-               </ButtonGroup>
+            <ButtonGroup orientation="horizontal" className="w-full lg:w-md">
+               <InputGroup>
+                  <InputGroupInput
+                     type="search"
+                     placeholder="Buscar Destinatario..."
+                     onChange={(e) => setSearchQuery(e.target.value)}
+                  />
+                  <InputGroupAddon>
+                     {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
+                  </InputGroupAddon>
+               </InputGroup>
+               <ReceiverFormDialog />
+            </ButtonGroup>
 
-               <DataTable
-                  columns={receiversColumns}
-                  data={receivers}
-                  pagination={pagination}
-                  setPagination={setPagination}
-                  isLoading={isLoading}
-               />
-            </div>
+            <DataTable
+               columns={receiversColumns}
+               data={receivers}
+               pagination={pagination}
+               setPagination={setPagination}
+               isLoading={isLoading}
+            />
          </div>
       </div>
    );

@@ -63,8 +63,11 @@ export function CreateIssueForm({ initialOrderId, initialParcelId, onSuccess }: 
    const [selectedParcelIds, setSelectedParcelIds] = useState<number[]>([]);
    const [imageFiles, setImageFiles] = useState<File[]>([]);
 
-   const { data: order, isLoading: isLoadingOrder, error: orderError } = useOrders.getById(Number(orderIdInput) || 0);
-
+   const {
+      data: orderParcels,
+      isLoading: isLoadingParcels,
+      error: orderParcelsError,
+   } = useOrders.getParcelsByOrderId(Number(orderIdInput) || 0);
    const addCommentMutation = useIssues.addComment({});
    const addAttachmentMutation = useIssues.addAttachment({});
 
@@ -93,36 +96,30 @@ export function CreateIssueForm({ initialOrderId, initialParcelId, onSuccess }: 
 
    // Update form when order changes
    useEffect(() => {
-      if (order?.id) {
+      if (orderParcels?.id) {
          const currentOrderId = form.getValues("order_id");
-         if (currentOrderId !== order.id) {
-            form.setValue("order_id", order.id, { shouldValidate: false, shouldDirty: false });
+         if (currentOrderId !== orderParcels.id) {
+            form.setValue("order_id", orderParcels.id, { shouldValidate: true, shouldDirty: false });
          }
          // Pre-select initial parcel if provided and order is loaded
-         if (initialParcelId && order.order_items) {
-            const parcelExists = order.order_items.some((item: OrderItems) => item.id === initialParcelId);
+         if (initialParcelId && orderParcels.parcels) {
+            const parcelExists = orderParcels.parcels.some((item: OrderItems) => item.id === initialParcelId);
             if (parcelExists && !selectedParcelIds.includes(initialParcelId)) {
                setSelectedParcelIds([initialParcelId]);
             }
          }
       }
       // eslint-disable-next-line react-hooks/exhaustive-deps
-   }, [order?.id, initialParcelId]);
+   }, [orderParcels?.id, initialParcelId]);
 
    // Update form when selected parcels change - use JSON string comparison to avoid reference issues
    const prevSelectedParcelIdsStringRef = useRef<string>("");
-   const isUpdatingFromCheckboxRef = useRef(false);
 
    useEffect(() => {
-      if (isUpdatingFromCheckboxRef.current) {
-         isUpdatingFromCheckboxRef.current = false;
-         return;
-      }
-
       const currentIdsString = JSON.stringify([...selectedParcelIds].sort((a, b) => a - b));
       const prevString = prevSelectedParcelIdsStringRef.current;
       if (prevString !== currentIdsString) {
-         form.setValue("affected_parcel_ids", selectedParcelIds, { shouldValidate: false, shouldDirty: false });
+         form.setValue("affected_parcel_ids", selectedParcelIds, { shouldValidate: true, shouldDirty: false });
          prevSelectedParcelIdsStringRef.current = currentIdsString;
       }
       // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -139,8 +136,8 @@ export function CreateIssueForm({ initialOrderId, initialParcelId, onSuccess }: 
    }, [imageFiles]);
 
    const handleSelectAllParcels = () => {
-      if (!order?.order_items) return;
-      const allParcelIds = order.order_items.map((item: OrderItems) => item.id);
+      if (!orderParcels?.parcels) return;
+      const allParcelIds = orderParcels.parcels.map((item: OrderItems) => item.id);
       const newIds = selectedParcelIds.length === allParcelIds.length ? [] : allParcelIds;
       setSelectedParcelIds(newIds);
    };
@@ -218,7 +215,7 @@ export function CreateIssueForm({ initialOrderId, initialParcelId, onSuccess }: 
       });
    }
 
-   const orderItems = order?.order_items || [];
+   const orderItems = orderParcels?.parcels || [];
 
    return (
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
@@ -235,33 +232,26 @@ export function CreateIssueForm({ initialOrderId, initialParcelId, onSuccess }: 
                            onChange={(e) => {
                               setOrderIdInput(e.target.value);
                               setSelectedParcelIds([]);
+                              form.setValue("affected_parcel_ids", [], { shouldValidate: true });
                            }}
                            placeholder="Enter order ID"
                         />
-                        {isLoadingOrder && <Spinner />}
+                        {isLoadingParcels && <Spinner />}
                      </div>
-                     {orderError && (
+                     {orderParcelsError && (
                         <p className="text-sm text-destructive mt-1">Order not found. Please check the order ID.</p>
                      )}
-                     {order && (
-                        <div className="mt-2 p-3 bg-muted rounded-md">
-                           <div className="flex items-center justify-between">
-                              <div>
-                                 <p className="font-semibold">Order #{order.id}</p>
-                                 <p className="text-sm text-muted-foreground">
-                                    {orderItems.length} parcel{orderItems.length !== 1 ? "s" : ""} found
-                                 </p>
-                              </div>
-                              <Badge variant="outline">{order.status}</Badge>
-                           </div>
-                        </div>
+                     {orderParcels && (
+                        <p className="text-sm text-muted-foreground mt-1">
+                           Order #{orderParcels.id} • {orderItems.length} parcel{orderItems.length !== 1 ? "s" : ""}
+                        </p>
                      )}
                      <FieldError>{form.formState.errors.order_id?.message}</FieldError>
                   </FieldContent>
                </Field>
 
                {/* Parcels Selection */}
-               {order && orderItems.length > 0 && (
+               {orderParcels && orderItems.length > 0 && (
                   <Card className="p-4">
                      <div className="flex items-center justify-between mb-4">
                         <div>
@@ -285,7 +275,6 @@ export function CreateIssueForm({ initialOrderId, initialParcelId, onSuccess }: 
                                  checked={selectedParcelIds.includes(item.id)}
                                  onCheckedChange={(checked) => {
                                     const parcelId = item.id; // Capture item.id in closure
-                                    isUpdatingFromCheckboxRef.current = true;
                                     if (checked === true) {
                                        setSelectedParcelIds((prev) => {
                                           if (prev.includes(parcelId)) return prev;
@@ -522,7 +511,15 @@ export function CreateIssueForm({ initialOrderId, initialParcelId, onSuccess }: 
             >
                Cancel
             </Button>
-            <Button type="submit" disabled={createIssueMutation.isPending || !order || selectedParcelIds.length === 0}>
+            <Button
+               type="submit"
+               disabled={
+                  createIssueMutation.isPending ||
+                  !orderParcels ||
+                  !orderParcels.parcels ||
+                  selectedParcelIds.length === 0
+               }
+            >
                {createIssueMutation.isPending && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
                Create Issue
             </Button>

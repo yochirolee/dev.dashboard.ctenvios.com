@@ -17,6 +17,13 @@ export const useOrders = {
          enabled: !!id,
       });
    },
+   getParcelsByOrderId: (order_id: number) => {
+      return useQuery({
+         queryKey: ["get-orders-parcels", order_id],
+         queryFn: () => api.orders.getParcelsByOrderId(order_id),
+         enabled: !!order_id,
+      });
+   },
    getHistory: (invoice_id: number) => {
       return useQuery({
          queryKey: ["get-orders-history", invoice_id],

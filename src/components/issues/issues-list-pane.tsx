@@ -71,7 +71,7 @@ export function IssuesListPane({
       <div className="flex flex-col h-full overflow-hidden">
          {/* Issues List - Scrollable */}
          <div className="flex-1 min-h-0 overflow-y-auto">
-            <ScrollArea className="h-[calc(100vh-200px)]">
+            <ScrollArea >
                {issues.map((issue) => {
                   const isSelected = selectedIssueId === issue.id;
                   const commentCount = issue._count?.comments || 0;

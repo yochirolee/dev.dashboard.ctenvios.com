@@ -32,10 +32,9 @@ export default function OrdersPage() {
       setDate(undefined);
    };
 
-   console.log(data);
-
+  
    return (
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-col p-2 md:p-4  gap-4">
          <div className="flex flex-row justify-between">
             <div className="flex flex-col">
                <h3 className=" font-bold">Ordenes</h3>

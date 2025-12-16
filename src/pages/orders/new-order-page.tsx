@@ -32,7 +32,7 @@ export function NewOrderPage() {
 
    const { data: services, isLoading: isLoadingServices } = useAgencies.getActiveServicesWithRates(agencyId);
    return (
-      <div className="space-y-4 ">
+      <div className="space-y-4 p-2 md:p-4">
          <div className="flex flex-col">
             <h3 className=" font-bold">Crear Orden</h3>
             <p className="text-sm text-gray-500 ">Orden de Envio, Destinatario, Servicio</p>

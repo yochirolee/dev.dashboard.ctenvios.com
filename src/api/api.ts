@@ -189,6 +189,10 @@ const api = {
          const response = await axiosInstance.get(`/orders/${id}`);
          return response.data;
       },
+      getParcelsByOrderId: async (order_id: number) => {
+         const response = await axiosInstance.get(`/orders/${order_id}/parcels`);
+         return response.data;
+      },
       create: async (data: Order) => {
          const response = await axiosInstance.post("/orders", data);
          return response.data;
