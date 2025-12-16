@@ -31,6 +31,7 @@ import { CogIcon, FileText } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { useAppStore } from "@/stores/app-store";
 import { IssueOrderDetails } from "./issue-order-details";
+import { Loader2 } from "lucide-react";
 
 interface IssueDetailPaneProps {
    issueId: number;
@@ -223,9 +224,9 @@ export function IssueDetailPane({ issueId }: IssueDetailPaneProps) {
             </div>
          </div>
 
-         <div className="grid grid-cols-2 h-full  bg-background overflow-hidden">
+         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-0 h-full  bg-background overflow-hidden">
             {/* Content Area */}
-            <div className="flex-1 min-h-0 border-r flex flex-col overflow-hidden">
+            <div className="flex-1 min-h-100 md:border-r border-b md:border-b-0 flex flex-col overflow-hidden">
                {/* Issue Description as First Message */}
 
                {/* Comments Section - Chat History (Scrollable) */}
@@ -384,7 +385,7 @@ export function IssueDetailPane({ issueId }: IssueDetailPaneProps) {
                         disabled={!commentText.trim() || addCommentMutation.isPending}
                         className="h-9 px-6 shrink-0 bg-muted hover:bg-muted/80 rounded-lg text-foreground font-medium"
                      >
-                        {addCommentMutation.isPending ? <CogIcon className="w-4 h-4 animate-spin" /> : "Send"}
+                        {addCommentMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : "Send"}
                      </Button>
                   </div>
                </div>
