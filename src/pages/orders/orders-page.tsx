@@ -18,6 +18,7 @@ export default function OrdersPage() {
    const [date, setDate] = useState<Date | undefined>(undefined);
    const { pagination, setPagination } = usePagination();
 
+  
    const { data, isLoading, isFetching } = useOrders.search(
       debouncedSearchQuery,
       pagination.pageIndex,
