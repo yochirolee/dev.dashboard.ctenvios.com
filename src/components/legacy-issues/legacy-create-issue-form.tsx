@@ -1,16 +1,12 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Controller, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
 import { Button } from "@/components/ui/button";
 import { Field, FieldContent, FieldDescription, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { issueType, issuePriority } from "@/data/types";
-import { useIssues } from "@/hooks/use-issues";
-import { useOrders } from "@/hooks/use-orders";
-import { Loader2 } from "lucide-react";
+import { Loader2, Search } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useState, useEffect, useRef } from "react";
@@ -18,20 +14,16 @@ import { useNavigate } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
 import { Spinner } from "@/components/ui/spinner";
 import { cn } from "@/lib/utils";
-import type { OrderItems } from "@/data/types";
+import { useLegacyIssues } from "@/hooks/use-legacy-issues";
+import { useDebounce } from "use-debounce";
+import { InputGroup, InputGroupAddon, InputGroupInput } from "../ui/input-group";
 
-const formSchema = z
-   .object({
-      title: z.string().min(1, "Title is required"),
-      description: z.string().min(1, "Description is required"),
-      type: z.nativeEnum(issueType).optional(),
-      priority: z.nativeEnum(issuePriority).optional(),
-      order_id: z.number().positive("Order ID is required"),
-      affected_parcel_ids: z.array(z.number().positive()).min(1, "At least one parcel must be selected"),
-   })
-   .refine((data) => data.order_id && data.affected_parcel_ids.length > 0, {
-      message: "Order ID and at least one parcel must be selected",
-   });
+const formSchema = z.object({
+   title: z.string().min(1, "Title is required"),
+   description: z.string().min(1, "Description is required"),
+   legacy_order_id: z.number().positive("Order ID is required"),
+   affected_parcel_ids: z.array(z.number().positive()).min(1, "At least one parcel must be selected"),
+});
 
 type FormValues = z.infer<typeof formSchema>;
 
@@ -40,47 +32,75 @@ interface CreateIssueFormProps {
    initialParcelId?: number;
    onSuccess?: () => void;
 }
+interface LegacyParcel {
+   id: number;
+   legacy_parcel_id?: number;
+   tracking_number: string;
+   description: string;
+   weight: number;
+}
 
-export function CreateIssueForm({ initialOrderId, initialParcelId, onSuccess }: CreateIssueFormProps) {
+export function LegacyCreateIssueForm({ initialOrderId, initialParcelId, onSuccess }: CreateIssueFormProps) {
    const navigate = useNavigate();
    const [orderIdInput, setOrderIdInput] = useState<string>(initialOrderId?.toString() || "");
+   const [debouncedOrderIdInput] = useDebounce(orderIdInput, 500);
    const [selectedParcelIds, setSelectedParcelIds] = useState<number[]>([]);
 
    const {
       data: orderParcels,
       isLoading: isLoadingParcels,
       error: orderParcelsError,
-   } = useOrders.getParcelsByOrderId(Number(orderIdInput) || 0);
+   } = useLegacyIssues.getParcelsByOrderId(Number(debouncedOrderIdInput) || 0);
 
    const form = useForm<FormValues>({
       resolver: zodResolver(formSchema),
       defaultValues: {
          title: "",
          description: "",
-         type: undefined,
-         priority: undefined,
-         order_id: initialOrderId,
+         legacy_order_id: initialOrderId || undefined,
          affected_parcel_ids: [],
       },
    });
 
-   // Update form when order changes
+   // Update form when orderIdInput changes - set order_id immediately if valid
    useEffect(() => {
-      if (orderParcels?.id) {
-         const currentOrderId = form.getValues("order_id");
-         if (currentOrderId !== orderParcels.id) {
-            form.setValue("order_id", orderParcels.id, { shouldValidate: true, shouldDirty: false });
+      const parsedOrderId = Number(orderIdInput);
+      if (parsedOrderId > 0 && !isNaN(parsedOrderId)) {
+         const currentOrderId = form.getValues("legacy_order_id");
+         if (currentOrderId !== parsedOrderId) {
+            form.setValue("legacy_order_id", parsedOrderId, { shouldValidate: true, shouldDirty: false });
+         }
+      } else if (orderIdInput === "" && initialOrderId) {
+         // If input is cleared but we have an initialOrderId, keep it
+         const currentOrderId = form.getValues("legacy_order_id");
+         if (currentOrderId !== initialOrderId) {
+            form.setValue("legacy_order_id", initialOrderId, { shouldValidate: true, shouldDirty: false });
+         }
+      }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+   }, [orderIdInput]);
+
+   // Update form when order parcels are loaded - ensure order_id matches
+   useEffect(() => {
+      if (orderParcels) {
+         // Try both id and order_id fields to handle different API response structures
+         const orderId = (orderParcels as any).order_id || orderParcels.id;
+         if (orderId) {
+            const currentOrderId = form.getValues("legacy_order_id");
+            if (currentOrderId !== orderId) {
+               form.setValue("legacy_order_id", orderId, { shouldValidate: true, shouldDirty: false });
+            }
          }
          // Pre-select initial parcel if provided and order is loaded
          if (initialParcelId && orderParcels.parcels) {
-            const parcelExists = orderParcels.parcels.some((item: OrderItems) => item.id === initialParcelId);
+            const parcelExists = orderParcels.parcels.some((item: LegacyParcel) => item.id === initialParcelId);
             if (parcelExists && !selectedParcelIds.includes(initialParcelId)) {
                setSelectedParcelIds([initialParcelId]);
             }
          }
       }
       // eslint-disable-next-line react-hooks/exhaustive-deps
-   }, [orderParcels?.id, initialParcelId]);
+   }, [orderParcels, initialParcelId]);
 
    // Update form when selected parcels change - use JSON string comparison to avoid reference issues
    const prevSelectedParcelIdsStringRef = useRef<string>("");
@@ -97,16 +117,16 @@ export function CreateIssueForm({ initialOrderId, initialParcelId, onSuccess }: 
 
    const handleSelectAllParcels = () => {
       if (!orderParcels?.parcels) return;
-      const allParcelIds = orderParcels.parcels.map((item: OrderItems) => item.id);
+      const allParcelIds = orderParcels.parcels.map((item: LegacyParcel) => item.id);
       const newIds = selectedParcelIds.length === allParcelIds.length ? [] : allParcelIds;
       setSelectedParcelIds(newIds);
    };
 
-   const createIssueMutation = useIssues.create({
+   const createIssueMutation = useLegacyIssues.create({
       onSuccess: async (data) => {
          toast.success("Issue created successfully");
          onSuccess?.();
-         navigate(`/issues/${data.id}`);
+         navigate(`/legacy-issues/${data.id}`);
       },
       onError: (error: any) => {
          toast.error(error?.response?.data?.message || "Failed to create issue");
@@ -114,14 +134,37 @@ export function CreateIssueForm({ initialOrderId, initialParcelId, onSuccess }: 
    });
 
    function onSubmit(data: FormValues) {
-      createIssueMutation.mutate({
+      // Ensure legacy_order_id is set from input if not already set
+      const parsedInputId = Number(orderIdInput);
+      const orderId = data.legacy_order_id || (parsedInputId > 0 && !isNaN(parsedInputId) ? parsedInputId : undefined);
+
+      if (!orderId || orderId <= 0 || isNaN(orderId)) {
+         toast.error("Order ID is required");
+         return;
+      }
+
+      if (!data.affected_parcel_ids || data.affected_parcel_ids.length === 0) {
+         toast.error("At least one parcel must be selected");
+         return;
+      }
+
+      // Ensure all parcel IDs are valid numbers
+      const validParcelIds = data.affected_parcel_ids.map((id) => Number(id)).filter((id) => id > 0 && !isNaN(id));
+
+      if (validParcelIds.length !== data.affected_parcel_ids.length) {
+         toast.error("Some parcel IDs are invalid");
+         return;
+      }
+
+      // Build payload with only defined values
+      const payload: Record<string, unknown> = {
          title: data.title,
          description: data.description,
-         type: data.type,
-         priority: data.priority,
-         order_id: data.order_id,
-         affected_parcel_ids: data.affected_parcel_ids,
-      });
+         legacy_order_id: Number(orderId),
+         affected_parcel_ids: validParcelIds,
+      };
+
+      createIssueMutation.mutate(payload as any);
    }
 
    const orderItems = orderParcels?.parcels || [];
@@ -134,28 +177,32 @@ export function CreateIssueForm({ initialOrderId, initialParcelId, onSuccess }: 
                <Field>
                   <FieldLabel>Order ID *</FieldLabel>
                   <FieldContent>
-                     <div className="flex gap-2">
-                        <Input
-                           type="number"
+                     <InputGroup>
+                        <InputGroupAddon align="inline-start">
+                           <Search className="w-4 h-4" />
+                        </InputGroupAddon>
+                        <InputGroupInput
                            value={orderIdInput}
-                           onChange={(e) => {
-                              setOrderIdInput(e.target.value);
-                              setSelectedParcelIds([]);
-                              form.setValue("affected_parcel_ids", [], { shouldValidate: true });
-                           }}
+                           onChange={(e) => setOrderIdInput(e.target.value)}
                            placeholder="Enter order ID"
                         />
-                        {isLoadingParcels && <Spinner />}
-                     </div>
+                        <InputGroupAddon align="inline-end">
+                           {isLoadingParcels && <Spinner className="w-4 h-4" />}
+                        </InputGroupAddon>
+                     </InputGroup>
+
                      {orderParcelsError && (
-                        <p className="text-sm text-destructive mt-1">Order not found. Please check the order ID.</p>
+                        <FieldError className="text-sm text-destructive mt-1">
+                           Order not found. Please check the order ID.
+                        </FieldError>
                      )}
                      {orderParcels && (
                         <p className="text-sm text-muted-foreground mt-1">
-                           Order #{orderParcels.id} • {orderItems.length} parcel{orderItems.length !== 1 ? "s" : ""}
+                           Order #{(orderParcels as any).order_id || orderParcels.id} • {orderItems.length} parcel
+                           {orderItems.length !== 1 ? "s" : ""}
                         </p>
                      )}
-                     <FieldError>{form.formState.errors.order_id?.message}</FieldError>
+                     <FieldError>{form.formState.errors.legacy_order_id?.message}</FieldError>
                   </FieldContent>
                </Field>
 
@@ -172,7 +219,7 @@ export function CreateIssueForm({ initialOrderId, initialParcelId, onSuccess }: 
                         </Button>
                      </div>
                      <div className="space-y-2 max-h-[300px] overflow-y-auto">
-                        {orderItems.map((item: OrderItems) => (
+                        {orderItems.map((item: LegacyParcel) => (
                            <div
                               key={item.id}
                               className={cn(
@@ -196,11 +243,11 @@ export function CreateIssueForm({ initialOrderId, initialParcelId, onSuccess }: 
                                  onClick={(e) => {
                                     e.stopPropagation();
                                  }}
-                                 aria-label={`Select parcel ${item.hbl}`}
+                                 aria-label={`Select parcel ${item.tracking_number}`}
                               />
                               <div className="flex-1 min-w-0">
                                  <div className="flex items-center gap-2">
-                                    <span className="font-medium">HBL: {item.hbl}</span>
+                                    <span className="font-medium">HBL: {item.tracking_number}</span>
                                     <Badge variant="secondary">{item.weight} lbs</Badge>
                                  </div>
                                  <p className="text-sm text-muted-foreground truncate">{item.description}</p>
@@ -228,58 +275,6 @@ export function CreateIssueForm({ initialOrderId, initialParcelId, onSuccess }: 
                      <FieldError>{form.formState.errors.description?.message}</FieldError>
                   </FieldContent>
                </Field>
-
-               <div className="grid grid-cols-2 gap-4">
-                  <Field>
-                     <FieldLabel>Type</FieldLabel>
-                     <FieldContent>
-                        <Controller
-                           control={form.control}
-                           name="type"
-                           render={({ field }) => (
-                              <Select value={field.value} onValueChange={field.onChange}>
-                                 <SelectTrigger>
-                                    <SelectValue placeholder="Select type" />
-                                 </SelectTrigger>
-                                 <SelectContent>
-                                    {Object.keys(issueType).map((key) => (
-                                       <SelectItem key={key} value={key}>
-                                          {issueType[key as keyof typeof issueType]}
-                                       </SelectItem>
-                                    ))}
-                                 </SelectContent>
-                              </Select>
-                           )}
-                        />
-                        <FieldError>{form.formState.errors.type?.message}</FieldError>
-                     </FieldContent>
-                  </Field>
-
-                  <Field>
-                     <FieldLabel>Priority</FieldLabel>
-                     <FieldContent>
-                        <Controller
-                           control={form.control}
-                           name="priority"
-                           render={({ field }) => (
-                              <Select value={field.value} onValueChange={field.onChange}>
-                                 <SelectTrigger>
-                                    <SelectValue placeholder="Select priority" />
-                                 </SelectTrigger>
-                                 <SelectContent>
-                                    {Object.keys(issuePriority).map((key) => (
-                                       <SelectItem key={key} value={key}>
-                                          {issuePriority[key as keyof typeof issuePriority]}
-                                       </SelectItem>
-                                    ))}
-                                 </SelectContent>
-                              </Select>
-                           )}
-                        />
-                        <FieldError>{form.formState.errors.priority?.message}</FieldError>
-                     </FieldContent>
-                  </Field>
-               </div>
             </FieldGroup>
 
             <div className="flex justify-end gap-2 pt-4 border-t p-2 md:p-4">
@@ -288,7 +283,7 @@ export function CreateIssueForm({ initialOrderId, initialParcelId, onSuccess }: 
                   variant="outline"
                   onClick={() => {
                      onSuccess?.();
-                     navigate("/issues");
+                     navigate("/legacy-issues");
                   }}
                >
                   Cancel

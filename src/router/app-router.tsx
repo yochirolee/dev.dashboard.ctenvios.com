@@ -23,6 +23,8 @@ import { AppLogsPage } from "@/pages/app-logs/app-logs-page";
 import { PartnersLogsPage } from "@/pages/app-logs/partners-logs-page";
 import IssuesPage from "@/pages/issues/issues-page";
 import NewIssuePage from "@/pages/issues/new-issue-page";
+import LegacyNewIssuePage from "@/pages/legacy-issues/legacy-new-issue-page";
+import LegacyIssuesPage from "@/pages/legacy-issues/legacy-issues-page";
 
 export const AppRouter = () => {
    return (
@@ -76,6 +78,11 @@ export const AppRouter = () => {
                   <Route index element={<IssuesPage />} />
                   <Route path="new" element={<NewIssuePage />} />
                   <Route path=":issueId" element={<IssuesPage />} />
+               </Route>
+               <Route path="legacy-issues">
+                  <Route index element={<LegacyIssuesPage />} />
+                  <Route path="new" element={<LegacyNewIssuePage />} />
+                  <Route path=":issueId" element={<LegacyIssuesPage />} />
                </Route>
             </Route>
          </Route>

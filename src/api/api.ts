@@ -594,6 +594,88 @@ const api = {
          return response.data;
       },
    },
+   // Legacy Issues API (used for legacy invoices) will be removed in the future
+   legacyIssues: {
+      getAll: async (
+         page: number = 1,
+         limit: number = 20,
+         filters?: {
+            status?: string;
+            priority?: string;
+            type?: string;
+            order_id?: string;
+            parcel_id?: string;
+            assigned_to_id?: string;
+         }
+      ) => {
+         const params: Record<string, string | number> = {
+            page: page + 1,
+            limit,
+         };
+
+         if (filters) {
+            if (filters.status) params.status = filters.status;
+            if (filters.priority) params.priority = filters.priority;
+            if (filters.type) params.type = filters.type;
+            if (filters.order_id) params.order_id = filters.order_id;
+            if (filters.parcel_id) params.parcel_id = filters.parcel_id;
+            if (filters.assigned_to_id) params.assigned_to_id = filters.assigned_to_id;
+         }
+
+         const response = await axiosInstance.get(`/legacy-issues`, {
+            params,
+         });
+         return response.data;
+      },
+      getById: async (id: number) => {
+         const response = await axiosInstance.get(`/legacy-issues/${id}`);
+         return response.data;
+      },
+      create: async (data: any) => {
+         const response = await axiosInstance.post(`/legacy-issues`, data);
+         return response.data;
+      },
+      update: async (id: number, data: any) => {
+         const response = await axiosInstance.patch(`/legacy-issues/${id}`, data);
+         return response.data;
+      },
+      resolve: async (id: number, data?: { resolution_notes?: string }) => {
+         const response = await axiosInstance.post(`/legacy-issues/${id}/resolve`, data || {});
+         return response.data;
+      },
+      delete: async (id: number) => {
+         const response = await axiosInstance.delete(`/legacy-issues/${id}`);
+         return response.data;
+      },
+      getComments: async (id: number) => {
+         const response = await axiosInstance.get(`/legacy-issues/${id}/comments`);
+         return response.data;
+      },
+      addComment: async (id: number, data: { content: string; is_internal?: boolean }) => {
+         const response = await axiosInstance.post(`/legacy-issues/${id}/comments`, data);
+         return response.data;
+      },
+      deleteComment: async (id: number, commentId: number) => {
+         const response = await axiosInstance.delete(`/legacy-issues/${id}/comments/${commentId}`);
+         return response.data;
+      },
+      getAttachments: async (id: number) => {
+         const response = await axiosInstance.get(`/legacy-issues/${id}/attachments`);
+         return response.data;
+      },
+      addAttachment: async (id: number, data: any) => {
+         const response = await axiosInstance.post(`/legacy-issues/${id}/attachments`, data);
+         return response.data;
+      },
+      deleteAttachment: async (id: number, attachmentId: number) => {
+         const response = await axiosInstance.delete(`/legacy-issues/${id}/attachments/${attachmentId}`);
+         return response.data;
+      },
+      getParcelsByOrderId: async (order_id: number) => {
+         const response = await axiosInstance.get(`/legacy/orders/${order_id}/parcels`);
+         return response.data;
+      },
+   },
 };
 
 export default api;

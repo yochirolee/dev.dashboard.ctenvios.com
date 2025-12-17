@@ -315,18 +315,20 @@ export type PaymentStatus = (typeof paymentStatus)[keyof typeof paymentStatus];
 
 // Issue Types
 export const issueType = {
-   BUG: "BUG",
-   FEATURE_REQUEST: "FEATURE_REQUEST",
-   QUESTION: "QUESTION",
-   COMPLAINT: "COMPLAINT",
-   OTHER: "OTHER",
+   COMPLAINT: "Reclamación", // Reclamación
+   DAMAGE: "Daño", // Daño
+   LOSS: "Pérdida", // Pérdida
+   DELAY: "Retraso", // Retraso
+   MISSING_ITEM: "Artículo faltante", // Artículo faltante
+   WRONG_ADDRESS: "Dirección incorrecta", // Dirección incorrecta
+   OTHER: "Otro", // Otro
 } as const;
 
 export const issuePriority = {
-   LOW: "LOW",
-   MEDIUM: "MEDIUM",
-   HIGH: "HIGH",
-   URGENT: "URGENT",
+   LOW: "Bajo",
+   MEDIUM: "Medio",
+   HIGH: "Alto",
+   URGENT: "Urgente",
 } as const;
 
 export const issueStatus = {
@@ -336,8 +338,8 @@ export const issueStatus = {
    CLOSED: "CLOSED",
 } as const;
 
-export type IssueType = (typeof issueType)[keyof typeof issueType];
-export type IssuePriority = (typeof issuePriority)[keyof typeof issuePriority];
+export type IssueType = keyof typeof issueType; // Use keys (COMPLAINT, DAMAGE, etc.) since DB stores keys
+export type IssuePriority = keyof typeof issuePriority; // Use keys (LOW, MEDIUM, etc.) since DB stores keys
 export type IssueStatus = (typeof issueStatus)[keyof typeof issueStatus];
 
 export interface IssueComment {
@@ -369,6 +371,7 @@ export interface IssueAttachment {
 
 export interface Issue {
    id: number;
+   legacy_order_id?: number;
    title: string;
    description: string;
    type: IssueType;
@@ -428,6 +431,27 @@ export const createIssueSchema = z
       message: "affected_parcel_ids requires order_id",
    });
 
+export const createLegacyIssueSchema = z
+   .object({
+      title: z.string().min(1, "Title is required"),
+      description: z.string().min(1, "Description is required"),
+      type: z.nativeEnum(issueType).optional(),
+      priority: z.nativeEnum(issuePriority).optional(),
+      legacy_order_id: z.number().positive().optional(),
+      parcel_id: z.number().positive().optional(),
+      affected_parcel_ids: z.array(z.number().positive()).optional(),
+      order_item_hbl: z.string().optional(),
+      assigned_to_id: z.string().uuid().optional(),
+   })
+   .refine(
+      (data) =>
+         data.legacy_order_id || data.parcel_id || (data.affected_parcel_ids && data.affected_parcel_ids.length > 0),
+      { message: "Either legacy_order_id, parcel_id, or affected_parcel_ids must be provided" }
+   )
+   .refine((data) => !data.affected_parcel_ids || data.legacy_order_id, {
+      message: "affected_parcel_ids requires legacy_order_id",
+   });
+
 export const updateIssueSchema = z.object({
    title: z.string().min(1).optional(),
    description: z.string().min(1).optional(),
@@ -452,6 +476,7 @@ export const addAttachmentSchema = z.object({
 });
 
 export type CreateIssueInput = z.infer<typeof createIssueSchema>;
+export type CreateLegacyIssueInput = z.infer<typeof createLegacyIssueSchema>;
 export type UpdateIssueInput = z.infer<typeof updateIssueSchema>;
 export type AddCommentInput = z.infer<typeof addCommentSchema>;
 export type AddAttachmentInput = z.infer<typeof addAttachmentSchema>;

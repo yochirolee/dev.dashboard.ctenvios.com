@@ -1,4 +1,4 @@
-import { useIssues } from "@/hooks/use-issues";
+import { useLegacyIssues } from "@/hooks/use-legacy-issues";
 import { CheckCircle2, Edit2, Lock, Paperclip, FileWarning, MoreVertical, Mic, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
@@ -27,17 +27,19 @@ import {
    AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@/components/ui/empty";
-import { CogIcon, FileText } from "lucide-react";
+import { FileText } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { useAppStore } from "@/stores/app-store";
-import { IssueOrderDetails } from "./issue-order-details";
+import { LegacyIssueOrderDetails } from "./legacy-issue-order-details";
 import { Loader2 } from "lucide-react";
+import { Spinner } from "../ui/spinner";
+import { Field, FieldContent, FieldGroup, FieldLabel } from "../ui/field";
 
-interface IssueDetailPaneProps {
+interface LegacyIssueDetailPaneProps {
    issueId: number;
 }
 
-export function IssueDetailPane({ issueId }: IssueDetailPaneProps) {
+export function LegacyIssueDetailPane({ issueId }: LegacyIssueDetailPaneProps) {
    const currentUser = useAppStore((state) => state.user);
    const [commentText, setCommentText] = useState("");
    const [isInternal, setIsInternal] = useState(false);
@@ -47,12 +49,10 @@ export function IssueDetailPane({ issueId }: IssueDetailPaneProps) {
    const [deleteCommentDialogOpen, setDeleteCommentDialogOpen] = useState(false);
    const [commentToDelete, setCommentToDelete] = useState<{ id: number; issueId: number } | null>(null);
 
-   const { data: issue, isLoading, error } = useIssues.getById(issueId);
-   const { data: comments } = useIssues.getComments(issueId);
+   const { data: issue, isLoading, error } = useLegacyIssues.getById(issueId);
+   const { data: comments } = useLegacyIssues.getComments(issueId);
 
-   console.log(issue, "issue");
-
-   const addCommentMutation = useIssues.addComment({
+   const addCommentMutation = useLegacyIssues.addComment({
       onSuccess: () => {
          toast.success("Comment added successfully");
          setCommentText("");
@@ -63,7 +63,7 @@ export function IssueDetailPane({ issueId }: IssueDetailPaneProps) {
       },
    });
 
-   const updateIssueMutation = useIssues.update({
+   const updateIssueMutation = useLegacyIssues.update({
       onSuccess: () => {
          toast.success("Issue updated successfully");
          setEditDialogOpen(false);
@@ -73,7 +73,7 @@ export function IssueDetailPane({ issueId }: IssueDetailPaneProps) {
       },
    });
 
-   const resolveIssueMutation = useIssues.resolve({
+   const resolveIssueMutation = useLegacyIssues.resolve({
       onSuccess: () => {
          toast.success("Issue resolved successfully");
          setResolveDialogOpen(false);
@@ -84,7 +84,7 @@ export function IssueDetailPane({ issueId }: IssueDetailPaneProps) {
       },
    });
 
-   const deleteCommentMutation = useIssues.deleteComment({
+   const deleteCommentMutation = useLegacyIssues.deleteComment({
       onSuccess: () => {
          toast.success("Comment deleted successfully");
          setDeleteCommentDialogOpen(false);
@@ -128,15 +128,9 @@ export function IssueDetailPane({ issueId }: IssueDetailPaneProps) {
 
    if (isLoading)
       return (
-         <Empty>
-            <EmptyHeader>
-               <EmptyMedia variant="icon">
-                  <CogIcon size={40} className="animate-spin" />
-               </EmptyMedia>
-               <EmptyTitle>Loading Issue</EmptyTitle>
-               <EmptyDescription>Please wait while we load the issue.</EmptyDescription>
-            </EmptyHeader>
-         </Empty>
+         <div className="flex items-center justify-center h-full">
+            <Spinner />
+         </div>
       );
 
    if (error || !issue)
@@ -226,6 +220,7 @@ export function IssueDetailPane({ issueId }: IssueDetailPaneProps) {
 
          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-0 h-full  bg-background overflow-hidden">
             {/* Content Area */}
+
             <div className="flex-1 min-h-100 md:border-r border-b md:border-b-0 flex flex-col overflow-hidden">
                {/* Issue Description as First Message */}
 
@@ -336,6 +331,25 @@ export function IssueDetailPane({ issueId }: IssueDetailPaneProps) {
                         </div>
                      )}
                   </div>
+                  {issue.status == "RESOLVED" && (
+                     <Empty>
+                        <EmptyHeader>
+                           <EmptyMedia variant="icon">
+                              <CheckCircle2 className="w-4 h-4" />
+                           </EmptyMedia>
+                        </EmptyHeader>
+                        <EmptyTitle>Issue Resolved</EmptyTitle>
+                        <EmptyDescription>The issue has been resolved.</EmptyDescription>
+                        <div className="text-sm text-center border-t border-border/50 pt-4 text-muted-foreground">
+                           <div className="font-medium">Resolution Notes:</div>
+                           <div className="text-foreground">{issue.resolution_notes}</div>
+                           <div className="text-xs text-muted-foreground">
+                              {format(new Date(issue.resolved_at), "dd/MM/yyyy hh:mm a")}
+                           </div>
+                           <div className="text-xs text-muted-foreground">Resolved by: {issue.resolved_by?.name}</div>
+                        </div>
+                     </Empty>
+                  )}
                </div>
 
                {/* Comment Input - Chat Style */}
@@ -391,74 +405,94 @@ export function IssueDetailPane({ issueId }: IssueDetailPaneProps) {
                </div>
             </div>
 
-            <IssueOrderDetails order_id={issue.order_id} affected_parcels={issue.affected_parcels || []} />
+            <LegacyIssueOrderDetails
+               legacy_order_id={issue.legacy_order_id}
+               affected_parcels={issue.affected_parcels || []}
+            />
          </div>
 
          {/* Edit Dialog */}
          <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
             <DialogContent>
-               <div className="flex items-center gap-2">
-                  <div className="flex items-center gap-1">
-                     <span className="text-muted-foreground font-medium shrink-0">Parcel:</span>
-                     <span className="text-foreground truncate">#{issue.parcel_id}</span>
-                  </div>
-               </div>
-               <div className="flex items-center gap-2">
-                  <div className="flex items-center gap-1">
-                     <span className="text-muted-foreground font-medium shrink-0">Title:</span>
-                     <span className="text-foreground truncate">{issue.title}</span>
-                  </div>
-               </div>
                <DialogHeader>
                   <DialogTitle>Edit Issue</DialogTitle>
                   <DialogDescription>Update issue details</DialogDescription>
                </DialogHeader>
+
                <div className="space-y-4 py-4">
-                  <div>
-                     <label className="text-sm font-medium">Status</label>
-                     <Select value={issue.status} onValueChange={(value) => handleUpdateIssue({ status: value })}>
-                        <SelectTrigger>
-                           <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                           {Object.values(issueStatus).map((status) => (
-                              <SelectItem key={status} value={status}>
-                                 {status}
-                              </SelectItem>
-                           ))}
-                        </SelectContent>
-                     </Select>
+                  <div className="flex items-center gap-2">
+                     <div className="flex items-center gap-1">
+                        <span className="text-muted-foreground font-medium shrink-0">Order:</span>
+                        <span className="text-foreground truncate">#{issue.legacy_order_id}</span>
+                     </div>
                   </div>
-                  <div>
-                     <label className="text-sm font-medium">Priority</label>
-                     <Select value={issue.priority} onValueChange={(value) => handleUpdateIssue({ priority: value })}>
-                        <SelectTrigger>
-                           <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                           {Object.keys(issuePriority).map((key) => (
-                              <SelectItem key={key} value={key}>
-                                 {issuePriority[key as keyof typeof issuePriority]}
-                              </SelectItem>
-                           ))}
-                        </SelectContent>
-                     </Select>
+                  <div className="flex flex-col gap-2 text-sm">
+                     <div className="flex items-center gap-1">
+                        <span className="text-muted-foreground  shrink-0">Title:</span>
+                        <span className="text-foreground truncate">{issue.title}</span>
+                     </div>
+                     <div className="flex items-center gap-1">
+                        <span className="text-muted-foreground shrink-0">Description:</span>
+                        <span className="text-foreground truncate">{issue.description}</span>
+                     </div>
                   </div>
-                  <div>
-                     <label className="text-sm font-medium">Type</label>
-                     <Select value={issue.type} onValueChange={(value) => handleUpdateIssue({ type: value })}>
-                        <SelectTrigger>
-                           <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                           {Object.keys(issueType).map((key) => (
-                              <SelectItem key={key} value={key}>
-                                 {issueType[key as keyof typeof issueType]}
-                              </SelectItem>
-                           ))}
-                        </SelectContent>
-                     </Select>
-                  </div>
+                  <FieldGroup>
+                     <Field>
+                        <FieldLabel>Status</FieldLabel>
+                        <FieldContent>
+                           <Select value={issue.status} onValueChange={(value) => handleUpdateIssue({ status: value })}>
+                              <SelectTrigger>
+                                 <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                 {Object.values(issueStatus).map((status) => (
+                                    <SelectItem key={status} value={status}>
+                                       {status}
+                                    </SelectItem>
+                                 ))}
+                              </SelectContent>
+                           </Select>
+                        </FieldContent>
+                     </Field>
+
+                     <Field>
+                        <FieldLabel>Type</FieldLabel>
+                        <FieldContent>
+                           <Select value={issue.type} onValueChange={(value) => handleUpdateIssue({ type: value })}>
+                              <SelectTrigger>
+                                 <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                 {Object.keys(issueType).map((key) => (
+                                    <SelectItem key={key} value={key}>
+                                       {issueType[key as keyof typeof issueType]}
+                                    </SelectItem>
+                                 ))}
+                              </SelectContent>
+                           </Select>
+                        </FieldContent>
+                     </Field>
+                     <Field>
+                        <FieldLabel>Priority</FieldLabel>
+                        <FieldContent>
+                           <Select
+                              value={issue.priority}
+                              onValueChange={(value) => handleUpdateIssue({ priority: value })}
+                           >
+                              <SelectTrigger>
+                                 <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                 {Object.keys(issuePriority).map((key) => (
+                                    <SelectItem key={key} value={key}>
+                                       {issuePriority[key as keyof typeof issuePriority]}
+                                    </SelectItem>
+                                 ))}
+                              </SelectContent>
+                           </Select>
+                        </FieldContent>
+                     </Field>
+                  </FieldGroup>
                </div>
                <DialogFooter>
                   <Button variant="outline" onClick={() => setEditDialogOpen(false)}>

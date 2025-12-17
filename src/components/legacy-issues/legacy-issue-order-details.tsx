@@ -1,4 +1,3 @@
-import { useOrders } from "@/hooks/use-orders";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { format } from "date-fns";
 import { formatFullName } from "@/lib/cents-utils";
@@ -6,6 +5,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from ".
 import { Spinner } from "../ui/spinner";
 import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "../ui/empty";
 import { TriangleAlert } from "lucide-react";
+import { useLegacyIssues } from "@/hooks/use-legacy-issues";
 
 interface Parcel {
    id: number;
@@ -14,8 +14,10 @@ interface Parcel {
    weight: number;
 }
 
-export function IssueOrderDetails({ order_id, affected_parcels }: { order_id: number; affected_parcels: any[] }) {
-   const { data: order, isLoading, error } = useOrders.getParcelsByOrderId(order_id);
+export function LegacyIssueOrderDetails({ legacy_order_id, affected_parcels }: { legacy_order_id: number; affected_parcels: any[] }) {
+   const { data: order, isLoading, error } = useLegacyIssues.getParcelsByOrderId(legacy_order_id);
+  
+   
    if (isLoading) {
       return (
          <div className="flex items-center justify-center h-full">
@@ -46,7 +48,7 @@ export function IssueOrderDetails({ order_id, affected_parcels }: { order_id: nu
                   <CardTitle className="flex items-center justify-between gap-2">
                      <div className="flex flex-col justify-between gap-2">
                         <span className=""> {order?.agency?.name}</span>
-                        <span className="text-muted-foreground">Order: {order?.id}</span>
+                        <span className="text-muted-foreground">Order: {order?.order_id}</span>
                      </div>
                      <div className="flex flex-col justify-between gap-2 text-right">
                         <span className="text-muted-foreground text-xs text-right">Created </span>
@@ -65,20 +67,20 @@ export function IssueOrderDetails({ order_id, affected_parcels }: { order_id: nu
                            order?.customer?.last_name,
                            order?.customer?.second_last_name
                         )}
-                        <div className="flex flex-col gap-2">{order.customer?.phone || order.customer?.mobile}</div>
+                        <div className="flex flex-col gap-2">{order?.customer?.phone || order?.customer?.mobile}</div>
                      </div>
 
                      <div className="flex flex-col gap-2">
                         {formatFullName(
-                           order.receiver?.first_name,
-                           order.receiver?.middle_name,
-                           order.receiver?.last_name,
-                           order.receiver?.second_last_name
+                           order?.receiver?.first_name,
+                           order?.receiver?.middle_name,
+                           order?.receiver?.last_name,
+                           order?.receiver?.second_last_name
                         )}
-                        <div className="flex flex-col gap-2">{order.receiver?.phone || order.receiver?.mobile}</div>
-                        <div className="flex flex-col gap-2">{order.receiver?.address}</div>
-                        <div className="flex flex-col gap-2">{order.receiver?.province?.name}</div>
-                        <div className="flex flex-col gap-2">{order.receiver?.city?.name}</div>
+                        <div className="flex flex-col gap-2">{order?.receiver?.phone || order?.receiver?.mobile}</div>
+                        <div className="flex flex-col gap-2">{order?.receiver?.address}</div>
+                        <div className="flex flex-col gap-2">{order?.receiver?.province?.name}</div>
+                        <div className="flex flex-col gap-2">{order?.receiver?.city?.name}</div>
                      </div>
                   </div>
                </CardContent>
@@ -94,7 +96,7 @@ export function IssueOrderDetails({ order_id, affected_parcels }: { order_id: nu
                      </TableHeader>
                      <TableBody>
                         {order?.parcels.map((parcel: Parcel) => {
-                           const isAffected = affected_parcels.some((ap) => ap.parcel_id === parcel.id);
+                           const isAffected = affected_parcels.some((ap) => Number(ap.legacy_parcel_id) === parcel.id);
                            return (
                               <TableRow
                                  key={parcel.id}

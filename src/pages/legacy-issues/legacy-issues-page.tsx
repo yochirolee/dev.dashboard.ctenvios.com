@@ -3,16 +3,16 @@ import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useIssues } from "@/hooks/use-issues";
 import usePagination from "@/hooks/use-pagination";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { issueStatus, issuePriority, issueType } from "@/data/types";
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from "@/components/ui/resizable";
-import { IssuesListPane } from "@/components/issues/issues-list-pane";
-import { IssueDetailPane } from "@/components/issues/issue-detail-pane";
+import { LegacyIssuesListPane } from "@/components/legacy-issues/legacy-issues-list-pane";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useLegacyIssues } from "@/hooks/use-legacy-issues";
+import { LegacyIssueDetailPane } from "@/components/legacy-issues/legacy-issue-detail-pane";
 
-export default function IssuesPage() {
+export default function LegacyIssuesPage() {
    const navigate = useNavigate();
    const { issueId } = useParams();
    const isMobile = useIsMobile();
@@ -24,7 +24,7 @@ export default function IssuesPage() {
    }>({});
    const { pagination, setPagination } = usePagination();
 
-   const { data, isLoading, isFetching } = useIssues.getAll(pagination.pageIndex, pagination.pageSize, filters);
+   const { data, isLoading, isFetching } = useLegacyIssues.getAll(pagination.pageIndex, pagination.pageSize, filters);
 
    const handleFilterChange = (newFilters: { status?: string; priority?: string; type?: string }) => {
       setFilters(newFilters);
@@ -40,7 +40,7 @@ export default function IssuesPage() {
    const hasActiveFilters = Object.values(filters).some((value) => value !== undefined) || searchQuery;
 
    const handleIssueSelect = (id: number) => {
-      navigate(`/issues/${id}`);
+      navigate(`/legacy-issues/${id}`);
    };
 
    // On mobile, show only one pane at a time
@@ -52,7 +52,7 @@ export default function IssuesPage() {
          {/* Mobile: Back button when viewing detail */}
          {showDetailOnMobile && (
             <div className="flex items-center gap-2 p-2 border-b shrink-0 md:hidden bg-background">
-               <Button variant="ghost" size="icon" onClick={() => navigate("/issues")} className="h-9 w-9">
+               <Button variant="ghost" size="icon" onClick={() => navigate("/legacy-issues")} className="h-9 w-9">
                   <ArrowLeft className="w-4 h-4" />
                </Button>
             </div>
@@ -67,7 +67,7 @@ export default function IssuesPage() {
                      <div className="flex items-center justify-between p-4 border-b shrink-0">
                         <h2 className="text-xl font-semibold">Issues</h2>
                         <Button
-                           onClick={() => navigate("/issues/new")}
+                           onClick={() => navigate("/legacy-issues/new")}
                            size="icon"
                            className="h-8 w-8 rounded-full"
                            variant="outline"
@@ -158,7 +158,7 @@ export default function IssuesPage() {
 
                      {/* Issues List */}
                      <div className="flex-1 min-h-0">
-                        <IssuesListPane
+                        <LegacyIssuesListPane
                            issues={data?.rows || []}
                            selectedIssueId={issueId ? Number(issueId) : undefined}
                            onIssueSelect={handleIssueSelect}
@@ -171,7 +171,7 @@ export default function IssuesPage() {
                   </div>
                ) : (
                   <div className="h-full overflow-hidden">
-                     <IssueDetailPane issueId={Number(issueId)} />
+                     <LegacyIssueDetailPane issueId={Number(issueId)} />
                   </div>
                )}
             </div>
@@ -184,7 +184,7 @@ export default function IssuesPage() {
                      {/* Header */}
                      <div className="flex items-center justify-between h-12 p-2 border-b shrink-0">
                         <h2 className="text-xl font-semibold">Issues</h2>
-                        <Button onClick={() => navigate("/issues/new")} size="icon" className="h-6 w-6 ">
+                        <Button onClick={() => navigate("/legacy-issues/new")} size="icon" className="h-6 w-6 ">
                            <FilePlus2 className="w-4 h-4" />
                         </Button>
                      </div>
@@ -267,7 +267,7 @@ export default function IssuesPage() {
                            <X className="w-4 h-4" />
                         </Button>
                      </div>
-                     <IssuesListPane
+                     <LegacyIssuesListPane
                         issues={data?.rows || []}
                         selectedIssueId={issueId ? Number(issueId) : undefined}
                         onIssueSelect={handleIssueSelect}
@@ -285,7 +285,7 @@ export default function IssuesPage() {
                <ResizablePanel defaultSize={80} minSize={80} maxSize={100}>
                   <div className="h-full overflow-hidden ">
                      {issueId ? (
-                        <IssueDetailPane issueId={Number(issueId)} />
+                        <LegacyIssueDetailPane issueId={Number(issueId)} />
                      ) : (
                         <div className="flex items-center justify-center h-full text-muted-foreground">
                            <div className="text-center">

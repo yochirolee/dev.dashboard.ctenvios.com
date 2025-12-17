@@ -11,7 +11,7 @@ import { Badge } from "../ui/badge";
 import { Link } from "react-router-dom";
 import { Spinner } from "../ui/spinner";
 
-interface IssuesListPaneProps {
+interface LegacyIssuesListPaneProps {
    issues: Issue[];
    selectedIssueId?: number;
    onIssueSelect: (id: number) => void;
@@ -24,7 +24,7 @@ interface IssuesListPaneProps {
    total: number;
 }
 
-export function IssuesListPane({
+export function LegacyIssuesListPane({
    issues,
    selectedIssueId,
    onIssueSelect,
@@ -32,7 +32,7 @@ export function IssuesListPane({
    pagination,
    onPaginationChange,
    total,
-}: IssuesListPaneProps) {
+}: LegacyIssuesListPaneProps) {
    const totalPages = Math.ceil(total / pagination.pageSize);
 
    const handlePrevious = () => {
@@ -84,17 +84,24 @@ export function IssuesListPane({
                         ? "bg-success/10 text-success border-success/20"
                         : "bg-blue-500/10 text-blue-500 border-blue-500/20";
 
+                  // Normalize priority value to handle any case variations
+                  const priorityValue = String(issue.priority).toUpperCase().trim();
+
                   const priorityColor =
-                     issue.priority === "URGENT"
+                     priorityValue === "URGENT"
                         ? "bg-destructive/10 text-destructive border-destructive/20"
-                        : issue.priority === "HIGH"
-                        ? "bg-orange-500/10 text-orange-600 border-orange-500/20"
-                        : issue.priority === "MEDIUM"
-                        ? "bg-warning/10 text-warning border-warning/20"
+                        : priorityValue === "HIGH"
+                        ? "bg-orange-500/10 text-orange-400 border-orange-500/20"
+                        : priorityValue === "MEDIUM"
+                        ? "bg-yellow-500/10 text-yellow-600 border-yellow-500/20"
+                        : priorityValue === "LOW"
+                        ? "bg-muted text-muted-foreground border-border"
                         : "bg-muted text-muted-foreground border-border";
 
                   const previewText = issue.description || "No description";
-                  const orderId = issue.order_id;
+                  const orderId = issue.legacy_order_id || issue.order_id;
+
+                  console.log(issue, "issue");
 
                   return (
                      <button
@@ -129,9 +136,21 @@ export function IssuesListPane({
                                     </div>
                                  </div>
                                  <div className="flex items-center gap-2 shrink-0">
-                                    <Badge variant="outline" className={cn("text-[10px] font-medium", priorityColor)}>
-                                       {issuePriority[issue.priority as keyof typeof issuePriority] || issue.priority}
-                                    </Badge>
+                                    {issue.status !== "RESOLVED" && (
+                                       <Badge variant="outline" className="text-[10px] font-medium">
+                                          {issueType[issue.type as keyof typeof issueType] || issue.type}
+                                       </Badge>
+                                    )}
+                                    {issue.status !== "RESOLVED" && (
+                                       <Badge
+                                          variant="outline"
+                                          className={cn("text-[10px] font-medium", priorityColor)}
+                                       >
+                                          {issuePriority[issue.priority as keyof typeof issuePriority] ||
+                                             issue.priority}
+                                       </Badge>
+                                    )}
+
                                     <Badge
                                        variant="outline"
                                        className={cn("text-[10px] font-medium shrink-0", statusColor)}
@@ -149,9 +168,6 @@ export function IssuesListPane({
                               {/* Metadata Row: Priority, Type, and Related Items */}
                               <div className="flex items-center justify-between gap-2 flex-wrap">
                                  <div className="flex items-center gap-2">
-                                    <Badge variant="outline" className="text-[10px] font-medium">
-                                       {issueType[issue.type as keyof typeof issueType] || issue.type}
-                                    </Badge>
                                     {orderId && (
                                        <Link
                                           className="inline-flex items-center gap-1 text-xs text-primary hover:underline"
