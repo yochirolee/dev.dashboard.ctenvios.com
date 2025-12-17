@@ -125,12 +125,12 @@ const navIssuesItems: SidebarItem[] = [
       title: "Issues",
       url: "#",
       icon: AlertCircle,
-      allowedRoles: ["ROOT", "ADMINISTRATOR", "AGENCY_ADMIN", "MESSENGER"],
+      allowedRoles: ["ROOT", "ADMINISTRATOR", "AGENCY_ADMIN", "AGENCY_SALES", "MESSENGER"],
       items: [
          {
             title: "Reclamaciones",
             url: "/legacy-issues",
-            allowedRoles: ["ROOT", "ADMINISTRATOR", "AGENCY_ADMIN", "MESSENGER"],
+            allowedRoles: ["ROOT", "ADMINISTRATOR", "AGENCY_ADMIN", "AGENCY_SALES", "MESSENGER"],
          },
       ],
    },
