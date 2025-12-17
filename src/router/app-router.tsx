@@ -75,7 +75,7 @@ export const AppRouter = () => {
                   </Route>
                </Route>
                <Route path="issues">
-                  <Route index element={<IssuesPage />} />
+                  <Route index element={<LegacyIssuesPage />} />
                   <Route path="new" element={<NewIssuePage />} />
                   <Route path=":issueId" element={<IssuesPage />} />
                </Route>

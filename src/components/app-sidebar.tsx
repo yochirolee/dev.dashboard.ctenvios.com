@@ -25,7 +25,6 @@ interface SidebarItem {
    items?: SidebarSubItem[];
 }
 
-
 const navMainItems: SidebarItem[] = [
    {
       title: "Ordenes",
@@ -126,12 +125,12 @@ const navIssuesItems: SidebarItem[] = [
       title: "Issues",
       url: "#",
       icon: AlertCircle,
-      allowedRoles: ["ROOT", "ADMINISTRATOR", "AGENCY_ADMIN","MESSENGER"],
+      allowedRoles: ["ROOT", "ADMINISTRATOR", "AGENCY_ADMIN", "MESSENGER"],
       items: [
          {
             title: "Reclamaciones",
-            url: "/issues",
-            allowedRoles: ["ROOT", "ADMINISTRATOR", "AGENCY_ADMIN","MESSENGER"],
+            url: "/legacy-issues",
+            allowedRoles: ["ROOT", "ADMINISTRATOR", "AGENCY_ADMIN", "MESSENGER"],
          },
       ],
    },
