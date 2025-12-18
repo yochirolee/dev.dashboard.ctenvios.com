@@ -25,6 +25,7 @@ import IssuesPage from "@/pages/issues/issues-page";
 import NewIssuePage from "@/pages/issues/new-issue-page";
 import LegacyNewIssuePage from "@/pages/legacy-issues/legacy-new-issue-page";
 import LegacyIssuesPage from "@/pages/legacy-issues/legacy-issues-page";
+import { canAccess } from "@/lib/rbac";
 
 export const AppRouter = () => {
    return (
@@ -35,14 +36,16 @@ export const AppRouter = () => {
             <Route path="/" element={<DashboardLayout />}>
                {/* These are relative to /dashboard */}
                <Route index element={<HomePage />} />
-               <Route path="orders">
-                  <Route index element={<Navigate to="list" replace />} />
-                  <Route path="list" element={<InvoicesPage />} />
-                  <Route path="new" element={<NewOrderPage />} />
-                  <Route path=":orderId/edit" element={<EditOrderPage />} />
-                  <Route path=":orderId" element={<OrderDetailsPage />} />
+               <Route element={<ProtectedRoute allowedRoles={canAccess.orders} />}>
+                  <Route path="orders">
+                     <Route index element={<Navigate to="list" replace />} />
+                     <Route path="list" element={<InvoicesPage />} />
+                     <Route path="new" element={<NewOrderPage />} />
+                     <Route path=":orderId/edit" element={<EditOrderPage />} />
+                     <Route path=":orderId" element={<OrderDetailsPage />} />
+                  </Route>
                </Route>
-               <Route element={<ProtectedRoute allowedRoles={["ROOT", "ADMINISTRATOR", "AGENCY_ADMIN"]} />}>
+               <Route element={<ProtectedRoute allowedRoles={canAccess.logistics} />}>
                   <Route path="logistics">
                      <Route index element={<Navigate to="dispatch" replace />} />
                      <Route path="dispatch">
@@ -55,7 +58,7 @@ export const AppRouter = () => {
                      <Route path="flights" element={<FlightsPage />} />
                   </Route>
                </Route>
-               <Route element={<ProtectedRoute allowedRoles={["ROOT", "ADMINISTRATOR", "AGENCY_ADMIN"]} />}>
+               <Route element={<ProtectedRoute allowedRoles={canAccess.agencySettings} />}>
                   <Route path="settings">
                      <Route index element={<Navigate to="providers" replace />} />
                      <Route path="providers" element={<ProvidersServicesPage />} />
@@ -67,7 +70,7 @@ export const AppRouter = () => {
                      <Route path="customs" element={<CustomsPage />} />
                   </Route>
                </Route>
-               <Route element={<ProtectedRoute allowedRoles={["ROOT", "ADMINISTRATOR"]} />}>
+               <Route element={<ProtectedRoute allowedRoles={canAccess.systemLogs} />}>
                   <Route path="logs">
                      <Route index element={<Navigate to="app-logs" replace />} />
                      <Route path="app-logs" element={<AppLogsPage />} />

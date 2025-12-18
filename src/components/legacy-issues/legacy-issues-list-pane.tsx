@@ -101,8 +101,6 @@ export function LegacyIssuesListPane({
                   const previewText = issue.description || "No description";
                   const orderId = issue.legacy_order_id || issue.order_id;
 
-                  console.log(issue, "issue");
-
                   return (
                      <button
                         key={issue.id}
@@ -172,7 +170,7 @@ export function LegacyIssuesListPane({
                                        <Link
                                           className="inline-flex items-center gap-1 text-xs text-primary hover:underline"
                                           target="_blank"
-                                          to={`/orders/${orderId}`}
+                                          to={`https://systemcaribetravel.com/ordenes/factura_print.php?id=${orderId}`}
                                           onClick={(e) => e.stopPropagation()}
                                        >
                                           <Package className="w-3 h-3" />

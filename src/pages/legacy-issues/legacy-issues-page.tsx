@@ -179,7 +179,7 @@ export default function LegacyIssuesPage() {
             /* Desktop: Split Pane Layout */
             <ResizablePanelGroup direction="horizontal" className="flex-1 min-h-0 overflow-hidden">
                {/* Left Pane - Issues List */}
-               <ResizablePanel defaultSize={40} minSize={30} maxSize={60}>
+               <ResizablePanel defaultSize={28} minSize={28} maxSize={40}>
                   <div className="flex flex-col h-full  bg-background">
                      {/* Header */}
                      <div className="flex items-center justify-between h-12 p-2 border-b shrink-0">
@@ -282,7 +282,7 @@ export default function LegacyIssuesPage() {
                <ResizableHandle withHandle />
 
                {/* Right Pane - Issue Detail */}
-               <ResizablePanel defaultSize={80} minSize={80} maxSize={100}>
+               <ResizablePanel defaultSize={60} minSize={60}>
                   <div className="h-full overflow-hidden ">
                      {issueId ? (
                         <LegacyIssueDetailPane issueId={Number(issueId)} />

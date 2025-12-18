@@ -1,23 +1,7 @@
 import { Banknote, CreditCard, CreditCardIcon, Zap } from "lucide-react";
-export const ROLE_HIERARCHY = {
-   ROOT: 100,
-   ADMINISTRATOR: 90,
-   CARRIER_ADMIN: 80,
-   AGENCY_ADMIN: 70,
-   SALES: 60,
-   CARRIER_MESSENGER: 50,
-   MESSENGER: 40,
-} as const;
-
-export const roles = {
-   ROOT: "ROOT",
-   ADMINISTRATOR: "ADMINISTRATOR",
-   AGENCY_ADMIN: "AGENCY_ADMIN",
-   MESSENGER: "MESSENGER",
-   SALES: "SALES",
-   CARRIER_MESSENGER: "CARRIER_MESSENGER",
-   CARRIER_ADMIN: "CARRIER_ADMIN",
-} as const;
+// Re-export roles and hierarchy from rbac.ts for backward compatibility
+export { ROLES as roles, ROLE_HIERARCHY, ROLE_GROUPS } from "@/lib/rbac";
+export type { Role } from "@/lib/rbac";
 
 export const payment_methods = [
    {

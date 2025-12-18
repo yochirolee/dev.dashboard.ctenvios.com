@@ -9,11 +9,12 @@ import { Button } from "./ui/button";
 import { useAppStore } from "@/stores/app-store";
 import { NavConfig } from "./nav-config";
 import { NavIssues } from "./nav-issues";
+import { canAccess, hasRole, type Role } from "@/lib/rbac";
 
 interface SidebarSubItem {
    title: string;
    url: string;
-   allowedRoles?: string[];
+   allowedRoles?: Role[];
 }
 
 interface SidebarItem {
@@ -21,7 +22,7 @@ interface SidebarItem {
    url: string;
    icon?: LucideIcon;
    isActive?: boolean;
-   allowedRoles?: string[];
+   allowedRoles?: Role[];
    items?: SidebarSubItem[];
 }
 
@@ -31,31 +32,32 @@ const navMainItems: SidebarItem[] = [
       url: "#",
       icon: FileBox,
       isActive: true,
+      allowedRoles: canAccess.orders,
       items: [
-         { title: "Crear Orden", url: "/orders/new" },
-         { title: "Ordenes", url: "/orders/list" },
+         { title: "Crear Orden", url: "/orders/new", allowedRoles: canAccess.orders },
+         { title: "Ordenes", url: "/orders/list", allowedRoles: canAccess.orders },
       ],
    },
    {
       title: "Logistica",
       url: "#",
       icon: Warehouse,
-      allowedRoles: ["ROOT", "ADMINISTRATOR", "AGENCY_ADMIN"],
+      allowedRoles: canAccess.logistics,
       items: [
          {
             title: "Despachos",
             url: "/logistics/dispatch",
-            allowedRoles: ["ROOT", "ADMINISTRATOR", "AGENCY_ADMIN"],
+            allowedRoles: canAccess.logistics,
          },
          {
             title: "Contenedores",
             url: "/logistics/containers",
-            allowedRoles: ["ROOT", "ADMINISTRATOR"],
+            allowedRoles: canAccess.containersAndFlights,
          },
          {
             title: "Vuelos",
             url: "/logistics/flights",
-            allowedRoles: ["ROOT", "ADMINISTRATOR"],
+            allowedRoles: canAccess.containersAndFlights,
          },
       ],
    },
@@ -63,37 +65,37 @@ const navMainItems: SidebarItem[] = [
       title: "Settings",
       url: "#",
       icon: Settings2,
-      allowedRoles: ["ROOT", "ADMINISTRATOR", "AGENCY_ADMIN"],
+      allowedRoles: canAccess.agencySettings,
       items: [
          {
             title: "Providers",
             url: "/settings/providers",
-            allowedRoles: ["ROOT", "ADMINISTRATOR"],
+            allowedRoles: canAccess.systemSettings,
          },
          {
             title: "Agencies",
             url: "/settings/agencies",
-            allowedRoles: ["ROOT", "ADMINISTRATOR", "AGENCY_ADMIN"],
+            allowedRoles: canAccess.agencySettings,
          },
          {
             title: "Customers",
             url: "/settings/customers",
-            allowedRoles: ["ROOT", "ADMINISTRATOR"],
+            allowedRoles: canAccess.systemSettings,
          },
          {
             title: "Receivers",
             url: "/settings/receivers",
-            allowedRoles: ["ROOT", "ADMINISTRATOR"],
+            allowedRoles: canAccess.systemSettings,
          },
          {
             title: "Aranceles",
             url: "/settings/customs",
-            allowedRoles: ["ROOT", "ADMINISTRATOR"],
+            allowedRoles: canAccess.systemSettings,
          },
          {
             title: "Usuarios",
             url: "/settings/users",
-            allowedRoles: ["ROOT", "ADMINISTRATOR"],
+            allowedRoles: canAccess.systemSettings,
          },
       ],
    },
@@ -104,17 +106,17 @@ const navConfigItems: SidebarItem[] = [
       title: "Logs",
       url: "#",
       icon: FileStack,
-      allowedRoles: ["ROOT", "ADMINISTRATOR", "AGENCY_ADMIN"],
+      allowedRoles: canAccess.systemLogs,
       items: [
          {
             title: "App Logs",
             url: "/logs/app-logs",
-            allowedRoles: ["ROOT", "ADMINISTRATOR"],
+            allowedRoles: canAccess.systemLogs,
          },
          {
             title: "Partners Logs",
             url: "/logs/partners-logs",
-            allowedRoles: ["ROOT", "ADMINISTRATOR"],
+            allowedRoles: canAccess.systemLogs,
          },
       ],
    },
@@ -125,12 +127,12 @@ const navIssuesItems: SidebarItem[] = [
       title: "Issues",
       url: "#",
       icon: AlertCircle,
-      allowedRoles: ["ROOT", "ADMINISTRATOR", "AGENCY_ADMIN", "AGENCY_SALES", "MESSENGER"],
+      allowedRoles: canAccess.issues,
       items: [
          {
             title: "Reclamaciones",
             url: "/legacy-issues",
-            allowedRoles: ["ROOT", "ADMINISTRATOR", "AGENCY_ADMIN", "AGENCY_SALES", "MESSENGER"],
+            allowedRoles: canAccess.issues,
          },
       ],
    },
@@ -148,14 +150,14 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                if (!item.allowedRoles?.length) {
                   return true;
                }
-               return role ? item.allowedRoles.includes(role) : false;
+               return hasRole(role as Role, item.allowedRoles);
             })
             .map((item) => {
                const visibleSubItems = item.items?.filter((subItem) => {
                   if (!subItem.allowedRoles?.length) {
                      return true;
                   }
-                  return role ? subItem.allowedRoles.includes(role) : false;
+                  return hasRole(role as Role, subItem.allowedRoles);
                });
                return {
                   ...item,
@@ -186,9 +188,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                   Inicio
                </Button>
             </Link>
-            <NavMain items={filteredNavMain} />
-            <NavIssues items={filteredNavIssues} />
-            <NavConfig items={filteredNavConfig} />
+            {filteredNavMain.length > 0 && <NavMain items={filteredNavMain} />}
+            {filteredNavIssues.length > 0 && <NavIssues items={filteredNavIssues} />}
+            {filteredNavConfig.length > 0 && <NavConfig items={filteredNavConfig} />}
          </SidebarContent>
          <SidebarFooter>
             <NavUser />
