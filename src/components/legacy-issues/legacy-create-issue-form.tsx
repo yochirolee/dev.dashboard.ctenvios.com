@@ -171,7 +171,7 @@ export function LegacyCreateIssueForm({ initialOrderId, initialParcelId, onSucce
 
    return (
       <Card className="p-4 ">
-         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 ">
+         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 ">
             <FieldGroup>
                {/* Order ID Input */}
                <Field>
@@ -197,10 +197,13 @@ export function LegacyCreateIssueForm({ initialOrderId, initialParcelId, onSucce
                         </FieldError>
                      )}
                      {orderParcels && (
-                        <p className="text-sm text-muted-foreground mt-1">
-                           Order #{(orderParcels as any).order_id || orderParcels.id} • {orderItems.length} parcel
-                           {orderItems.length !== 1 ? "s" : ""}
-                        </p>
+                        <div className="flex items-center mt-2 gap-4">
+                           <p className="text-sm text-muted-foreground ">
+                              Order #{(orderParcels as any).order_id || orderParcels.id} • {orderItems.length} parcel
+                              {orderItems.length !== 1 ? "s" : ""}
+                           </p>
+                           <Badge>{orderParcels?.agency?.name}</Badge>
+                        </div>
                      )}
                      <FieldError>{form.formState.errors.legacy_order_id?.message}</FieldError>
                   </FieldContent>
