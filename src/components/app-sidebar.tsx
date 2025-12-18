@@ -14,7 +14,7 @@ import { canAccess, hasRole, type Role } from "@/lib/rbac";
 interface SidebarSubItem {
    title: string;
    url: string;
-   allowedRoles?: Role[];
+   allowedRoles?: readonly Role[];
 }
 
 interface SidebarItem {
@@ -22,7 +22,7 @@ interface SidebarItem {
    url: string;
    icon?: LucideIcon;
    isActive?: boolean;
-   allowedRoles?: Role[];
+   allowedRoles?: readonly Role[];
    items?: SidebarSubItem[];
 }
 
