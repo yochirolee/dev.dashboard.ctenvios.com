@@ -12,11 +12,12 @@ import {
    SidebarMenuSubItem,
 } from "@/components/ui/sidebar";
 import { cn } from "@/lib/utils";
+import { type Role } from "@/lib/rbac";
 
 interface NavMainSubItem {
    title: string;
    url: string;
-   allowedRoles?: string[];
+   allowedRoles?: readonly Role[];
 }
 
 interface NavMainItem {
@@ -24,7 +25,7 @@ interface NavMainItem {
    url: string;
    icon?: LucideIcon;
    isActive?: boolean;
-   allowedRoles?: string[];
+   allowedRoles?: readonly Role[];
    items?: NavMainSubItem[];
 }
 
