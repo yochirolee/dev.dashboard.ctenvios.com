@@ -5,18 +5,20 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import usePagination from "@/hooks/use-pagination";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { issueStatus, issuePriority, issueType } from "@/data/types";
+import { issueStatus, issuePriority, issueType, type Issue } from "@/data/types";
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from "@/components/ui/resizable";
 import { LegacyIssuesListPane } from "@/components/legacy-issues/legacy-issues-list-pane";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useLegacyIssues } from "@/hooks/use-legacy-issues";
 import { LegacyIssueDetailPane } from "@/components/legacy-issues/legacy-issue-detail-pane";
+import { useDebounce } from "use-debounce";
 
 export default function LegacyIssuesPage() {
    const navigate = useNavigate();
    const { issueId } = useParams();
    const isMobile = useIsMobile();
    const [searchQuery, setSearchQuery] = useState("");
+   const [debouncedSearchQuery] = useDebounce(searchQuery, 500);
    const [filters, setFilters] = useState<{
       status?: string;
       priority?: string;
@@ -24,36 +26,47 @@ export default function LegacyIssuesPage() {
    }>({});
    const { pagination, setPagination } = usePagination();
 
-   // Parse search query to extract issue_id or legacy_order_id
-   const searchFilters = useMemo(() => {
-      const trimmedQuery = searchQuery.trim();
-      if (!trimmedQuery) return {};
-
-      // Check if search query is numeric (for issue_id or legacy_order_id)
+   // Determine if we're searching (to adjust page size and filtering strategy)
+   const isSearching = useMemo(() => {
+      const trimmedQuery = debouncedSearchQuery.trim();
+      if (!trimmedQuery) return false;
       const numericValue = Number(trimmedQuery);
-      if (!isNaN(numericValue) && numericValue > 0) {
-         return {
-            issue_id: trimmedQuery,
-            order_id: trimmedQuery,
-         };
-      }
+      return !isNaN(numericValue) && numericValue > 0;
+   }, [debouncedSearchQuery]);
 
-      return {};
-   }, [searchQuery]);
-
-   // Combine filters with search filters
+   // When searching, use larger page size and filter client-side
+   // When not searching, use normal filters
    const combinedFilters = useMemo(() => {
+      // Don't add order_id filter when searching - we'll filter client-side for both issue_id and legacy_order_id
       return {
          ...filters,
-         ...searchFilters,
       };
-   }, [filters, searchFilters]);
+   }, [filters]);
+
+   // Use larger page size when searching to get more results for client-side filtering
+   const effectivePageSize = isSearching ? 100 : pagination.pageSize;
 
    const { data, isLoading, isFetching } = useLegacyIssues.getAll(
       pagination.pageIndex,
-      pagination.pageSize,
+      effectivePageSize,
       combinedFilters
    );
+
+   // Filter results client-side for issue_id matches when searching
+   const filteredIssues = useMemo(() => {
+      if (!data?.rows) return [];
+
+      const trimmedQuery = debouncedSearchQuery.trim();
+      if (!trimmedQuery) return data.rows;
+
+      const numericValue = Number(trimmedQuery);
+      if (!isNaN(numericValue) && numericValue > 0) {
+         // Filter for issues where id matches OR legacy_order_id matches
+         return data.rows.filter((issue: Issue) => issue.id === numericValue || issue.legacy_order_id === numericValue);
+      }
+
+      return data.rows;
+   }, [data?.rows, debouncedSearchQuery]);
 
    const handleFilterChange = (newFilters: { status?: string; priority?: string; type?: string }) => {
       setFilters(newFilters);
@@ -193,13 +206,13 @@ export default function LegacyIssuesPage() {
                      {/* Issues List */}
                      <div className="flex-1 min-h-0">
                         <LegacyIssuesListPane
-                           issues={data?.rows || []}
+                           issues={filteredIssues}
                            selectedIssueId={issueId ? Number(issueId) : undefined}
                            onIssueSelect={handleIssueSelect}
                            isLoading={isLoading || isFetching}
                            pagination={pagination}
                            onPaginationChange={setPagination}
-                           total={data?.total || 0}
+                           total={searchQuery.trim() ? filteredIssues.length : data?.total || 0}
                         />
                      </div>
                   </div>
@@ -302,13 +315,13 @@ export default function LegacyIssuesPage() {
                         </Button>
                      </div>
                      <LegacyIssuesListPane
-                        issues={data?.rows || []}
+                        issues={filteredIssues}
                         selectedIssueId={issueId ? Number(issueId) : undefined}
                         onIssueSelect={handleIssueSelect}
                         isLoading={isLoading || isFetching}
                         pagination={pagination}
                         onPaginationChange={setPagination}
-                        total={data?.total || 0}
+                        total={searchQuery.trim() ? filteredIssues.length : data?.total || 0}
                      />
                   </div>
                </ResizablePanel>
