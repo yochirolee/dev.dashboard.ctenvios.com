@@ -72,6 +72,7 @@ export function AppLogsPage() {
    }
 
    const { data: logStatus, isLoading: isLoadingLogStatus } = useLogStatus();
+
    const logsEnabled = logStatus?.status;
    const { mutate: toggleAppLogs } = useToggleAppLogs();
 

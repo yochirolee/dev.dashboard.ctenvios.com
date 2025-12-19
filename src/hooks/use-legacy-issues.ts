@@ -40,19 +40,6 @@ export const useLegacyIssues = {
          queryKey: ["legacy-issues", id, "comments"],
          queryFn: () => api.legacyIssues.getComments(id),
          enabled: !!id,
-         // Poll every 2 seconds when tab is visible for live-like updates
-         refetchInterval: (query) => {
-            // Only poll if tab is visible and query is not in error state
-            if (document.visibilityState === "visible" && !query.state.error) {
-               return 2000; // 2 seconds
-            }
-            return false; // Stop polling when tab is hidden
-         },
-         refetchOnWindowFocus: true,
-         refetchOnMount: true,
-         refetchOnReconnect: true,
-         staleTime: 0, // Always consider data stale to ensure fresh updates
-         gcTime: 5 * 60 * 1000, // Keep in cache for 5 minutes
       });
    },
    getAttachments: (id: number) => {

@@ -14,10 +14,16 @@ interface Parcel {
    weight: number;
 }
 
-export function LegacyIssueOrderDetails({ legacy_order_id, affected_parcels }: { legacy_order_id: number; affected_parcels: any[] }) {
+export function LegacyIssueOrderDetails({
+   legacy_order_id,
+   affected_parcels,
+}: {
+   legacy_order_id: number;
+   affected_parcels: any[];
+}) {
    const { data: order, isLoading, error } = useLegacyIssues.getParcelsByOrderId(legacy_order_id);
-  
-   
+
+   console.log("order", order);
    if (isLoading) {
       return (
          <div className="flex items-center justify-center h-full">
@@ -79,8 +85,10 @@ export function LegacyIssueOrderDetails({ legacy_order_id, affected_parcels }: {
                         )}
                         <div className="flex flex-col gap-2">{order?.receiver?.phone || order?.receiver?.mobile}</div>
                         <div className="flex flex-col gap-2">{order?.receiver?.address}</div>
-                        <div className="flex flex-col gap-2">{order?.receiver?.province?.name}</div>
-                        <div className="flex flex-col gap-2">{order?.receiver?.city?.name}</div>
+
+                        <div className="flex flex-col gap-2">
+                           {order?.receiver?.province} / {order?.receiver?.city}
+                        </div>
                      </div>
                   </div>
                </CardContent>

@@ -4,10 +4,10 @@ import { queryClient } from "@/lib/query-client";
 import type { ParcelStatus } from "@/data/types";
 
 export const useDispatches = {
-   get: () => {
+   get: (page: number, limit: number) => {
       return useQuery({
-         queryKey: ["dispatches"],
-         queryFn: () => api.dispatch.get(0, 25),
+         queryKey: ["dispatches", page, limit],
+         queryFn: () => api.dispatch.get(page, limit),
       });
    },
    create: () => {

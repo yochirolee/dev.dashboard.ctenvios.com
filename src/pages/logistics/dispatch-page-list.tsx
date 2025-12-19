@@ -2,7 +2,6 @@ import { useDispatches } from "@/hooks/use-dispatches";
 import { DataTable } from "@/components/ui/data-table";
 import { dispatchColumns } from "../../components/dispatch/dispatch-columns";
 import { useState, useMemo, useCallback } from "react";
-import type { PaginationState } from "@tanstack/react-table";
 import { ButtonGroup } from "@/components/ui/button-group";
 import { Button } from "@/components/ui/button";
 import { Group, PackageOpen, PackagePlus } from "lucide-react";
@@ -11,15 +10,13 @@ import { Spinner } from "@/components/ui/spinner";
 import { Empty, EmptyHeader, EmptyMedia, EmptyTitle, EmptyDescription, EmptyContent } from "@/components/ui/empty";
 import { toast } from "sonner";
 import { AlertDeleteDispatch } from "@/components/dispatch/alert-delete-dispatch";
+import usePagination from "@/hooks/use-pagination";
 
 export const DispatchPageLists = () => {
-   const { data, isLoading } = useDispatches.get();
+   const { pagination, setPagination } = usePagination();
+   const { data, isLoading } = useDispatches.get(pagination.pageIndex, pagination.pageSize);
    const navigate = useNavigate();
    const dispatches = data?.rows ?? [];
-   const [pagination, setPagination] = useState<PaginationState>({
-      pageIndex: 0,
-      pageSize: 25,
-   });
    const createDispatchMutation = useDispatches.create();
    const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
 
@@ -45,7 +42,7 @@ export const DispatchPageLists = () => {
 
    // Memoize columns to prevent recreation on every render
    const columns = useMemo(() => dispatchColumns(handleDeleteDispatch), [handleDeleteDispatch]);
-console.log(data, "data");
+   console.log(data, "data");
    if (isLoading)
       return (
          <div>
