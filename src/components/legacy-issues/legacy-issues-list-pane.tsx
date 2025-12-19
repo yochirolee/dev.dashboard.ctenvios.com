@@ -112,7 +112,7 @@ export function LegacyIssuesListPane({
                      >
                         <div className="flex items-start gap-3">
                            {/* Avatar */}
-                           <Avatar className="w-8 h-8 shrink-0">
+                           <Avatar className="w-7 h-7 shrink-0">
                               <AvatarFallback className="bg-primary/10 text-primary text-sm font-semibold">
                                  {creatorInitials}
                               </AvatarFallback>
@@ -125,10 +125,10 @@ export function LegacyIssuesListPane({
                                  <div className="flex flex-col">
                                     <span className="text-xs text-muted-foreground font-medium">{creatorName}</span>
                                     <div className="flex items-center gap-2 flex-1 min-w-0">
-                                       <span className="text-xs font-mono text-muted-foreground shrink-0">
+                                       <span className="text-[14px] font-mono text-muted-foreground shrink-0">
                                           #{issue.id}
                                        </span>
-                                       <h3 className="font-semibold text-sm text-foreground line-clamp-1 flex-1">
+                                       <h3 className="font-semibold text-xs text-foreground flex-1">
                                           {issue.title}
                                        </h3>
                                     </div>

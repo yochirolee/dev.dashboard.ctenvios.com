@@ -134,6 +134,11 @@ const navIssuesItems: SidebarItem[] = [
             url: "/legacy-issues",
             allowedRoles: canAccess.issues,
          },
+         {
+            title: "HM Paquetes",
+            url: "/hm-paquetes",
+            allowedRoles: canAccess.issues,
+         },
       ],
    },
 ];

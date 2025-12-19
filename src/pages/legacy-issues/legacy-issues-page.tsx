@@ -1,5 +1,5 @@
 import { FilePlus2, Search, X, ArrowLeft } from "lucide-react";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -24,10 +24,44 @@ export default function LegacyIssuesPage() {
    }>({});
    const { pagination, setPagination } = usePagination();
 
-   const { data, isLoading, isFetching } = useLegacyIssues.getAll(pagination.pageIndex, pagination.pageSize, filters);
+   // Parse search query to extract issue_id or legacy_order_id
+   const searchFilters = useMemo(() => {
+      const trimmedQuery = searchQuery.trim();
+      if (!trimmedQuery) return {};
+
+      // Check if search query is numeric (for issue_id or legacy_order_id)
+      const numericValue = Number(trimmedQuery);
+      if (!isNaN(numericValue) && numericValue > 0) {
+         return {
+            issue_id: trimmedQuery,
+            order_id: trimmedQuery,
+         };
+      }
+
+      return {};
+   }, [searchQuery]);
+
+   // Combine filters with search filters
+   const combinedFilters = useMemo(() => {
+      return {
+         ...filters,
+         ...searchFilters,
+      };
+   }, [filters, searchFilters]);
+
+   const { data, isLoading, isFetching } = useLegacyIssues.getAll(
+      pagination.pageIndex,
+      pagination.pageSize,
+      combinedFilters
+   );
 
    const handleFilterChange = (newFilters: { status?: string; priority?: string; type?: string }) => {
       setFilters(newFilters);
+      setPagination({ ...pagination, pageIndex: 0 });
+   };
+
+   const handleSearchChange = (value: string) => {
+      setSearchQuery(value);
       setPagination({ ...pagination, pageIndex: 0 });
    };
 
@@ -84,8 +118,8 @@ export default function LegacyIssuesPage() {
                               type="search"
                               className="pl-9 bg-muted/50 border-0"
                               value={searchQuery}
-                              onChange={(e) => setSearchQuery(e.target.value)}
-                              placeholder="Issues search..."
+                              onChange={(e) => handleSearchChange(e.target.value)}
+                              placeholder="Search by Issue ID or Order ID..."
                            />
                         </div>
                      </div>
@@ -197,8 +231,8 @@ export default function LegacyIssuesPage() {
                               type="search"
                               className="pl-9 bg-muted/50 border-0"
                               value={searchQuery}
-                              onChange={(e) => setSearchQuery(e.target.value)}
-                              placeholder="Issues search..."
+                              onChange={(e) => handleSearchChange(e.target.value)}
+                              placeholder="Search by Issue ID or Order ID..."
                            />
                         </div>
                      </div>

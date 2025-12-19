@@ -26,6 +26,7 @@ import NewIssuePage from "@/pages/issues/new-issue-page";
 import LegacyNewIssuePage from "@/pages/legacy-issues/legacy-new-issue-page";
 import LegacyIssuesPage from "@/pages/legacy-issues/legacy-issues-page";
 import { canAccess } from "@/lib/rbac";
+import TrackingHmPage from "@/pages/hm-paquetes/tracking-hm-page";
 
 export const AppRouter = () => {
    return (
@@ -86,6 +87,10 @@ export const AppRouter = () => {
                   <Route index element={<LegacyIssuesPage />} />
                   <Route path="new" element={<LegacyNewIssuePage />} />
                   <Route path=":issueId" element={<LegacyIssuesPage />} />
+               </Route>
+               <Route path="hm-paquetes">
+                  <Route index element={<TrackingHmPage />} />
+                  <Route path="tracking" element={<TrackingHmPage />} />
                </Route>
             </Route>
          </Route>

@@ -607,6 +607,7 @@ const api = {
             order_id?: string;
             parcel_id?: string;
             assigned_to_id?: string;
+            issue_id?: string;
          }
       ) => {
          const params: Record<string, string | number> = {
@@ -621,6 +622,7 @@ const api = {
             if (filters.order_id) params.order_id = filters.order_id;
             if (filters.parcel_id) params.parcel_id = filters.parcel_id;
             if (filters.assigned_to_id) params.assigned_to_id = filters.assigned_to_id;
+            if (filters.issue_id) params.issue_id = filters.issue_id;
          }
 
          const response = await axiosInstance.get(`/legacy-issues`, {

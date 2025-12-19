@@ -19,6 +19,7 @@ export const useLegacyIssues = {
          order_id?: string;
          parcel_id?: string;
          assigned_to_id?: string;
+         issue_id?: string;
       }
    ) => {
       return useQuery({
