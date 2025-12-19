@@ -11,7 +11,6 @@ import { format } from "date-fns";
 import { toast } from "sonner";
 import { parcelStatus, type ParcelStatus } from "@/data/types";
 
-
 type ParcelsInDispatch = {
    id: number;
    tracking_number: string;
@@ -34,7 +33,6 @@ export const ParcelsInDispatch = ({
       20,
       status ?? parcelStatus.IN_DISPATCH
    );
-
    // Flatten all pages into a single array
    const parcelsInDispatch = data?.pages.flatMap((page) => page?.rows ?? []) ?? [];
    const total = data?.pages[0]?.total ?? 0;
@@ -101,7 +99,6 @@ export const ParcelsInDispatch = ({
             <Button variant="outline" disabled={total === 0} onClick={handleFinishDispatch}>
                {finishDispatchMutation.isPending ? <Spinner /> : <CheckCircle2 />}
                <span className="hidden md:block">
-                
                   {finishDispatchMutation.isPending ? "Finalizando..." : "Finalizar Despacho"}
                </span>
             </Button>

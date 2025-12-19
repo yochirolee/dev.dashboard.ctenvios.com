@@ -158,8 +158,8 @@ export const useDispatches = {
    },
    getParcelsByDispatchId: (dispatch_id: number, limit: number = 20, status: ParcelStatus | undefined) => {
       return useInfiniteQuery({
-         queryKey: ["dispatch-parcels", dispatch_id],
-         queryFn: ({ pageParam = 1 }) => api.dispatch.getParcelsByDispatchId(dispatch_id, pageParam, limit, status),
+         queryKey: ["dispatch-parcels", dispatch_id, status],
+         queryFn: ({ pageParam = 0 }) => api.dispatch.getParcelsByDispatchId(dispatch_id, pageParam, limit, status),
          enabled: !!dispatch_id,
          getNextPageParam: (lastPage, allPages) => {
             const currentPage = allPages.length;
@@ -172,10 +172,11 @@ export const useDispatches = {
             }
 
             // Otherwise, check if there are more pages based on total
+            // Return 0-based page number (currentPage is already 0-based since it's allPages.length)
             const totalPages = Math.ceil(totalRows / limit);
-            return currentPage < totalPages ? currentPage + 1 : undefined;
+            return currentPage < totalPages ? currentPage : undefined;
          },
-         initialPageParam: 1,
+         initialPageParam: 0,
       });
    },
    removeParcel: (dispatch_id: number, agency_id: number) => {

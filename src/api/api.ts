@@ -453,12 +453,17 @@ const api = {
          limit: number = 20,
          status?: ParcelStatus
       ) => {
+         const params: Record<string, string | number> = {
+            page: page + 1,
+            limit,
+         };
+
+         if (status) {
+            params.status = status;
+         }
+
          const response = await axiosInstance.get(`/dispatches/${dispatch_id}/parcels`, {
-            params: {
-               page: page + 1,
-               limit,
-               status,
-            },
+            params,
          });
          return response.data;
       },
