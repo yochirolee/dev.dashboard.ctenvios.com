@@ -535,8 +535,8 @@ const api = {
             assigned_to_id?: string;
          }
       ) => {
-         // Ensure page is at least 1 (1-indexed)
-         const pageNumber = Math.max(1, page);
+         // Convert 0-indexed (from TanStack Table) to 1-indexed (for API)
+         const pageNumber = page + 1;
          const params: Record<string, string | number> = {
             page: pageNumber,
             limit,
@@ -616,8 +616,8 @@ const api = {
             issue_id?: string;
          }
       ) => {
-         // Ensure page is at least 1 (1-indexed)
-         const pageNumber = Math.max(1, page);
+         // Convert 0-indexed (from TanStack Table) to 1-indexed (for API)
+         const pageNumber = page + 1;
          const params: Record<string, string | number> = {
             page: pageNumber,
             limit,
