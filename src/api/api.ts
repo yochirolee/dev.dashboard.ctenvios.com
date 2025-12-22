@@ -535,8 +535,10 @@ const api = {
             assigned_to_id?: string;
          }
       ) => {
+         // Ensure page is at least 1 (1-indexed)
+         const pageNumber = Math.max(1, page);
          const params: Record<string, string | number> = {
-            page,
+            page: pageNumber,
             limit,
          };
 
@@ -614,8 +616,10 @@ const api = {
             issue_id?: string;
          }
       ) => {
+         // Ensure page is at least 1 (1-indexed)
+         const pageNumber = Math.max(1, page);
          const params: Record<string, string | number> = {
-            page: page,
+            page: pageNumber,
             limit,
          };
 
