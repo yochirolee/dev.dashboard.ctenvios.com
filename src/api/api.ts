@@ -76,28 +76,31 @@ axiosInstance.interceptors.response.use(
 const api = {
    customer: {
       get: async (page: number | 0, limit: number | 50) => {
+         // Convert 0-indexed (from TanStack Table) to 1-indexed (for API)
          const response = await axiosInstance.get("/customers", {
             params: {
-               page: page,
+               page: page + 1,
                limit: limit,
             },
          });
          return response.data;
       },
       getReceivers: async (customerId: number, page: number | 0, limit: number | 50) => {
+         // Convert 0-indexed (from TanStack Table) to 1-indexed (for API)
          const response = await axiosInstance.get(`/customers/${customerId}/receivers`, {
             params: {
-               page: page,
+               page: page + 1,
                limit: limit,
             },
          });
          return response.data;
       },
       search: async (query: string, page: number | 0, limit: number | 50) => {
+         // Convert 0-indexed (from TanStack Table) to 1-indexed (for API)
          if (query === "" || query === undefined) {
             const response = await axiosInstance.get("/customers", {
                params: {
-                  page: page,
+                  page: page + 1,
                   limit: limit,
                },
             });
@@ -106,7 +109,7 @@ const api = {
          const response = await axiosInstance.get("/customers/search", {
             params: {
                query,
-               page: page,
+               page: page + 1,
                limit: limit,
             },
          });
@@ -129,9 +132,10 @@ const api = {
    },
    receivers: {
       get: async (page: number | 0, limit: number | 50) => {
+         // Convert 0-indexed (from TanStack Table) to 1-indexed (for API)
          const response = await axiosInstance.get("/receivers", {
             params: {
-               page,
+               page: page + 1,
                limit,
             },
          });
@@ -142,10 +146,11 @@ const api = {
          return response.data;
       },
       search: async (query: string, page: number | 0, limit: number | 50) => {
+         // Convert 0-indexed (from TanStack Table) to 1-indexed (for API)
          if (query === "" || query === undefined) {
             const response = await axiosInstance.get("/receivers", {
                params: {
-                  page: page,
+                  page: page + 1,
                   limit: limit,
                },
             });
@@ -154,7 +159,7 @@ const api = {
          const response = await axiosInstance.get("/receivers/search", {
             params: {
                query,
-               page: page,
+               page: page + 1,
                limit: limit,
             },
          });
@@ -175,10 +180,11 @@ const api = {
    },
    orders: {
       search: async (search: string, page: number | 1, limit: number | 20, startDate: string, endDate: string) => {
+         // Convert 0-indexed (from TanStack Table) to 1-indexed (for API)
          const response = await axiosInstance.get("/orders", {
             params: {
                search,
-               page: page,
+               page: page + 1,
                limit: limit,
                startDate: startDate,
                endDate: endDate,
@@ -227,9 +233,10 @@ const api = {
 
    users: {
       get: async (page: number | 1, limit: number | 25) => {
+         // Convert 0-indexed (from TanStack Table) to 1-indexed (for API)
          const response = await axiosInstance.get("/users", {
             params: {
-               page: page,
+               page: page + 1,
                limit: limit,
             },
          });
@@ -288,7 +295,7 @@ const api = {
          const response = await axiosInstance.get("/agencies/search", {
             params: {
                query,
-               page,
+               page: page + 1,
                limit,
             },
          });
@@ -314,19 +321,21 @@ const api = {
    },
    customs: {
       get: async (page: number | 1, limit: number | 25) => {
+         // Convert 0-indexed (from TanStack Table) to 1-indexed (for API)
          const response = await axiosInstance.get("/customs-rates", {
             params: {
-               page: page,
+               page: page + 1,
                limit: limit,
             },
          });
          return response.data;
       },
       search: async (query: string, page: number | 1, limit: number | 25) => {
+         // Convert 0-indexed (from TanStack Table) to 1-indexed (for API)
          const response = await axiosInstance.get("/customs-rates/search", {
             params: {
                query,
-               page: page,
+               page: page + 1,
                limit: limit,
             },
          });
@@ -409,7 +418,7 @@ const api = {
       get: async (page: number | 1, limit: number | 25) => {
          const response = await axiosInstance.get("/dispatches", {
             params: {
-               page: page,
+               page: page + 1,
                limit: limit,
             },
          });
@@ -440,7 +449,7 @@ const api = {
       readyForDispatch: async (page: number = 1, limit: number = 20) => {
          const response = await axiosInstance.get(`/dispatches/ready-for-dispatch`, {
             params: {
-               page,
+               page: page + 1,
                limit,
             },
          });
@@ -453,7 +462,7 @@ const api = {
          status?: ParcelStatus
       ) => {
          const params: Record<string, string | number> = {
-            page: page,
+            page: page + 1,
             limit,
          };
 
@@ -486,8 +495,9 @@ const api = {
             endDate?: Date;
          }
       ) => {
+         // Convert 0-indexed (from TanStack Table) to 1-indexed (for API)
          const params: Record<string, string | number> = {
-            page: page,
+            page: page + 1,
             limit,
          };
 
@@ -536,9 +546,8 @@ const api = {
          }
       ) => {
          // Convert 0-indexed (from TanStack Table) to 1-indexed (for API)
-         const pageNumber = page + 1;
          const params: Record<string, string | number> = {
-            page: pageNumber,
+            page: page + 1,
             limit,
          };
 
@@ -617,9 +626,8 @@ const api = {
          }
       ) => {
          // Convert 0-indexed (from TanStack Table) to 1-indexed (for API)
-         const pageNumber = page + 1;
          const params: Record<string, string | number> = {
-            page: pageNumber,
+            page: page + 1,
             limit,
          };
 
