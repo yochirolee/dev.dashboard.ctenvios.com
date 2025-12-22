@@ -70,18 +70,18 @@ export default function LegacyIssuesPage() {
 
    const handleFilterChange = (newFilters: { status?: string; priority?: string; type?: string }) => {
       setFilters(newFilters);
-      setPagination({ ...pagination, pageIndex: 0 });
+      setPagination({ ...pagination, pageIndex: 1 });
    };
 
    const handleSearchChange = (value: string) => {
       setSearchQuery(value);
-      setPagination({ ...pagination, pageIndex: 0 });
+      setPagination({ ...pagination, pageIndex: 1 });
    };
 
    const handleClearFilters = () => {
       setSearchQuery("");
       setFilters({});
-      setPagination({ ...pagination, pageIndex: 0 });
+      setPagination({ ...pagination, pageIndex: 1 });
    };
 
    const hasActiveFilters = Object.values(filters).some((value) => value !== undefined) || searchQuery;

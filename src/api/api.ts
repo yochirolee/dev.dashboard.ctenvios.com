@@ -78,7 +78,7 @@ const api = {
       get: async (page: number | 0, limit: number | 50) => {
          const response = await axiosInstance.get("/customers", {
             params: {
-               page: page ,
+               page: page,
                limit: limit,
             },
          });
@@ -87,7 +87,7 @@ const api = {
       getReceivers: async (customerId: number, page: number | 0, limit: number | 50) => {
          const response = await axiosInstance.get(`/customers/${customerId}/receivers`, {
             params: {
-               page: page ,
+               page: page,
                limit: limit,
             },
          });
@@ -97,7 +97,7 @@ const api = {
          if (query === "" || query === undefined) {
             const response = await axiosInstance.get("/customers", {
                params: {
-                  page: page ,
+                  page: page,
                   limit: limit,
                },
             });
@@ -106,7 +106,7 @@ const api = {
          const response = await axiosInstance.get("/customers/search", {
             params: {
                query,
-               page: page ,
+               page: page,
                limit: limit,
             },
          });
@@ -229,7 +229,7 @@ const api = {
       get: async (page: number | 1, limit: number | 25) => {
          const response = await axiosInstance.get("/users", {
             params: {
-               page: page ,
+               page: page,
                limit: limit,
             },
          });
@@ -316,7 +316,7 @@ const api = {
       get: async (page: number | 1, limit: number | 25) => {
          const response = await axiosInstance.get("/customs-rates", {
             params: {
-               page: page ,
+               page: page,
                limit: limit,
             },
          });
@@ -453,7 +453,7 @@ const api = {
          status?: ParcelStatus
       ) => {
          const params: Record<string, string | number> = {
-            page: page ,
+            page: page,
             limit,
          };
 
@@ -487,7 +487,7 @@ const api = {
          }
       ) => {
          const params: Record<string, string | number> = {
-            page: page ,
+            page: page,
             limit,
          };
 
@@ -536,7 +536,7 @@ const api = {
          }
       ) => {
          const params: Record<string, string | number> = {
-            page: page + 1,
+            page,
             limit,
          };
 
@@ -615,7 +615,7 @@ const api = {
          }
       ) => {
          const params: Record<string, string | number> = {
-            page: page + 1,
+            page: page,
             limit,
          };
 
