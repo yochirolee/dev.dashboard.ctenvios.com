@@ -28,13 +28,12 @@ export default function IssuesPage() {
 
    const handleFilterChange = (newFilters: { status?: string; priority?: string; type?: string }) => {
       setFilters(newFilters);
-      setPagination({ ...pagination, pageIndex: 0 });
    };
 
    const handleClearFilters = () => {
       setSearchQuery("");
       setFilters({});
-      setPagination({ ...pagination, pageIndex: 0 });
+      setPagination({ ...pagination });
    };
 
    const hasActiveFilters = Object.values(filters).some((value) => value !== undefined) || searchQuery;

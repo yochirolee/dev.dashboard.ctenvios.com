@@ -536,7 +536,7 @@ const api = {
          }
       ) => {
          const params: Record<string, string | number> = {
-            page: page ,
+            page: page + 1,
             limit,
          };
 
@@ -615,7 +615,7 @@ const api = {
          }
       ) => {
          const params: Record<string, string | number> = {
-            page: page ,
+            page: page + 1,
             limit,
          };
 
