@@ -447,9 +447,10 @@ const api = {
          return response.data;
       },
       readyForDispatch: async (page: number = 1, limit: number = 20) => {
+         // Note: page is already 1-indexed from useInfiniteQuery, so no conversion needed
          const response = await axiosInstance.get(`/dispatches/ready-for-dispatch`, {
             params: {
-               page: page + 1,
+               page,
                limit,
             },
          });
