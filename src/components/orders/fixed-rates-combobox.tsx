@@ -32,7 +32,7 @@ const FixedRatesCombobox = React.memo(function FixedRatesCombobox({
    // Watch the rate_id from form to sync with form changes
    const formRateId = useWatch({
       control,
-      name: `items.${index}.rate_id`,
+      name: `order_items.${index}.rate_id`,
    });
 
    // Derive selectedRate from form value instead of local state
@@ -44,27 +44,27 @@ const FixedRatesCombobox = React.memo(function FixedRatesCombobox({
    useEffect(() => {
       // Only update form if onSelect callback is not provided (default behavior)
       if (!onSelect && selectedRate) {
-         setValue(`items.${index}.rate_id`, selectedRate?.id || 0);
-         setValue(`items.${index}.price_in_cents`, selectedRate?.price_in_cents || 0);
-         setValue(`items.${index}.description`, selectedRate?.description || "");
-         setValue(`items.${index}.cost_in_cents`, selectedRate?.cost_in_cents || 0);
-         setValue(`items.${index}.unit`, selectedRate?.unit || "FIXED");
+         setValue(`order_items.${index}.rate_id`, selectedRate?.id || 0);
+         setValue(`order_items.${index}.price_in_cents`, selectedRate?.price_in_cents || 0);
+         setValue(`order_items.${index}.description`, selectedRate?.description || "");
+         setValue(`order_items.${index}.cost_in_cents`, selectedRate?.cost_in_cents || 0);
+         setValue(`order_items.${index}.unit`, selectedRate?.unit || "FIXED");
       }
    }, [shipping_rates, selectedRate, onSelect]);
 
    const handleUpdateRate = (rate: ShippingRate): void => {
       // Always update form to keep it in sync
-      setValue(`items.${index}.rate_id`, rate?.id || 0);
+      setValue(`order_items.${index}.rate_id`, rate?.id || 0);
 
       // If onSelect callback is provided, use it
       if (onSelect) {
          onSelect(rate);
       } else {
          // Otherwise use default behavior with form.setValue for other fields
-         setValue(`items.${index}.price_in_cents`, rate?.price_in_cents || 0);
-         setValue(`items.${index}.description`, rate?.description || "");
-         setValue(`items.${index}.cost_in_cents`, rate?.cost_in_cents || 0);
-         setValue(`items.${index}.unit`, rate?.unit || "FIXED");
+         setValue(`order_items.${index}.price_in_cents`, rate?.price_in_cents || 0);
+         setValue(`order_items.${index}.description`, rate?.description || "");
+         setValue(`order_items.${index}.cost_in_cents`, rate?.cost_in_cents || 0);
+         setValue(`order_items.${index}.unit`, rate?.unit || "FIXED");
       }
 
       setOpen(false);

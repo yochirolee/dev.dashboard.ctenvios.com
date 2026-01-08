@@ -21,7 +21,7 @@ export const customsColumns = (
       accessorKey: "id",
       header: "ID",
       cell: ({ row }) => {
-         return <div>{row.original?.id}</div>;
+         return <span className="font-mono text-xs text-muted-foreground">{row.original?.id}</span>;
       },
    },
    {
@@ -37,19 +37,35 @@ export const customsColumns = (
    {
       accessorKey: "custom_value",
       header: "Custom Value",
-      cell: ({ row }) => <div>{row.original?.custom_value} pts</div>,
+      cell: ({ row }) => (
+         <span className="font-mono text-xs text-muted-foreground">{row.original?.custom_value} pts</span>
+      ),
    },
    {
       accessorKey: "fee_in_cents",
       header: "Fee",
-      cell: ({ row }) => <div>${centsToDollars(row.original?.fee_in_cents).toFixed(2)}</div>,
+      cell: ({ row }) => (
+         <span className="font-mono ">
+            ${centsToDollars(row.original?.fee_in_cents).toFixed(2)}
+         </span>
+      ),
+   },
+   {
+      accessorKey: "insurance_fee_in_cents",
+      header: "Insurance Fee",
+      
+      cell: ({ row }) => (
+         <span className="font-mono text-sm">
+            ${centsToDollars(row.original?.insurance_fee_in_cents).toFixed(2)}
+         </span>
+      ),
    },
 
    {
       accessorKey: "max_quantity",
       header: "Max Quantity",
       cell: ({ row }) => {
-         return <div>{row.original?.max_quantity}</div>;
+         return <span className="font-mono text-xs text-muted-foreground">{row.original?.max_quantity}</span>;
       },
    },
 
@@ -64,13 +80,13 @@ export const customsColumns = (
    {
       accessorKey: "min_weight",
       header: "Min Weight",
-      cell: ({ row }) => <div>{row.original?.min_weight}</div>,
+      cell: ({ row }) => <span className="font-mono text-xs text-muted-foreground">{row.original?.min_weight}</span>,
    },
 
    {
       accessorKey: "max_weight",
       header: "Max Weight",
-      cell: ({ row }) => <div>{row.original?.max_weight}</div>,
+      cell: ({ row }) => <span className="font-mono text-xs text-muted-foreground">{row.original?.max_weight}</span>,
    },
 
    // TODO: Add actions

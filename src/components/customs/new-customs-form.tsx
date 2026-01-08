@@ -19,7 +19,7 @@ import { useCustoms } from "@/hooks/use-customs";
 import type { Customs } from "@/data/types";
 import { customsRatesSchema } from "@/data/types";
 import { centsToDollars, dollarsToCents } from "@/lib/cents-utils";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Controller } from "react-hook-form";
 import { Field } from "@/components/ui/field";
 import { FieldLabel, FieldError } from "@/components/ui/field";
@@ -45,11 +45,14 @@ export function NewCustomsForm({
          country_id: 1,
          fee_type: "UNIT",
          fee_in_cents: undefined,
+         insurance_fee_in_cents: undefined,
          min_weight: 0,
          max_weight: 0,
          max_quantity: 0,
       },
    });
+
+   const [isEditing, setIsEditing] = useState(false);
 
    useEffect(() => {
       if (customsRate) {
@@ -60,10 +63,12 @@ export function NewCustomsForm({
             country_id: customsRate?.country_id,
             fee_type: customsRate?.fee_type,
             fee_in_cents: centsToDollars(customsRate?.fee_in_cents ?? 0),
+            insurance_fee_in_cents: centsToDollars(customsRate?.insurance_fee_in_cents ?? 0),
             min_weight: customsRate?.min_weight ?? 0,
             max_weight: customsRate?.max_weight ?? 0,
             max_quantity: customsRate?.max_quantity ?? 0,
          });
+         setIsEditing(true);
       } else {
          form.reset({
             name: "",
@@ -72,10 +77,12 @@ export function NewCustomsForm({
             country_id: 1,
             fee_type: "UNIT",
             fee_in_cents: undefined,
+            insurance_fee_in_cents: undefined,
             min_weight: 0,
             max_weight: 0,
             max_quantity: 0,
          });
+         setIsEditing(false);
       }
    }, [customsRate, open]);
 
@@ -83,10 +90,14 @@ export function NewCustomsForm({
    const updateCustomsMutation = useCustoms.update();
    const onSubmit = async (data: FormData) => {
       const feeInCents = dollarsToCents(data.fee_in_cents ?? 0);
-
+      const insuranceFeeInCents = dollarsToCents(data.insurance_fee_in_cents ?? 0);
+       console.log(data);
       if (customsRate) {
          updateCustomsMutation.mutate(
-            { id: customsRate?.id, data: { ...data, fee_in_cents: feeInCents } } as {
+            {
+               id: customsRate?.id,
+               data: { ...data, fee_in_cents: feeInCents, insurance_fee_in_cents: insuranceFeeInCents },
+            } as {
                id: number;
                data: Customs;
             },
@@ -99,13 +110,16 @@ export function NewCustomsForm({
             }
          );
       } else {
-         createCustomsMutation.mutate({ ...data, fee_in_cents: feeInCents } as Customs, {
-            onSuccess: () => {
-               setCustomsRate(undefined);
-               setOpen(false);
-               form.reset();
-            },
-         });
+         createCustomsMutation.mutate(
+            { ...data, fee_in_cents: feeInCents, insurance_fee_in_cents: insuranceFeeInCents } as Customs,
+            {
+               onSuccess: () => {
+                  setCustomsRate(undefined);
+                  setOpen(false);
+                  form.reset();
+               },
+            }
+         );
       }
    };
 
@@ -200,6 +214,24 @@ export function NewCustomsForm({
                <div className="flex flex-col w-full gap-2">
                   <Controller
                      control={form.control}
+                     name="insurance_fee_in_cents"
+                     render={({ field, fieldState }) => (
+                        <Field data-invalid={fieldState.invalid}>
+                           <FieldLabel>Seguro</FieldLabel>
+                           <Input
+                              {...field}
+                              placeholder="0.00"
+                              type="number"
+                              onChange={(e) => field.onChange(e.target.valueAsNumber)}
+                           />
+                           {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                        </Field>
+                     )}
+                  />
+               </div>
+               <div className="flex flex-col w-full gap-2">
+                  <Controller
+                     control={form.control}
                      name="max_weight"
                      render={({ field, fieldState }) => (
                         <Field data-invalid={fieldState.invalid}>
@@ -259,7 +291,11 @@ export function NewCustomsForm({
                         className="w-full"
                         disabled={createCustomsMutation.isPending || updateCustomsMutation.isPending}
                      >
-                        {createCustomsMutation.isPending || updateCustomsMutation.isPending ? "Creando..." : "Crear"}
+                        {createCustomsMutation.isPending || updateCustomsMutation.isPending
+                           ? "Creando..."
+                           : isEditing
+                           ? "Actualizar"
+                           : "Crear"}
                      </Button>
                      <Button
                         type="button"
@@ -269,6 +305,7 @@ export function NewCustomsForm({
                            setOpen(false);
                            form.reset();
                            setCustomsRate(undefined);
+                           setIsEditing(false);
                         }}
                      >
                         Cancelar

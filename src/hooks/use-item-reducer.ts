@@ -6,7 +6,6 @@ export interface ItemState {
    description: string;
    weight: number | undefined;
    price_in_cents: number;
-   cost_in_cents: number;
    rate_id: number;
    unit: "PER_LB" | "FIXED";
    insurance_fee_in_cents: number;
@@ -54,8 +53,7 @@ type ItemAction =
    | {
         type: "SET_CHARGE";
         payload: { amount: number };
-   };
-   
+     };
 
 export function itemReducer(state: ItemState, action: ItemAction): ItemState {
    switch (action.type) {
@@ -70,7 +68,6 @@ export function itemReducer(state: ItemState, action: ItemAction): ItemState {
             description: "",
             rate_id: activeRate?.id || 0,
             price_in_cents: activeRate?.price_in_cents || 0,
-            cost_in_cents: activeRate?.cost_in_cents || 0,
             customs_fee_in_cents: 0,
             customs_id: 0, // Reset customs_id when toggling unit
          };
@@ -106,7 +103,6 @@ export function itemReducer(state: ItemState, action: ItemAction): ItemState {
             ...state,
             rate_id: rate.id || 0,
             price_in_cents: rate.price_in_cents || 0,
-            cost_in_cents: rate.cost_in_cents || 0,
             description: rate.description || "",
             unit: "FIXED",
          };
@@ -174,8 +170,6 @@ export function itemReducer(state: ItemState, action: ItemAction): ItemState {
             ...state,
             insurance_fee_in_cents: action.payload.amount,
          };
-
-         console.log("newState", newState);
 
          newState.subtotal = calculate_row_subtotal(
             newState.price_in_cents,

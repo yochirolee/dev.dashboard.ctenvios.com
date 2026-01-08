@@ -1,10 +1,31 @@
+import type React from "react";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { type ColumnDef } from "@tanstack/react-table";
 import { format } from "date-fns";
 import { formatFullName } from "@/lib/cents-utils";
-import { EllipsisVertical, FileBoxIcon, Pencil, TagIcon } from "lucide-react";
+import {
+   EllipsisVertical,
+   FileBoxIcon,
+   Pencil,
+   TagIcon,
+   Building2,
+   Package,
+   Send,
+   PackageCheck,
+   Warehouse,
+   Container,
+   Ship,
+   Anchor,
+   ShieldCheck,
+   CheckCircle2,
+   Truck,
+   XCircle,
+   CircleCheckBig,
+   Undo2,
+   type LucideIcon,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
    DropdownMenu,
@@ -69,6 +90,111 @@ export type Order = {
 const baseUrl = import.meta.env.VITE_API_URL;
 const oldBaseUrl = "https://systemcaribetravel.com/ordenes/factura_print.php?id=";
 
+// Order Status Constants
+export const ORDER_STATUS = {
+   // Estados base
+   IN_AGENCY: "IN_AGENCY",
+   IN_PALLET: "IN_PALLET",
+   IN_DISPATCH: "IN_DISPATCH",
+   RECEIVED_IN_DISPATCH: "RECEIVED_IN_DISPATCH",
+   IN_WAREHOUSE: "IN_WAREHOUSE",
+   IN_CONTAINER: "IN_CONTAINER",
+   IN_TRANSIT: "IN_TRANSIT",
+   AT_PORT_OF_ENTRY: "AT_PORT_OF_ENTRY",
+   CUSTOMS_INSPECTION: "CUSTOMS_INSPECTION",
+   RELEASED_FROM_CUSTOMS: "RELEASED_FROM_CUSTOMS",
+   OUT_FOR_DELIVERY: "OUT_FOR_DELIVERY",
+   FAILED_DELIVERY: "FAILED_DELIVERY",
+   DELIVERED: "DELIVERED",
+   RETURNED_TO_SENDER: "RETURNED_TO_SENDER",
+   // Estados parciales
+   PARTIALLY_IN_PALLET: "PARTIALLY_IN_PALLET",
+   PARTIALLY_IN_DISPATCH: "PARTIALLY_IN_DISPATCH",
+   PARTIALLY_IN_CONTAINER: "PARTIALLY_IN_CONTAINER",
+   PARTIALLY_IN_TRANSIT: "PARTIALLY_IN_TRANSIT",
+   PARTIALLY_AT_PORT: "PARTIALLY_AT_PORT",
+   PARTIALLY_IN_CUSTOMS: "PARTIALLY_IN_CUSTOMS",
+   PARTIALLY_RELEASED: "PARTIALLY_RELEASED",
+   PARTIALLY_OUT_FOR_DELIVERY: "PARTIALLY_OUT_FOR_DELIVERY",
+   PARTIALLY_DELIVERED: "PARTIALLY_DELIVERED",
+} as const;
+
+export type OrderStatus = (typeof ORDER_STATUS)[keyof typeof ORDER_STATUS];
+
+// Labels para UI
+export const STATUS_LABELS: Record<OrderStatus, string> = {
+   IN_AGENCY: "En agencia",
+   IN_PALLET: "En pallet",
+   IN_DISPATCH: "En despacho",
+   RECEIVED_IN_DISPATCH: "Recibido en despacho",
+   IN_WAREHOUSE: "En almacén",
+   IN_CONTAINER: "En contenedor",
+   IN_TRANSIT: "En tránsito",
+   AT_PORT_OF_ENTRY: "En puerto",
+   CUSTOMS_INSPECTION: "En aduana",
+   RELEASED_FROM_CUSTOMS: "Liberado de aduana",
+   OUT_FOR_DELIVERY: "En camino",
+   FAILED_DELIVERY: "Entrega fallida",
+   DELIVERED: "Entregado",
+   RETURNED_TO_SENDER: "Devuelto",
+   PARTIALLY_IN_PALLET: "Parcial en pallet",
+   PARTIALLY_IN_DISPATCH: "Parcial en despacho",
+   PARTIALLY_IN_CONTAINER: "Parcial en contenedor",
+   PARTIALLY_IN_TRANSIT: "Parcial en tránsito",
+   PARTIALLY_AT_PORT: "Parcial en puerto",
+   PARTIALLY_IN_CUSTOMS: "Parcial en aduana",
+   PARTIALLY_RELEASED: "Parcial liberado",
+   PARTIALLY_OUT_FOR_DELIVERY: "Parcial en camino",
+   PARTIALLY_DELIVERED: "Parcial entregado",
+};
+
+// Configuración de iconos y colores para cada estado
+interface StatusConfig {
+   icon: LucideIcon;
+   color: string;
+}
+
+const STATUS_CONFIG: Record<OrderStatus, StatusConfig> = {
+   // Estados base - Flujo normal
+   IN_AGENCY: { icon: Building2, color: "text-blue-500" },
+   IN_PALLET: { icon: Package, color: "text-indigo-500" },
+   IN_DISPATCH: { icon: Send, color: "text-violet-500" },
+   RECEIVED_IN_DISPATCH: { icon: PackageCheck, color: "text-purple-500" },
+   IN_WAREHOUSE: { icon: Warehouse, color: "text-fuchsia-500" },
+   IN_CONTAINER: { icon: Container, color: "text-cyan-500" },
+   IN_TRANSIT: { icon: Ship, color: "text-teal-500" },
+   AT_PORT_OF_ENTRY: { icon: Anchor, color: "text-orange-500" },
+   CUSTOMS_INSPECTION: { icon: ShieldCheck, color: "text-amber-500" },
+   RELEASED_FROM_CUSTOMS: { icon: CheckCircle2, color: "text-lime-500" },
+   OUT_FOR_DELIVERY: { icon: Truck, color: "text-sky-500" },
+   FAILED_DELIVERY: { icon: XCircle, color: "text-red-500" },
+   DELIVERED: { icon: CircleCheckBig, color: "text-green-500" },
+   RETURNED_TO_SENDER: { icon: Undo2, color: "text-rose-500" },
+   // Estados parciales - Mismos iconos con colores más suaves
+   PARTIALLY_IN_PALLET: { icon: Package, color: "text-indigo-400" },
+   PARTIALLY_IN_DISPATCH: { icon: Send, color: "text-violet-400" },
+   PARTIALLY_IN_CONTAINER: { icon: Container, color: "text-cyan-400" },
+   PARTIALLY_IN_TRANSIT: { icon: Ship, color: "text-teal-400" },
+   PARTIALLY_AT_PORT: { icon: Anchor, color: "text-orange-400" },
+   PARTIALLY_IN_CUSTOMS: { icon: ShieldCheck, color: "text-amber-400" },
+   PARTIALLY_RELEASED: { icon: CheckCircle2, color: "text-lime-400" },
+   PARTIALLY_OUT_FOR_DELIVERY: { icon: Truck, color: "text-sky-400" },
+   PARTIALLY_DELIVERED: { icon: CircleCheckBig, color: "text-green-400" },
+};
+
+export const getOrderStatusBadge = (status: string): React.ReactNode => {
+   const config = STATUS_CONFIG[status as OrderStatus] || { icon: Package, color: "text-gray-500" };
+   const label = STATUS_LABELS[status as OrderStatus] || status;
+   const Icon = config.icon;
+
+   return (
+      <Badge className="w-fit gap-1.5" variant="secondary">
+         <Icon className={`shrink-0 min-w-4 min-h-4 ${config.color}`} />
+         <span className="text-nowrap font-normal text-muted-foreground text-xs">{label}</span>
+      </Badge>
+   );
+};
+
 export const orderColumns: ColumnDef<Order>[] = [
    {
       id: "select",
@@ -109,7 +235,10 @@ export const orderColumns: ColumnDef<Order>[] = [
       header: "Labels",
       cell: ({ row }) => {
          return (
-            <Badge variant="secondary" className="flex items-center gap-2 w-fit font-mono text-xs text-muted-foreground ">
+            <Badge
+               variant="secondary"
+               className="flex items-center gap-2 w-fit font-mono text-xs text-muted-foreground "
+            >
                <Link
                   className="flex items-center gap-2"
                   target="_blank"
@@ -236,13 +365,9 @@ export const orderColumns: ColumnDef<Order>[] = [
       accessorKey: "status",
       header: "Status",
       cell: ({ row }) => {
-         return (
-            <Badge variant="secondary" className="whitespace-nowrap">
-               {row.original?.status}
-            </Badge>
-         );
+         return getOrderStatusBadge(row.original?.status);
       },
-      size: 100,
+      size: 150,
    },
    {
       accessorKey: "created_at",

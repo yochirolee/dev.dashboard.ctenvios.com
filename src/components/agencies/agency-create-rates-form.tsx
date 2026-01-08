@@ -57,8 +57,6 @@ export const AgencyCreateRatesForm = ({
       },
    });
 
-   console.log(form.formState.errors);
-
    function onSubmit(data: z.infer<typeof formSchema>) {
       console.log(data);
       createRate(
@@ -74,7 +72,6 @@ export const AgencyCreateRatesForm = ({
                setIsOpen(false);
             },
             onError: (error) => {
-            
                const errorMessage =
                   (error as any)?.response?.data?.error ||
                   (error as any)?.response?.data?.message ||
@@ -231,7 +228,8 @@ export const AgencyCreateRatesForm = ({
             <Button type="submit" form="form-create-rate">
                {isPending ? (
                   <>
-                     <Spinner className="w-4 h-4 animate-spin" /> <span className="hidden md:block">Creando tarifa...</span>
+                     <Spinner className="w-4 h-4 animate-spin" />{" "}
+                     <span className="hidden md:block">Creando tarifa...</span>
                   </>
                ) : (
                   "Crear tarifa"

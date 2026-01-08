@@ -65,3 +65,30 @@ export const useLogOut = () => {
       },
    });
 };
+
+export const useResetPassword = (options?: { onSuccess?: () => void; onError?: (error: any) => void }) => {
+   return useMutation({
+      mutationFn: async ({ token, newPassword }: { token: string; newPassword: string }) => {
+         return api.users.resetPassword(token, newPassword);
+      },
+      onSuccess: () => {
+         options?.onSuccess?.();
+      },
+      onError: (error) => {
+         options?.onError?.(error);
+      },
+   });
+};
+export const useForgotPassword = (options?: { onSuccess?: () => void; onError?: (error: any) => void }) => {
+   return useMutation({
+      mutationFn: async (email: string) => {
+         return api.users.forgotPassword(email);
+      },
+      onSuccess: () => {
+         options?.onSuccess?.();
+      },
+      onError: (error) => {
+         options?.onError?.(error);
+      },
+   });
+};

@@ -51,7 +51,7 @@ const CustomsFeeCombobox = React.memo(function CustomsFeeCombobox({
    return (
       <FormField
          control={control}
-         name={`items.${index}.customs_id`}
+         name={`order_items.${index}.customs_id`}
          render={({ field }) => (
             <Popover open={open} onOpenChange={handleOpenChange}>
                <PopoverTrigger asChild>
@@ -89,11 +89,7 @@ const CustomsFeeCombobox = React.memo(function CustomsFeeCombobox({
                                  key={custom?.id}
                                  value={custom?.name}
                                  onSelect={() => {
-                                    console.log("Selected custom:", custom);
-                                    console.log("Setting customs_id to:", custom.id);
-                                    console.log("Setting customs_fee to:", custom.fee_in_cents);
-
-                                    // Always update field to keep FormField in sync
+                                     // Always update field to keep FormField in sync
                                     field.onChange(custom.id);
 
                                     // If onSelect callback is provided, use it
@@ -101,11 +97,11 @@ const CustomsFeeCombobox = React.memo(function CustomsFeeCombobox({
                                        onSelect(custom);
                                     } else {
                                        // Otherwise use default behavior with form.setValue
-                                       setValue(`items.${index}.description`, custom.description, {
+                                       setValue(`order_items.${index}.description`, custom.description, {
                                           shouldDirty: true,
                                           shouldTouch: true,
                                        });
-                                       setValue(`items.${index}.customs_fee_in_cents`, custom.fee_in_cents, {
+                                       setValue(`order_items.${index}.customs_fee_in_cents`, custom.fee_in_cents, {
                                           shouldDirty: true,
                                           shouldTouch: true,
                                        });

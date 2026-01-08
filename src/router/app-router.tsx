@@ -12,7 +12,8 @@ import ProvidersServicesPage from "@/pages/settings/providers-services-page";
 import { EditOrderPage } from "@/pages/orders/edit-order-page";
 import { ReceiversPage } from "@/pages/settings/receiver-page";
 import { NewAgencyPage } from "@/pages/settings/agencies/new-agency-page";
-import { ContainersPage } from "@/pages/logistics/containers-page";
+import { ContainersPage } from "@/pages/logistics/Containers/containers-page";
+import { LoadContainerPage } from "@/pages/logistics/Containers/load-container-page";
 import { FlightsPage } from "@/pages/logistics/flights-page";
 import OrderDetailsPage from "@/pages/orders/order-details-page";
 import { HomePage } from "@/pages/home-page";
@@ -27,11 +28,14 @@ import LegacyNewIssuePage from "@/pages/legacy-issues/legacy-new-issue-page";
 import LegacyIssuesPage from "@/pages/legacy-issues/legacy-issues-page";
 import { canAccess } from "@/lib/rbac";
 import TrackingHmPage from "@/pages/hm-paquetes/tracking-hm-page";
+import { AgenciesIntegrationsPage } from "@/pages/settings/agencies/agencies-integrations-page";
+import { ResetPasswordPage } from "@/pages/reset-password-page";
 
 export const AppRouter = () => {
    return (
       <Routes>
          <Route path="/login" element={<LoginPage />} />
+         <Route path="/reset-password" element={<ResetPasswordPage />} />
          {/* Protected routes */}
          <Route element={<ProtectedRoute />}>
             <Route path="/" element={<DashboardLayout />}>
@@ -55,7 +59,11 @@ export const AppRouter = () => {
                         <Route path="create/:dispatchId" element={<CreateDispatchPage />} />
                         <Route path="receive/" element={<ReceiveDispatchPage />} />
                      </Route>
-                     <Route path="containers" element={<ContainersPage />} />
+                     <Route path="containers">
+                        <Route index element={<Navigate to="list" replace />} />
+                        <Route path="list" element={<ContainersPage />} />
+                        <Route path="load/:containerId" element={<LoadContainerPage />} />
+                     </Route>
                      <Route path="flights" element={<FlightsPage />} />
                   </Route>
                </Route>
@@ -65,6 +73,7 @@ export const AppRouter = () => {
                      <Route path="providers" element={<ProvidersServicesPage />} />
                      <Route path="agencies" element={<AgenciesPage />} />
                      <Route path="agencies/new" element={<NewAgencyPage />} />
+                     <Route path="agencies/integrations" element={<AgenciesIntegrationsPage />} />
                      <Route path="customers" element={<CustomersPage />} />
                      <Route path="receivers" element={<ReceiversPage />} />
                      <Route path="users" element={<UserPage />} />

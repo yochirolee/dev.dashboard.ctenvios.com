@@ -42,7 +42,6 @@ function ItemRowReducer({
       description: form.getValues(`order_items.${index}.description`) || "",
       weight: form.getValues(`order_items.${index}.weight`),
       price_in_cents: form.getValues(`order_items.${index}.price_in_cents`) || activeWeightRate?.price_in_cents || 0,
-      cost_in_cents: form.getValues(`order_items.${index}.cost_in_cents`) || activeWeightRate?.cost_in_cents || 0,
       rate_id: form.getValues(`order_items.${index}.rate_id`) || activeWeightRate?.id || 0,
       unit: form.getValues(`order_items.${index}.unit`) || "PER_LB",
       insurance_fee_in_cents: form.getValues(`order_items.${index}.insurance_fee_in_cents`) || 0,

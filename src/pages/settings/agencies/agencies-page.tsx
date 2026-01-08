@@ -8,7 +8,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import type { Agency } from "@/data/types";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
-import { PlusCircle } from "lucide-react";
+import { Key, PlusCircle } from "lucide-react";
 import { ButtonGroup } from "@/components/ui/button-group";
 
 export const AgenciesPage = () => {
@@ -36,23 +36,33 @@ export const AgenciesPage = () => {
                <p className="text-sm text-gray-500 "> Listado de Agencias</p>
             </div>
             {agencies?.length > 0 && (
-               <ButtonGroup orientation="horizontal" className="w-full">
-                  <AgenciesCombobox
-                     isLoading={isLoading}
-                     agencies={agencies}
-                     selectedAgency={selectedAgency}
-                     setSelectedAgency={(agency) => setSelectedAgencyId(agency?.id ?? null)}
-                  />
+               <div className="flex flex-row gap-2 w-full">
+                  <ButtonGroup orientation="horizontal" className="w-full">
+                     <AgenciesCombobox
+                        isLoading={isLoading}
+                        agencies={agencies}
+                        selectedAgency={selectedAgency}
+                        setSelectedAgency={(agency) => setSelectedAgencyId(agency?.id ?? null)}
+                     />
 
+                     <Button
+                        variant="outline"
+                        onClick={() => {
+                           navigate("/settings/agencies/new");
+                        }}
+                     >
+                        <PlusCircle size={16} /> <span className="hidden md:block">Crear Agencia</span>
+                     </Button>
+                  </ButtonGroup>
                   <Button
                      variant="outline"
                      onClick={() => {
-                        navigate("/settings/agencies/new");
+                        navigate("/settings/agencies/integrations");
                      }}
                   >
-                     <PlusCircle size={16} /> <span className="hidden md:block">Crear Agencia</span>
+                     <Key size={16} /> <span className="hidden md:block">Integraciones</span>
                   </Button>
-               </ButtonGroup>
+               </div>
             )}
          </div>
 

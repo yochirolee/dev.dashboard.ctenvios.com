@@ -30,7 +30,7 @@ export const InsuranceFeeDialog = ({
 
    useEffect(() => {
       if (open) {
-         const currentValue = form.getValues(`items.${index}.insurance_fee_in_cents`);
+         const currentValue = form.getValues(`order_items.${index}.insurance_fee_in_cents`);
          setInsuranceValue(currentValue ? centsToDollars(currentValue).toFixed(2) : "");
       }
    }, [open, form, index]);
@@ -46,7 +46,7 @@ export const InsuranceFeeDialog = ({
          });
       } else {
          // Fallback to direct form update
-         form.setValue(`items.${index}.insurance_fee_in_cents`, amountInCents);
+         form.setValue(`order_items.${index}.insurance_fee_in_cents`, amountInCents);
       }
       setOpen(false);
    };
@@ -94,7 +94,7 @@ export const ChargeDialog = ({
 
    useEffect(() => {
       if (open) {
-         const currentValue = form.getValues(`items.${index}.charge_fee_in_cents`);
+         const currentValue = form.getValues(`order_items.${index}.charge_fee_in_cents`);
          setChargeValue(currentValue ? centsToDollars(currentValue).toFixed(2) : "");
       }
    }, [open, form, index]);
@@ -110,7 +110,7 @@ export const ChargeDialog = ({
          });
       } else {
          // Fallback to direct form update
-         form.setValue(`items.${index}.charge_fee_in_cents`, amountInCents);
+         form.setValue(`order_items.${index}.charge_fee_in_cents`, amountInCents);
       }
       setOpen(false);
    };
@@ -156,13 +156,13 @@ export const ChangeRateDialog = ({
 
    useEffect(() => {
       if (open) {
-         const currentValue = form.getValues(`items.${index}.rate_in_cents`);
+         const currentValue = form.getValues(`order_items.${index}.price_in_cents`);
          setRateValue(currentValue ? centsToDollars(currentValue).toFixed(2) : "");
       }
    }, [open, form, index]);
 
    const handleChangeRate = () => {
-      form.setValue(`items.${index}.rate_in_cents`, dollarsToCents(parseFloat(rateValue || "0")));
+      form.setValue(`order_items.${index}.price_in_cents`, dollarsToCents(parseFloat(rateValue || "0")));
       setOpen(false);
    };
 

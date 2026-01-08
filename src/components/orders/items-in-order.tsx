@@ -23,6 +23,8 @@ import { Spinner } from "../ui/spinner";
 
 type FormValues = z.infer<typeof orderSchema>;
 
+const MAX_ITEMS = 100;
+
 export function ItemsInOrder() {
    const navigate = useNavigate();
    const user = useAppStore((state) => state.user);
@@ -65,7 +67,6 @@ export function ItemsInOrder() {
                description: "",
                weight: undefined,
                price_in_cents: 0,
-               cost_in_cents: 0,
                rate_id: 0,
                unit: "PER_LB",
                insurance_fee_in_cents: 0,
@@ -87,17 +88,17 @@ export function ItemsInOrder() {
    }, [fields]);
 
    const handleAddItem = () => {
-      // Simply add the number of items needed to reach the target count
-      const itemsToAdd = items_count - fields.length;
+      // Cap target count at MAX_ITEMS
+      const targetCount = Math.min(items_count, MAX_ITEMS);
+      const itemsToAdd = targetCount - fields.length;
 
       if (itemsToAdd > 0) {
-         // Add only the additional items needed
+         // Add only the additional items needed (up to MAX_ITEMS)
          for (let i = 0; i < itemsToAdd; i++) {
             append({
                description: "",
                weight: 0,
                rate_id: 0,
-               cost_in_cents: 0,
                price_in_cents: 0,
                unit: "PER_LB",
                insurance_fee_in_cents: 0,
@@ -110,7 +111,9 @@ export function ItemsInOrder() {
          // Focus on the first newly added item
          setTimeout(() => {
             const newItemIndex = fields.length; // This will be the index of the first new item
-            const input = document.querySelector<HTMLInputElement>(`input[name="order_items.${newItemIndex}.description"]`);
+            const input = document.querySelector<HTMLInputElement>(
+               `input[name="order_items.${newItemIndex}.description"]`
+            );
             input?.focus();
          }, 0);
       }
@@ -173,6 +176,7 @@ export function ItemsInOrder() {
                         className="w-18 number-spinner"
                         type="number"
                         min={1}
+                        max={MAX_ITEMS}
                         value={items_count === 0 ? "" : items_count}
                         onChange={(e) => {
                            const val = e.target.value;
@@ -181,7 +185,7 @@ export function ItemsInOrder() {
                            } else {
                               const num = Number(val);
                               if (!isNaN(num) && num >= 1) {
-                                 setItemsCount(num);
+                                 setItemsCount(Math.min(num, MAX_ITEMS));
                               }
                            }
                         }}
@@ -277,7 +281,9 @@ export function ItemsInOrder() {
 
 function InvoiceTotal({ form }: { form: any }) {
    const [open, setOpen] = useState(false);
-   const total_weight = form.watch("order_items").reduce((acc: number, item: OrderItem) => acc + Number(item?.weight) || 0, 0);
+   const total_weight = form
+      .watch("order_items")
+      .reduce((acc: number, item: OrderItem) => acc + Number(item?.weight) || 0, 0);
    const total_delivery = calculateTotalDeliveryFee();
    return (
       <div>

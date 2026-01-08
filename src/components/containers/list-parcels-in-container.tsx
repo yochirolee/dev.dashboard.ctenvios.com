@@ -1,47 +1,43 @@
 import { useState, useEffect, useRef } from "react";
-import { Card, CardHeader, CardTitle, CardContent } from "../ui/card";
-import { ScrollArea } from "../ui/scroll-area";
-import { Badge } from "../ui/badge";
-import { CheckCircle2, Trash2Icon } from "lucide-react";
-import { useDispatches } from "@/hooks/use-dispatches";
-import { Button } from "../ui/button";
-import { useAppStore } from "@/stores/app-store";
-import { Spinner } from "../ui/spinner";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Badge } from "@/components/ui/badge";
+import { CheckCircle2, Trash2Icon, Container } from "lucide-react";
+import { useContainers } from "@/hooks/use-containers";
+import { Button } from "@/components/ui/button";
+import { Spinner } from "@/components/ui/spinner";
 import { format } from "date-fns";
 import { toast } from "sonner";
-import { parcelStatus, type ParcelStatus } from "@/data/types";
 
-type ParcelsInDispatch = {
+interface ParcelInContainer {
    id: number;
    tracking_number: string;
+   hbl: string;
    order_id: number;
    description?: string;
-   status: ParcelStatus;
-   updated_at?: Date;
-};
+   status: string;
+   weight?: number;
+   updated_at?: string;
+}
 
-export const ParcelsInDispatch = ({
-   dispatchId,
-   status,
-}: {
-   dispatchId: number | undefined;
-   status: ParcelStatus | undefined;
-}) => {
-   const agency_id = useAppStore.getState().agency?.id;
-   const { data, isLoading, isFetchingNextPage, hasNextPage, fetchNextPage } = useDispatches.getParcelsByDispatchId(
-      dispatchId ?? 0,
-      20,
-      status ?? parcelStatus.IN_DISPATCH
+interface ParcelsInContainerProps {
+   containerId: number;
+   containerName?: string;
+   canModify?: boolean;
+}
+
+export const ParcelsInContainer = ({ containerId, containerName, canModify = true }: ParcelsInContainerProps) => {
+   const { data, isLoading, isFetchingNextPage, hasNextPage, fetchNextPage } = useContainers.getParcels(
+      containerId,
+      20
    );
 
-   // Flatten all pages into a single array
-   const parcelsInDispatch = data?.pages.flatMap((page) => page?.rows ?? []) ?? [];
-   const total = data?.pages[0]?.rows?.length ?? 0;
+   const parcelsInContainer = data?.pages.flatMap((page) => page?.rows ?? []) ?? [];
+   const total = data?.pages[0]?.total ?? 0;
 
    const [removingTrackingNumber, setRemovingTrackingNumber] = useState<string | null>(null);
-   const { mutate: removeParcel } = useDispatches.removeParcel(dispatchId ?? 0, agency_id ?? 0);
+   const { mutate: removeParcel } = useContainers.removeParcel(containerId);
 
-   // Intersection observer for infinite scrolling
    const loadMoreRef = useRef<HTMLDivElement>(null);
 
    useEffect(() => {
@@ -64,59 +60,48 @@ export const ParcelsInDispatch = ({
          }
       };
    }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
+
    const handleRemoveParcel = (tracking_number: string) => {
       setRemovingTrackingNumber(tracking_number);
       removeParcel(
-         { tracking_number: tracking_number },
+         { trackingNumber: tracking_number },
          {
             onSuccess: () => {
                setRemovingTrackingNumber(null);
+               toast.success("Paquete removido del contenedor");
             },
-            onError: () => {
+            onError: (error: any) => {
                setRemovingTrackingNumber(null);
+               toast.error(error?.response?.data?.message || "Error al remover paquete");
             },
          }
       );
    };
-   const finishDispatchMutation = useDispatches.finishDispatch(dispatchId ?? 0);
-   const handleFinishDispatch = () => {
-      finishDispatchMutation.mutate(undefined, {
-         onSuccess: () => {
-            toast.success("Despacho finalizado correctamente");
-         },
-         onError: () => {
-            toast.error("Error al finalizar el despacho");
-         },
-      });
-   };
+
    return (
       <Card className="flex-1 flex flex-col min-h-0">
          <CardHeader className="pb-2 flex flex-row justify-between items-center">
             <div className="flex flex-col gap-2">
-               <CardTitle className="text-lg">Despacho: {dispatchId?.toString() ?? ""}</CardTitle>
+               <CardTitle className="text-lg flex items-center gap-2">
+                  <Container className="h-5 w-5" />
+                  {containerName || `Contenedor: ${containerId}`}
+               </CardTitle>
                <Badge variant="outline">Total de Paquetes: {total}</Badge>
             </div>
-
-            <Button variant="outline" disabled={total === 0} onClick={handleFinishDispatch}>
-               {finishDispatchMutation.isPending ? <Spinner /> : <CheckCircle2 />}
-               <span className="hidden md:block">
-                  {finishDispatchMutation.isPending ? "Finalizando..." : "Finalizar Despacho"}
-               </span>
-            </Button>
          </CardHeader>
          <CardContent className="flex-1 overflow-hidden p-0">
-            <ScrollArea className="h-[calc(100vh-200px)]">
+            <ScrollArea className="h-[calc(100vh-300px)]">
                {isLoading ? (
-                  <div className="flex items-center justify-center h-full">
+                  <div className="flex items-center justify-center h-full py-8">
                      <Spinner />
                   </div>
                ) : (
                   <div className="divide-y divide-border">
-                     {parcelsInDispatch.length === 0 ? (
-                        <div className="p-8 text-center text-muted-foreground">No hay paquetes escaneados</div>
+                     {parcelsInContainer.length === 0 ? (
+                        <div className="p-8 text-center text-muted-foreground">No hay paquetes en este contenedor</div>
                      ) : (
                         <>
-                           {parcelsInDispatch.map((pkg: ParcelsInDispatch) => (
+                           {parcelsInContainer.map((pkg: ParcelInContainer) => (
                               <div
                                  key={pkg.id}
                                  className="p-3 flex items-center justify-between hover:bg-muted/50 transition-colors"
@@ -126,28 +111,40 @@ export const ParcelsInDispatch = ({
                                        <CheckCircle2 className="h-4 w-4 text-green-500" />
                                     </div>
                                     <div className="flex flex-col gap-1">
-                                       <div className="flex-col md:flex-row items-center gap-2">
-                                          <span className=" text-sm">{pkg.tracking_number}</span>
+                                       <div className="flex flex-col md:flex-row items-start md:items-center gap-2">
+                                          <span className="text-sm font-medium">{pkg.tracking_number || pkg.hbl}</span>
                                           <Badge variant="outline">Orden: {pkg.order_id}</Badge>
                                        </div>
-                                       <span className="text-xs text-muted-foreground">{pkg.description}</span>
+                                       {pkg.description && (
+                                          <span className="text-xs text-muted-foreground">{pkg.description}</span>
+                                       )}
                                     </div>
                                  </div>
                                  <div className="flex items-center gap-2">
                                     <div className="flex flex-col items-end gap-1">
-                                       <span className="text-xs text-muted-foreground">
-                                          {format(pkg?.updated_at ?? new Date(), "dd/MM/yyyy HH:mm:ss")}
-                                       </span>
-                                       <Badge variant="outline">{pkg.status}</Badge>
+                                       {pkg.updated_at && (
+                                          <span className="text-xs text-muted-foreground">
+                                             {format(new Date(pkg.updated_at), "dd/MM/yyyy HH:mm")}
+                                          </span>
+                                       )}
+                                       {pkg.weight && (
+                                          <span className="text-xs text-muted-foreground">{pkg.weight} lbs</span>
+                                       )}
                                     </div>
-                                    <Button
-                                       variant="ghost"
-                                       size="icon"
-                                       onClick={() => handleRemoveParcel(pkg.tracking_number)}
-                                       disabled={removingTrackingNumber !== null}
-                                    >
-                                       {removingTrackingNumber === pkg.tracking_number ? <Spinner /> : <Trash2Icon />}
-                                    </Button>
+                                    {canModify && (
+                                       <Button
+                                          variant="ghost"
+                                          size="icon"
+                                          onClick={() => handleRemoveParcel(pkg.tracking_number || pkg.hbl)}
+                                          disabled={removingTrackingNumber !== null}
+                                       >
+                                          {removingTrackingNumber === (pkg.tracking_number || pkg.hbl) ? (
+                                             <Spinner />
+                                          ) : (
+                                             <Trash2Icon className="h-4 w-4" />
+                                          )}
+                                       </Button>
+                                    )}
                                  </div>
                               </div>
                            ))}

@@ -262,6 +262,17 @@ const api = {
          const response = await axiosInstance.post("/users/sign-out");
          return response.data;
       },
+      resetPassword: async (token: string, newPassword: string) => {
+         const response = await axiosInstance.post("/users/reset-password", {
+            token,
+            newPassword,
+         });
+         return response.data;
+      },
+      forgotPassword: async (email: string) => {
+         const response = await axiosInstance.post("/users/forgot-password", { email });
+         return response.data;
+      },
    },
    providers: {
       get: async () => {
@@ -612,6 +623,71 @@ const api = {
       },
    },
    // Legacy Issues API (used for legacy invoices) will be removed in the future
+   containers: {
+      get: async (page: number = 0, limit: number = 20) => {
+         const response = await axiosInstance.get("/containers", {
+            params: {
+               page: page + 1,
+               limit,
+            },
+         });
+         return response.data;
+      },
+      getById: async (id: number) => {
+         const response = await axiosInstance.get(`/containers/${id}`);
+         return response.data;
+      },
+      create: async (data: any) => {
+         const response = await axiosInstance.post("/containers", data);
+         return response.data;
+      },
+      update: async (id: number, data: any) => {
+         const response = await axiosInstance.patch(`/containers/${id}`, data);
+         return response.data;
+      },
+      updateStatus: async (id: number, data: { status: string; location?: string; description?: string }) => {
+         const response = await axiosInstance.patch(`/containers/${id}/status`, data);
+         return response.data;
+      },
+      delete: async (id: number) => {
+         const response = await axiosInstance.delete(`/containers/${id}`);
+         return response.data;
+      },
+      addParcel: async (containerId: number, trackingNumber: string) => {
+         const response = await axiosInstance.post(`/containers/${containerId}/parcels`, {
+            tracking_number: trackingNumber,
+         });
+         return response.data;
+      },
+      addParcelsByOrderId: async (containerId: number, orderId: number) => {
+         const response = await axiosInstance.post(`/containers/${containerId}/parcels/by-order`, {
+            order_id: orderId,
+         });
+         return response.data;
+      },
+      removeParcel: async (containerId: number, trackingNumber: string) => {
+         const response = await axiosInstance.delete(`/containers/${containerId}/parcels/${trackingNumber}`);
+         return response.data;
+      },
+      getParcels: async (containerId: number, page: number = 0, limit: number = 20) => {
+         const response = await axiosInstance.get(`/containers/${containerId}/parcels`, {
+            params: {
+               page: page + 1,
+               limit,
+            },
+         });
+         return response.data;
+      },
+      readyForContainer: async (page: number = 1, limit: number = 20) => {
+         const response = await axiosInstance.get(`/containers/ready-for-container`, {
+            params: {
+               page,
+               limit,
+            },
+         });
+         return response.data;
+      },
+   },
    legacyIssues: {
       getAll: async (
          page: number = 1,

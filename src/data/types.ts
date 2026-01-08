@@ -117,7 +117,6 @@ export const orderItemSchema = z.object({
    charge_fee_in_cents: z.number().min(0).optional(),
    delivery_fee_in_cents: z.number().min(0).optional(),
    price_in_cents: z.number().min(0),
-   cost_in_cents: z.number().min(0),
    rate_id: z.number().min(0),
    unit: z.enum(["PER_LB", "FIXED"]),
 });
@@ -145,6 +144,7 @@ export const customsRatesSchema = z.object({
    chapter: z.string().optional(),
    fee_type: z.enum(["UNIT", "WEIGHT", "VALUE"]).optional().default("UNIT"),
    fee_in_cents: z.number().min(0, "Fee must be greater than 0"),
+   insurance_fee_in_cents: z.number().min(0, "Insurance fee must be greater than 0").optional().default(0),
    custom_value: z.number().min(0, "Custom value must be greater than 0").optional().default(0),
    min_weight: z.number().optional().default(0),
    max_weight: z.number().optional().default(0),
@@ -523,3 +523,69 @@ export interface Dispatch {
    };
 }
 
+/// CONTAINERS
+export const containerType = {
+   DRY_20FT: "DRY_20FT",
+   DRY_40FT: "DRY_40FT",
+   DRY_40FT_HC: "DRY_40FT_HC",
+   REEFER_20FT: "REEFER_20FT",
+   REEFER_40FT: "REEFER_40FT",
+   REEFER_40FT_HC: "REEFER_40FT_HC",
+} as const;
+
+export const containerStatus = {
+   PENDING: "PENDING",
+   LOADING: "LOADING",
+   SEALED: "SEALED",
+   DEPARTED: "DEPARTED",
+   IN_TRANSIT: "IN_TRANSIT",
+   AT_PORT: "AT_PORT",
+   CUSTOMS_HOLD: "CUSTOMS_HOLD",
+   CUSTOMS_CLEARED: "CUSTOMS_CLEARED",
+   UNLOADING: "UNLOADING",
+   COMPLETED: "COMPLETED",
+} as const;
+
+export type ContainerType = (typeof containerType)[keyof typeof containerType];
+export type ContainerStatus = (typeof containerStatus)[keyof typeof containerStatus];
+
+export interface Container {
+   id: number;
+   container_name: string;
+   container_number: string;
+   bl_number: string | null;
+   seal_number: string | null;
+   container_type: ContainerType;
+   status: ContainerStatus;
+   vessel_name: string | null;
+   voyage_number: string | null;
+   origin_port: string;
+   destination_port: string;
+   max_weight_kg: number | null;
+   current_weight_kg: string | null;
+   estimated_departure: string | null;
+   estimated_arrival: string | null;
+   actual_departure: string | null;
+   actual_arrival: string | null;
+   notes: string | null;
+   forwarder_id: number;
+   provider_id: number;
+   created_at: string;
+   updated_at: string;
+   created_by_id: string;
+   forwarder: {
+      id: number;
+      name: string;
+   };
+   provider: {
+      id: number;
+      name: string;
+   };
+   created_by: {
+      id: string;
+      name: string;
+   };
+   _count: {
+      parcels: number;
+   };
+}
