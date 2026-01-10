@@ -8,7 +8,6 @@ import { formatFullName } from "@/lib/cents-utils";
 import {
    EllipsisVertical,
    FileBoxIcon,
-   Pencil,
    TagIcon,
    Building2,
    Package,
@@ -429,7 +428,7 @@ export const orderColumns: ColumnDef<Order>[] = [
                         </DropdownMenuItem>
                      </Link>
                      <DropdownMenuSeparator />
-                    
+
                      <DropdownMenuItem className="text-destructive" asChild>
                         <DeleteOrderDialog order_id={row.original.id} />
                      </DropdownMenuItem>
