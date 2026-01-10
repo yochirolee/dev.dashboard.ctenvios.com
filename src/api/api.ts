@@ -15,6 +15,8 @@ import {
    userSchema,
    type Discount,
    type ParcelStatus,
+   type FinancialDashboard,
+   type DailyClosing,
 } from "@/data/types";
 import { useAppStore } from "@/stores/app-store";
 import { toast } from "sonner";
@@ -399,6 +401,22 @@ const api = {
       },
       getDailySalesByAgency: async () => {
          const response = await axiosInstance.get("/analytics/daily-sales-by-agency");
+         return response.data;
+      },
+   },
+   financialReports: {
+      getDashboard: async (): Promise<FinancialDashboard> => {
+         const response = await axiosInstance.get("/financial-reports/dashboard");
+         return response.data;
+      },
+      getDailyClosing: async (filters?: {
+         date?: string;
+         user_id?: string;
+         agency_id?: number;
+      }): Promise<DailyClosing> => {
+         const response = await axiosInstance.get("/financial-reports/daily-closing", {
+            params: filters,
+         });
          return response.data;
       },
    },

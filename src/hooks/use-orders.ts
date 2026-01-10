@@ -52,6 +52,11 @@ export const useOrders = {
          },
          onSuccess: async () => {
             await queryClient.invalidateQueries({ queryKey: ["get-orders"] });
+            await queryClient.invalidateQueries({
+               queryKey: ["financial-dashboard"],
+            });
+            await queryClient.invalidateQueries({ queryKey: ["financial-reports", "daily-closing"] });
+
             options?.onSuccess?.();
          },
          onError: (error) => {
@@ -65,6 +70,8 @@ export const useOrders = {
          mutationFn: (payment_id: number) => api.orders.deletePayment(payment_id),
          onSuccess: async () => {
             await queryClient.invalidateQueries({ queryKey: ["get-orders"] });
+            await queryClient.invalidateQueries({ queryKey: ["financial-dashboard"] });
+            await queryClient.invalidateQueries({ queryKey: ["financial-reports", "daily-closing"] });
             options?.onSuccess?.();
          },
          onError: (error) => {

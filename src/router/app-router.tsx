@@ -30,6 +30,7 @@ import { canAccess } from "@/lib/rbac";
 import TrackingHmPage from "@/pages/hm-paquetes/tracking-hm-page";
 import { AgenciesIntegrationsPage } from "@/pages/settings/agencies/agencies-integrations-page";
 import { ResetPasswordPage } from "@/pages/reset-password-page";
+import DailyClosurePage from "@/pages/finances/daily-closure-page";
 
 export const AppRouter = () => {
    return (
@@ -65,6 +66,12 @@ export const AppRouter = () => {
                         <Route path="load/:containerId" element={<LoadContainerPage />} />
                      </Route>
                      <Route path="flights" element={<FlightsPage />} />
+                  </Route>
+               </Route>
+               <Route element={<ProtectedRoute allowedRoles={canAccess.finances} />}>
+                  <Route path="finances">
+                     <Route index element={<Navigate to="daily-closure" replace />} />
+                     <Route path="daily-closure" element={<DailyClosurePage />} />
                   </Route>
                </Route>
                <Route element={<ProtectedRoute allowedRoles={canAccess.agencySettings} />}>

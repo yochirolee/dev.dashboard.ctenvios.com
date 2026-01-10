@@ -24,6 +24,10 @@ const userSchemaColumns = z.object({
       name: z.string(),
       agency_type: z.string(),
    }),
+   carrier: z.object({
+      id: z.number(),
+      name: z.string(),
+   }),
    role: z.string(),
    isActive: z.boolean(),
    createdAt: z.string(),
@@ -55,11 +59,11 @@ export const userColumns = (
    },
    {
       accessorKey: "agency",
-      header: "Agency",
+      header: "Agency / Carrier",
       cell: ({ row }) => (
          <div className="text-sm text-muted-foreground flex gap-2">
-            <div>{row.original?.agency?.name}</div>
-            <Badge variant="outline">{row.original?.agency?.agency_type}</Badge>
+            <div>{row.original?.agency?.name || row.original?.carrier?.name}</div>
+            <Badge variant="outline">{row.original?.agency?.agency_type || "Carrier"}</Badge>
          </div>
       ),
    },

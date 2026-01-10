@@ -82,6 +82,8 @@ export function itemReducer(state: ItemState, action: ItemAction): ItemState {
             customs_id: customs.id || 0,
             customs_fee_in_cents: customs.fee_in_cents || 0,
             description: customs.description || "",
+            // Add insurance_fee_in_cents from customs if available
+            insurance_fee_in_cents: customs.insurance_fee_in_cents || state.insurance_fee_in_cents,
          };
 
          // Recalculate subtotal

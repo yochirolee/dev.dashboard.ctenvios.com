@@ -50,6 +50,13 @@ export const useLoginMutation = () => {
          setAgency(agency as Agency);
          navigate("/", { replace: true });
       },
+      onError: () => {
+         //clear all stores
+         useAppStore.getState().clearAll();
+         useOrderStore.getState().clearAll();
+         queryClient.clear();
+         navigate("/login", { replace: true });
+      },
    });
 };
 

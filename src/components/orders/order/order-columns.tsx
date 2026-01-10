@@ -188,8 +188,8 @@ export const getOrderStatusBadge = (status: string): React.ReactNode => {
    const Icon = config.icon;
 
    return (
-      <Badge className="w-fit gap-1.5" variant="secondary">
-         <Icon className={`shrink-0 min-w-4 min-h-4 ${config.color}`} />
+      <Badge className={`"w-fit gap-1.5"`} variant="secondary">
+         <Icon className={`shrink-0 min-w-4 min-h-4 mr-1 ${config.color}`} />
          <span className="text-nowrap font-normal text-muted-foreground text-xs">{label}</span>
       </Badge>
    );
@@ -429,12 +429,7 @@ export const orderColumns: ColumnDef<Order>[] = [
                         </DropdownMenuItem>
                      </Link>
                      <DropdownMenuSeparator />
-                     <Link to={`/orders/${row.original.id}/edit`}>
-                        <DropdownMenuItem>
-                           <Pencil className="w-4 h-4 mr-2" />
-                           Editar
-                        </DropdownMenuItem>
-                     </Link>
+                    
                      <DropdownMenuItem className="text-destructive" asChild>
                         <DeleteOrderDialog order_id={row.original.id} />
                      </DropdownMenuItem>

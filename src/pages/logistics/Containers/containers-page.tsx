@@ -173,6 +173,7 @@ export const ContainersPage = () => {
                   <AlertDialogAction
                      onClick={confirmDelete}
                      className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                     disabled={deleteContainerMutation.isPending}
                   >
                      {deleteContainerMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
                      Eliminar

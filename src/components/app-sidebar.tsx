@@ -1,5 +1,14 @@
 import * as React from "react";
-import { AlertCircle, FileBox, FileStack, HomeIcon, Settings2, Warehouse, type LucideIcon } from "lucide-react";
+import {
+   AlertCircle,
+   CreditCard,
+   FileBox,
+   FileStack,
+   HomeIcon,
+   Settings2,
+   Warehouse,
+   type LucideIcon,
+} from "lucide-react";
 import { NavMain } from "@/components/nav-main";
 import { NavUser } from "@/components/nav-user";
 import { TeamSwitcher } from "@/components/team-switcher";
@@ -10,6 +19,7 @@ import { useAppStore } from "@/stores/app-store";
 import { NavConfig } from "./nav-config";
 import { NavIssues } from "./nav-issues";
 import { canAccess, hasRole, type Role } from "@/lib/rbac";
+import { NavFinances } from "@/components/nav-finances";
 
 interface SidebarSubItem {
    title: string;
@@ -122,6 +132,22 @@ const navConfigItems: SidebarItem[] = [
    },
 ];
 
+const navFinancesItems: SidebarItem[] = [
+   {
+      title: "Finanzas",
+      url: "#",
+      icon: CreditCard,
+      allowedRoles: canAccess.finances,
+      items: [
+         {
+            title: "Cierre Diario",
+            url: "/finances/daily-closure",
+            allowedRoles: canAccess.finances,
+         },
+      ],
+   },
+];
+
 const navIssuesItems: SidebarItem[] = [
    {
       title: "Issues",
@@ -181,6 +207,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
    const filteredNavMain = React.useMemo(() => filterByRole(navMainItems), [filterByRole]);
    const filteredNavConfig = React.useMemo(() => filterByRole(navConfigItems), [filterByRole]);
    const filteredNavIssues = React.useMemo(() => filterByRole(navIssuesItems), [filterByRole]);
+   const filteredNavFinances = React.useMemo(() => filterByRole(navFinancesItems), [filterByRole]);
    return (
       <Sidebar collapsible="icon" {...props}>
          <SidebarHeader>
@@ -194,6 +221,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                </Button>
             </Link>
             {filteredNavMain.length > 0 && <NavMain items={filteredNavMain} />}
+            {filteredNavFinances.length > 0 && <NavFinances items={filteredNavFinances} />}
             {filteredNavIssues.length > 0 && <NavIssues items={filteredNavIssues} />}
             {filteredNavConfig.length > 0 && <NavConfig items={filteredNavConfig} />}
          </SidebarContent>

@@ -4,7 +4,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
 import { Button } from "@/components/ui/button";
-import { EllipsisVertical, Trash2Icon, Package, Ship, Anchor, RefreshCw } from "lucide-react";
+import { EllipsisVertical, Trash2Icon, Package, Ship, Anchor, RefreshCw, FileSpreadsheet } from "lucide-react";
 import {
    DropdownMenu,
    DropdownMenuContent,
@@ -13,6 +13,8 @@ import {
    DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import type { Container, ContainerStatus } from "@/data/types";
+import { axiosInstance } from "@/api/api";
+import { toast } from "sonner";
 
 const statusConfig: Record<ContainerStatus, { label: string; color: string }> = {
    PENDING: { label: "Pendiente", color: "bg-gray-400/80 ring-gray-500/40" },
@@ -34,6 +36,38 @@ const containerTypeLabels: Record<string, string> = {
    REEFER_20FT: "Reefer 20ft",
    REEFER_40FT: "Reefer 40ft",
    REEFER_40FT_HC: "Reefer 40ft HC",
+};
+
+// Download manifest Excel file
+const downloadManifest = async (containerId: number, containerName: string): Promise<void> => {
+   try {
+      toast.loading("Generando manifiesto...", { id: "manifest-download" });
+
+      const response = await axiosInstance.get(`/containers/${containerId}/manifest/excel`, {
+         responseType: "blob",
+      });
+
+      // Create blob URL and trigger download
+      const blob = new Blob([response.data], {
+         type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      });
+      const url = URL.createObjectURL(blob);
+
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `manifiesto-${containerName}-${format(new Date(), "yyyy-MM-dd")}.xlsx`;
+      document.body.appendChild(link);
+      link.click();
+
+      // Cleanup
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+
+      toast.success("Manifiesto descargado correctamente", { id: "manifest-download" });
+   } catch (error) {
+      console.error("Error downloading manifest:", error);
+      toast.error("Error al descargar el manifiesto", { id: "manifest-download" });
+   }
 };
 
 interface ContainersColumnsProps {
@@ -157,13 +191,13 @@ export const containersColumns = ({ onDelete, onUpdateStatus }: ContainersColumn
    },
    {
       accessorKey: "current_weight_kg",
-      header: "Peso (kg)",
+      header: "Peso (lbs)",
       cell: ({ row }) => {
          const currentWeight = row.original?.current_weight_kg ?? "0";
          const maxWeight = row.original?.max_weight_kg;
          return (
             <div className="flex items-center gap-1 min-w-0">
-               <span className="text-sm">{currentWeight}</span>
+               <span className="text-sm">{ parseFloat(currentWeight).toFixed(2)}</span>
                {maxWeight && <span className="text-xs text-muted-foreground">/ {maxWeight}</span>}
             </div>
          );
@@ -205,6 +239,12 @@ export const containersColumns = ({ onDelete, onUpdateStatus }: ContainersColumn
                      <DropdownMenuItem onClick={() => onUpdateStatus(row.original)}>
                         <RefreshCw className="w-4 h-4 mr-2" />
                         Cambiar Estado
+                     </DropdownMenuItem>
+                     <DropdownMenuItem
+                        onClick={() => downloadManifest(row.original?.id, row.original?.container_name)}
+                     >
+                        <FileSpreadsheet className="w-4 h-4 mr-2" />
+                        Descargar Manifiesto
                      </DropdownMenuItem>
                      <DropdownMenuSeparator />
                      <DropdownMenuItem className="text-destructive" onClick={() => onDelete(row.original?.id)}>

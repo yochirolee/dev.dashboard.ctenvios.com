@@ -42,7 +42,6 @@ export const DispatchPageLists = () => {
 
    // Memoize columns to prevent recreation on every render
    const columns = useMemo(() => dispatchColumns(handleDeleteDispatch), [handleDeleteDispatch]);
-   console.log(data, "data");
    if (isLoading)
       return (
          <div>

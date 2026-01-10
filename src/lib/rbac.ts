@@ -42,13 +42,7 @@ export const ROLE_GROUPS = {
    AGENCY_ADMINS: [ROLES.ROOT, ROLES.ADMINISTRATOR, ROLES.AGENCY_ADMIN, ROLES.AGENCY_SUPERVISOR],
 
    // Personal de agencias (ventas y admin)
-   AGENCY_STAFF: [
-      ROLES.ROOT,
-      ROLES.ADMINISTRATOR,
-      ROLES.AGENCY_ADMIN,
-      ROLES.AGENCY_SUPERVISOR,
-      ROLES.AGENCY_SALES,
-   ],
+   AGENCY_STAFF: [ROLES.ROOT, ROLES.ADMINISTRATOR, ROLES.AGENCY_ADMIN, ROLES.AGENCY_SUPERVISOR, ROLES.AGENCY_SALES],
 
    // Administradores de forwarders
    FORWARDER_ADMINS: [ROLES.ROOT, ROLES.ADMINISTRATOR, ROLES.FORWARDER_ADMIN],
@@ -98,6 +92,9 @@ export const hasMinimumRole = (userRole: Role | null | undefined, minimumRole: R
 
 // Helper para obtener roles permitidos de forma más legible
 export const canAccess = {
+   // Finanzas (solo admins)
+   finances: ROLE_GROUPS.AGENCY_STAFF,
+
    // Configuración del sistema (solo admins)
    systemSettings: ROLE_GROUPS.SYSTEM_ADMINS,
 
@@ -129,4 +126,3 @@ export const canAccess = {
       ROLES.USER,
    ],
 } as const;
-

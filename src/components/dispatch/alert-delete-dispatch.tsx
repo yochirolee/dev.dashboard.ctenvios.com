@@ -45,7 +45,11 @@ export function AlertDeleteDispatch({
             </AlertDialogHeader>
             <AlertDialogFooter>
                <AlertDialogCancel>Cancelar</AlertDialogCancel>
-               <AlertDialogAction onClick={handleDelete}>
+               <AlertDialogAction
+                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                  onClick={handleDelete}
+                  disabled={deleteDispatchMutation.isPending}
+               >
                   {deleteDispatchMutation.isPending ? <Spinner /> : "Eliminar"}
                </AlertDialogAction>
             </AlertDialogFooter>

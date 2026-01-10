@@ -52,6 +52,7 @@ export const PaymentForm = ({ order }: { order: Order }) => {
    const { mutate: createPayment, isPending } = useOrders.payOrder({
       onSuccess: () => {
          toast.success("Payment created successfully");
+         
          form.reset({});
          setOpen(false);
       },

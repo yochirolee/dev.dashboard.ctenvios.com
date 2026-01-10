@@ -549,6 +549,105 @@ export const containerStatus = {
 export type ContainerType = (typeof containerType)[keyof typeof containerType];
 export type ContainerStatus = (typeof containerStatus)[keyof typeof containerStatus];
 
+// FINANCIAL DASHBOARD
+export interface DashboardPeriodSummary {
+   total_orders: number;
+   total_billed_cents: number;
+   total_paid_cents: number;
+   total_pending_cents?: number;
+}
+
+export interface PaymentBreakdown {
+   method: string;
+   total_payments: number;
+   total_amount_cents: number;
+   total_charges_cents: number;
+}
+
+export interface TopDebtor {
+   customer_id: number;
+   customer_name: string;
+   customer_phone: string;
+   total_orders: number;
+   total_billed_cents: number;
+   total_paid_cents: number;
+   total_debt_cents: number;
+   oldest_pending_order: string;
+}
+
+export interface FinancialDashboard {
+   today: DashboardPeriodSummary;
+   month: DashboardPeriodSummary;
+   growth_percentage: number;
+   payment_breakdown: PaymentBreakdown[];
+   top_debtors: TopDebtor[];
+}
+
+// DAILY CLOSING
+export interface DailyClosingPayment {
+   amount_cents: number;
+   charge_cents: number;
+   total_cents: number;
+   method: string;
+   date: string;
+}
+
+export interface DailyClosingOrder {
+   order_id: number;
+   created_at: string;
+   customer: {
+      id: number;
+      name: string;
+      phone: string;
+   };
+   receiver: {
+      id: number;
+      name: string;
+      city: string;
+   };
+   service: string;
+   hbl_count: number;
+   total_weight_lbs: number;
+   total_in_cents: number;
+   paid_in_cents: number;
+   pending_in_cents: number;
+   discounts_in_cents: number;
+   payment_status: string;
+   payment_methods: string[];
+   payments: DailyClosingPayment[];
+}
+
+export interface DailyClosingSummary {
+   total_orders: number;
+   total_hbls: number;
+   total_weight_lbs: number;
+   total_billed_cents: number;
+   total_paid_cents: number;
+   total_charges_cents: number;
+   grand_total_collected_cents: number;
+   total_pending_cents: number;
+   total_discounts_cents: number;
+}
+
+export interface DailyClosingUser {
+   user_id: string;
+   user_name: string;
+   user_email: string;
+   summary: DailyClosingSummary;
+   payment_breakdown: PaymentBreakdown[];
+   orders: DailyClosingOrder[];
+}
+
+export interface DailyClosingTotals extends DailyClosingSummary {
+   payment_breakdown: PaymentBreakdown[];
+}
+
+export interface DailyClosing {
+   date: string;
+   users: DailyClosingUser[];
+   totals: DailyClosingTotals;
+}
+
 export interface Container {
    id: number;
    container_name: string;
