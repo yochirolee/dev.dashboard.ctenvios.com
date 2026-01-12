@@ -1,9 +1,8 @@
 import { useState, useRef } from "react";
-import { Barcode, CheckCircle2, AlertTriangle, RefreshCw, Container, Package, FileText } from "lucide-react";
+import { Barcode, CheckCircle2, AlertTriangle, RefreshCw, Package, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { Card, CardContent } from "@/components/ui/card";
 import { ParcelsInContainer } from "@/components/containers/list-parcels-in-container";
 import { ParcelsReadyForContainer } from "@/components/containers/list-parcels-ready-for-container";
 import { useContainers } from "@/hooks/use-containers";
@@ -149,31 +148,10 @@ export const LoadContainerPage = () => {
                   {/* Left Column: Container Info, Scanner & Parcels in Container */}
                   <div className="lg:col-span-2 flex flex-col gap-6">
                      {/* Container Info */}
-                     <Card>
-                        <CardHeader className="pb-2">
-                           <CardTitle className="text-lg flex items-center gap-2">
-                              <Container className="h-5 w-5" />
-                              {container?.container_name}
-                           </CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                           <div className="flex flex-wrap items-center gap-3">
-                              <Badge variant="outline">{container?.container_number}</Badge>
-                              <Badge variant="secondary">{container?.status}</Badge>
-                              <Badge variant="outline">{container?.container_type}</Badge>
-                              <span className="text-sm text-muted-foreground">
-                                 {container?.origin_port} → {container?.destination_port}
-                              </span>
-                              <span className="text-sm text-muted-foreground">
-                                 {container?._count?.parcels || 0} paquetes
-                              </span>
-                           </div>
-                        </CardContent>
-                     </Card>
 
                      {/* Scanner Input Area */}
                      <Card>
-                        <CardContent className="pt-6">
+                        <CardContent>
                            <form onSubmit={(e) => handleScan(e)} className="flex flex-col gap-4">
                               <div className="flex items-center justify-between">
                                  <label className="text-sm font-medium flex items-center gap-2">
@@ -264,11 +242,7 @@ export const LoadContainerPage = () => {
                         </CardContent>
                      </Card>
 
-                     <ParcelsInContainer
-                        containerId={containerIdNumber}
-                        containerName={container?.container_name}
-                        canModify={canLoadParcels}
-                     />
+                     <ParcelsInContainer container={container} canModify={canLoadParcels} />
                   </div>
 
                   {/* Right Column: Parcels Ready for Container */}

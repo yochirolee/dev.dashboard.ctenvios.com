@@ -10,6 +10,7 @@ import { InputGroupAddon } from "@/components/ui/input-group";
 import zelleIcon from "/zelle-icon.svg";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { cn } from "@/lib/utils";
+import { format } from "date-fns";
 
 const paymentIcons = {
    CASH: <Banknote className="size-4" />,
@@ -23,6 +24,7 @@ const paymentIcons = {
 
 export const PaymentsDetails = ({ order }: { order: Order & { payments: Payment[] } }) => {
    const [open, setOpen] = useState(false);
+
    return (
       <Collapsible className="w-full" open={open} onOpenChange={setOpen}>
          <div className="flex items-center gap-2 justify-between">
@@ -86,12 +88,16 @@ const PaymentItem = ({ payment }: { payment: Payment }) => {
          </ItemContent>
          <ItemActions>
             {formatCents(payment?.amount_in_cents + (payment?.charge_in_cents ?? 0))}
+
             {isDeleting ? (
                <InputGroupAddon align="inline-end">
                   <Spinner className="size-4 h-4 w-4 text-muted-foreground" />
                </InputGroupAddon>
             ) : (
                <InputGroupAddon align="inline-end">
+                  <div className="text-muted-foreground text-xs font-light mr-2">
+                     {format(new Date(payment?.created_at ?? ""), "dd/MM/yyyy HH:mm a")}
+                  </div>
                   <Trash2 size="4" className="cursor-pointer" onClick={() => deletePayment(payment?.id ?? 0)} />
                </InputGroupAddon>
             )}

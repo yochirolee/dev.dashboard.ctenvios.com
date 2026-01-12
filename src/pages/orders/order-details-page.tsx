@@ -13,7 +13,6 @@ import {
    ArchiveIcon,
    EllipsisVerticalIcon,
    CogIcon,
-   FileWarning,
    FileTextIcon,
 } from "lucide-react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -91,15 +90,7 @@ export default function OrderDetailsPage() {
 
    if (error || !order)
       return (
-         <Empty>
-            <EmptyHeader>
-               <EmptyMedia variant="icon">
-                  <FileWarning />
-               </EmptyMedia>
-               <EmptyTitle>Order Not Found</EmptyTitle>
-               <EmptyDescription>The order you are looking for does not exist.</EmptyDescription>
-            </EmptyHeader>
-         </Empty>
+       <OrderNotFound />
       );
 
    return order ? (

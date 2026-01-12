@@ -219,8 +219,16 @@ const api = {
          const response = await axiosInstance.delete(`/orders/${payment_id}/payments`);
          return response.data;
       },
-      delete: async (order_id: number) => {
-         const response = await axiosInstance.delete(`/orders/${order_id}`);
+      delete: async (order_id: number, reason: string) => {
+         const response = await axiosInstance.delete(`/orders/${order_id}`, {
+            data: {
+               reason,
+            },
+         });
+         return response.data;
+      },
+      restore: async (order_id: number) => {
+         const response = await axiosInstance.post(`/orders/${order_id}/restore`);
          return response.data;
       },
       deleteDiscount: async (discount_id: number) => {

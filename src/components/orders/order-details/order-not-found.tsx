@@ -11,8 +11,8 @@ export function OrderNotFound() {
             <EmptyMedia variant="icon">
                <FileWarning />
             </EmptyMedia>
-            <EmptyTitle>No Order Found!</EmptyTitle>
-            <EmptyDescription> The order you are looking for does not exist.</EmptyDescription>
+            <EmptyTitle>Order not found!</EmptyTitle>
+            <EmptyDescription> The order you are looking for has been deleted or does not exist.</EmptyDescription>
          </EmptyHeader>
          <EmptyContent className="grid grid-cols-2 gap-2">
             <Button onClick={() => navigate("/orders")} variant="outline" size="sm">

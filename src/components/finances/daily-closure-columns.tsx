@@ -40,22 +40,39 @@ export const dailyClosureColumns: ColumnDef<DailyClosingOrder>[] = [
       accessorKey: "order_id",
       header: "Orden",
       cell: ({ row }) => (
-         <Link className="flex items-center gap-2 text-primary hover:underline" to={`/orders/${row.original.order_id}`}>
-            <FileBoxIcon size={16} className="shrink-0" />
-            <span className="font-mono text-xs">{row.original.order_id}</span>
-         </Link>
+         <div className="flex items-center gap-2">
+            <Link
+               className="flex items-center gap-2 text-primary hover:underline"
+               to={`/orders/${row.original.order_id}`}
+            >
+               <FileBoxIcon size={16} className="shrink-0" />
+               <span className="font-mono text-xs">{row.original.order_id}</span>
+            </Link>
+            {row.original.is_debt_collection && (
+               <Badge className="text-[10px] px-1.5 py-0 bg-orange-100 text-orange-700 hover:bg-orange-100 border-orange-300">
+                  Deuda
+               </Badge>
+            )}
+         </div>
       ),
-      size: 80,
+      size: 120,
    },
    {
       accessorKey: "created_at",
-      header: "Hora",
+      header: "Fecha",
       cell: ({ row }) => (
-         <span className="font-mono text-xs text-muted-foreground">
-            {format(new Date(row.original.created_at), "dd/MM/yyyy HH:mm")}
-         </span>
+         <div className="flex flex-col">
+            <span className="font-mono text-xs text-muted-foreground">
+               {format(new Date(row.original.created_at), "HH:mm")}
+            </span>
+            {row.original.is_debt_collection && row.original.original_order_date && (
+               <span className="text-[10px] text-orange-600">
+                  Orden: {format(new Date(row.original.original_order_date), "dd/MM/yyyy")}
+               </span>
+            )}
+         </div>
       ),
-      size: 60,
+      size: 80,
    },
    {
       accessorKey: "customer.name",
@@ -108,12 +125,19 @@ export const dailyClosureColumns: ColumnDef<DailyClosingOrder>[] = [
          <span className="font-mono text-sm font-medium">{formatCurrency(row.original.total_in_cents)}</span>
       ),
       size: 100,
-    },
+   },
    {
       accessorKey: "discounts_in_cents",
       header: "Descuento",
       cell: ({ row }) => (
-         <span className= {cn("font-mono text-sm font-medium", row.original.discounts_in_cents > 0 ? "text-red-600" : "text-muted-foreground")}>{formatCurrency(row.original.discounts_in_cents)}</span>
+         <span
+            className={cn(
+               "font-mono text-sm font-medium",
+               row.original.discounts_in_cents > 0 ? "text-red-600" : "text-muted-foreground"
+            )}
+         >
+            {formatCurrency(row.original.discounts_in_cents)}
+         </span>
       ),
       size: 100,
    },

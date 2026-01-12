@@ -9,6 +9,16 @@ import { Spinner } from "@/components/ui/spinner";
 import { format } from "date-fns";
 import { toast } from "sonner";
 
+type Container = {
+   id: number;
+   container_name: string;
+   container_number: string;
+   status: string;
+   container_type: string;
+   origin_port: string;
+   destination_port: string;
+};
+
 interface ParcelInContainer {
    id: number;
    tracking_number: string;
@@ -21,14 +31,14 @@ interface ParcelInContainer {
 }
 
 interface ParcelsInContainerProps {
-   containerId: number;
+   container: Container;
    containerName?: string;
    canModify?: boolean;
 }
 
-export const ParcelsInContainer = ({ containerId, containerName, canModify = true }: ParcelsInContainerProps) => {
+export const ParcelsInContainer = ({ container, canModify = true }: ParcelsInContainerProps) => {
    const { data, isLoading, isFetchingNextPage, hasNextPage, fetchNextPage } = useContainers.getParcels(
-      containerId,
+      container.id,
       20
    );
 
@@ -36,7 +46,7 @@ export const ParcelsInContainer = ({ containerId, containerName, canModify = tru
    const total = data?.pages[0]?.total ?? 0;
 
    const [removingTrackingNumber, setRemovingTrackingNumber] = useState<string | null>(null);
-   const { mutate: removeParcel } = useContainers.removeParcel(containerId);
+   const { mutate: removeParcel } = useContainers.removeParcel(container.id);
 
    const loadMoreRef = useRef<HTMLDivElement>(null);
 
@@ -84,9 +94,17 @@ export const ParcelsInContainer = ({ containerId, containerName, canModify = tru
             <div className="flex flex-col gap-2">
                <CardTitle className="text-lg flex items-center gap-2">
                   <Container className="h-5 w-5" />
-                  {containerName || `Contenedor: ${containerId}`}
+                  {container.container_name || `Contenedor: ${container.id}`}
                </CardTitle>
                <Badge variant="outline">Total de Paquetes: {total}</Badge>
+            </div>
+            <div>
+               <Badge variant="outline">{container.container_number}</Badge>
+               <Badge variant="secondary">{container.status}</Badge>
+               <Badge variant="outline">{container.container_type}</Badge>
+               <span className="text-sm text-muted-foreground ml-2">
+                  {container.origin_port} → {container.destination_port}
+               </span>
             </div>
          </CardHeader>
          <CardContent className="flex-1 overflow-hidden p-0">

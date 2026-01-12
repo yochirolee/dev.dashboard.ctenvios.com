@@ -16,12 +16,28 @@ import {
 import { Spinner } from "@/components/ui/spinner";
 import { TrashIcon } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import z from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { Input } from "@/components/ui/input";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+
+const deleteOrderSchema = z.object({
+   reason: z.string().min(1, "El motivo es requerido"),
+});
 
 export function DeleteOrderDialog({ order_id, asRedirect }: { order_id: number; asRedirect?: boolean }) {
+   const form = useForm<z.infer<typeof deleteOrderSchema>>({
+      resolver: zodResolver(deleteOrderSchema),
+      defaultValues: {
+         reason: "",
+      },
+   });
+
    const navigate = useNavigate();
    const { mutate: deleteOrder, isPending: isDeletingOrder } = useOrders.delete({
-      onSuccess: () => {
-         toast.success("Order deleted successfully");
+      onSuccess: (_order_id: number, _reason: string) => {
+         toast.success("Orden eliminada correctamente");
          if (asRedirect) {
             navigate("/orders");
          }
@@ -31,8 +47,8 @@ export function DeleteOrderDialog({ order_id, asRedirect }: { order_id: number; 
       },
    });
 
-   const handleDelete = () => {
-      deleteOrder(order_id);
+   const onSubmit = (data: z.infer<typeof deleteOrderSchema>) => {
+      deleteOrder({ order_id, reason: data.reason });
    };
 
    return (
@@ -48,19 +64,29 @@ export function DeleteOrderDialog({ order_id, asRedirect }: { order_id: number; 
                <AlertDialogTitle>¿Estás seguro de querer eliminar esta orden?</AlertDialogTitle>
                <AlertDialogDescription>Esta acción no se puede deshacer.</AlertDialogDescription>
             </AlertDialogHeader>
-
-            <AlertDialogFooter>
-               <AlertDialogCancel>Cancelar</AlertDialogCancel>
-               <AlertDialogAction onClick={handleDelete}>
-                  {isDeletingOrder ? (
-                     <>
-                        <Spinner /> Eliminando...
-                     </>
-                  ) : (
-                     "Eliminar"
-                  )}
-               </AlertDialogAction>
-            </AlertDialogFooter>
+            <Form {...form}>
+               <form id="delete-order-form" onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                  <FormField
+                     control={form.control}
+                     name="reason"
+                     render={({ field }) => (
+                        <FormItem>
+                           <FormLabel>Motivo</FormLabel>
+                           <FormControl>
+                              <Input placeholder="Ingrese el motivo de eliminación" {...field} />
+                           </FormControl>
+                           <FormMessage />
+                        </FormItem>
+                     )}
+                  />
+                  <AlertDialogFooter>
+                     <AlertDialogCancel type="button">Cancelar</AlertDialogCancel>
+                     <AlertDialogAction type="submit" disabled={isDeletingOrder}>
+                        {isDeletingOrder ? <Spinner /> : "Eliminar"}
+                     </AlertDialogAction>
+                  </AlertDialogFooter>
+               </form>
+            </Form>
          </AlertDialogContent>
       </AlertDialog>
    );

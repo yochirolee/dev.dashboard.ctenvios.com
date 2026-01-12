@@ -86,6 +86,7 @@ export const paymentSchema = z.object({
    method: z.string().min(1, "You must select a payment method to continue."),
    reference: z.string().min(0).optional(),
    notes: z.string().min(0).optional(),
+   created_at: z.string().optional(),
 });
 export const discountSchema = z.object({
    id: z.number().optional(),
@@ -595,6 +596,7 @@ export interface DailyClosingPayment {
 export interface DailyClosingOrder {
    order_id: number;
    created_at: string;
+   original_order_date?: string; // Present when is_debt_collection is true
    customer: {
       id: number;
       name: string;
@@ -614,7 +616,8 @@ export interface DailyClosingOrder {
    discounts_in_cents: number;
    payment_status: string;
    payment_methods: string[];
-   payments: DailyClosingPayment[];
+   payments?: DailyClosingPayment[];
+   is_debt_collection: boolean;
 }
 
 export interface DailyClosingSummary {
@@ -622,11 +625,11 @@ export interface DailyClosingSummary {
    total_hbls: number;
    total_weight_lbs: number;
    total_billed_cents: number;
-   total_paid_cents: number;
+   total_collected_cents: number;
    total_charges_cents: number;
-   grand_total_collected_cents: number;
    total_pending_cents: number;
    total_discounts_cents: number;
+   debt_collections_cents: number;
 }
 
 export interface DailyClosingUser {
@@ -644,6 +647,10 @@ export interface DailyClosingTotals extends DailyClosingSummary {
 
 export interface DailyClosing {
    date: string;
+   date_range?: {
+      start: string;
+      end: string;
+   };
    users: DailyClosingUser[];
    totals: DailyClosingTotals;
 }

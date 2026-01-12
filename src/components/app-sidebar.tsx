@@ -18,13 +18,14 @@ import { Button } from "./ui/button";
 import { useAppStore } from "@/stores/app-store";
 import { NavConfig } from "./nav-config";
 import { NavIssues } from "./nav-issues";
-import { canAccess, hasRole, type Role } from "@/lib/rbac";
+import { canAccess, hasRole, canAccessByAgencyType, AGENCY_TYPES, type Role, type AgencyType } from "@/lib/rbac";
 import { NavFinances } from "@/components/nav-finances";
 
 interface SidebarSubItem {
    title: string;
    url: string;
    allowedRoles?: readonly Role[];
+   allowedAgencyTypes?: readonly AgencyType[];
 }
 
 interface SidebarItem {
@@ -63,11 +64,13 @@ const navMainItems: SidebarItem[] = [
             title: "Contenedores",
             url: "/logistics/containers",
             allowedRoles: canAccess.containersAndFlights,
+            allowedAgencyTypes: [AGENCY_TYPES.FORWARDER],
          },
          {
             title: "Vuelos",
             url: "/logistics/flights",
             allowedRoles: canAccess.containersAndFlights,
+            allowedAgencyTypes: [AGENCY_TYPES.FORWARDER],
          },
       ],
    },
@@ -171,8 +174,9 @@ const navIssuesItems: SidebarItem[] = [
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
    const location = useLocation();
-   const { user } = useAppStore();
+   const { user, agency } = useAppStore();
    const role = user?.role ?? null;
+   const agencyType = agency?.agency_type as AgencyType | undefined;
 
    const filterByRole = React.useCallback(
       (items: SidebarItem[]): SidebarItem[] =>
@@ -188,6 +192,15 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                   if (!subItem.allowedRoles?.length) {
                      return true;
                   }
+                  // Use canAccessByAgencyType if allowedAgencyTypes is specified
+                  if (subItem.allowedAgencyTypes?.length) {
+                     return canAccessByAgencyType(
+                        role as Role,
+                        agencyType,
+                        subItem.allowedRoles,
+                        subItem.allowedAgencyTypes
+                     );
+                  }
                   return hasRole(role as Role, subItem.allowedRoles);
                });
                return {
@@ -201,7 +214,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                }
                return item.items.length > 0;
             }),
-      [role]
+      [role, agencyType]
    );
 
    const filteredNavMain = React.useMemo(() => filterByRole(navMainItems), [filterByRole]);

@@ -304,6 +304,32 @@ export default function DailyClosurePage() {
                      </CardFooter>
                   </Card>
 
+                  {/* Cobrado */}
+                  <Card className="@container/card">
+                     <CardHeader className="relative">
+                        <CardDescription>Total Cobrado</CardDescription>
+                        <CardTitle className="@[250px]/card:text-3xl text-2xl font-semibold tabular-nums text-green-600">
+                           {formatCurrency(data.totals.total_collected_cents)}
+                        </CardTitle>
+                        <div className="absolute right-4 top-4">
+                           <Badge variant="outline" className="flex gap-1 rounded-lg text-xs text-green-600">
+                              <TrendingUpIcon className="size-3" />
+                              cobrado
+                           </Badge>
+                        </div>
+                     </CardHeader>
+                     <CardFooter className="flex-col items-start gap-1 text-sm">
+                        <div className="line-clamp-1 flex items-center gap-2 font-medium">
+                           Total Deudas Cobradas
+                        </div>
+                        
+                           <div className="text-green-600">
+                            {formatCurrency(data.totals.debt_collections_cents)}
+                           </div>
+                        
+                     </CardFooter>
+                  </Card>
+
                   {/* Facturado */}
                   <Card className="@container/card">
                      <CardHeader className="relative">
@@ -324,30 +350,6 @@ export default function DailyClosurePage() {
                            {data.totals.total_weight_lbs} lbs
                         </div>
                         <div className="text-muted-foreground">Peso total facturado</div>
-                     </CardFooter>
-                  </Card>
-
-                  {/* Cobrado */}
-                  <Card className="@container/card">
-                     <CardHeader className="relative">
-                        <CardDescription>Total Cobrado</CardDescription>
-                        <CardTitle className="@[250px]/card:text-3xl text-2xl font-semibold tabular-nums text-green-600">
-                           {formatCurrency(data.totals.grand_total_collected_cents)}
-                        </CardTitle>
-                        <div className="absolute right-4 top-4">
-                           <Badge variant="outline" className="flex gap-1 rounded-lg text-xs text-green-600">
-                              <TrendingUpIcon className="size-3" />
-                              cobrado
-                           </Badge>
-                        </div>
-                     </CardHeader>
-                     <CardFooter className="flex-col items-start gap-1 text-sm">
-                        <div className="line-clamp-1 flex items-center gap-2 font-medium">
-                           {formatCurrency(data.totals.total_charges_cents)} cargos
-                        </div>
-                        <div className="text-muted-foreground">
-                           Pagado: {formatCurrency(data.totals.total_paid_cents)}
-                        </div>
                      </CardFooter>
                   </Card>
 
@@ -472,8 +474,13 @@ export default function DailyClosurePage() {
                                           <div>
                                              <span className="text-muted-foreground">Cobrado: </span>
                                              <span className="font-mono text-green-600">
-                                                {formatCurrency(user.summary.grand_total_collected_cents)}
+                                                {formatCurrency(user.summary.total_collected_cents)}
                                              </span>
+                                             {user.summary.debt_collections_cents > 0 && (
+                                                <span className="font-mono text-orange-600 ml-1">
+                                                   ({formatCurrency(user.summary.debt_collections_cents)} deudas)
+                                                </span>
+                                             )}
                                           </div>
                                           <div>
                                              <span className=" text-muted-foreground">Pendiente: </span>

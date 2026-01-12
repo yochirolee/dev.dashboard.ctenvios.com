@@ -79,21 +79,29 @@ export const useOrders = {
          },
       });
    },
-   delete: (options?: { onSuccess?: () => void; onError?: (error: any) => void }) => {
+   delete: (options?: { onSuccess?: (order_id: number, reason: string) => void; onError?: (error: any, reason: string) => void }) => {
       const queryClient = useQueryClient();
       return useMutation({
-         mutationFn: (order_id: number) => api.orders.delete(order_id),
-         onSuccess: async () => {
+         mutationFn: ({ order_id, reason }: { order_id: number; reason: string }) => api.orders.delete(order_id, reason),
+         onSuccess: async (_, variables) => {
             await queryClient.invalidateQueries({ queryKey: ["get-orders"] });
-            options?.onSuccess?.();
+            options?.onSuccess?.(variables.order_id, variables.reason);
          },
-         onError: (error) => {
-            options?.onError?.(error);
+         onError: (error, variables) => {
+            options?.onError?.(error, variables.reason);
          },
       });
    },
-
-   //need to improve the revalidation of the order
+   restore: (options?: { onSuccess?: (order_id: number) => void; onError?: (error: any) => void }) => {
+      const queryClient = useQueryClient();
+      return useMutation({
+         mutationFn: ({ order_id }: { order_id: number }) => api.orders.restore(order_id),
+         onSuccess: async (_, variables) => {
+            await queryClient.invalidateQueries({ queryKey: ["get-orders"] });
+            options?.onSuccess?.(variables.order_id);
+         },
+      });
+   },
    addDiscount: (order_id: number, options?: { onSuccess?: () => void; onError?: (error: any) => void }) => {
       const queryClient = useQueryClient();
       return useMutation({

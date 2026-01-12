@@ -35,6 +35,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Link } from "react-router-dom";
 import { DeleteOrderDialog } from "@/pages/orders/delete-order-dialog";
+import { RestoreOrderButton } from "@/pages/orders/restore-order-button";
 
 // This type is used to define the shape of our data.
 // You can use a Zod schema here if you want.
@@ -116,6 +117,7 @@ export const ORDER_STATUS = {
    PARTIALLY_RELEASED: "PARTIALLY_RELEASED",
    PARTIALLY_OUT_FOR_DELIVERY: "PARTIALLY_OUT_FOR_DELIVERY",
    PARTIALLY_DELIVERED: "PARTIALLY_DELIVERED",
+   CANCELLED: "CANCELLED",
 } as const;
 
 export type OrderStatus = (typeof ORDER_STATUS)[keyof typeof ORDER_STATUS];
@@ -145,6 +147,7 @@ export const STATUS_LABELS: Record<OrderStatus, string> = {
    PARTIALLY_RELEASED: "Parcial liberado",
    PARTIALLY_OUT_FOR_DELIVERY: "Parcial en camino",
    PARTIALLY_DELIVERED: "Parcial entregado",
+   CANCELLED: "Cancelada",
 };
 
 // Configuración de iconos y colores para cada estado
@@ -179,6 +182,7 @@ const STATUS_CONFIG: Record<OrderStatus, StatusConfig> = {
    PARTIALLY_RELEASED: { icon: CheckCircle2, color: "text-lime-400" },
    PARTIALLY_OUT_FOR_DELIVERY: { icon: Truck, color: "text-sky-400" },
    PARTIALLY_DELIVERED: { icon: CircleCheckBig, color: "text-green-400" },
+   CANCELLED: { icon: XCircle, color: "text-red-500" },
 };
 
 export const getOrderStatusBadge = (status: string): React.ReactNode => {
@@ -428,10 +432,15 @@ export const orderColumns: ColumnDef<Order>[] = [
                         </DropdownMenuItem>
                      </Link>
                      <DropdownMenuSeparator />
-
-                     <DropdownMenuItem className="text-destructive" asChild>
-                        <DeleteOrderDialog order_id={row.original.id} />
-                     </DropdownMenuItem>
+                     {row.original.status !== "CANCELLED" ? (
+                        <DropdownMenuItem className="text-destructive" asChild>
+                           <DeleteOrderDialog order_id={row.original.id} />
+                        </DropdownMenuItem>
+                     ) : (
+                        <DropdownMenuItem asChild>
+                           <RestoreOrderButton order_id={row.original.id} />
+                        </DropdownMenuItem>
+                     )}
                   </DropdownMenuContent>
                </DropdownMenu>
             </div>

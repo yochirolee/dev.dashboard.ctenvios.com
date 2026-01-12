@@ -90,6 +90,35 @@ export const hasMinimumRole = (userRole: Role | null | undefined, minimumRole: R
    return userLevel >= minimumLevel;
 };
 
+// Agency types
+export const AGENCY_TYPES = {
+   FORWARDER: "FORWARDER",
+   AGENCY: "AGENCY",
+   RESELLER: "RESELLER",
+} as const;
+
+export type AgencyType = (typeof AGENCY_TYPES)[keyof typeof AGENCY_TYPES];
+
+// Check access based on role AND agency type
+export const canAccessByAgencyType = (
+   userRole: Role | null | undefined,
+   agencyType: AgencyType | null | undefined,
+   allowedRoles: readonly Role[],
+   allowedAgencyTypes?: readonly AgencyType[]
+): boolean => {
+   // First check if user has one of the allowed roles
+   if (hasRole(userRole, allowedRoles)) {
+      return true;
+   }
+
+   // If agency type conditions are specified, check if AGENCY_ADMIN with allowed agency type
+   if (allowedAgencyTypes && agencyType && userRole === ROLES.AGENCY_ADMIN) {
+      return allowedAgencyTypes.includes(agencyType);
+   }
+
+   return false;
+};
+
 // Helper para obtener roles permitidos de forma más legible
 export const canAccess = {
    // Finanzas (solo admins)
@@ -110,8 +139,8 @@ export const canAccess = {
    // Issues (varios roles)
    issues: ROLE_GROUPS.ISSUES_VIEWERS,
 
-   // Contenedores y vuelos (solo admins principales)
-   containersAndFlights: [ROLES.ROOT, ROLES.ADMINISTRATOR],
+   // Contenedores y vuelos (admins principales y forwarders)
+   containersAndFlights: [ROLES.ROOT, ROLES.ADMINISTRATOR, ROLES.FORWARDER_ADMIN, ROLES.FORWARDER_RESELLER],
 
    // Órdenes (todos excepto carriers)
    orders: [
