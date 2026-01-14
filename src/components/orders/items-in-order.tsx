@@ -127,8 +127,7 @@ export function ItemsInOrder() {
       setItemsCount(1);
    };
 
-   console.log(form.formState.errors, "errors");
-
+   
    const { mutate: createOrder, isPending: isCreatingOrder } = useOrders.create({
       onSuccess: (data) => {
          console.log(data, "data in order creation");

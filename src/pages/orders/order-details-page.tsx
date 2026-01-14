@@ -14,6 +14,7 @@ import {
    EllipsisVerticalIcon,
    CogIcon,
    FileTextIcon,
+   IdCardIcon,
 } from "lucide-react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
@@ -47,6 +48,7 @@ export default function OrderDetailsPage() {
 
    const { data: order, isLoading, error } = useOrders.getById(Number(orderId));
 
+   
    const subtotal = order?.order_items.reduce(
       (acc: number, item: OrderItems) =>
          acc +
@@ -88,10 +90,7 @@ export default function OrderDetailsPage() {
          </Empty>
       );
 
-   if (error || !order)
-      return (
-       <OrderNotFound />
-      );
+   if (error || !order) return <OrderNotFound />;
 
    return order ? (
       <div className="space-y-4 container max-w-screen-xl mx-auto p-2 md:p-4">
@@ -117,7 +116,7 @@ export default function OrderDetailsPage() {
                            </Badge>
                         </div>
                         <div className="flex  gap-2">
-                           <span className="text-sm text-muted-foreground">Facturado por:</span>
+                           <span className="text-sm text-muted-foreground">Creado por:</span>
                            <span className="text-sm"> {order?.user?.name}</span>
                         </div>
                      </div>
@@ -167,8 +166,8 @@ export default function OrderDetailsPage() {
             </ButtonGroup>
          </div>
          <Card className="p-4 container mx-auto print:shadow-none bg-card print:bg-white print:py-0 print:text-gray-500">
-            <div className="flex flex-col xl:flex-row justify-between items-start ">
-               <div className="flex items-center gap-4">
+            <div className="grid grid-cols-1 xl:grid-cols-2  xl:flex-row justify-between items-start ">
+               <div className="flex  items-center gap-4">
                   {order?.agency?.logo ? (
                      <img
                         src={order?.agency?.logo}
@@ -190,7 +189,7 @@ export default function OrderDetailsPage() {
                   <h1 className="xl:text-xl text-end font-bold ">Order {order?.id}</h1>
                   <div className="flex items-center gap-2 text-end justify-end">
                      <span className="xl:text-lg text-end">{total_weight?.toFixed(2)} lbs</span>
-                     <span className="xl:text-lg text-end">Items: {order?.items?.length || 0}</span>
+                     <span className="xl:text-lg text-end">Items: {order?.order_items?.length || 0}</span>
                   </div>
                   <time className="text-sm text-end text-muted-foreground">
                      Fecha: {format(new Date(order?.created_at), "dd/MM/yyyy HH:mm a")}
@@ -220,6 +219,12 @@ export default function OrderDetailsPage() {
                   </li>
                   <li className="flex items-center gap-2 justify-start">
                      <span className="text-muted-foreground">
+                        <IdCardIcon size={16} />
+                     </span>
+                     <span>{order?.customer?.identity_document}</span>
+                  </li>
+                  <li className="flex items-center gap-2 justify-start">
+                     <span className="text-muted-foreground">
                         <MapPin size={16} />
                      </span>
                      <span>{order?.customer?.address}</span>
@@ -244,13 +249,24 @@ export default function OrderDetailsPage() {
                      <span className="text-muted-foreground">
                         <Phone size={16} />
                      </span>
-                     <span>{order?.receiver?.phone || order?.receiver?.mobile}</span>
+                     <span>{order?.receiver?.phone || order?.receiver?.mobile} </span>
+                  </li>
+                  <li className="flex items-center gap-2 justify-start">
+                     <span className="text-muted-foreground">
+                        <IdCardIcon size={16} />
+                     </span>
+                     <span>
+                        {order?.receiver?.ci} {order?.receiver?.passport ? `- ${order?.receiver?.passport}` : ""}
+                     </span>
                   </li>
                   <li className="flex items-center gap-2 justify-start">
                      <span className="text-muted-foreground">
                         <MapPin size={16} />
                      </span>
-                     <span>{order?.receiver?.address}</span>
+                     <span>
+                        {order?.receiver?.address} {order?.receiver?.province?.name} / {order?.receiver?.city?.name}
+                     </span>
+                    
                   </li>
                </ul>
             </div>

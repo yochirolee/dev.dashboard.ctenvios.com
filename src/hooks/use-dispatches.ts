@@ -134,6 +134,7 @@ export const useDispatches = {
          },
       });
    },
+
    readyForDispatch: (agency_id: number, limit: number = 20) => {
       return useInfiniteQuery({
          queryKey: ["ready-for-dispatch", agency_id],

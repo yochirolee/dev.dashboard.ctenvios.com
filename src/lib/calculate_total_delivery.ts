@@ -6,6 +6,7 @@ export const calculateTotalDeliveryFee = () => {
    //if province name is equal to City name, then the city is capital and the delivery fee is 1200
    //if not return 18000
    const selectedReceiver = useOrderStore((state: any) => state.selectedReceiver);
+
    if (!selectedReceiver) return 0;
    if (
       selectedReceiver.province === "La Habana" ||
