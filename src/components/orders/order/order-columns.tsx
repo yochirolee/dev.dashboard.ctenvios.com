@@ -286,6 +286,15 @@ export const orderColumns: ColumnDef<Order>[] = [
       size: 150,
    },
 
+    {
+      accessorKey: "status",
+      header: "Status",
+      cell: ({ row }) => {
+         return getOrderStatusBadge(row.original?.status);
+      },
+      size: 150,
+   },
+
    {
       accessorKey: "customer",
       header: "Envia",
@@ -364,14 +373,7 @@ export const orderColumns: ColumnDef<Order>[] = [
          );
       },
    },
-   {
-      accessorKey: "status",
-      header: "Status",
-      cell: ({ row }) => {
-         return getOrderStatusBadge(row.original?.status);
-      },
-      size: 150,
-   },
+  
    {
       accessorKey: "created_at",
       header: "Fecha",
@@ -451,35 +453,49 @@ export const orderColumns: ColumnDef<Order>[] = [
    },
 ];
 
-const paymentStatus = (payment_status: string) => {
-   switch (payment_status) {
+const getPaymentStatusColor = (status: string): string => {
+   switch (status) {
       case "PAID":
-         return (
-            <Badge className="w-fit  " variant="secondary">
-               <span className="  rounded-full bg-green-400/80 text-white text-xs h-1.5 ring-1 ring-green-500/40 w-1.5 flex items-center justify-center" />
-               <span className="ml-1 text-nowrap font-extralight text-muted-foreground text-xs">Paid</span>
-            </Badge>
-         );
+         return "bg-green-400";
+      case "PENDING":
+         return "bg-yellow-400";
       case "PARTIALLY_PAID":
-         return (
-            <Badge className="w-fit  " variant="secondary">
-               <span className="  rounded-full bg-yellow-400/80 text-white text-xs h-1.5 ring-1 ring-yellow-500/40 w-1.5 flex items-center justify-center" />
-               <span className="ml-1 text-nowrap font-extralight text-muted-foreground text-xs">Partial</span>
-            </Badge>
-         );
+         return "bg-orange-400";
       case "FULL_DISCOUNT":
-         return (
-            <Badge className="w-fit  " variant="secondary">
-               <span className="  rounded-full bg-sky-400/50 text-white text-xs h-1.5 ring-1 ring-sky-500/40 w-1.5 flex items-center justify-center" />
-               <span className="ml-1 text-nowrap font-extralight text-muted-foreground text-xs">Discounted</span>
-            </Badge>
-         );
+         return "bg-blue-400";
+      case "REFUNDED":
+         return "bg-purple-400";
+      case "CANCELLED":
+         return "bg-red-600";
       default:
-         return (
-            <Badge className="w-fit  " variant="secondary">
-               <span className="  rounded-full bg-red-400/80 text-white text-xs h-1.5 ring-1 ring-red-500/40 w-1.5 flex items-center justify-center" />
-               <span className="ml-1 text-nowrap font-extralight text-muted-foreground text-xs">Pending</span>
-            </Badge>
-         );
+         return "bg-gray-400";
    }
+};
+
+const getPaymentStatusLabel = (status: string): string => {
+   switch (status) {
+      case "PAID":
+         return "Pagado";
+      case "PENDING":
+         return "Pendiente";
+      case "PARTIALLY_PAID":
+         return "Pago Parcial";
+      case "FULL_DISCOUNT":
+         return "Descuento";
+      case "REFUNDED":
+         return "Reembolsado";
+      case "CANCELLED":
+         return "Cancelado";
+      default:
+         return status;
+   }
+};
+
+const paymentStatus = (payment_status: string) => {
+   return (
+      <Badge className="w-fit" variant="secondary">
+         <span className={`rounded-full h-2 w-2 ${getPaymentStatusColor(payment_status)}`} />
+         <span className="ml-1.5 text-nowrap font-normal text-xs">{getPaymentStatusLabel(payment_status)}</span>
+      </Badge>
+   );
 };

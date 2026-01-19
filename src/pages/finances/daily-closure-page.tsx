@@ -11,11 +11,9 @@ import {
    Receipt,
    Loader2,
    Scale,
-   Building2,
-   UserIcon,
-   FilterX,
    BoxIcon,
    FileSpreadsheet,
+   X,
 } from "lucide-react";
 import { useDailyClosing } from "@/hooks/use-daily-closing";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -23,7 +21,6 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { cn } from "@/lib/utils";
@@ -35,6 +32,7 @@ import { useAppStore } from "@/stores/app-store";
 import { ROLE_GROUPS } from "@/lib/rbac";
 import { axiosInstance } from "@/api/api";
 import { toast } from "sonner";
+import { DataTableFacetedFilter } from "@/components/ui/data-table-faceted-filter";
 
 const formatCurrency = (cents: number): string => {
    return new Intl.NumberFormat("en-US", {
@@ -198,69 +196,41 @@ export default function DailyClosurePage() {
                </Popover>
             </div>
 
-            {/* Filters */}
-            <div className="flex flex-wrap items-center gap-3">
+            {/* Filters - shadcn Tasks style */}
+            <div className="flex flex-wrap items-center gap-2">
                {/* Agency Filter (Admin only) */}
                {isAdmin && agencies && (
-                  <Select
-                     value={selectedAgencyId?.toString() || "all"}
-                     onValueChange={(value) => {
-                        setSelectedAgencyId(value === "all" ? undefined : parseInt(value));
+                  <DataTableFacetedFilter
+                     title="Agencia"
+                     options={agencies.map((agency: any) => ({
+                        value: agency.id.toString(),
+                        label: agency.name,
+                     }))}
+                     selectedValue={selectedAgencyId?.toString()}
+                     onSelect={(value) => {
+                        setSelectedAgencyId(value ? parseInt(value) : undefined);
                         setSelectedUserId(undefined); // Reset user when agency changes
                      }}
-                  >
-                     <SelectTrigger className="w-[200px]">
-                        <Building2 className="mr-2 h-4 w-4" />
-                        <SelectValue placeholder="Todas las agencias" />
-                     </SelectTrigger>
-                     <SelectContent>
-                        <SelectItem value="all">Todas las agencias</SelectItem>
-                        {agencies.map((agency: any) => (
-                           <SelectItem key={agency.id} value={agency.id.toString()}>
-                              {agency.name}
-                           </SelectItem>
-                        ))}
-                     </SelectContent>
-                  </Select>
+                  />
                )}
 
                {/* User Filter */}
-               <Select
-                  value={selectedUserId || "all"}
-                  onValueChange={(value) => setSelectedUserId(value === "all" ? undefined : value)}
-               >
-                  <SelectTrigger className="w-[220px]">
-                     <UserIcon className="mr-2 h-4 w-4" />
-                     <SelectValue placeholder="Todos los usuarios" />
-                  </SelectTrigger>
-                  <SelectContent>
-                     <SelectItem value="all">Todos los usuarios</SelectItem>
-                     {availableUsers.map((u) => (
-                        <SelectItem key={u.user_id} value={u.user_id}>
-                           {u.user_name}
-                        </SelectItem>
-                     ))}
-                  </SelectContent>
-               </Select>
+               <DataTableFacetedFilter
+                  title="Usuario"
+                  options={availableUsers.map((u) => ({
+                     value: u.user_id,
+                     label: u.user_name,
+                  }))}
+                  selectedValue={selectedUserId}
+                  onSelect={(value) => setSelectedUserId(value)}
+               />
 
-               {/* Clear Filters */}
+               {/* Reset Filters */}
                {hasActiveFilters && (
-                  <Button variant="ghost" size="sm" onClick={clearFilters} className="h-10">
-                     <FilterX className="mr-2 h-4 w-4" />
-                     Limpiar filtros
+                  <Button variant="ghost" onClick={clearFilters} className="h-8 px-2 lg:px-3">
+                     Reset
+                     <X className="ml-2 h-4 w-4" />
                   </Button>
-               )}
-
-               {/* Active filters badges */}
-               {selectedAgencyId && (
-                  <Badge variant="secondary" className="text-xs">
-                     Agencia: {agencies?.find((a: any) => a.id === selectedAgencyId)?.name}
-                  </Badge>
-               )}
-               {selectedUserId && (
-                  <Badge variant="secondary" className="text-xs">
-                     Usuario: {availableUsers.find((u) => u.user_id === selectedUserId)?.user_name}
-                  </Badge>
                )}
             </div>
          </div>

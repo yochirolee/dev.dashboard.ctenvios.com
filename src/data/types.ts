@@ -290,16 +290,20 @@ export interface OrderItems {
 
 /// DISPATCH
 export const dispatchStatus = {
-   DRAFT: "DRAFT",
-   DISPACHED: "DISPACHED",
-   RECEIVED: "RECEIVED",
-   DISCREPANCY: "DISCREPANCY",
+   DRAFT: "DRAFT", // Empty dispatch, no parcels
+   LOADING: "LOADING", // Dispatch has parcels being added
+   DISPATCHED: "DISPATCHED", // Ready for dispatch / in transit to receiver
+   RECEIVING: "RECEIVING", // At least one parcel has been received at destination
+   RECEIVED: "RECEIVED", // All parcels received / completed
+   DISCREPANCY: "DISCREPANCY", // Reception discrepancy detected
    CANCELLED: "CANCELLED",
 } as const;
 export const paymentStatus = {
    PENDING: "PENDING",
    PAID: "PAID",
    PARTIALLY_PAID: "PARTIALLY_PAID",
+   FULL_DISCOUNT: "FULL_DISCOUNT",
+   REFUNDED: "REFUNDED",
    CANCELLED: "CANCELLED",
 } as const;
 
@@ -521,6 +525,40 @@ export interface Dispatch {
    };
    _count: {
       order_items: number;
+   };
+}
+
+/// PALLETS
+export const palletStatus = {
+   OPEN: "OPEN",
+   CLOSED: "CLOSED",
+   DISPATCHED: "DISPATCHED",
+   CANCELLED: "CANCELLED",
+} as const;
+export type PalletStatus = (typeof palletStatus)[keyof typeof palletStatus];
+
+export interface Pallet {
+   id: number;
+   pallet_number?: string;
+   agency_id?: number;
+   status: PalletStatus | string;
+   total_weight_kg?: string;
+   parcels_count?: number;
+   notes?: string | null;
+   dispatch_id?: number | null;
+   created_at: string;
+   updated_at: string;
+   agency?: {
+      id: number;
+      name: string;
+   };
+   created_by?: {
+      id: string;
+      name: string;
+   };
+   created_by_id?: string;
+   _count?: {
+      parcels?: number;
    };
 }
 

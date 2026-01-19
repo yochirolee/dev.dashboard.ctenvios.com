@@ -9,14 +9,17 @@ import { ParcelsInDispatch } from "@/components/dispatch/list-parcels-in-dispatc
 import { useDispatches } from "@/hooks/use-dispatches";
 import { useParams } from "react-router-dom";
 import { toast } from "sonner";
-import { parcelStatus } from "@/data/types";
+import { parcelStatus, type DispatchStatus } from "@/data/types";
 
 // Types
 type ScanStatus = "matched" | "surplus" | "duplicate";
 
-export const CreateDispatchPage = () => {
+export const CreateDispatchPage = (): React.ReactElement => {
    const { dispatchId } = useParams();
    const dispatchIdNumber = Number(dispatchId ?? 0);
+
+   // Fetch dispatch data to get status
+   const { data: dispatchData } = useDispatches.getById(dispatchIdNumber);
 
    // State
    const [currentInput, setCurrentInput] = useState("");
@@ -152,7 +155,11 @@ export const CreateDispatchPage = () => {
                   </Card>
 
                   {/* Recent Activity Log */}
-                  <ParcelsInDispatch dispatchId={Number(dispatchId)} status={parcelStatus.IN_DISPATCH} />
+                  <ParcelsInDispatch
+                     dispatchId={Number(dispatchId)}
+                     status={parcelStatus.IN_DISPATCH}
+                     dispatchStatus={dispatchData?.status as DispatchStatus}
+                  />
                </div>
 
                <ParcelsInAgency />

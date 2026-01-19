@@ -20,6 +20,8 @@ import { HomePage } from "@/pages/home-page";
 import { CreateDispatchPage } from "@/pages/logistics/Dispatch/create-dispatch-page";
 import { ReceiveDispatchPage } from "@/pages/logistics/Dispatch/receive-dispatch-page";
 import { DispatchPageLists } from "@/pages/logistics/dispatch-page-list";
+import { PalletsPage } from "@/pages/logistics/Pallets/pallets-page";
+import { CreatePalletPage } from "@/pages/logistics/Pallets/create-pallet-page";
 import { AppLogsPage } from "@/pages/app-logs/app-logs-page";
 import { PartnersLogsPage } from "@/pages/app-logs/partners-logs-page";
 import IssuesPage from "@/pages/issues/issues-page";
@@ -59,6 +61,11 @@ export const AppRouter = () => {
                         <Route path="list" element={<DispatchPageLists />} />
                         <Route path="create/:dispatchId" element={<CreateDispatchPage />} />
                         <Route path="receive/" element={<ReceiveDispatchPage />} />
+                     </Route>
+                     <Route path="pallets">
+                        <Route index element={<Navigate to="list" replace />} />
+                        <Route path="list" element={<PalletsPage />} />
+                        <Route path="create/:palletId" element={<CreatePalletPage />} />
                      </Route>
                      <Route path="containers">
                         <Route index element={<Navigate to="list" replace />} />

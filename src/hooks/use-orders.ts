@@ -3,10 +3,18 @@ import api from "@/api/api";
 import type { Discount, Order, Payment } from "@/data/types";
 
 export const useOrders = {
-   search: (searchQuery: string, page: number, limit: number, startDate: string, endDate: string) => {
+   search: (
+      searchQuery: string,
+      page: number,
+      limit: number,
+      startDate: string,
+      endDate: string,
+      payment_status?: string,
+      agency_id?: number
+   ) => {
       return useQuery({
-         queryKey: ["get-orders", "search", searchQuery, page, limit, startDate, endDate],
-         queryFn: () => api.orders.search(searchQuery, page, limit, startDate, endDate),
+         queryKey: ["get-orders", "search", searchQuery, page, limit, startDate, endDate, payment_status, agency_id],
+         queryFn: () => api.orders.search(searchQuery, page, limit, startDate, endDate, payment_status, agency_id),
          staleTime: 1000 * 60 * 5,
       });
    },

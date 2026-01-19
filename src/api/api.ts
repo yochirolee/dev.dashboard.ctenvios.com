@@ -181,17 +181,27 @@ const api = {
       },
    },
    orders: {
-      search: async (search: string, page: number | 1, limit: number | 20, startDate: string, endDate: string) => {
+      search: async (
+         search: string,
+         page: number | 1,
+         limit: number | 20,
+         startDate: string,
+         endDate: string,
+         payment_status?: string,
+         agency_id?: number
+      ) => {
          // Convert 0-indexed (from TanStack Table) to 1-indexed (for API)
-         const response = await axiosInstance.get("/orders", {
-            params: {
-               search,
-               page: page + 1,
-               limit: limit,
-               startDate: startDate,
-               endDate: endDate,
-            },
-         });
+         const params: Record<string, string | number> = {
+            page: page + 1,
+            limit: limit,
+         };
+         if (search) params.search = search;
+         if (startDate) params.startDate = startDate;
+         if (endDate) params.endDate = endDate;
+         if (payment_status) params.payment_status = payment_status;
+         if (agency_id) params.agency_id = agency_id;
+
+         const response = await axiosInstance.get("/orders", { params });
          return response.data;
       },
       getById: async (id: number) => {
@@ -452,13 +462,31 @@ const api = {
    },
 
    dispatch: {
-      get: async (page: number | 1, limit: number | 25) => {
-         const response = await axiosInstance.get("/dispatches", {
-            params: {
-               page: page + 1,
-               limit: limit,
-            },
-         });
+      get: async (
+         page: number = 1,
+         limit: number = 25,
+         status?: string,
+         payment_status?: string,
+         dispatch_id?: number,
+         agency_id?: number
+      ) => {
+         const params: Record<string, string | number> = {
+            page: page + 1,
+            limit: limit,
+         };
+         if (status) {
+            params.status = status;
+         }
+         if (payment_status) {
+            params.payment_status = payment_status;
+         }
+         if (dispatch_id) {
+            params.dispatch_id = dispatch_id;
+         }
+         if (agency_id) {
+            params.agency_id = agency_id;
+         }
+         const response = await axiosInstance.get("/dispatches", { params });
          return response.data;
       },
 
@@ -515,6 +543,78 @@ const api = {
       },
       finishDispatch: async (dispatch_id: number) => {
          const response = await axiosInstance.post(`/dispatches/${dispatch_id}/complete-dispatch`);
+         return response.data;
+      },
+      finalizeCreate: async (dispatch_id: number) => {
+         const response = await axiosInstance.post(`/dispatches/${dispatch_id}/finalize-create`);
+         return response.data;
+      },
+      createFromParcels: async (tracking_numbers: string[]) => {
+         const response = await axiosInstance.post(`/dispatches/receive-parcels`, { tracking_numbers });
+         return response.data;
+      },
+      receiveParcel: async (dispatch_id: number, tracking_number: string) => {
+         const response = await axiosInstance.post(`/dispatches/${dispatch_id}/receive-parcel`, { tracking_number });
+         return response.data;
+      },
+      completeReceive: async (dispatch_id: number) => {
+         const response = await axiosInstance.post(`/dispatches/${dispatch_id}/complete-receive`);
+         return response.data;
+      },
+      verifyParcel: async (tracking_number: string) => {
+         const response = await axiosInstance.get(`/dispatches/verify-parcel/${tracking_number}`);
+         return response.data;
+      },
+   },
+   pallets: {
+      get: async (page: number | 0, limit: number | 25) => {
+         const response = await axiosInstance.get("/pallets", {
+            params: {
+               page: page + 1,
+               limit,
+            },
+         });
+         return response.data;
+      },
+      create: async () => {
+         const response = await axiosInstance.post("/pallets");
+         return response.data;
+      },
+      addParcel: async (pallet_id: number, hbl: string) => {
+         const response = await axiosInstance.post(`/pallets/${pallet_id}/add-parcel`, { tracking_number: hbl });
+         return response.data;
+      },
+      addParcelsByOrderId: async (pallet_id: number, order_id: number) => {
+         const response = await axiosInstance.post(`/pallets/${pallet_id}/parcels/by-order`, {
+            order_id,
+         });
+         return response.data;
+      },
+      removeParcel: async (pallet_id: number, hbl: string) => {
+         const response = await axiosInstance.delete(`/pallets/${pallet_id}/remove-parcel/${hbl}`);
+         return response.data;
+      },
+      readyForPallet: async (page: number = 1, limit: number = 20, agency_id?: number) => {
+         const response = await axiosInstance.get(`/pallets/ready-for-pallet`, {
+            params: {
+               page,
+               limit,
+               ...(agency_id ? { agency_id } : {}),
+            },
+         });
+         return response.data;
+      },
+      getParcelsByPalletId: async (pallet_id: number, page: number = 1, limit: number = 20) => {
+         const response = await axiosInstance.get(`/pallets/${pallet_id}/parcels`, {
+            params: {
+               page: page + 1,
+               limit,
+            },
+         });
+         return response.data;
+      },
+      delete: async (pallet_id: number) => {
+         const response = await axiosInstance.delete(`/pallets/${pallet_id}`);
          return response.data;
       },
    },
@@ -648,7 +748,6 @@ const api = {
          return response.data;
       },
    },
-   // Legacy Issues API (used for legacy invoices) will be removed in the future
    containers: {
       get: async (page: number = 0, limit: number = 20) => {
          const response = await axiosInstance.get("/containers", {
@@ -714,6 +813,15 @@ const api = {
          return response.data;
       },
    },
+   parcels: {
+      get: async () => {
+         const response = await axiosInstance.get("/parcels");
+         console.log(response.data);
+         return response.data;
+      },
+   },
+   // Legacy Issues API (used for legacy invoices) will be removed in the future
+
    legacyIssues: {
       getAll: async (
          page: number = 1,

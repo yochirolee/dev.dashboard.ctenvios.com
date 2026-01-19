@@ -52,22 +52,101 @@ export const dispatchColumns = (handleDeleteDispatch: (dispatch_id: number) => v
       header: "Status",
       cell: ({ row }) => {
          const status = row.original?.status;
-         const color = status === "RECEIVED" ? "bg-green-400/80 ring-green-500/40" : "bg-red-400/80 ring-red-500/40";
+         const getStatusColor = (s: string): string => {
+            switch (s) {
+               case "DRAFT":
+                  return "bg-gray-400";
+               case "LOADING":
+                  return "bg-blue-400";
+               case "DISPATCHED":
+                  return "bg-yellow-400";
+               case "RECEIVING":
+                  return "bg-orange-400";
+               case "RECEIVED":
+                  return "bg-green-400";
+               case "DISCREPANCY":
+                  return "bg-red-400";
+               case "CANCELLED":
+                  return "bg-red-600";
+               default:
+                  return "bg-gray-400";
+            }
+         };
+         const getStatusLabel = (s: string): string => {
+            switch (s) {
+               case "DRAFT":
+                  return "Creado";
+               case "LOADING":
+                  return "Cargando";
+               case "DISPATCHED":
+                  return "Despachado";
+               case "RECEIVING":
+                  return "Recibiendo";
+               case "RECEIVED":
+                  return "Recibido";
+               case "DISCREPANCY":
+                  return "Discrepancia";
+               case "CANCELLED":
+                  return "Cancelado";
+               default:
+                  return s;
+            }
+         };
          return (
-            <Badge className="w-fit  " variant="secondary">
-               <span
-                  className={`  rounded-full bg-${color}-400/80 text-white text-xs h-1.5 ring-1 ring-${color}-500/40 w-1.5 flex items-center justify-center`}
-               />
-               <span className="ml-1 text-nowrap font-extralight text-muted-foreground text-xs">{status}</span>
+            <Badge className="w-fit" variant="secondary">
+               <span className={`rounded-full h-2 w-2 ${getStatusColor(status)}`} />
+               <span className="ml-1.5 text-nowrap font-normal text-xs">{getStatusLabel(status)}</span>
             </Badge>
          );
       },
    },
    {
       accessorKey: "payment_status",
-      header: "Payment",
+      header: "Pago",
       cell: ({ row }) => {
-         return row.original?.payment_status;
+         const paymentStatus = row.original?.payment_status;
+         const getPaymentColor = (s: string): string => {
+            switch (s) {
+               case "PAID":
+                  return "bg-green-400";
+               case "PENDING":
+                  return "bg-yellow-400";
+               case "PARTIALLY_PAID":
+                  return "bg-orange-400";
+               case "FULL_DISCOUNT":
+                  return "bg-blue-400";
+               case "REFUNDED":
+                  return "bg-purple-400";
+               case "CANCELLED":
+                  return "bg-red-600";
+               default:
+                  return "bg-gray-400";
+            }
+         };
+         const getPaymentLabel = (s: string): string => {
+            switch (s) {
+               case "PAID":
+                  return "Pagado";
+               case "PENDING":
+                  return "Pendiente";
+               case "PARTIALLY_PAID":
+                  return "Parcial";
+               case "FULL_DISCOUNT":
+                  return "Descuento";
+               case "REFUNDED":
+                  return "Reembolsado";
+               case "CANCELLED":
+                  return "Cancelado";
+               default:
+                  return s;
+            }
+         };
+         return (
+            <Badge className="w-fit" variant="secondary">
+               <span className={`rounded-full h-2 w-2 ${getPaymentColor(paymentStatus)}`} />
+               <span className="ml-1.5 text-nowrap font-normal text-xs">{getPaymentLabel(paymentStatus)}</span>
+            </Badge>
+         );
       },
    },
    {

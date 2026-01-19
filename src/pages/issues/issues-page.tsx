@@ -5,38 +5,60 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useIssues } from "@/hooks/use-issues";
 import usePagination from "@/hooks/use-pagination";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { issueStatus, issuePriority, issueType } from "@/data/types";
+import { DataTableFacetedFilter } from "@/components/ui/data-table-faceted-filter";
+import { issueType } from "@/data/types";
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from "@/components/ui/resizable";
 import { IssuesListPane } from "@/components/issues/issues-list-pane";
 import { IssueDetailPane } from "@/components/issues/issue-detail-pane";
 import { useIsMobile } from "@/hooks/use-mobile";
+
+// Filter options for DataTableFacetedFilter
+const statusOptions = [
+   { value: "OPEN", label: "Abierto", color: "bg-blue-400" },
+   { value: "IN_PROGRESS", label: "En Progreso", color: "bg-yellow-400" },
+   { value: "RESOLVED", label: "Resuelto", color: "bg-green-400" },
+   { value: "CLOSED", label: "Cerrado", color: "bg-gray-400" },
+];
+
+const priorityOptions = [
+   { value: "LOW", label: "Bajo", color: "bg-gray-400" },
+   { value: "MEDIUM", label: "Medio", color: "bg-blue-400" },
+   { value: "HIGH", label: "Alto", color: "bg-orange-400" },
+   { value: "URGENT", label: "Urgente", color: "bg-red-400" },
+];
+
+const typeOptions = Object.entries(issueType).map(([key, label]) => ({
+   value: key,
+   label: label,
+}));
 
 export default function IssuesPage() {
    const navigate = useNavigate();
    const { issueId } = useParams();
    const isMobile = useIsMobile();
    const [searchQuery, setSearchQuery] = useState("");
-   const [filters, setFilters] = useState<{
-      status?: string;
-      priority?: string;
-      type?: string;
-   }>({});
+   const [selectedStatus, setSelectedStatus] = useState<string | undefined>(undefined);
+   const [selectedPriority, setSelectedPriority] = useState<string | undefined>(undefined);
+   const [selectedType, setSelectedType] = useState<string | undefined>(undefined);
    const { pagination, setPagination } = usePagination();
+
+   const filters = {
+      status: selectedStatus,
+      priority: selectedPriority,
+      type: selectedType,
+   };
 
    const { data, isLoading, isFetching } = useIssues.getAll(pagination.pageIndex, pagination.pageSize, filters);
 
-   const handleFilterChange = (newFilters: { status?: string; priority?: string; type?: string }) => {
-      setFilters(newFilters);
-   };
-
    const handleClearFilters = () => {
       setSearchQuery("");
-      setFilters({});
-      setPagination({ ...pagination });
+      setSelectedStatus(undefined);
+      setSelectedPriority(undefined);
+      setSelectedType(undefined);
+      setPagination({ ...pagination, pageIndex: 0 });
    };
 
-   const hasActiveFilters = Object.values(filters).some((value) => value !== undefined) || searchQuery;
+   const hasActiveFilters = !!searchQuery || !!selectedStatus || !!selectedPriority || !!selectedType;
 
    const handleIssueSelect = (id: number) => {
       navigate(`/issues/${id}`);
@@ -90,70 +112,44 @@ export default function IssuesPage() {
                      </div>
 
                      {/* Filters */}
-                     {hasActiveFilters && (
-                        <div className="flex items-center gap-2 p-4 border-b shrink-0 flex-wrap">
-                           <Select
-                              value={filters?.status || "all"}
-                              onValueChange={(value) => {
-                                 handleFilterChange({ ...filters, status: value === "all" ? undefined : value });
-                              }}
-                           >
-                              <SelectTrigger className="h-8 w-[120px] text-xs">
-                                 <SelectValue placeholder="Status" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                 <SelectItem value="all">All Status</SelectItem>
-                                 {Object.values(issueStatus).map((status) => (
-                                    <SelectItem key={status} value={status}>
-                                       {status}
-                                    </SelectItem>
-                                 ))}
-                              </SelectContent>
-                           </Select>
+                     <div className="flex items-center gap-2 p-4 border-b shrink-0 flex-wrap">
+                        <DataTableFacetedFilter
+                           title="Estado"
+                           options={statusOptions}
+                           selectedValue={selectedStatus}
+                           onSelect={(value) => {
+                              setSelectedStatus(value);
+                              setPagination({ ...pagination, pageIndex: 0 });
+                           }}
+                        />
 
-                           <Select
-                              value={filters?.priority || "all"}
-                              onValueChange={(value) => {
-                                 handleFilterChange({ ...filters, priority: value === "all" ? undefined : value });
-                              }}
-                           >
-                              <SelectTrigger className="h-8 w-[120px] text-xs">
-                                 <SelectValue placeholder="Priority" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                 <SelectItem value="all">All Priorities</SelectItem>
-                                 {Object.keys(issuePriority).map((key) => (
-                                    <SelectItem key={key} value={key}>
-                                       {issuePriority[key as keyof typeof issuePriority]}
-                                    </SelectItem>
-                                 ))}
-                              </SelectContent>
-                           </Select>
+                        <DataTableFacetedFilter
+                           title="Prioridad"
+                           options={priorityOptions}
+                           selectedValue={selectedPriority}
+                           onSelect={(value) => {
+                              setSelectedPriority(value);
+                              setPagination({ ...pagination, pageIndex: 0 });
+                           }}
+                        />
 
-                           <Select
-                              value={filters?.type || "all"}
-                              onValueChange={(value) => {
-                                 handleFilterChange({ ...filters, type: value === "all" ? undefined : value });
-                              }}
-                           >
-                              <SelectTrigger className="h-8 w-[120px] text-xs">
-                                 <SelectValue placeholder="Type" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                 <SelectItem value="all">All Types</SelectItem>
-                                 {Object.keys(issueType).map((key) => (
-                                    <SelectItem key={key} value={key}>
-                                       {issueType[key as keyof typeof issueType]}
-                                    </SelectItem>
-                                 ))}
-                              </SelectContent>
-                           </Select>
+                        <DataTableFacetedFilter
+                           title="Tipo"
+                           options={typeOptions}
+                           selectedValue={selectedType}
+                           onSelect={(value) => {
+                              setSelectedType(value);
+                              setPagination({ ...pagination, pageIndex: 0 });
+                           }}
+                        />
 
-                           <Button variant="ghost" onClick={handleClearFilters} size="sm" className="h-8">
-                              <X className="w-4 h-4" />
+                        {hasActiveFilters && (
+                           <Button variant="ghost" onClick={handleClearFilters} className="h-8 px-2 lg:px-3">
+                              Reset
+                              <X className="ml-2 w-4 h-4" />
                            </Button>
-                        </div>
-                     )}
+                        )}
+                     </div>
 
                      {/* Issues List */}
                      <div className="flex-1 min-h-0">
@@ -203,68 +199,43 @@ export default function IssuesPage() {
                      </div>
 
                      {/* Filters */}
-
-                     <div className="flex items-center gap-2 p-1 md:p-2 border-b shrink-0  overflow-x-auto">
-                        <Select
-                           value={filters?.status || "all"}
-                           onValueChange={(value) => {
-                              handleFilterChange({ ...filters, status: value === "all" ? undefined : value });
+                     <div className="flex items-center gap-2 p-1 md:p-2 border-b shrink-0 overflow-x-auto">
+                        <DataTableFacetedFilter
+                           title="Estado"
+                           options={statusOptions}
+                           selectedValue={selectedStatus}
+                           onSelect={(value) => {
+                              setSelectedStatus(value);
+                              setPagination({ ...pagination, pageIndex: 0 });
                            }}
-                        >
-                           <SelectTrigger className="h-6 w-[120px] text-xs">
-                              <SelectValue placeholder="Status" className="text-xs" />
-                           </SelectTrigger>
-                           <SelectContent>
-                              <SelectItem value="all">All Status</SelectItem>
-                              {Object.values(issueStatus).map((status) => (
-                                 <SelectItem key={status} value={status}>
-                                    {status}
-                                 </SelectItem>
-                              ))}
-                           </SelectContent>
-                        </Select>
+                        />
 
-                        <Select
-                           value={filters?.priority || "all"}
-                           onValueChange={(value) => {
-                              handleFilterChange({ ...filters, priority: value === "all" ? undefined : value });
+                        <DataTableFacetedFilter
+                           title="Prioridad"
+                           options={priorityOptions}
+                           selectedValue={selectedPriority}
+                           onSelect={(value) => {
+                              setSelectedPriority(value);
+                              setPagination({ ...pagination, pageIndex: 0 });
                            }}
-                        >
-                           <SelectTrigger className="h-8 w-[120px] text-xs">
-                              <SelectValue placeholder="Priority" />
-                           </SelectTrigger>
-                           <SelectContent>
-                              <SelectItem value="all">All Priorities</SelectItem>
-                              {Object.keys(issuePriority).map((key) => (
-                                 <SelectItem key={key} value={key}>
-                                    {issuePriority[key as keyof typeof issuePriority]}
-                                 </SelectItem>
-                              ))}
-                           </SelectContent>
-                        </Select>
+                        />
 
-                        <Select
-                           value={filters?.type || "all"}
-                           onValueChange={(value) => {
-                              handleFilterChange({ ...filters, type: value === "all" ? undefined : value });
+                        <DataTableFacetedFilter
+                           title="Tipo"
+                           options={typeOptions}
+                           selectedValue={selectedType}
+                           onSelect={(value) => {
+                              setSelectedType(value);
+                              setPagination({ ...pagination, pageIndex: 0 });
                            }}
-                        >
-                           <SelectTrigger className="h-8 w-[120px] text-xs">
-                              <SelectValue placeholder="Type" />
-                           </SelectTrigger>
-                           <SelectContent>
-                              <SelectItem value="all">All Types</SelectItem>
-                              {Object.keys(issueType).map((key) => (
-                                 <SelectItem key={key} value={key}>
-                                    {issueType[key as keyof typeof issueType]}
-                                 </SelectItem>
-                              ))}
-                           </SelectContent>
-                        </Select>
+                        />
 
-                        <Button variant="ghost" onClick={handleClearFilters} size="sm" className="h-8">
-                           <X className="w-4 h-4" />
-                        </Button>
+                        {hasActiveFilters && (
+                           <Button variant="ghost" onClick={handleClearFilters} className="h-8 px-2 lg:px-3">
+                              Reset
+                              <X className="ml-2 w-4 h-4" />
+                           </Button>
+                        )}
                      </div>
                      <IssuesListPane
                         issues={data?.rows || []}

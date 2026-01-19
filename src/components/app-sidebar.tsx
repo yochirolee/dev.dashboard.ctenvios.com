@@ -56,10 +56,16 @@ const navMainItems: SidebarItem[] = [
       allowedRoles: canAccess.logistics,
       items: [
          {
+            title: "Pallets",
+            url: "/logistics/pallets",
+            allowedRoles: canAccess.logistics,
+         },
+         {
             title: "Despachos",
             url: "/logistics/dispatch",
             allowedRoles: canAccess.logistics,
          },
+
          {
             title: "Contenedores",
             url: "/logistics/containers",

@@ -2,14 +2,14 @@ import { useState, useEffect, useRef } from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "../ui/card";
 import { ScrollArea } from "../ui/scroll-area";
 import { Badge } from "../ui/badge";
-import { CheckCircle2, Trash2Icon } from "lucide-react";
+import { CheckCircle2, Trash2Icon, FileText } from "lucide-react";
 import { useDispatches } from "@/hooks/use-dispatches";
 import { Button } from "../ui/button";
 import { useAppStore } from "@/stores/app-store";
 import { Spinner } from "../ui/spinner";
 import { format } from "date-fns";
 import { toast } from "sonner";
-import { parcelStatus, type ParcelStatus } from "@/data/types";
+import { dispatchStatus, parcelStatus, type ParcelStatus, type DispatchStatus } from "@/data/types";
 
 type ParcelsInDispatch = {
    id: number;
@@ -20,13 +20,17 @@ type ParcelsInDispatch = {
    updated_at?: Date;
 };
 
+interface ParcelsInDispatchProps {
+   dispatchId: number | undefined;
+   status: ParcelStatus | undefined;
+   dispatchStatus?: DispatchStatus;
+}
+
 export const ParcelsInDispatch = ({
    dispatchId,
    status,
-}: {
-   dispatchId: number | undefined;
-   status: ParcelStatus | undefined;
-}) => {
+   dispatchStatus: currentDispatchStatus,
+}: ParcelsInDispatchProps): React.ReactElement => {
    const agency_id = useAppStore.getState().agency?.id;
    const { data, isLoading, isFetchingNextPage, hasNextPage, fetchNextPage } = useDispatches.getParcelsByDispatchId(
       dispatchId ?? 0,
@@ -34,9 +38,11 @@ export const ParcelsInDispatch = ({
       status ?? parcelStatus.IN_DISPATCH
    );
 
+   console.log(data);
+
    // Flatten all pages into a single array
    const parcelsInDispatch = data?.pages.flatMap((page) => page?.rows ?? []) ?? [];
-   const total = data?.pages[0]?.rows?.length ?? 0;
+   const total = data?.pages[0]?.total ?? 0;
 
    const [removingTrackingNumber, setRemovingTrackingNumber] = useState<string | null>(null);
    const { mutate: removeParcel } = useDispatches.removeParcel(dispatchId ?? 0, agency_id ?? 0);
@@ -78,17 +84,29 @@ export const ParcelsInDispatch = ({
          }
       );
    };
-   const finishDispatchMutation = useDispatches.finishDispatch(dispatchId ?? 0);
-   const handleFinishDispatch = () => {
-      finishDispatchMutation.mutate(undefined, {
+   const finalizeCreateMutation = useDispatches.finalizeCreate(dispatchId ?? 0);
+   const handleFinalizeDispatch = (): void => {
+      finalizeCreateMutation.mutate(undefined, {
          onSuccess: () => {
             toast.success("Despacho finalizado correctamente");
          },
-         onError: () => {
-            toast.error("Error al finalizar el despacho");
+         onError: (error: any) => {
+            const errorMessage = error?.response?.data?.message || "Error al finalizar el despacho";
+            toast.error(errorMessage);
          },
       });
    };
+
+   const handleDownloadPdf = (): void => {
+      if (!dispatchId) return;
+      const apiUrl = import.meta.env.VITE_API_URL;
+      window.open(`${apiUrl}/dispatches/${dispatchId}/pdf`, "_blank");
+   };
+
+   // Show finalize button only for DRAFT or LOADING status
+   const canFinalize =
+      currentDispatchStatus === dispatchStatus.DRAFT || currentDispatchStatus === dispatchStatus.LOADING;
+
    return (
       <Card className="flex-1 flex flex-col min-h-0">
          <CardHeader className="pb-2 flex flex-row justify-between items-center">
@@ -97,12 +115,19 @@ export const ParcelsInDispatch = ({
                <Badge variant="outline">Total de Paquetes: {total}</Badge>
             </div>
 
-            <Button variant="outline" disabled={total === 0} onClick={handleFinishDispatch}>
-               {finishDispatchMutation.isPending ? <Spinner /> : <CheckCircle2 />}
-               <span className="hidden md:block">
-                  {finishDispatchMutation.isPending ? "Finalizando..." : "Finalizar Despacho"}
-               </span>
-            </Button>
+            {canFinalize ? (
+               <Button variant="outline" disabled={total === 0} onClick={handleFinalizeDispatch}>
+                  {finalizeCreateMutation.isPending ? <Spinner /> : <CheckCircle2 />}
+                  <span className="hidden md:block">
+                     {finalizeCreateMutation.isPending ? "Finalizando..." : "Finalizar Despacho"}
+                  </span>
+               </Button>
+            ) : (
+               <Button variant="outline" onClick={handleDownloadPdf}>
+                  <FileText className="h-4 w-4" />
+                  <span className="hidden md:block">Descargar PDF</span>
+               </Button>
+            )}
          </CardHeader>
          <CardContent className="flex-1 overflow-hidden p-0">
             <ScrollArea className="h-[calc(100vh-200px)]">
