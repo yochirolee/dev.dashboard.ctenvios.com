@@ -528,7 +528,7 @@ const api = {
          status?: ParcelStatus
       ) => {
          const params: Record<string, string | number> = {
-            page: page + 1,
+            page,
             limit,
          };
 
@@ -563,6 +563,10 @@ const api = {
       },
       verifyParcel: async (tracking_number: string) => {
          const response = await axiosInstance.get(`/dispatches/verify-parcel/${tracking_number}`);
+         return response.data;
+      },
+      smartReceive: async (tracking_numbers: string[]) => {
+         const response = await axiosInstance.post(`/dispatches/smart-receive`, { tracking_numbers });
          return response.data;
       },
    },

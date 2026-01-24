@@ -18,7 +18,7 @@ import { useAppStore } from "@/stores/app-store";
 import { Separator } from "../ui/separator";
 import { ChangeRateDialog, ChargeDialog, DiscountDialog, InsuranceFeeDialog } from "./order-dialogs";
 import { formatCents } from "@/lib/cents-utils";
-import { calculateTotalDeliveryFee } from "@/lib/calculate_total_delivery";
+import { useDeliveryFee } from "@/hooks/use-delivery-fee";
 import { Spinner } from "../ui/spinner";
 
 type FormValues = z.infer<typeof orderSchema>;
@@ -143,7 +143,7 @@ export function ItemsInOrder() {
          toast.error(error.response.data.message);
       },
    });
-   const total_delivery_fee = calculateTotalDeliveryFee();
+   const total_delivery_fee = useDeliveryFee();
 
    const handleSubmit = (data: FormValues) => {
       data.service_id = selectedService?.id || 0;
@@ -283,7 +283,7 @@ function InvoiceTotal({ form }: { form: any }) {
    const total_weight = form
       .watch("order_items")
       .reduce((acc: number, item: OrderItem) => acc + Number(item?.weight) || 0, 0);
-   const total_delivery = calculateTotalDeliveryFee();
+   const total_delivery = useDeliveryFee();
    return (
       <div>
          <div className="mt-8 flex justify-end p-2 lg:pr-6">

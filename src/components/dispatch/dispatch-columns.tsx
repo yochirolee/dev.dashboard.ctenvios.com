@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { formatCents } from "@/lib/cents-utils";
 import { format } from "date-fns";
 import { Button } from "@/components/ui/button";
-import { EllipsisVertical, Pencil, Trash2Icon } from "lucide-react";
+import { EllipsisVertical, Pencil, Printer, Trash2Icon } from "lucide-react";
 import {
    DropdownMenu,
    DropdownMenuContent,
@@ -100,55 +100,7 @@ export const dispatchColumns = (handleDeleteDispatch: (dispatch_id: number) => v
          );
       },
    },
-   {
-      accessorKey: "payment_status",
-      header: "Pago",
-      cell: ({ row }) => {
-         const paymentStatus = row.original?.payment_status;
-         const getPaymentColor = (s: string): string => {
-            switch (s) {
-               case "PAID":
-                  return "bg-green-400";
-               case "PENDING":
-                  return "bg-yellow-400";
-               case "PARTIALLY_PAID":
-                  return "bg-orange-400";
-               case "FULL_DISCOUNT":
-                  return "bg-blue-400";
-               case "REFUNDED":
-                  return "bg-purple-400";
-               case "CANCELLED":
-                  return "bg-red-600";
-               default:
-                  return "bg-gray-400";
-            }
-         };
-         const getPaymentLabel = (s: string): string => {
-            switch (s) {
-               case "PAID":
-                  return "Pagado";
-               case "PENDING":
-                  return "Pendiente";
-               case "PARTIALLY_PAID":
-                  return "Parcial";
-               case "FULL_DISCOUNT":
-                  return "Descuento";
-               case "REFUNDED":
-                  return "Reembolsado";
-               case "CANCELLED":
-                  return "Cancelado";
-               default:
-                  return s;
-            }
-         };
-         return (
-            <Badge className="w-fit" variant="secondary">
-               <span className={`rounded-full h-2 w-2 ${getPaymentColor(paymentStatus)}`} />
-               <span className="ml-1.5 text-nowrap font-normal text-xs">{getPaymentLabel(paymentStatus)}</span>
-            </Badge>
-         );
-      },
-   },
+  
    {
       accessorKey: "sender_agency.name",
       header: "Sender",
@@ -211,6 +163,55 @@ export const dispatchColumns = (handleDeleteDispatch: (dispatch_id: number) => v
          );
       },
    },
+    {
+      accessorKey: "payment_status",
+      header: "Pago",
+      cell: ({ row }) => {
+         const paymentStatus = row.original?.payment_status;
+         const getPaymentColor = (s: string): string => {
+            switch (s) {
+               case "PAID":
+                  return "bg-green-400";
+               case "PENDING":
+                  return "bg-yellow-400";
+               case "PARTIALLY_PAID":
+                  return "bg-orange-400";
+               case "FULL_DISCOUNT":
+                  return "bg-blue-400";
+               case "REFUNDED":
+                  return "bg-purple-400";
+               case "CANCELLED":
+                  return "bg-red-600";
+               default:
+                  return "bg-gray-400";
+            }
+         };
+         const getPaymentLabel = (s: string): string => {
+            switch (s) {
+               case "PAID":
+                  return "Pagado";
+               case "PENDING":
+                  return "Pendiente";
+               case "PARTIALLY_PAID":
+                  return "Parcial";
+               case "FULL_DISCOUNT":
+                  return "Descuento";
+               case "REFUNDED":
+                  return "Reembolsado";
+               case "CANCELLED":
+                  return "Cancelado";
+               default:
+                  return s;
+            }
+         };
+         return (
+            <Badge className="w-fit" variant="secondary">
+               <span className={`rounded-full h-2 w-2 ${getPaymentColor(paymentStatus)}`} />
+               <span className="ml-1.5 text-nowrap font-normal text-xs">{getPaymentLabel(paymentStatus)}</span>
+            </Badge>
+         );
+      },
+   },
 
    {
       accessorKey: "created_at",
@@ -218,7 +219,7 @@ export const dispatchColumns = (handleDeleteDispatch: (dispatch_id: number) => v
       cell: ({ row }) => {
          return (
             <div className="flex items-center gap-2 min-w-0">
-               <span className="text-sm">{format(row.original?.created_at, "dd/MM/yyyy")}</span>
+               <span className="text-sm">{format(row.original?.created_at, "dd/MM/yyyy HH:mm")}</span>
             </div>
          );
       },
@@ -229,7 +230,7 @@ export const dispatchColumns = (handleDeleteDispatch: (dispatch_id: number) => v
       cell: ({ row }) => {
          return (
             <div className="flex items-center gap-2 min-w-0">
-               <span className="text-sm">{format(row.original?.updated_at, "dd/MM/yyyy")}</span>
+               <span className="text-sm">{format(row.original?.updated_at, "dd/MM/yyyy HH:mm")}</span>
             </div>
          );
       },
@@ -269,6 +270,17 @@ export const dispatchColumns = (handleDeleteDispatch: (dispatch_id: number) => v
                      </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent>
+                     <DropdownMenuItem
+                        onClick={() => {
+                           window.open(
+                              `${import.meta.env.VITE_API_URL}/dispatches/${row.original?.id}/pdf`,
+                              "_blank"
+                           );
+                        }}
+                     >
+                        <Printer className="w-4 h-4 mr-2" />
+                        Imprimir
+                     </DropdownMenuItem>
                      <DropdownMenuItem>
                         <Link
                            className="inline-flex items-center gap-2"

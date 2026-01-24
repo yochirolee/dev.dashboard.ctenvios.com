@@ -130,7 +130,7 @@ const ReceiverForm = ({
       } else {
          form.reset({
             first_name: selectedReceiver.first_name,
-            middle_name: selectedReceiver.middle_name,
+            middle_name: selectedReceiver.middle_name ?? "",
             last_name: selectedReceiver.last_name,
             second_last_name: selectedReceiver.second_last_name,
             ci: selectedReceiver.ci,
