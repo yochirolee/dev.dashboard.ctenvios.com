@@ -12,7 +12,6 @@ import { toast } from "sonner";
 import usePagination from "@/hooks/use-pagination";
 import { Input } from "@/components/ui/input";
 import { ButtonGroup } from "@/components/ui/button-group";
-import { useNavigate } from "react-router-dom";
 import type { Container } from "@/data/types";
 import {
    AlertDialog,

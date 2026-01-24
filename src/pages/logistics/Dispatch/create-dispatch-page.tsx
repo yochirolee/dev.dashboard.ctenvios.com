@@ -50,6 +50,7 @@ export const CreateDispatchPage = (): React.ReactElement => {
 
    const finalizeCreateMutation = useDispatches.finalizeCreate(dispatchIdNumber);
    const removeParcelMutation = useDispatches.removeParcel(dispatchIdNumber, agency_id ?? 0);
+   const totalAdded = dispatchParcelsData?.pages?.[0]?.total ?? 0;
 
    const handleScan = (e?: React.FormEvent): void => {
       e?.preventDefault();
@@ -149,8 +150,7 @@ export const CreateDispatchPage = (): React.ReactElement => {
       return agencyPackages.filter((pkg: { tracking_number: string }) => !dispatchTrackingSet.has(pkg.tracking_number));
    }, [agencyPackages, dispatchTrackingSet]);
 
-   
-    const canFinalize = dispatchData?.status === dispatchStatus.DRAFT || dispatchData?.status === dispatchStatus.LOADING;
+   const canFinalize = dispatchData?.status === dispatchStatus.DRAFT || dispatchData?.status === dispatchStatus.LOADING;
 
    // Filter dispatch parcels based on search
    const filteredDispatchParcels = useMemo(() => {
