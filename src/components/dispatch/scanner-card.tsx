@@ -1,10 +1,7 @@
 import { useRef } from "react";
 import { Barcode, CheckCircle2, AlertTriangle, RefreshCw, PackagePlus, Scan } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Spinner } from "@/components/ui/spinner";
-import { ButtonGroup } from "../ui/button-group";
 import { InputGroup, InputGroupAddon, InputGroupInput } from "../ui/input-group";
 
 export type ScanStatus = "matched" | "surplus" | "duplicate" | "verified" | "not_found" | "invalid" | "error";
