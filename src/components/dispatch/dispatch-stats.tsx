@@ -28,7 +28,7 @@ export const DispatchStats = ({
 }: DispatchStatsProps): React.ReactElement => {
    return (
       <>
-         <div className="flex flex-wrap items-center gap-4 mt-6">
+         <div className="flex flex-wrap items-center gap-4 ">
             {indicators.map((indicator, index) => (
                <div key={index} className="flex items-center gap-2">
                   <span className={`h-2 w-2 rounded-full ${colorMap[indicator.color]}`} />

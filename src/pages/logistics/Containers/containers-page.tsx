@@ -124,10 +124,7 @@ export const ContainersPage = () => {
                >
                   <NewContainerForm setOpen={setOpenCreateDialog} />
                </ShareDialog>
-               <Button variant="outline" onClick={() => navigate("/logistics/containers/load")}>
-                  <PackagePlus size={16} />
-                  <span className="hidden md:block">Cargar</span>
-               </Button>
+             
             </ButtonGroup>
          </div>
 

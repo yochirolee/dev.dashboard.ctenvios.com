@@ -1,16 +1,19 @@
 import { useRef } from "react";
-import { Barcode, CheckCircle2, AlertTriangle, RefreshCw, PackagePlus, Scan } from "lucide-react";
+import { Barcode, CheckCircle2, AlertTriangle, RefreshCw, PackagePlus, Scan, Package, FileText, ChevronDown } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Spinner } from "@/components/ui/spinner";
-import { InputGroup, InputGroupAddon, InputGroupInput } from "../ui/input-group";
+import { InputGroup, InputGroupAddon, InputGroupInput, InputGroupButton } from "../ui/input-group";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
 export type ScanStatus = "matched" | "surplus" | "duplicate" | "verified" | "not_found" | "invalid" | "error";
+export type ScanMode = "tracking_number" | "order_id";
 
 export interface ScanFeedback {
    tracking_number: string;
    status: ScanStatus;
    description?: string;
    errorMessage?: string;
+   count?: number;
 }
 
 interface ScannerCardProps {
@@ -21,6 +24,9 @@ interface ScannerCardProps {
    buttonLabel?: string;
    placeholder?: string;
    isLoading?: boolean;
+   scanMode?: ScanMode;
+   onScanModeChange?: (mode: ScanMode) => void;
+   showScanMode?: boolean;
 }
 
 export const ScannerCard = ({
@@ -28,8 +34,11 @@ export const ScannerCard = ({
    onChange,
    onScan,
    lastScanStatus,
-   placeholder = "Escanear o escribir tracking...",
+   placeholder,
    isLoading = false,
+   scanMode = "tracking_number",
+   onScanModeChange,
+   showScanMode = false,
 }: ScannerCardProps): React.ReactElement => {
    const inputRef = useRef<HTMLInputElement>(null);
 
@@ -39,29 +48,81 @@ export const ScannerCard = ({
       inputRef.current?.focus();
    };
 
+   const getPlaceholder = (): string => {
+      if (placeholder) return placeholder;
+      return scanMode === "tracking_number" 
+         ? "Escanear o escribir tracking..." 
+         : "Ingresar ID de orden...";
+   };
+
+   const getTitle = (): string => {
+      return scanMode === "tracking_number" 
+         ? "Escanear código" 
+         : "Agregar por Orden";
+   };
+
    return (
       <Card className="rounded-xl gap-2 border border-border/60 bg-card/60">
          <CardHeader>
             <CardTitle className="flex items-center gap-2">
-               <Barcode className="size-4 text-primary" />
-               Escanear código
+               {scanMode === "tracking_number" ? (
+                  <Barcode className="size-4 text-primary" />
+               ) : (
+                  <FileText className="size-4 text-primary" />
+               )}
+               {getTitle()}
             </CardTitle>
          </CardHeader>
          <CardContent>
-            <form onSubmit={handleSubmit} >
-               <InputGroup  className="w-full">
+            <form onSubmit={handleSubmit}>
+               <InputGroup className="w-full">
                   <InputGroupInput
                      ref={inputRef}
                      value={value}
                      onChange={(e) => onChange(e.target.value)}
-                     placeholder={placeholder}
+                     placeholder={getPlaceholder()}
+                     type={scanMode === "order_id" ? "number" : "text"}
                      autoFocus
                   />
+                  {showScanMode && onScanModeChange && (
+                     <InputGroupAddon align="inline-end">
+                        <DropdownMenu>
+                           <DropdownMenuTrigger asChild>
+                              <InputGroupButton variant="ghost" className="!pr-1.5 text-xs gap-1">
+                                 {scanMode === "tracking_number" ? (
+                                    <>
+                                       <Package className="size-3.5" />
+                                       Tracking
+                                    </>
+                                 ) : (
+                                    <>
+                                       <FileText className="size-3.5" />
+                                       Orden
+                                    </>
+                                 )}
+                                 <ChevronDown className="size-3" />
+                              </InputGroupButton>
+                           </DropdownMenuTrigger>
+                           <DropdownMenuContent align="end">
+                              <DropdownMenuGroup>
+                                 <DropdownMenuItem onClick={() => onScanModeChange("tracking_number")}>
+                                    <Package className="size-4 mr-2" />
+                                    Tracking #
+                                 </DropdownMenuItem>
+                                 <DropdownMenuItem onClick={() => onScanModeChange("order_id")}>
+                                    <FileText className="size-4 mr-2" />
+                                    Orden ID
+                                 </DropdownMenuItem>
+                              </DropdownMenuGroup>
+                           </DropdownMenuContent>
+                        </DropdownMenu>
+                     </InputGroupAddon>
+                  )}
                   <InputGroupAddon>
-                        {isLoading ? <Spinner  /> : <Scan  />}
+                     {isLoading ? <Spinner /> : <Scan />}
                   </InputGroupAddon>
                </InputGroup>
-            </form> 
+            </form>
             {lastScanStatus && <ScanFeedbackDisplay feedback={lastScanStatus} />}
          </CardContent>
       </Card>
@@ -107,7 +168,9 @@ export const ScanFeedbackDisplay = ({ feedback }: ScanFeedbackDisplayProps): Rea
       
       switch (feedback.status) {
          case "matched":
-            return "Agregado correctamente";
+            return feedback.count !== undefined 
+               ? `${feedback.count} paquete(s) agregado(s)` 
+               : "Agregado correctamente";
          case "verified":
             return "Verificado correctamente";
          case "surplus":

@@ -1,38 +1,23 @@
-import { useState, useRef } from "react";
-import { Barcode, CheckCircle2, AlertTriangle, RefreshCw, Package, FileText } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Card, CardContent } from "@/components/ui/card";
+import { useState } from "react";
 import { ParcelsInContainer } from "@/components/containers/list-parcels-in-container";
 import { ParcelsReadyForContainer } from "@/components/containers/list-parcels-ready-for-container";
 import { useContainers } from "@/hooks/use-containers";
 import { useParams } from "react-router-dom";
 import { toast } from "sonner";
 import { Spinner } from "@/components/ui/spinner";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { containerStatus, type ContainerStatus } from "@/data/types";
 import { LockContainerState } from "@/components/containers/lock-container-state";
+import { ScannerCard, type ScanFeedback, type ScanMode } from "@/components/dispatch/scanner-card";
 
 const LOADABLE_STATUSES: ContainerStatus[] = [containerStatus.PENDING, containerStatus.LOADING];
 
-type ScanStatus = "matched" | "surplus" | "duplicate";
-type ScanMode = "tracking_number" | "order_id";
-
-export const LoadContainerPage = () => {
+export const LoadContainerPage = (): React.ReactElement => {
    const { containerId } = useParams();
    const containerIdNumber = Number(containerId ?? 0);
 
    const [currentInput, setCurrentInput] = useState("");
    const [scanMode, setScanMode] = useState<ScanMode>("tracking_number");
-   const [lastScanStatus, setLastScanStatus] = useState<{
-      value: string;
-      status: ScanStatus;
-      description?: string;
-      errorMessage?: string;
-      count?: number;
-   } | null>(null);
-
-   const inputRef = useRef<HTMLInputElement>(null);
+   const [lastScanStatus, setLastScanStatus] = useState<ScanFeedback | null>(null);
 
    // Fetch container details
    const { data: container, isLoading: isLoadingContainer } = useContainers.getById(containerIdNumber);
@@ -45,7 +30,7 @@ export const LoadContainerPage = () => {
    const isAdding = isAddingParcel || isAddingByOrder;
    const canLoadParcels = container?.status && LOADABLE_STATUSES.includes(container.status as ContainerStatus);
 
-   const handleScan = (e?: React.FormEvent) => {
+   const handleScan = (e?: React.FormEvent): void => {
       e?.preventDefault();
       if (!currentInput.trim()) return;
 
@@ -58,10 +43,9 @@ export const LoadContainerPage = () => {
             {
                onSuccess: () => {
                   setLastScanStatus({
-                     value: scannedId,
+                     tracking_number: scannedId,
                      status: "matched",
                   });
-                  toast.success("Paquete agregado al contenedor");
                },
                onError: (error: any) => {
                   const errorMessage = error?.response?.data?.message || error?.message || "Error al agregar paquete";
@@ -72,20 +56,11 @@ export const LoadContainerPage = () => {
                      errorMessage.toLowerCase().includes("ya está") ||
                      error?.response?.status === 409;
 
-                  if (isDuplicateError) {
-                     setLastScanStatus({
-                        value: scannedId,
-                        status: "duplicate",
-                        errorMessage: errorMessage,
-                     });
-                  } else {
-                     toast.error(errorMessage);
-                     setLastScanStatus({
-                        value: scannedId,
-                        status: "surplus",
-                        errorMessage: errorMessage,
-                     });
-                  }
+                  setLastScanStatus({
+                     tracking_number: scannedId,
+                     status: isDuplicateError ? "duplicate" : "error",
+                     errorMessage,
+                  });
                },
             }
          );
@@ -102,19 +77,17 @@ export const LoadContainerPage = () => {
                onSuccess: (data: any) => {
                   const added = data?.added || data?.length || 0;
                   setLastScanStatus({
-                     value: `Orden #${orderId}`,
+                     tracking_number: `Orden #${orderId}`,
                      status: "matched",
                      count: added,
                   });
-                  toast.success(`${added} paquete(s) agregado(s) al contenedor`);
                },
                onError: (error: any) => {
                   const errorMessage = error?.response?.data?.message || error?.message || "Error al agregar paquetes";
-                  toast.error(errorMessage);
                   setLastScanStatus({
-                     value: `Orden #${orderId}`,
-                     status: "surplus",
-                     errorMessage: errorMessage,
+                     tracking_number: `Orden #${orderId}`,
+                     status: "error",
+                     errorMessage,
                   });
                },
             }
@@ -122,7 +95,6 @@ export const LoadContainerPage = () => {
       }
 
       setCurrentInput("");
-      inputRef.current?.focus();
    };
 
    if (isLoadingContainer) {
@@ -150,97 +122,16 @@ export const LoadContainerPage = () => {
                      {/* Container Info */}
 
                      {/* Scanner Input Area */}
-                     <Card>
-                        <CardContent>
-                           <form onSubmit={(e) => handleScan(e)} className="flex flex-col gap-4">
-                              <div className="flex items-center justify-between">
-                                 <label className="text-sm font-medium flex items-center gap-2">
-                                    {scanMode === "tracking_number" ? (
-                                       <Barcode className="size-4 text-primary" />
-                                    ) : (
-                                       <FileText className="size-4 text-primary" />
-                                    )}
-                                    {scanMode === "tracking_number"
-                                       ? "Escanear Código de Barras o QR"
-                                       : "Agregar por ID de Orden"}
-                                 </label>
-                                 <span className="text-xs text-muted-foreground animate-pulse">
-                                    Listo para {scanMode === "tracking_number" ? "escanear" : "ingresar"}...
-                                 </span>
-                              </div>
-                              <div className="flex gap-2">
-                                 <Input
-                                    ref={inputRef}
-                                    value={currentInput}
-                                    onChange={(e) => setCurrentInput(e.target.value)}
-                                    placeholder={
-                                       scanMode === "tracking_number"
-                                          ? "Escanear o escribir tracking number..."
-                                          : "Ingresar ID de orden..."
-                                    }
-                                    type={scanMode === "order_id" ? "number" : "text"}
-                                    autoFocus
-                                 />
-                                 <Select value={scanMode} onValueChange={(value: ScanMode) => setScanMode(value)}>
-                                    <SelectTrigger className="w-[180px]">
-                                       <SelectValue />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                       <SelectItem value="tracking_number">
-                                          <div className="flex items-center gap-2">
-                                             <Package className="h-4 w-4" />
-                                             Tracking #
-                                          </div>
-                                       </SelectItem>
-                                       <SelectItem value="order_id">
-                                          <div className="flex items-center gap-2">
-                                             <FileText className="h-4 w-4" />
-                                             Orden ID
-                                          </div>
-                                       </SelectItem>
-                                    </SelectContent>
-                                 </Select>
-                                 <Button type="submit" disabled={isAdding}>
-                                    {isAdding ? <Spinner className="h-4 w-4" /> : "Agregar"}
-                                 </Button>
-                              </div>
-                           </form>
-
-                           {/* Last Scan Feedback */}
-                           {lastScanStatus && (
-                              <div
-                                 className={`mt-4 p-4 rounded-lg border flex items-center gap-3 animate-in fade-in slide-in-from-top-2 ${
-                                    lastScanStatus.status === "matched"
-                                       ? "bg-green-500/10 border-green-500/30 text-green-500"
-                                       : lastScanStatus.status === "surplus"
-                                       ? "bg-red-500/10 border-red-500/30 text-red-500"
-                                       : "bg-yellow-500/10 border-yellow-500/30 text-yellow-500"
-                                 }`}
-                              >
-                                 {lastScanStatus.status === "matched" && <CheckCircle2 className="h-6 w-6" />}
-                                 {lastScanStatus.status === "surplus" && <AlertTriangle className="h-6 w-6" />}
-                                 {lastScanStatus.status === "duplicate" && <RefreshCw className="h-6 w-6" />}
-
-                                 <div className="flex-1">
-                                    <p className="font-bold text-lg">{lastScanStatus.value}</p>
-                                    {lastScanStatus.description && (
-                                       <p className="text-xs text-muted-foreground">{lastScanStatus.description}</p>
-                                    )}
-                                    <p className="text-sm opacity-90">
-                                       {lastScanStatus.status === "matched" &&
-                                          (lastScanStatus.count
-                                             ? `${lastScanStatus.count} paquete(s) agregado(s) al contenedor`
-                                             : "Agregado correctamente al contenedor")}
-                                       {lastScanStatus.status === "surplus" &&
-                                          (lastScanStatus.errorMessage || "Error: No encontrado")}
-                                       {lastScanStatus.status === "duplicate" &&
-                                          (lastScanStatus.errorMessage || "Advertencia: Ya está en el contenedor")}
-                                    </p>
-                                 </div>
-                              </div>
-                           )}
-                        </CardContent>
-                     </Card>
+                     <ScannerCard
+                        value={currentInput}
+                        onChange={setCurrentInput}
+                        onScan={handleScan}
+                        lastScanStatus={lastScanStatus}
+                        isLoading={isAdding}
+                        scanMode={scanMode}
+                        onScanModeChange={setScanMode}
+                        showScanMode={true}
+                     />
 
                      <ParcelsInContainer container={container} canModify={canLoadParcels} />
                   </div>
