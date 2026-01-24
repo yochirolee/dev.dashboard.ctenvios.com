@@ -29,7 +29,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 export const ContainersPage = () => {
    const { pagination, setPagination } = usePagination();
    const { data, isLoading } = useContainers.get(pagination.pageIndex, pagination.pageSize);
-   const navigate = useNavigate();
+
    const deleteContainerMutation = useContainers.delete();
 
    const containers = data?.rows ?? [];

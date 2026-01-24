@@ -9,7 +9,8 @@ export type ScanStatus = "matched" | "surplus" | "duplicate" | "verified" | "not
 export type ScanMode = "tracking_number" | "order_id";
 
 export interface ScanFeedback {
-   tracking_number: string;
+   tracking_number?: string;
+   value?: string;
    status: ScanStatus;
    description?: string;
    errorMessage?: string;
@@ -134,6 +135,7 @@ interface ScanFeedbackDisplayProps {
 }
 
 export const ScanFeedbackDisplay = ({ feedback }: ScanFeedbackDisplayProps): React.ReactElement => {
+   const displayValue = feedback.tracking_number ?? feedback.value ?? "";
    const getStatusStyles = (): string => {
       switch (feedback.status) {
          case "matched":
@@ -190,7 +192,7 @@ export const ScanFeedbackDisplay = ({ feedback }: ScanFeedbackDisplayProps): Rea
       >
          {getIcon()}
          <div className="flex-1">
-            <p className="font-bold text-lg">{feedback.tracking_number}</p>
+            <p className="font-bold text-lg">{displayValue}</p>
             <p className="text-sm opacity-90">{getMessage()}</p>
          </div>
       </div>

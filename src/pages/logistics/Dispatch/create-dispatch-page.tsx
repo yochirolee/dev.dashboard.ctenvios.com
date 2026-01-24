@@ -149,13 +149,8 @@ export const CreateDispatchPage = (): React.ReactElement => {
       return agencyPackages.filter((pkg: { tracking_number: string }) => !dispatchTrackingSet.has(pkg.tracking_number));
    }, [agencyPackages, dispatchTrackingSet]);
 
-   // Counts
-   const totalAdded = dispatchParcels.length;
-   const totalPending = pendingPackages.length;
-   const totalAll = totalAdded + totalPending;
-
-   const progressValue = totalAll > 0 ? Math.round((totalAdded / totalAll) * 100) : 0;
-   const canFinalize = dispatchData?.status === dispatchStatus.DRAFT || dispatchData?.status === dispatchStatus.LOADING;
+   
+    const canFinalize = dispatchData?.status === dispatchStatus.DRAFT || dispatchData?.status === dispatchStatus.LOADING;
 
    // Filter dispatch parcels based on search
    const filteredDispatchParcels = useMemo(() => {
