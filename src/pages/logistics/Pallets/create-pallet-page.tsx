@@ -6,8 +6,8 @@ import { toast } from "sonner";
 import { ParcelsInPallet } from "@/components/palllets/list-parcels-in-pallet";
 import { ParcelsInAgencyForPallet } from "@/components/palllets/list-parcels-in-agency";
 import { ScannerCard } from "@/components/dispatch/scanner-card";
+import type { ScanFeedback } from "@/components/dispatch/scanner-card";
 
-type ScanStatus = "matched" | "surplus" | "duplicate";
 type ScanMode = "tracking_number" | "order_id";
 
 export const CreatePalletPage = () => {
@@ -16,13 +16,9 @@ export const CreatePalletPage = () => {
 
    const [currentInput, setCurrentInput] = useState("");
    const [scanMode, setScanMode] = useState<ScanMode>("tracking_number");
-   const [lastScanStatus, setLastScanStatus] = useState<{
-      value: string;
-      status: ScanStatus;
-      count?: number;
-      description?: string;
-      errorMessage?: string;
-   } | null>(null);
+    const [lastScanStatus, setLastScanStatus] = useState<ScanFeedback | null>(null);
+  
+
 
    const inputRef = useRef<HTMLInputElement>(null);
    const agency_id = useAppStore.getState().agency?.id;
@@ -47,7 +43,7 @@ export const CreatePalletPage = () => {
             {
                onSuccess: () => {
                   setLastScanStatus({
-                     value: scannedId,
+                     tracking_number: scannedId,
                      status: "matched",
                   });
                },
@@ -61,14 +57,14 @@ export const CreatePalletPage = () => {
 
                   if (isDuplicateError) {
                      setLastScanStatus({
-                        value: scannedId,
+                        tracking_number: scannedId,
                         status: "duplicate",
                         errorMessage,
                      });
                   } else {
                      toast.error(errorMessage);
                      setLastScanStatus({
-                        value: scannedId,
+                        tracking_number: scannedId,
                         status: "surplus",
                         errorMessage,
                      });
@@ -90,7 +86,7 @@ export const CreatePalletPage = () => {
                   const added = data?.added ?? 0;
                   const skipped = data?.skipped ?? 0;
                   setLastScanStatus({
-                     value: `Orden #${orderId}`,
+                     tracking_number: `Orden #${orderId}`,
                      status: "matched",
                      count: added,
                   });
@@ -101,7 +97,7 @@ export const CreatePalletPage = () => {
                   const errorMessage = error?.response?.data?.message || error?.message || "Error al agregar paquetes";
                   toast.error(errorMessage);
                   setLastScanStatus({
-                     value: `Orden #${orderId}`,
+                     tracking_number: `Orden #${orderId}`,
                      status: "surplus",
                      errorMessage,
                   });

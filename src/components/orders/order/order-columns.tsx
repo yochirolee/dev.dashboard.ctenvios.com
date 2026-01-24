@@ -1,4 +1,3 @@
-import type React from "react";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -171,7 +170,7 @@ export const orderColumns: ColumnDef<Order>[] = [
       size: 150,
    },
 
-    {
+   {
       accessorKey: "status",
       header: "Status",
       cell: ({ row }) => {
@@ -189,7 +188,7 @@ export const orderColumns: ColumnDef<Order>[] = [
             customer?.first_name,
             customer?.middle_name,
             customer?.last_name,
-            customer?.second_last_name
+            customer?.second_last_name,
          );
 
          return (
@@ -222,7 +221,7 @@ export const orderColumns: ColumnDef<Order>[] = [
             receiver?.first_name,
             receiver?.middle_name,
             receiver?.last_name,
-            receiver?.second_last_name
+            receiver?.second_last_name,
          );
 
          return (
@@ -258,7 +257,7 @@ export const orderColumns: ColumnDef<Order>[] = [
          );
       },
    },
-  
+
    {
       accessorKey: "created_at",
       header: "Fecha",

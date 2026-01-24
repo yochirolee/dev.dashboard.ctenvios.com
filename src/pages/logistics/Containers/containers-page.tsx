@@ -5,13 +5,12 @@ import { NewContainerForm } from "@/components/containers/new-container-form";
 import { UpdateStatusContainerForm } from "@/components/containers/update-status-container-form";
 import { ShareDialog } from "@/components/shares/share-dialog";
 import { useState, useMemo, useCallback } from "react";
-import { Container as ContainerIcon, Search, Loader2, PackagePlus } from "lucide-react";
+import { Container as ContainerIcon, Search, Loader2 } from "lucide-react";
 import { Spinner } from "@/components/ui/spinner";
 import { Empty, EmptyHeader, EmptyMedia, EmptyTitle, EmptyDescription, EmptyContent } from "@/components/ui/empty";
 import { toast } from "sonner";
 import usePagination from "@/hooks/use-pagination";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 import { ButtonGroup } from "@/components/ui/button-group";
 import { useNavigate } from "react-router-dom";
 import type { Container } from "@/data/types";
@@ -70,7 +69,7 @@ export const ContainersPage = () => {
 
    const columns = useMemo(
       () => containersColumns({ onDelete: handleDeleteContainer, onUpdateStatus: handleUpdateStatus }),
-      [handleDeleteContainer, handleUpdateStatus]
+      [handleDeleteContainer, handleUpdateStatus],
    );
 
    if (isLoading) {
@@ -124,7 +123,6 @@ export const ContainersPage = () => {
                >
                   <NewContainerForm setOpen={setOpenCreateDialog} />
                </ShareDialog>
-             
             </ButtonGroup>
          </div>
 

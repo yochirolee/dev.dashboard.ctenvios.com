@@ -9,7 +9,6 @@ import { toast } from "sonner";
 import { Spinner } from "@/components/ui/spinner";
 import { dispatchStatus } from "@/data/types";
 import { ScannerCard, type ScanFeedback, type ScanMode } from "@/components/dispatch/scanner-card";
-import { DispatchStats } from "@/components/dispatch/dispatch-stats";
 import { VirtualizedParcelTable } from "@/components/parcels/virtualized-parcel-table";
 import { ButtonGroup } from "@/components/ui/button-group";
 import { Badge } from "@/components/ui/badge";
@@ -27,7 +26,7 @@ export const CreateDispatchPage = (): React.ReactElement => {
    const [searchTerm, setSearchTerm] = useState("");
    const [lastScanStatus, setLastScanStatus] = useState<ScanFeedback | null>(null);
    const [removingTrackingNumber, setRemovingTrackingNumber] = useState<string | null>(null);
-   const [scanMode, setScanMode] = useState<ScanMode>("tracking_number");  
+   const [scanMode, setScanMode] = useState<ScanMode>("tracking_number");
    const agency_id = useAppStore.getState().agency?.id;
 
    const { mutate: addItem, isPending: isAddingItem } = useDispatches.addItem(dispatchIdNumber, agency_id ?? 0);
@@ -90,7 +89,7 @@ export const CreateDispatchPage = (): React.ReactElement => {
                   });
                }
             },
-         }
+         },
       );
       setCurrentInput("");
    };
@@ -125,20 +124,20 @@ export const CreateDispatchPage = (): React.ReactElement => {
                onSettled: () => {
                   setRemovingTrackingNumber(null);
                },
-            }
+            },
          );
       },
-      [removeParcelMutation]
+      [removeParcelMutation],
    );
 
    // Flatten pages from infinite queries
    const agencyPackages = useMemo(
       () => agencyPackagesData?.pages?.flatMap((page) => page?.rows ?? []) ?? [],
-      [agencyPackagesData]
+      [agencyPackagesData],
    );
    const dispatchParcels = useMemo(
       () => dispatchParcelsData?.pages?.flatMap((page) => page?.rows ?? []) ?? [],
-      [dispatchParcelsData]
+      [dispatchParcelsData],
    );
 
    const dispatchTrackingSet = useMemo(() => {
@@ -147,9 +146,7 @@ export const CreateDispatchPage = (): React.ReactElement => {
 
    // Pending packages (in agency, not yet in dispatch)
    const pendingPackages = useMemo(() => {
-      return agencyPackages.filter(
-         (pkg: { tracking_number: string }) => !dispatchTrackingSet.has(pkg.tracking_number)
-      );
+      return agencyPackages.filter((pkg: { tracking_number: string }) => !dispatchTrackingSet.has(pkg.tracking_number));
    }, [agencyPackages, dispatchTrackingSet]);
 
    // Counts
@@ -158,8 +155,7 @@ export const CreateDispatchPage = (): React.ReactElement => {
    const totalAll = totalAdded + totalPending;
 
    const progressValue = totalAll > 0 ? Math.round((totalAdded / totalAll) * 100) : 0;
-   const canFinalize =
-      dispatchData?.status === dispatchStatus.DRAFT || dispatchData?.status === dispatchStatus.LOADING;
+   const canFinalize = dispatchData?.status === dispatchStatus.DRAFT || dispatchData?.status === dispatchStatus.LOADING;
 
    // Filter dispatch parcels based on search
    const filteredDispatchParcels = useMemo(() => {
@@ -169,7 +165,7 @@ export const CreateDispatchPage = (): React.ReactElement => {
          (pkg: { tracking_number: string; description?: string; order_id?: number }) =>
             pkg.tracking_number?.toLowerCase().includes(normalized) ||
             pkg.description?.toLowerCase().includes(normalized) ||
-            String(pkg.order_id ?? "").includes(normalized)
+            String(pkg.order_id ?? "").includes(normalized),
       );
    }, [dispatchParcels, searchTerm]);
 
@@ -181,12 +177,10 @@ export const CreateDispatchPage = (): React.ReactElement => {
          (pkg: { tracking_number: string; description?: string; order_id?: number }) =>
             pkg.tracking_number?.toLowerCase().includes(normalized) ||
             pkg.description?.toLowerCase().includes(normalized) ||
-            String(pkg.order_id ?? "").includes(normalized)
+            String(pkg.order_id ?? "").includes(normalized),
       );
    }, [pendingPackages, searchTerm]);
 
-  
- 
    return (
       <div className="flex flex-col p-2 md:p-4 mx-auto w-full h-full">
          <main className="flex-1 flex flex-col min-h-0">
@@ -201,10 +195,7 @@ export const CreateDispatchPage = (): React.ReactElement => {
                      <p className="text-sm text-gray-500">Despacho #{dispatchIdNumber}</p>
                   </div>
                </div>
-             
             </div>
-
-          
 
             {/* ==================== DESKTOP LAYOUT (>= lg) ==================== */}
             <div className="hidden lg:grid lg:grid-cols-5 gap-6 mt-6 flex-1 min-h-0">
@@ -232,23 +223,26 @@ export const CreateDispatchPage = (): React.ReactElement => {
                            </span>
                         </div>
 
-                        
                         <ButtonGroup>
                            {canFinalize && (
-                              <Button variant="outline" size="sm" onClick={handleFinalizeDispatch} disabled={finalizeCreateMutation.isPending || totalAdded === 0}>
-                               {finalizeCreateMutation.isPending ? <Spinner /> : <CheckCircle2 />}
-                                <span >Finalizar</span>
-                             </Button>
-                              )}
-                           
-                         
+                              <Button
+                                 variant="outline"
+                                 size="sm"
+                                 onClick={handleFinalizeDispatch}
+                                 disabled={finalizeCreateMutation.isPending || totalAdded === 0}
+                              >
+                                 {finalizeCreateMutation.isPending ? <Spinner /> : <CheckCircle2 />}
+                                 <span>Finalizar</span>
+                              </Button>
+                           )}
+
                            <Button variant="outline" size="sm" onClick={handleDownloadPdf}>
                               <Printer className="h-4 w-4 mr-1" />
                               Imprimir
                            </Button>
                         </ButtonGroup>
                      </div>
-                   
+
                      <div className="relative px-4 pb-2">
                         <Search className="absolute left-6 top-2 h-4 w-4 text-muted-foreground" />
                         <Input
@@ -258,7 +252,7 @@ export const CreateDispatchPage = (): React.ReactElement => {
                            onChange={(e) => setSearchTerm(e.target.value)}
                         />
                      </div>
-                     
+
                      <div className="flex-1 min-h-0">
                         <VirtualizedParcelTable
                            data={filteredDispatchParcels}
@@ -292,9 +286,8 @@ export const CreateDispatchPage = (): React.ReactElement => {
                      title="En Agencia"
                      icon={Box}
                      headerRight={
-                       <Badge variant="outline">
-                         {agencyPackagesData?.pages?.[0]?.total ?? 0} paquetes
-                        </Badge>}
+                        <Badge variant="outline">{agencyPackagesData?.pages?.[0]?.total ?? 0} paquetes</Badge>
+                     }
                      showIcon={false}
                      showQR={true}
                      showStatus={false}
