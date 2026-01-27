@@ -34,6 +34,7 @@ export const ContainersPage = () => {
    const containers = data?.rows ?? [];
    const total = data?.total ?? 0;
 
+
    const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
    const [openCreateDialog, setOpenCreateDialog] = useState(false);
    const [openStatusDialog, setOpenStatusDialog] = useState(false);

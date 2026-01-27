@@ -164,9 +164,14 @@ const navIssuesItems: SidebarItem[] = [
       icon: AlertCircle,
       allowedRoles: canAccess.issues,
       items: [
-         {
+         /* {
             title: "Reclamaciones",
             url: "/legacy-issues",
+            allowedRoles: canAccess.issues,
+         }, */
+         {
+            title: "Reclamaciones",
+            url: "/issues",
             allowedRoles: canAccess.issues,
          },
          {

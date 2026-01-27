@@ -22,6 +22,7 @@ export const LoadContainerPage = (): React.ReactElement => {
    // Fetch container details
    const { data: container, isLoading: isLoadingContainer } = useContainers.getById(containerIdNumber);
 
+   
    // Mutations for adding parcels
    const { mutate: addParcel, isPending: isAddingParcel } = useContainers.addParcel(containerIdNumber);
    const { mutate: addParcelsByOrderId, isPending: isAddingByOrder } =
@@ -64,7 +65,7 @@ export const LoadContainerPage = (): React.ReactElement => {
                },
             }
          );
-      } else {
+      } else if (scanMode === "order_id") {
          const orderId = Number(inputValue);
          if (isNaN(orderId)) {
             toast.error("El ID de orden debe ser un número");
@@ -86,6 +87,34 @@ export const LoadContainerPage = (): React.ReactElement => {
                   const errorMessage = error?.response?.data?.message || error?.message || "Error al agregar paquetes";
                   setLastScanStatus({
                      tracking_number: `Orden #${orderId}`,
+                     status: "error",
+                     errorMessage,
+                  });
+               },
+            }
+         );
+      } else {
+         const dispatchId = Number(inputValue);
+         if (isNaN(dispatchId)) {
+            toast.error("El ID de despacho debe ser un número");
+            return;
+         }
+
+         addParcelsByOrderId(
+            { dispatchId },
+            {
+               onSuccess: (data: any) => {
+                  const added = data?.added || data?.length || 0;
+                  setLastScanStatus({
+                     tracking_number: `Despacho #${dispatchId}`,
+                     status: "matched",
+                     count: added,
+                  });
+               },
+               onError: (error: any) => {
+                  const errorMessage = error?.response?.data?.message || error?.message || "Error al agregar paquetes";
+                  setLastScanStatus({
+                     tracking_number: `Despacho #${dispatchId}`,
                      status: "error",
                      errorMessage,
                   });

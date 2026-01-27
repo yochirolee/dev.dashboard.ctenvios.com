@@ -72,4 +72,56 @@ export const useAgencies = {
          staleTime: 1000 * 60 * 60 * 24,
       });
    },
+   getIntegrations: (agency_id: number) => {
+      return useQuery({
+         queryKey: ["agency-integrations", agency_id],
+         queryFn: () => api.agencies.getIntegrations(agency_id),
+         enabled: !!agency_id,
+      });
+   },
+   createIntegration: (
+      agency_id: number,
+      options?: { onSuccess?: (data?: any) => void; onError?: (error: any) => void },
+   ) => {
+      return useMutation({
+         mutationFn: (data: {
+            name: string;
+            email: string;
+            contact_name: string;
+            phone: string;
+            agency_id: number;
+            rate_limit: number;
+            forwarder_id: number;
+         }) => api.partners.createAdmin(data),
+         onSuccess: (data) => {
+            queryClient.invalidateQueries({ queryKey: ["agency-integrations", agency_id] });
+            options?.onSuccess?.(data);
+         },
+         onError: (error) => {
+            options?.onError?.(error);
+         },
+      });
+   },
+   createApiKey: (
+      partnerId: number,
+      options?: { onSuccess?: (data?: any) => void; onError?: (error: any) => void },
+   ) => {
+      return useMutation({
+         mutationFn: (data?: { name?: string; environment?: string; expires_in_days?: number }) =>
+            api.partners.createApiKey(partnerId, data),
+         onSuccess: (data) => {
+            options?.onSuccess?.(data);
+         },
+         onError: (error) => {
+            options?.onError?.(error);
+         },
+      });
+   },
+   getApiKeys: (partnerId: number) => {
+      return useQuery({
+         queryKey: ["partner-api-keys", partnerId],
+         queryFn: () => api.partners.getApiKeys(partnerId),
+         enabled: !!partnerId,
+      });
+   },
 };

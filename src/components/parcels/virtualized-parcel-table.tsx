@@ -211,11 +211,11 @@ export function VirtualizedParcelTable<T extends Parcel>({
                id: "agency",
                header: "Agencia",
                cell: (info) => (
-                  <Badge variant="secondary" className="w-fit text-xs truncate">
+                  <Badge variant="secondary" className="max-w-full truncate text-xs">
                      {info.getValue() || "-"}
                   </Badge>
                ),
-               meta: { flex: "none", width: "120px" },
+               meta: { flex: "none", width: "140px" },
             })
          );
       }
@@ -235,7 +235,7 @@ export function VirtualizedParcelTable<T extends Parcel>({
          columnHelper.accessor("description", {
             header: "Descripción",
             cell: (info) => (
-               <span className="text-xs text-muted-foreground line-clamp-2">
+               <span className="block max-w-full truncate text-xs text-muted-foreground">
                   {info.getValue() || "-"}
                </span>
             ),

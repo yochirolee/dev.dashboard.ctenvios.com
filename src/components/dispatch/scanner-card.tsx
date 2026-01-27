@@ -1,12 +1,23 @@
 import { useRef } from "react";
-import { Barcode, CheckCircle2, AlertTriangle, RefreshCw, PackagePlus, Scan, Package, FileText, ChevronDown } from "lucide-react";
+import {
+   Barcode,
+   CheckCircle2,
+   AlertTriangle,
+   RefreshCw,
+   PackagePlus,
+   Scan,
+   Package,
+   FileText,
+   ChevronDown,
+   Truck,
+} from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Spinner } from "@/components/ui/spinner";
 import { InputGroup, InputGroupAddon, InputGroupInput, InputGroupButton } from "../ui/input-group";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
 export type ScanStatus = "matched" | "surplus" | "duplicate" | "verified" | "not_found" | "invalid" | "error";
-export type ScanMode = "tracking_number" | "order_id";
+export type ScanMode = "tracking_number" | "order_id" | "dispatch_id";
 
 export interface ScanFeedback {
    tracking_number?: string;
@@ -51,15 +62,15 @@ export const ScannerCard = ({
 
    const getPlaceholder = (): string => {
       if (placeholder) return placeholder;
-      return scanMode === "tracking_number" 
-         ? "Escanear o escribir tracking..." 
-         : "Ingresar ID de orden...";
+      if (scanMode === "tracking_number") return "Escanear o escribir tracking...";
+      if (scanMode === "order_id") return "Ingresar ID de orden...";
+      return "Ingresar ID de despacho...";
    };
 
    const getTitle = (): string => {
-      return scanMode === "tracking_number" 
-         ? "Escanear código" 
-         : "Agregar por Orden";
+      if (scanMode === "tracking_number") return "Escanear código";
+      if (scanMode === "order_id") return "Agregar por Orden";
+      return "Agregar por Despacho";
    };
 
    return (
@@ -95,10 +106,15 @@ export const ScannerCard = ({
                                        <Package className="size-3.5" />
                                        Tracking
                                     </>
-                                 ) : (
+                                 ) : scanMode === "order_id" ? (
                                     <>
                                        <FileText className="size-3.5" />
                                        Orden
+                                    </>
+                                 ) : (
+                                    <>
+                                       <Truck className="size-3.5" />
+                                       Despacho
                                     </>
                                  )}
                                  <ChevronDown className="size-3" />
@@ -114,6 +130,10 @@ export const ScannerCard = ({
                                     <FileText className="size-4 mr-2" />
                                     Orden ID
                                  </DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => onScanModeChange("dispatch_id")}>
+                                   <Truck className="size-4 mr-2" />
+                                   Despacho ID
+                                </DropdownMenuItem>
                               </DropdownMenuGroup>
                            </DropdownMenuContent>
                         </DropdownMenu>

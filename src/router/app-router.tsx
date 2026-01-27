@@ -26,8 +26,8 @@ import { AppLogsPage } from "@/pages/app-logs/app-logs-page";
 import { PartnersLogsPage } from "@/pages/app-logs/partners-logs-page";
 import IssuesPage from "@/pages/issues/issues-page";
 import NewIssuePage from "@/pages/issues/new-issue-page";
-import LegacyNewIssuePage from "@/pages/legacy-issues/legacy-new-issue-page";
-import LegacyIssuesPage from "@/pages/legacy-issues/legacy-issues-page";
+/* import LegacyNewIssuePage from "@/pages/legacy-issues/legacy-new-issue-page";
+import LegacyIssuesPage from "@/pages/legacy-issues/legacy-issues-page"; */
 import { canAccess } from "@/lib/rbac";
 import TrackingHmPage from "@/pages/hm-paquetes/tracking-hm-page";
 import { AgenciesIntegrationsPage } from "@/pages/settings/agencies/agencies-integrations-page";
@@ -102,15 +102,15 @@ export const AppRouter = () => {
                   </Route>
                </Route>
                <Route path="issues">
-                  <Route index element={<LegacyIssuesPage />} />
+                  <Route index element={<IssuesPage />} />
                   <Route path="new" element={<NewIssuePage />} />
                   <Route path=":issueId" element={<IssuesPage />} />
                </Route>
-               <Route path="legacy-issues">
+               {/*    <Route path="legacy-issues">
                   <Route index element={<LegacyIssuesPage />} />
                   <Route path="new" element={<LegacyNewIssuePage />} />
                   <Route path=":issueId" element={<LegacyIssuesPage />} />
-               </Route>
+               </Route> */}
                <Route path="hm-paquetes">
                   <Route index element={<TrackingHmPage />} />
                   <Route path="tracking" element={<TrackingHmPage />} />

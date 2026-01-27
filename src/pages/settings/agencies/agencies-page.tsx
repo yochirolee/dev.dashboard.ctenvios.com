@@ -57,7 +57,8 @@ export const AgenciesPage = () => {
                   <Button
                      variant="outline"
                      onClick={() => {
-                        navigate("/settings/agencies/integrations");
+                        if (!selectedAgency) return;
+                        navigate(`/settings/agencies/integrations?agencyId=${selectedAgency.id}`);
                      }}
                   >
                      <Key size={16} /> <span className="hidden md:block">Integraciones</span>

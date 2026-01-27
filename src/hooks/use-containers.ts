@@ -154,7 +154,15 @@ export const useContainers = {
 
    addParcelsByOrderId: (containerId: number) => {
       return useMutation({
-         mutationFn: ({ orderId }: { orderId: number }) => api.containers.addParcelsByOrderId(containerId, orderId),
+         mutationFn: ({ orderId, dispatchId }: { orderId?: number; dispatchId?: number }) => {
+            if (dispatchId !== undefined) {
+               return api.containers.addParcelsByDispatchId(containerId, dispatchId);
+            }
+            if (orderId !== undefined) {
+               return api.containers.addParcelsByOrderId(containerId, orderId);
+            }
+            throw new Error("orderId or dispatchId is required");
+         },
          onSuccess: async () => {
             await queryClient.invalidateQueries({ queryKey: ["container-parcels", containerId] });
             await queryClient.invalidateQueries({ queryKey: ["ready-for-container"] });

@@ -55,7 +55,7 @@ axiosInstance.interceptors.request.use(
 
    (error) => {
       return Promise.reject(error);
-   }
+   },
 );
 
 // Add response interceptor for better error handling with React Query
@@ -72,7 +72,7 @@ axiosInstance.interceptors.response.use(
 
       // Let React Query handle the error
       return Promise.reject(error);
-   }
+   },
 );
 
 const api = {
@@ -188,7 +188,7 @@ const api = {
          startDate: string,
          endDate: string,
          payment_status?: string,
-         agency_id?: number
+         agency_id?: number,
       ) => {
          // Convert 0-indexed (from TanStack Table) to 1-indexed (for API)
          const params: Record<string, string | number> = {
@@ -349,6 +349,35 @@ const api = {
          const response = await axiosInstance.get(`/agencies/${id}/active-services-with-rates`);
          return response.data;
       },
+      getIntegrations: async (agencyId: number) => {
+         const response = await axiosInstance.get(`/partners/admin/agency/${agencyId}`);
+         return response.data;
+      },
+   },
+   partners: {
+      createAdmin: async (data: {
+         name: string;
+         email: string;
+         contact_name: string;
+         phone: string;
+         agency_id: number;
+         rate_limit: number;
+         forwarder_id: number;
+      }) => {
+         const response = await axiosInstance.post("/partners/admin", data);
+         return response.data;
+      },
+      getApiKeys: async (partnerId: number) => {
+         const response = await axiosInstance.get(`/partners/admin/${partnerId}/api-keys`);
+         return response.data;
+      },
+      createApiKey: async (
+         partnerId: number,
+         data?: { name?: string; environment?: string; expires_in_days?: number }
+      ) => {
+         const response = await axiosInstance.post(`/partners/admin/${partnerId}/api-keys`, data ?? {});
+         return response.data;
+      },
    },
    customs: {
       get: async (page: number | 1, limit: number | 25) => {
@@ -468,7 +497,7 @@ const api = {
          status?: string,
          payment_status?: string,
          dispatch_id?: number,
-         agency_id?: number
+         agency_id?: number,
       ) => {
          const params: Record<string, string | number> = {
             page: page + 1,
@@ -525,7 +554,7 @@ const api = {
          dispatch_id: number,
          page: number = 1,
          limit: number = 20,
-         status?: ParcelStatus
+         status?: ParcelStatus,
       ) => {
          const params: Record<string, string | number> = {
             page,
@@ -635,7 +664,7 @@ const api = {
             method?: string;
             startDate?: Date;
             endDate?: Date;
-         }
+         },
       ) => {
          // Convert 0-indexed (from TanStack Table) to 1-indexed (for API)
          const params: Record<string, string | number> = {
@@ -685,7 +714,7 @@ const api = {
             order_id?: string;
             parcel_id?: string;
             assigned_to_id?: string;
-         }
+         },
       ) => {
          // Convert 0-indexed (from TanStack Table) to 1-indexed (for API)
          const params: Record<string, string | number> = {
@@ -794,6 +823,12 @@ const api = {
          });
          return response.data;
       },
+      addParcelsByDispatchId: async (containerId: number, dispatchId: number) => {
+         const response = await axiosInstance.post(`/containers/${containerId}/parcels/by-dispatch`, {
+            dispatch_id: dispatchId,
+         });
+         return response.data;
+      },
       removeParcel: async (containerId: number, trackingNumber: string) => {
          const response = await axiosInstance.delete(`/containers/${containerId}/parcels/${trackingNumber}`);
          return response.data;
@@ -838,7 +873,7 @@ const api = {
             parcel_id?: string;
             assigned_to_id?: string;
             issue_id?: string;
-         }
+         },
       ) => {
          // Convert 0-indexed (from TanStack Table) to 1-indexed (for API)
          const params: Record<string, string | number> = {

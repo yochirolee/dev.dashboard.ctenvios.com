@@ -25,6 +25,7 @@ export const ParcelsInContainer = ({ container, canModify = true }: ParcelsInCon
       container.id,
       100
    );
+   console.log(data);
 
    const { mutate: removeParcel } = useContainers.removeParcel(container.id);
 
