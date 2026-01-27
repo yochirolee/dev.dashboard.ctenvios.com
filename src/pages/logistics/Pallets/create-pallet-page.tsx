@@ -5,17 +5,16 @@ import { useParams } from "react-router-dom";
 import { toast } from "sonner";
 import { ParcelsInPallet } from "@/components/palllets/list-parcels-in-pallet";
 import { ParcelsInAgencyForPallet } from "@/components/palllets/list-parcels-in-agency";
-import { ScannerCard } from "@/components/dispatch/scanner-card";
-import type { ScanFeedback } from "@/components/dispatch/scanner-card";
+import { ScannerCard, type ScanFeedback, type ScanMode } from "@/components/dispatch/scanner-card";
 
-type ScanMode = "tracking_number" | "order_id";
+type PalletScanMode = Exclude<ScanMode, "dispatch_id">;
 
 export const CreatePalletPage = () => {
    const { palletId } = useParams();
    const palletIdNumber = Number(palletId ?? 0);
 
    const [currentInput, setCurrentInput] = useState("");
-   const [scanMode, setScanMode] = useState<ScanMode>("tracking_number");
+   const [scanMode, setScanMode] = useState<PalletScanMode>("tracking_number");
     const [lastScanStatus, setLastScanStatus] = useState<ScanFeedback | null>(null);
   
 
@@ -126,7 +125,9 @@ export const CreatePalletPage = () => {
                      lastScanStatus={lastScanStatus}
                      isLoading={isAdding}
                      scanMode={scanMode}
-                     onScanModeChange={setScanMode}
+                     onScanModeChange={(mode) =>
+                        setScanMode(mode === "dispatch_id" ? "tracking_number" : mode)
+                     }
                      showScanMode={true}
                   />
 
