@@ -39,8 +39,10 @@ export const AgencyCreateRatesForm = ({
    const { data: products } = useProducts.get();
    const { mutate: createRate, isPending } = useShippingRates.create();
 
+ 
    const user = useAppStore();
    const seller_agency_id = user?.agency?.id;
+
 
    const form = useForm<z.infer<typeof formSchema>>({
       resolver: zodResolver(formSchema),

@@ -14,6 +14,7 @@ import { toast } from "sonner";
 
 export const AgencyRates = ({ shippingRates }: { shippingRates: ShippingRate[] }) => {
    if (shippingRates?.length === 0) return <EmptyServicesRates />;
+
    return (
       <Table>
          <TableHeader>
@@ -40,25 +41,21 @@ export const AgencyRates = ({ shippingRates }: { shippingRates: ShippingRate[] }
 
 const RateRow = ({ rate }: { rate: ShippingRate }) => {
    const [isOpen, setIsOpen] = useState(false);
-   const { mutate: updateRate } = useShippingRates.update(rate?.id as number);
-   const calculateProfit = (rate: ShippingRate) => {
-      return rate?.price_in_cents - rate?.cost_in_cents;
+   const { mutate: toggleStatus, isPending } = useShippingRates.toggleStatus({
+      onSuccess: () => {
+         toast.success(rate?.is_active ? "Tarifa desactivada" : "Tarifa activada");
+      },
+      onError: () => {
+         toast.error("Error al cambiar el estado de la tarifa");
+      },
+   });
+
+   const handleToggleStatus = (): void => {
+      toggleStatus({ rate_id: rate?.id as number, is_active: !rate?.is_active });
    };
 
-   const handleActivate = (rate: ShippingRate) => {
-      rate.is_active = !rate.is_active;
-      updateRate(rate as ShippingRate, {
-         onSuccess: () => {
-            toast.success("Tarifa actualizada correctamente");
-         },
-         onError: (error) => {
-            const errorMessage =
-               (error as any)?.response?.data?.error ||
-               (error as any)?.response?.data?.message ||
-               "Error al actualizar la tarifa";
-            toast.error(errorMessage);
-         },
-      });
+   const calculateProfit = (rate: ShippingRate) => {
+      return rate?.price_in_cents - rate?.cost_in_cents;
    };
 
    return (
@@ -89,7 +86,7 @@ const RateRow = ({ rate }: { rate: ShippingRate }) => {
             </p>
          </TableCell>
          <TableCell>
-            <Switch checked={rate?.is_active} onCheckedChange={() => handleActivate(rate)} />
+            <Switch checked={rate?.is_active} onCheckedChange={handleToggleStatus} disabled={isPending} />
          </TableCell>
          <TableCell className="flex justify-end">
             <Dialog open={isOpen} onOpenChange={setIsOpen}>

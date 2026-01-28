@@ -13,7 +13,6 @@ import { Spinner } from "../ui/spinner";
 
 export default function AgencyServices({ agencyId }: { agencyId: number }) {
    const { data: services, isLoading } = useAgencies.getServicesWithRates(agencyId);
-   console.log(services, "services");
    const [openDialogId, setOpenDialogId] = useState<number | null>(null);
 
    if (isLoading)

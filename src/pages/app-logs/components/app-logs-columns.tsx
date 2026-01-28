@@ -1,7 +1,20 @@
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { type ColumnDef } from "@tanstack/react-table";
 import { format } from "date-fns";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { EyeIcon, Loader2 } from "lucide-react";
+import {
+   Dialog,
+   DialogContent,
+   DialogDescription,
+   DialogHeader,
+   DialogTitle,
+   DialogTrigger,
+} from "@/components/ui/dialog";
+import React, { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import api from "@/api/api";
 
 export interface AppLog {
    id: number;
@@ -10,8 +23,13 @@ export interface AppLog {
    source: string;
    code: string | null;
    status_code: number | null;
+   details: Record<string, unknown> | null;
+   stack: string | null;
    path: string;
    method: string;
+   ip_address: string | null;
+   user_agent: string | null;
+   user_id: string | null;
    user_email: string | null;
    created_at: string;
    user: {
@@ -60,6 +78,110 @@ const getMethodColor = (method: string): string => {
       default:
          return "text-muted-foreground";
    }
+};
+
+const stripAnsiCodes = (str: string): string => {
+   // eslint-disable-next-line no-control-regex
+   return str.replace(/\x1B\[[0-9;]*[a-zA-Z]|\[[0-9;]*m/g, "");
+};
+
+interface LogDetailsDialogProps {
+   logId: number;
+   method: string;
+   path: string;
+   level: string;
+}
+
+const LogDetailsDialog = ({ logId, method, path, level }: LogDetailsDialogProps): React.ReactElement => {
+   const [open, setOpen] = useState(false);
+
+   const { data: log, isLoading } = useQuery({
+      queryKey: ["app-log", logId],
+      queryFn: () => api.logs.getLogById(logId),
+      enabled: open,
+   });
+
+   return (
+      <Dialog open={open} onOpenChange={setOpen}>
+         <DialogTrigger asChild>
+            <Button variant="ghost" size="icon" className="h-8 w-8">
+               <EyeIcon className="w-4 h-4" />
+            </Button>
+         </DialogTrigger>
+         <DialogContent className="max-w-4xl lg:max-w-6xl max-h-[80vh]">
+            <DialogHeader>
+               <DialogTitle>Log Details</DialogTitle>
+               <DialogDescription>
+                  {method} {path} - {level}
+               </DialogDescription>
+            </DialogHeader>
+            {isLoading ? (
+               <div className="flex items-center justify-center py-12">
+                  <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
+               </div>
+            ) : (
+               <div className="space-y-4 overflow-y-auto max-h-[60vh]">
+                  <div className="grid grid-cols-2 gap-4">
+                     <div>
+                        <h4 className="text-sm font-medium text-muted-foreground mb-1">ID</h4>
+                        <p className="font-mono text-sm">{log?.id}</p>
+                     </div>
+                     <div>
+                        <h4 className="text-sm font-medium text-muted-foreground mb-1">Level</h4>
+                        <p className="text-sm">{log?.level}</p>
+                     </div>
+                     <div>
+                        <h4 className="text-sm font-medium text-muted-foreground mb-1">Source</h4>
+                        <p className="text-sm">{log?.source || "N/A"}</p>
+                     </div>
+                     <div>
+                        <h4 className="text-sm font-medium text-muted-foreground mb-1">Status Code</h4>
+                        <p className="font-mono text-sm">{log?.status_code || "N/A"}</p>
+                     </div>
+                     <div>
+                        <h4 className="text-sm font-medium text-muted-foreground mb-1">Code</h4>
+                        <p className="font-mono text-sm">{log?.code || "N/A"}</p>
+                     </div>
+                     <div>
+                        <h4 className="text-sm font-medium text-muted-foreground mb-1">IP Address</h4>
+                        <p className="font-mono text-sm">{log?.ip_address || "N/A"}</p>
+                     </div>
+                     <div className="col-span-2">
+                        <h4 className="text-sm font-medium text-muted-foreground mb-1">User Email</h4>
+                        <p className="font-mono text-sm">{log?.user_email || "N/A"}</p>
+                     </div>
+                     <div className="col-span-2">
+                        <h4 className="text-sm font-medium text-muted-foreground mb-1">User Agent</h4>
+                        <p className="font-mono text-xs break-all">{log?.user_agent || "N/A"}</p>
+                     </div>
+                  </div>
+                  <div>
+                     <h3 className="font-semibold mb-2">Message</h3>
+                     <pre className="bg-muted p-4 rounded-md text-xs overflow-x-auto whitespace-pre-wrap">
+                        {log?.message || "No message"}
+                     </pre>
+                  </div>
+                  {log?.details && (
+                     <div>
+                        <h3 className="font-semibold mb-2">Details</h3>
+                        <pre className="bg-muted p-4 rounded-md text-xs overflow-x-auto">
+                           {JSON.stringify(log.details, null, 2)}
+                        </pre>
+                     </div>
+                  )}
+                  {log?.stack && (
+                     <div>
+                        <h3 className="font-semibold mb-2">Stack Trace</h3>
+                        <pre className="bg-destructive/10 text-destructive p-4 rounded-md text-xs overflow-x-auto whitespace-pre-wrap">
+                           {stripAnsiCodes(log.stack)}
+                        </pre>
+                     </div>
+                  )}
+               </div>
+            )}
+         </DialogContent>
+      </Dialog>
+   );
 };
 
 export const appLogsColumns: ColumnDef<AppLog>[] = [
@@ -180,5 +302,22 @@ export const appLogsColumns: ColumnDef<AppLog>[] = [
          );
       },
       size: 150,
+   },
+   {
+      id: "details",
+      header: "",
+      cell: ({ row }) => {
+         const log = row.original;
+         return (
+            <LogDetailsDialog
+               logId={log.id}
+               method={log.method}
+               path={log.path}
+               level={log.level}
+            />
+         );
+      },
+      size: 60,
+      enableSorting: false,
    },
 ];

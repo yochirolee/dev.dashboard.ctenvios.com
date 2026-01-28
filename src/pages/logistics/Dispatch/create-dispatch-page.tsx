@@ -1,5 +1,5 @@
 import { useMemo, useState, useCallback } from "react";
-import { CheckCircle2, Search, ArrowLeft, Printer, Send, Box } from "lucide-react";
+import { CheckCircle2, Search, ArrowLeft, Printer, Send, Box, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useAppStore } from "@/stores/app-store";
@@ -12,6 +12,8 @@ import { ScannerCard, type ScanFeedback, type ScanMode } from "@/components/disp
 import { VirtualizedParcelTable } from "@/components/parcels/virtualized-parcel-table";
 import { ButtonGroup } from "@/components/ui/button-group";
 import { Badge } from "@/components/ui/badge";
+import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/input-group";
+import { InputGroupButton } from "@/components/ui/input-group";
 
 export const CreateDispatchPage = (): React.ReactElement => {
    const { dispatchId } = useParams();
@@ -193,7 +195,7 @@ export const CreateDispatchPage = (): React.ReactElement => {
             </div>
 
             {/* ==================== DESKTOP LAYOUT (>= lg) ==================== */}
-            <div className="hidden lg:grid lg:grid-cols-5 gap-6 mt-6 flex-1 min-h-0">
+            <div className=" lg:grid lg:grid-cols-5 gap-6 mt-6 flex-1 min-h-0">
                {/* Left Column: Scanner + Added Parcels */}
                <div className="flex flex-col gap-4 col-span-3 min-h-0">
                   <ScannerCard
@@ -208,7 +210,7 @@ export const CreateDispatchPage = (): React.ReactElement => {
                   />
 
                   {/* Added Parcels (in dispatch) */}
-                  <div className="rounded-xl border border-border/60 bg-card/60 flex-1 gap-4 flex flex-col min-h-0 overflow-hidden">
+                  <div className="rounded-xl border border-border/60 bg-card/60 flex-1 space-y-4 flex flex-col ">
                      <div className="flex items-center justify-between p-4 ">
                         <div className="flex items-center gap-2">
                            <Send className="h-5 w-5 text-emerald-500" />
@@ -227,25 +229,27 @@ export const CreateDispatchPage = (): React.ReactElement => {
                                  disabled={finalizeCreateMutation.isPending || totalAdded === 0}
                               >
                                  {finalizeCreateMutation.isPending ? <Spinner /> : <CheckCircle2 />}
-                                 <span>Finalizar</span>
+                                 <span className="hidden lg:block">Finalizar</span>
                               </Button>
                            )}
 
                            <Button variant="outline" size="sm" onClick={handleDownloadPdf}>
                               <Printer className="h-4 w-4 mr-1" />
-                              Imprimir
+                              <span className="hidden lg:block">Imprimir</span>
                            </Button>
                         </ButtonGroup>
                      </div>
 
-                     <div className="relative px-4 pb-2">
-                        <Search className="absolute left-6 top-2 h-4 w-4 text-muted-foreground" />
-                        <Input
-                           placeholder="Buscar en despacho..."
-                           className="pl-8 h-8 text-sm"
-                           value={searchTerm}
-                           onChange={(e) => setSearchTerm(e.target.value)}
-                        />
+                     <div className="relative  px-4 pb-2">
+                        <InputGroup>
+                           <InputGroupAddon align="inline-start">
+                              <Search className="h-4 w-4 mr-1" />
+                           </InputGroupAddon>
+                           <InputGroupInput placeholder="Buscar en despacho..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
+                           <InputGroupAddon align="inline-end">
+                            {searchTerm && <X className="h-4 w-4 mr-1" onClick={() => setSearchTerm("")} />}
+                           </InputGroupAddon>
+                        </InputGroup>
                      </div>
 
                      <div className="flex-1 min-h-0">

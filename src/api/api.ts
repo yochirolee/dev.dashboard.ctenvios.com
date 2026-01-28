@@ -373,7 +373,7 @@ const api = {
       },
       createApiKey: async (
          partnerId: number,
-         data?: { name?: string; environment?: string; expires_in_days?: number }
+         data?: { name?: string; environment?: string; expires_in_days?: number },
       ) => {
          const response = await axiosInstance.post(`/partners/admin/${partnerId}/api-keys`, data ?? {});
          return response.data;
@@ -431,6 +431,10 @@ const api = {
       },
       update: async (rate_id: number, data: ShippingRate) => {
          const response = await axiosInstance.put(`/shipping-rates/${rate_id}`, data);
+         return response.data;
+      },
+      toggleStatus: async (rate_id: number, is_active: boolean) => {
+         const response = await axiosInstance.patch(`/shipping-rates/${rate_id}/change-status`, { is_active });
          return response.data;
       },
    },
@@ -686,6 +690,10 @@ const api = {
          const response = await axiosInstance.get(`/logs`, {
             params,
          });
+         return response.data;
+      },
+      getLogById: async (id: number) => {
+         const response = await axiosInstance.get(`/logs/${id}`);
          return response.data;
       },
       toggleAppLogs: async (currentAppLogsStatus: boolean) => {

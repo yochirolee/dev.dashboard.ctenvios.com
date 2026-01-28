@@ -31,5 +31,19 @@ export const useShippingRates = {
          },
       });
    },
-   
+   toggleStatus: (options?: { onSuccess?: () => void; onError?: (error: any) => void }) => {
+      const queryClient = useQueryClient();
+      return useMutation({
+         mutationFn: ({ rate_id, is_active }: { rate_id: number; is_active: boolean }) => {
+            return api.shippingRates.toggleStatus(rate_id, is_active);
+         },
+         onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["get-services-with-rates"] });
+            options?.onSuccess?.();
+         },
+         onError: (error) => {
+            options?.onError?.(error);
+         },
+      });
+   },
 };
