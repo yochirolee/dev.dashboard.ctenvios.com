@@ -353,6 +353,20 @@ const api = {
          const response = await axiosInstance.get(`/partners/admin/agency/${agencyId}`);
          return response.data;
       },
+      uploadLogo: async (agencyId: number, file: File) => {
+         const formData = new FormData();
+         formData.append("logo", file);
+         const response = await axiosInstance.post(`/agencies/${agencyId}/logo`, formData, {
+            headers: {
+               "Content-Type": "multipart/form-data",
+            },
+         });
+         return response.data;
+      },
+      deleteLogo: async (agencyId: number) => {
+         const response = await axiosInstance.delete(`/agencies/${agencyId}/logo`);
+         return response.data;
+      },
    },
    partners: {
       createAdmin: async (data: {

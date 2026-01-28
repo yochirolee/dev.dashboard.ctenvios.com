@@ -124,4 +124,36 @@ export const useAgencies = {
          enabled: !!partnerId,
       });
    },
+   uploadLogo: (
+      agencyId: number,
+      options?: { onSuccess?: (data?: any) => void; onError?: (error: any) => void },
+   ) => {
+      return useMutation({
+         mutationFn: (file: File) => api.agencies.uploadLogo(agencyId, file),
+         onSuccess: (data) => {
+            queryClient.invalidateQueries({ queryKey: ["get-agency", agencyId] });
+            queryClient.invalidateQueries({ queryKey: ["get-agencies"] });
+            options?.onSuccess?.(data);
+         },
+         onError: (error) => {
+            options?.onError?.(error);
+         },
+      });
+   },
+   deleteLogo: (
+      agencyId: number,
+      options?: { onSuccess?: () => void; onError?: (error: any) => void },
+   ) => {
+      return useMutation({
+         mutationFn: () => api.agencies.deleteLogo(agencyId),
+         onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["get-agency", agencyId] });
+            queryClient.invalidateQueries({ queryKey: ["get-agencies"] });
+            options?.onSuccess?.();
+         },
+         onError: (error) => {
+            options?.onError?.(error);
+         },
+      });
+   },
 };

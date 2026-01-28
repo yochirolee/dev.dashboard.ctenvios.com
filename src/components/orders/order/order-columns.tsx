@@ -1,3 +1,4 @@
+import React from "react";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -23,6 +24,9 @@ import {
    getStatusBadge as getOrderStatusBadge,
    type ParcelStatus,
 } from "@/lib/parcel-status";
+import { useAppStore } from "@/stores/app-store";
+
+const ADMIN_ROLES = ["AGENCY_ADMIN", "ADMINISTRATOR", "ROOT"] as const;
 
 // This type is used to define the shape of our data.
 // You can use a Zod schema here if you want.
@@ -76,6 +80,45 @@ export type Order = {
 
 const baseUrl = import.meta.env.VITE_API_URL;
 const oldBaseUrl = "https://systemcaribetravel.com/ordenes/factura_print.php?id=";
+
+const OrderActionsCell = ({ order }: { order: Order }): React.ReactElement => {
+   const user = useAppStore((state) => state.user);
+   const canDeleteOrRestore = user?.role && ADMIN_ROLES.includes(user.role as (typeof ADMIN_ROLES)[number]);
+
+   return (
+      <div className="flex justify-center">
+         <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+               <Button variant="ghost" size="icon" className="h-8 w-8">
+                  <EllipsisVertical className="w-4 h-4" />
+               </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+               <Link to={`/orders/${order.id}`}>
+                  <DropdownMenuItem>
+                     <FileBoxIcon className="w-4 h-4 mr-2" />
+                     Details
+                  </DropdownMenuItem>
+               </Link>
+               {canDeleteOrRestore && (
+                  <>
+                     <DropdownMenuSeparator />
+                     {order.status !== "CANCELLED" ? (
+                        <DropdownMenuItem className="text-destructive" asChild>
+                           <DeleteOrderDialog order_id={order.id} />
+                        </DropdownMenuItem>
+                     ) : (
+                        <DropdownMenuItem asChild>
+                           <RestoreOrderButton order_id={order.id} />
+                        </DropdownMenuItem>
+                     )}
+                  </>
+               )}
+            </DropdownMenuContent>
+         </DropdownMenu>
+      </div>
+   );
+};
 
 // Re-export for backward compatibility
 export const ORDER_STATUS = PARCEL_STATUS;
@@ -301,37 +344,7 @@ export const orderColumns: ColumnDef<Order>[] = [
    },
    {
       header: "Actions",
-      cell: ({ row }) => {
-         return (
-            <div className="flex justify-center">
-               <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                     <Button variant="ghost" size="icon" className="h-8 w-8">
-                        <EllipsisVertical className="w-4 h-4" />
-                     </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                     <Link to={`/orders/${row.original.id}`}>
-                        <DropdownMenuItem>
-                           <FileBoxIcon className="w-4 h-4 mr-2" />
-                           Details
-                        </DropdownMenuItem>
-                     </Link>
-                     <DropdownMenuSeparator />
-                     {row.original.status !== "CANCELLED" ? (
-                        <DropdownMenuItem className="text-destructive" asChild>
-                           <DeleteOrderDialog order_id={row.original.id} />
-                        </DropdownMenuItem>
-                     ) : (
-                        <DropdownMenuItem asChild>
-                           <RestoreOrderButton order_id={row.original.id} />
-                        </DropdownMenuItem>
-                     )}
-                  </DropdownMenuContent>
-               </DropdownMenu>
-            </div>
-         );
-      },
+      cell: ({ row }) => <OrderActionsCell order={row.original} />,
       size: 60,
       enableSorting: false,
    },
