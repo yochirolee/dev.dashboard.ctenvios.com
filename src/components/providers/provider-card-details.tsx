@@ -1,23 +1,18 @@
 import type { Provider } from "@/data/types";
 import { Card, CardContent } from "../ui/card";
-import ImageUploadForm from "../upload/ImageUploadForm";
 import { Separator } from "../ui/separator";
 import { User, Phone, Mail, Globe } from "lucide-react";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 
 export const ProviderCardDetails = ({ provider }: { provider: Provider }) => {
    return (
       <Card>
          <CardContent>
             <div className="flex flex-row items-center gap-4">
-               {provider?.logo ? (
-                  <img
-                     src={provider?.logo}
-                     alt={provider?.name}
-                     className="w-20 h-20  object-center object-scale-down rounded-full border  "
-                  />
-               ) : (
-                  <ImageUploadForm onChange={() => {}} label="Seleccionar imagen" defaultImage={provider?.logo} />
-               )}
+               <Avatar>
+                  <AvatarImage src={provider?.logo} alt={provider?.name} />
+                  <AvatarFallback>{provider?.name.charAt(0)}</AvatarFallback>
+               </Avatar>
 
                <div className="flex flex-col gap-2 w-full">
                   <h1 className="text-2xl font-bold">{provider?.name}</h1>

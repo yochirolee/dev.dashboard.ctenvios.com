@@ -46,15 +46,7 @@ export const PalletsPage = () => {
 
    const columns = useMemo(() => palletsColumns(handleDeletePallet), [handleDeletePallet]);
 
-   if (isLoading) {
-      return (
-         <div>
-            <Spinner />
-         </div>
-      );
-   }
-
-   if (pallets.length === 0) {
+   if (pallets.length === 0 && !isLoading) {
       return (
          <Empty>
             <EmptyHeader>

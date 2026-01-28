@@ -16,7 +16,6 @@ export const AgenciesPage = () => {
 
    const [selectedAgencyId, setSelectedAgencyId] = useState<number | null>(null);
    const { data: agencies = [], isLoading, error } = useAgencies.get();
-
    const selectedAgency = agencies.find((agency: Agency) => agency.id === selectedAgencyId) ?? agencies[0] ?? null;
 
    if (isLoading)

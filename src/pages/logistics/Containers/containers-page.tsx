@@ -34,7 +34,6 @@ export const ContainersPage = () => {
    const containers = data?.rows ?? [];
    const total = data?.total ?? 0;
 
-
    const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
    const [openCreateDialog, setOpenCreateDialog] = useState(false);
    const [openStatusDialog, setOpenStatusDialog] = useState(false);
@@ -72,15 +71,7 @@ export const ContainersPage = () => {
       [handleDeleteContainer, handleUpdateStatus],
    );
 
-   if (isLoading) {
-      return (
-         <div className="flex items-center justify-center h-64">
-            <Spinner />
-         </div>
-      );
-   }
-
-   if (containers.length === 0 && !searchQuery) {
+   if (containers?.length === 0 && !searchQuery && !isLoading) {
       return (
          <Empty>
             <EmptyHeader>

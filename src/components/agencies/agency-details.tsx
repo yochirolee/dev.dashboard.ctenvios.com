@@ -13,7 +13,9 @@ import { AgencyEditForm } from "./agency-edit-form";
 import { AgencyLogoUpload } from "./agency-logo-upload";
 
 export const AgencyDetails = ({ selectedAgency }: { selectedAgency: Agency }) => {
-   const [isOpen, setIsOpen] = useState(false);
+	const [isOpen, setIsOpen] = useState(false);
+	
+	console.log(selectedAgency,"selectedAgency");
 
    if (!selectedAgency) return <Skeleton className="h-[200px] w-full" />;
    return (
@@ -28,7 +30,7 @@ export const AgencyDetails = ({ selectedAgency }: { selectedAgency: Agency }) =>
                   />
 
                   <div className="flex flex-col gap-2 w-full">
-                     <h1 className="text-2xl font-bold">{selectedAgency?.name}</h1>
+                     <h1 className="lg:text-2xl font-bold">{selectedAgency?.name}</h1>
                      <Badge variant="outline">{selectedAgency?.agency_type?.toUpperCase()}</Badge>
 
                      <p className="text-sm text-muted-foreground">{selectedAgency?.address}</p>
@@ -39,7 +41,7 @@ export const AgencyDetails = ({ selectedAgency }: { selectedAgency: Agency }) =>
                      <DialogTrigger asChild>
                         <Button variant="outline">
                            <Edit size={16} />
-                           Editar
+                           <span className="hidden md:block">Editar</span>
                         </Button>
                      </DialogTrigger>
                      <DialogContent className="max-w-2xl">

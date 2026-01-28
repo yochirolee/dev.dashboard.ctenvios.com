@@ -82,8 +82,8 @@ export const AgencyLogoUpload = ({ agencyId, agencyName, currentLogo }: AgencyLo
          <DropdownMenu>
             <DropdownMenuTrigger asChild disabled={isPending}>
                <button className="relative cursor-pointer focus:outline-none" type="button">
-                  <Avatar className="w-20 h-20 border-2 border-border">
-                     <AvatarImage src={currentLogo || undefined} alt={agencyName} className="object-cover" />
+                  <Avatar className="lg:w-20 lg:h-20 w-14 h-14 border-2 border-border">
+                     <AvatarImage src={currentLogo || undefined} alt={agencyName} className="p-1 object-scale-down" />
                      <AvatarFallback className="text-lg font-semibold">{initials}</AvatarFallback>
                   </Avatar>
                   <div className="absolute inset-0 bg-black/50 rounded-full opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">

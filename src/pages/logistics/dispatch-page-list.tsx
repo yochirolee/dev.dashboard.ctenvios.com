@@ -91,7 +91,7 @@ export const DispatchPageLists = () => {
    const columns = useMemo(() => dispatchColumns(handleDeleteDispatch), [handleDeleteDispatch]);
 
    // Only show empty component if no filters are active
-   if (dispatches.length === 0 && !hasActiveFilters)
+   if (dispatches.length === 0 && !hasActiveFilters && !isLoading)
       return (
          <Empty>
             <EmptyHeader>

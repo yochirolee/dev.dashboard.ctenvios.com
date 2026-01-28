@@ -83,7 +83,7 @@ export const AppRouter = () => {
                </Route>
                <Route element={<ProtectedRoute allowedRoles={canAccess.agencySettings} />}>
                   <Route path="settings">
-                     <Route index element={<Navigate to="providers" replace />} />
+                     <Route index element={<Navigate to="agencies" replace />} />
                      <Route path="providers" element={<ProvidersServicesPage />} />
                      <Route path="agencies" element={<AgenciesPage />} />
                      <Route path="agencies/new" element={<NewAgencyPage />} />
