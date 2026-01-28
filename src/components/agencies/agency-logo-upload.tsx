@@ -2,7 +2,6 @@ import { useRef } from "react";
 import { useAgencies } from "@/hooks/use-agencies";
 import { toast } from "sonner";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
 import { Camera, Loader2, Trash2 } from "lucide-react";
 import {
    DropdownMenu,
@@ -78,13 +77,7 @@ export const AgencyLogoUpload = ({ agencyId, agencyName, currentLogo }: AgencyLo
 
    return (
       <div className="relative group">
-         <input
-            ref={fileInputRef}
-            type="file"
-            accept="image/*"
-            onChange={handleFileChange}
-            className="hidden"
-         />
+         <input ref={fileInputRef} type="file" accept="image/*" onChange={handleFileChange} className="hidden" />
 
          <DropdownMenu>
             <DropdownMenuTrigger asChild disabled={isPending}>
