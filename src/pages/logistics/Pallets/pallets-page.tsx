@@ -6,7 +6,6 @@ import { ButtonGroup } from "@/components/ui/button-group";
 import { Button } from "@/components/ui/button";
 import { Layers, PackagePlus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { Spinner } from "@/components/ui/spinner";
 import { Empty, EmptyHeader, EmptyMedia, EmptyTitle, EmptyDescription, EmptyContent } from "@/components/ui/empty";
 import { toast } from "sonner";
 import { AlertDeletePallet } from "@/components/palllets/alert-delete-pallet";
