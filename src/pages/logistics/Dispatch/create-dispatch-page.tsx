@@ -1,7 +1,6 @@
 import { useMemo, useState, useCallback } from "react";
 import { CheckCircle2, Search, ArrowLeft, Printer, Send, Box, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { useAppStore } from "@/stores/app-store";
 import { useDispatches } from "@/hooks/use-dispatches";
 import { useParams, useNavigate } from "react-router-dom";
@@ -13,7 +12,6 @@ import { VirtualizedParcelTable } from "@/components/parcels/virtualized-parcel-
 import { ButtonGroup } from "@/components/ui/button-group";
 import { Badge } from "@/components/ui/badge";
 import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/input-group";
-import { InputGroupButton } from "@/components/ui/input-group";
 
 export const CreateDispatchPage = (): React.ReactElement => {
    const { dispatchId } = useParams();
@@ -245,9 +243,13 @@ export const CreateDispatchPage = (): React.ReactElement => {
                            <InputGroupAddon align="inline-start">
                               <Search className="h-4 w-4 mr-1" />
                            </InputGroupAddon>
-                           <InputGroupInput placeholder="Buscar en despacho..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
+                           <InputGroupInput
+                              placeholder="Buscar en despacho..."
+                              value={searchTerm}
+                              onChange={(e) => setSearchTerm(e.target.value)}
+                           />
                            <InputGroupAddon align="inline-end">
-                            {searchTerm && <X className="h-4 w-4 mr-1" onClick={() => setSearchTerm("")} />}
+                              {searchTerm && <X className="h-4 w-4 mr-1" onClick={() => setSearchTerm("")} />}
                            </InputGroupAddon>
                         </InputGroup>
                      </div>
