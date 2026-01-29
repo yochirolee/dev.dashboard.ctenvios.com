@@ -130,7 +130,7 @@ const navConfigItems: SidebarItem[] = [
          {
             title: "App Logs",
             url: "/logs/app-logs",
-            allowedRoles: canAccess.agencySettings,
+            allowedRoles: canAccess.systemLogs,
          },
          {
             title: "Partners Logs",
@@ -209,7 +209,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                         role as Role,
                         agencyType,
                         subItem.allowedRoles,
-                        subItem.allowedAgencyTypes
+                        subItem.allowedAgencyTypes,
                      );
                   }
                   return hasRole(role as Role, subItem.allowedRoles);
@@ -225,7 +225,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                }
                return item.items.length > 0;
             }),
-      [role, agencyType]
+      [role, agencyType],
    );
 
    const filteredNavMain = React.useMemo(() => filterByRole(navMainItems), [filterByRole]);
