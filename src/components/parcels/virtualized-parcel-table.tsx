@@ -1,4 +1,4 @@
-import { useRef, useMemo, useCallback, useState } from "react";
+import { useRef, useMemo, useCallback, useState, useEffect } from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { CheckCircle2, Trash2Icon, type LucideIcon } from "lucide-react";
@@ -334,17 +334,16 @@ export function VirtualizedParcelTable<T extends Parcel>({
    const virtualRows = virtualizer.getVirtualItems();
    const totalSize = virtualizer.getTotalSize();
 
-   // Auto-fetch more when scrolling near end
+   // Auto-fetch more when scrolling near end (avoid firing on initial mount)
    const lastVirtualRow = virtualRows[virtualRows.length - 1];
-   if (
-      lastVirtualRow &&
-      lastVirtualRow.index >= rows.length - 10 &&
-      hasNextPage &&
-      !isFetchingNextPage &&
-      fetchNextPage
-   ) {
-      fetchNextPage();
-   }
+   useEffect(() => {
+      if (!lastVirtualRow || !hasNextPage || isFetchingNextPage || !fetchNextPage) return;
+      const scrollEl = parentRef.current;
+      if (!scrollEl || scrollEl.scrollTop <= 0) return;
+      if (lastVirtualRow.index >= rows.length - 10) {
+         fetchNextPage();
+      }
+   }, [lastVirtualRow?.index, rows.length, hasNextPage, isFetchingNextPage, fetchNextPage]);
 
    const hasHeader = title || Icon || headerRight;
 

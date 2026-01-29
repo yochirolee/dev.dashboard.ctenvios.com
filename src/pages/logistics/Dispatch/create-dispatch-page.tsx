@@ -29,7 +29,7 @@ export const CreateDispatchPage = (): React.ReactElement => {
    const [scanMode, setScanMode] = useState<ScanMode>("tracking_number");
    const agency_id = useAppStore.getState().agency?.id;
 
-   const { mutate: addItem, isPending: isAddingItem } = useDispatches.addItem(dispatchIdNumber, agency_id ?? 0);
+   const { mutate: addItem, isPending: isAddingItem } = useDispatches.addParcel(dispatchIdNumber, agency_id ?? 0);
 
    // Use infinite queries for parcels
    const {
@@ -38,7 +38,9 @@ export const CreateDispatchPage = (): React.ReactElement => {
       fetchNextPage: fetchNextAgencyPage,
       hasNextPage: hasNextAgencyPage,
       isFetchingNextPage: isFetchingNextAgencyPage,
-   } = useDispatches.readyForDispatchAll(agency_id ?? 0, 100);
+   } = useDispatches.readyForDispatch(agency_id ?? 0, 20);
+
+   console.log(agencyPackagesData,"data  ");
 
    const {
       data: dispatchParcelsData,
@@ -136,6 +138,8 @@ export const CreateDispatchPage = (): React.ReactElement => {
       () => agencyPackagesData?.pages?.flatMap((page) => page?.rows ?? []) ?? [],
       [agencyPackagesData],
    );
+
+   console.log(agencyPackages,"agencyPackages");
    const dispatchParcels = useMemo(
       () => dispatchParcelsData?.pages?.flatMap((page) => page?.rows ?? []) ?? [],
       [dispatchParcelsData],

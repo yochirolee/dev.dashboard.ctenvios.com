@@ -125,17 +125,17 @@ const navConfigItems: SidebarItem[] = [
       title: "Logs",
       url: "#",
       icon: FileStack,
-      allowedRoles: canAccess.systemLogs,
+      allowedRoles: canAccess.agencySettings,
       items: [
          {
             title: "App Logs",
             url: "/logs/app-logs",
-            allowedRoles: canAccess.systemLogs,
+            allowedRoles: canAccess.agencySettings,
          },
          {
             title: "Partners Logs",
             url: "/logs/partners-logs",
-            allowedRoles: canAccess.systemLogs,
+            allowedRoles: canAccess.agencySettings,
          },
       ],
    },

@@ -94,7 +94,7 @@ export const AppRouter = () => {
                      <Route path="customs" element={<CustomsPage />} />
                   </Route>
                </Route>
-               <Route element={<ProtectedRoute allowedRoles={canAccess.systemLogs} />}>
+               <Route element={<ProtectedRoute allowedRoles={canAccess.agencySettings} />}>
                   <Route path="logs">
                      <Route index element={<Navigate to="app-logs" replace />} />
                      <Route path="app-logs" element={<AppLogsPage />} />
