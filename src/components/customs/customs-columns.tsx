@@ -26,13 +26,13 @@ export const customsColumns = (
    },
    {
       accessorKey: "name",
-      header: "Name",
-      cell: ({ row }) => <div>{row.original?.name}</div>,
+      header: () => <div className="w-44 min-w-44">Name</div>,
+      cell: ({ row }) => <div className="w-100 min-w-100 whitespace-normal break-words">{row.original?.name}</div>,
    },
    {
       accessorKey: "description",
-      header: "Description",
-      cell: ({ row }) => <div>{row.original?.description}</div>,
+      header: () => <div className="w-80 min-w-80">Description</div>,
+      cell: ({ row }) => <div className="w-100 min-w-100 whitespace-normal break-words">{row.original?.description}</div>,
    },
    {
       accessorKey: "custom_value",
@@ -41,23 +41,26 @@ export const customsColumns = (
          <span className="font-mono text-xs text-muted-foreground">{row.original?.custom_value} pts</span>
       ),
    },
+
+   {
+      accessorKey: "price_in_cup",
+      header: "Price in Cup",
+      cell: ({ row }) => (
+         <span className="font-mono text-xs text-muted-foreground">{row.original?.price_in_cup ?? 0} </span>
+      ),
+   },
+
    {
       accessorKey: "fee_in_cents",
       header: "Fee",
-      cell: ({ row }) => (
-         <span className="font-mono ">
-            ${centsToDollars(row.original?.fee_in_cents).toFixed(2)}
-         </span>
-      ),
+      cell: ({ row }) => <span className="font-mono ">${centsToDollars(row.original?.fee_in_cents).toFixed(2)}</span>,
    },
    {
       accessorKey: "insurance_fee_in_cents",
       header: "Insurance Fee",
-      
+
       cell: ({ row }) => (
-         <span className="font-mono text-sm">
-            ${centsToDollars(row.original?.insurance_fee_in_cents).toFixed(2)}
-         </span>
+         <span className="font-mono text-sm">${centsToDollars(row.original?.insurance_fee_in_cents).toFixed(2)}</span>
       ),
    },
 
@@ -77,17 +80,7 @@ export const customsColumns = (
       },
       size: 100,
    },
-   {
-      accessorKey: "min_weight",
-      header: "Min Weight",
-      cell: ({ row }) => <span className="font-mono text-xs text-muted-foreground">{row.original?.min_weight}</span>,
-   },
 
-   {
-      accessorKey: "max_weight",
-      header: "Max Weight",
-      cell: ({ row }) => <span className="font-mono text-xs text-muted-foreground">{row.original?.max_weight}</span>,
-   },
 
    // TODO: Add actions
    {

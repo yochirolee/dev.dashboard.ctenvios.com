@@ -19,7 +19,6 @@ const agencyEditSchema = z.object({
    contact: z.string(),
    email: z.string().email().optional().or(z.literal("")),
    website: z.string().url().optional().or(z.literal("")),
-   logo: z.string().url().optional().or(z.literal("")),
    agency_type: z.enum(["FORWARDER", "AGENCY", "RESELLER"]).optional(),
    parent_agency_id: z.number().optional().nullable(),
 });
@@ -55,7 +54,6 @@ export const AgencyEditForm = ({ agency, onSuccess }: AgencyEditFormProps): Reac
          contact: agency.contact,
          email: agency.email || "",
          website: agency.website || "",
-         logo: agency.logo || "",
          agency_type: agency.agency_type,
          parent_agency_id: agency.parent_agency_id,
       },
@@ -65,7 +63,6 @@ export const AgencyEditForm = ({ agency, onSuccess }: AgencyEditFormProps): Reac
       // Clean up empty optional fields
       const cleanedData = {
          ...data,
-         logo: data.logo || undefined,
          website: data.website || undefined,
          email: data.email || undefined,
       };
@@ -112,11 +109,6 @@ export const AgencyEditForm = ({ agency, onSuccess }: AgencyEditFormProps): Reac
                <Input id="website" {...register("website")} placeholder="https://" />
                {errors.website && <p className="text-xs text-destructive">{errors.website.message}</p>}
             </div>
-            <div className="space-y-2">
-               <Label htmlFor="logo">Logo URL</Label>
-               <Input id="logo" {...register("logo")} placeholder="https://" />
-               {errors.logo && <p className="text-xs text-destructive">{errors.logo.message}</p>}
-            </div>
          </div>
 
          <div className="flex justify-end gap-2 pt-4">
@@ -130,6 +122,10 @@ export const AgencyEditForm = ({ agency, onSuccess }: AgencyEditFormProps): Reac
                   "Guardar cambios"
                )}
             </Button>
+            <Button type="button" variant="outline" onClick={() => onSuccess()}>
+               Cancelar
+            </Button>
+         
          </div>
       </form>
    );

@@ -30,6 +30,10 @@ export const CreateDispatchPage = (): React.ReactElement => {
    const agency_id = useAppStore.getState().agency?.id;
 
    const { mutate: addItem, isPending: isAddingItem } = useDispatches.addParcel(dispatchIdNumber, agency_id ?? 0);
+   const { mutate: addParcelsByOrderId, isPending: isAddingByOrder } = useDispatches.addParcelsByOrderId(
+      dispatchIdNumber,
+      agency_id ?? 0
+   );
 
    // Use infinite queries for parcels
    const {
@@ -39,8 +43,6 @@ export const CreateDispatchPage = (): React.ReactElement => {
       hasNextPage: hasNextAgencyPage,
       isFetchingNextPage: isFetchingNextAgencyPage,
    } = useDispatches.readyForDispatch(agency_id ?? 0, 20);
-
-   console.log(agencyPackagesData,"data  ");
 
    const {
       data: dispatchParcelsData,
@@ -58,42 +60,68 @@ export const CreateDispatchPage = (): React.ReactElement => {
       e?.preventDefault();
       if (!currentInput.trim()) return;
 
-      const scannedId = currentInput.trim().toUpperCase();
+      const inputValue = currentInput.trim();
 
-      addItem(
-         { hbl: scannedId },
-         {
-            onSuccess: () => {
-               setLastScanStatus({
-                  tracking_number: scannedId,
-                  status: "matched",
-               });
-            },
-            onError: (error: any) => {
-               const errorMessage = error?.response?.data?.message || error?.message || "Error al agregar paquete";
-               const isDuplicateError =
-                  errorMessage.toLowerCase().includes("already") ||
-                  errorMessage.toLowerCase().includes("duplicate") ||
-                  errorMessage.toLowerCase().includes("ya existe") ||
-                  error?.response?.status === 409;
-
-               if (isDuplicateError) {
+      if (scanMode === "tracking_number") {
+         const scannedId = inputValue.toUpperCase();
+         addItem(
+            { hbl: scannedId },
+            {
+               onSuccess: () => {
                   setLastScanStatus({
                      tracking_number: scannedId,
-                     status: "duplicate",
-                     errorMessage: errorMessage,
+                     status: "matched",
                   });
-               } else {
-                  toast.error(errorMessage);
+               },
+               onError: (error: any) => {
+                  const errorMessage = error?.response?.data?.message || error?.message || "Error al agregar paquete";
+                  const isDuplicateError =
+                     errorMessage.toLowerCase().includes("already") ||
+                     errorMessage.toLowerCase().includes("duplicate") ||
+                     errorMessage.toLowerCase().includes("ya existe") ||
+                     errorMessage.toLowerCase().includes("ya está") ||
+                     error?.response?.status === 409;
+
                   setLastScanStatus({
                      tracking_number: scannedId,
+                     status: isDuplicateError ? "duplicate" : "error",
+                     errorMessage,
+                  });
+               },
+            }
+         );
+      } else if (scanMode === "order_id") {
+         const orderId = Number(inputValue);
+         if (isNaN(orderId)) {
+            toast.error("El ID de orden debe ser un número");
+            return;
+         }
+
+         addParcelsByOrderId(
+            { orderId },
+            {
+               onSuccess: (data: any) => {
+                  const added = data?.added || data?.length || 0;
+                  setLastScanStatus({
+                     tracking_number: `Orden #${orderId}`,
+                     status: "matched",
+                     count: added,
+                  });
+               },
+               onError: (error: any) => {
+                  const errorMessage = error?.response?.data?.message || error?.message || "Error al agregar paquetes";
+                  setLastScanStatus({
+                     tracking_number: `Orden #${orderId}`,
                      status: "error",
-                     errorMessage: errorMessage,
+                     errorMessage,
                   });
-               }
-            },
-         },
-      );
+               },
+            }
+         );
+      } else {
+         toast.error("Agregar por despacho no está disponible al crear despacho");
+      }
+
       setCurrentInput("");
    };
 
@@ -127,22 +155,22 @@ export const CreateDispatchPage = (): React.ReactElement => {
                onSettled: () => {
                   setRemovingTrackingNumber(null);
                },
-            },
+            }
          );
       },
-      [removeParcelMutation],
+      [removeParcelMutation]
    );
 
    // Flatten pages from infinite queries
    const agencyPackages = useMemo(
       () => agencyPackagesData?.pages?.flatMap((page) => page?.rows ?? []) ?? [],
-      [agencyPackagesData],
+      [agencyPackagesData]
    );
 
-   console.log(agencyPackages,"agencyPackages");
+   console.log(agencyPackages, "agencyPackages");
    const dispatchParcels = useMemo(
       () => dispatchParcelsData?.pages?.flatMap((page) => page?.rows ?? []) ?? [],
-      [dispatchParcelsData],
+      [dispatchParcelsData]
    );
 
    const dispatchTrackingSet = useMemo(() => {
@@ -164,7 +192,7 @@ export const CreateDispatchPage = (): React.ReactElement => {
          (pkg: { tracking_number: string; description?: string; order_id?: number }) =>
             pkg.tracking_number?.toLowerCase().includes(normalized) ||
             pkg.description?.toLowerCase().includes(normalized) ||
-            String(pkg.order_id ?? "").includes(normalized),
+            String(pkg.order_id ?? "").includes(normalized)
       );
    }, [dispatchParcels, searchTerm]);
 
@@ -176,7 +204,7 @@ export const CreateDispatchPage = (): React.ReactElement => {
          (pkg: { tracking_number: string; description?: string; order_id?: number }) =>
             pkg.tracking_number?.toLowerCase().includes(normalized) ||
             pkg.description?.toLowerCase().includes(normalized) ||
-            String(pkg.order_id ?? "").includes(normalized),
+            String(pkg.order_id ?? "").includes(normalized)
       );
    }, [pendingPackages, searchTerm]);
 
@@ -205,7 +233,7 @@ export const CreateDispatchPage = (): React.ReactElement => {
                      onChange={setCurrentInput}
                      onScan={handleScan}
                      lastScanStatus={lastScanStatus}
-                     isLoading={isAddingItem}
+                     isLoading={isAddingItem || isAddingByOrder}
                      scanMode={scanMode}
                      onScanModeChange={setScanMode}
                      showScanMode={true}

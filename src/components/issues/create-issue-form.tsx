@@ -1,12 +1,11 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Controller, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
 import { Button } from "@/components/ui/button";
 import { Field, FieldContent, FieldDescription, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { issueType, issuePriority } from "@/data/types";
 import { useIssues } from "@/hooks/use-issues";
 import { useOrders } from "@/hooks/use-orders";
@@ -24,8 +23,6 @@ const formSchema = z
    .object({
       title: z.string().min(1, "Title is required"),
       description: z.string().min(1, "Description is required"),
-      type: z.nativeEnum(issueType).optional(),
-      priority: z.nativeEnum(issuePriority).optional(),
       order_id: z.number().positive("Order ID is required"),
       affected_parcel_ids: z.array(z.number().positive()).min(1, "At least one parcel must be selected"),
    })
@@ -57,8 +54,6 @@ export function CreateIssueForm({ initialOrderId, initialParcelId, onSuccess }: 
       defaultValues: {
          title: "",
          description: "",
-         type: undefined,
-         priority: undefined,
          order_id: initialOrderId,
          affected_parcel_ids: [],
       },
@@ -117,8 +112,6 @@ export function CreateIssueForm({ initialOrderId, initialParcelId, onSuccess }: 
       createIssueMutation.mutate({
          title: data.title,
          description: data.description,
-         type: data.type,
-         priority: data.priority,
          order_id: data.order_id,
          affected_parcel_ids: data.affected_parcel_ids,
       });
@@ -228,58 +221,6 @@ export function CreateIssueForm({ initialOrderId, initialParcelId, onSuccess }: 
                      <FieldError>{form.formState.errors.description?.message}</FieldError>
                   </FieldContent>
                </Field>
-
-               <div className="grid grid-cols-2 gap-4">
-                  <Field>
-                     <FieldLabel>Type</FieldLabel>
-                     <FieldContent>
-                        <Controller
-                           control={form.control}
-                           name="type"
-                           render={({ field }) => (
-                              <Select value={field.value} onValueChange={field.onChange}>
-                                 <SelectTrigger>
-                                    <SelectValue placeholder="Select type" />
-                                 </SelectTrigger>
-                                 <SelectContent>
-                                    {Object.keys(issueType).map((key) => (
-                                       <SelectItem key={key} value={key}>
-                                          {issueType[key as keyof typeof issueType]}
-                                       </SelectItem>
-                                    ))}
-                                 </SelectContent>
-                              </Select>
-                           )}
-                        />
-                        <FieldError>{form.formState.errors.type?.message}</FieldError>
-                     </FieldContent>
-                  </Field>
-
-                  <Field>
-                     <FieldLabel>Priority</FieldLabel>
-                     <FieldContent>
-                        <Controller
-                           control={form.control}
-                           name="priority"
-                           render={({ field }) => (
-                              <Select value={field.value} onValueChange={field.onChange}>
-                                 <SelectTrigger>
-                                    <SelectValue placeholder="Select priority" />
-                                 </SelectTrigger>
-                                 <SelectContent>
-                                    {Object.keys(issuePriority).map((key) => (
-                                       <SelectItem key={key} value={key}>
-                                          {issuePriority[key as keyof typeof issuePriority]}
-                                       </SelectItem>
-                                    ))}
-                                 </SelectContent>
-                              </Select>
-                           )}
-                        />
-                        <FieldError>{form.formState.errors.priority?.message}</FieldError>
-                     </FieldContent>
-                  </Field>
-               </div>
             </FieldGroup>
 
             <div className="flex justify-end gap-2 pt-4 border-t p-2 md:p-4">

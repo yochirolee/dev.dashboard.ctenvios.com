@@ -55,7 +55,7 @@ axiosInstance.interceptors.request.use(
 
    (error) => {
       return Promise.reject(error);
-   },
+   }
 );
 
 // Add response interceptor for better error handling with React Query
@@ -72,7 +72,7 @@ axiosInstance.interceptors.response.use(
 
       // Let React Query handle the error
       return Promise.reject(error);
-   },
+   }
 );
 
 const api = {
@@ -188,7 +188,7 @@ const api = {
          startDate: string,
          endDate: string,
          payment_status?: string,
-         agency_id?: number,
+         agency_id?: number
       ) => {
          // Convert 0-indexed (from TanStack Table) to 1-indexed (for API)
          const params: Record<string, string | number> = {
@@ -387,7 +387,7 @@ const api = {
       },
       createApiKey: async (
          partnerId: number,
-         data?: { name?: string; environment?: string; expires_in_days?: number },
+         data?: { name?: string; environment?: string; expires_in_days?: number }
       ) => {
          const response = await axiosInstance.post(`/partners/admin/${partnerId}/api-keys`, data ?? {});
          return response.data;
@@ -515,7 +515,7 @@ const api = {
          status?: string,
          payment_status?: string,
          dispatch_id?: number,
-         agency_id?: number,
+         agency_id?: number
       ) => {
          const params: Record<string, string | number> = {
             page: page + 1,
@@ -553,6 +553,10 @@ const api = {
          const response = await axiosInstance.post(`/dispatches/${dispatch_id}/add-parcel`, { hbl });
          return response.data;
       },
+      addParcelsByOrderId: async (dispatch_id: number, order_id: number) => {
+         const response = await axiosInstance.post(`/dispatches/${dispatch_id}/add-parcels-by-order`, { order_id });
+         return response.data;
+      },
       removeParcel: async (dispatch_id: number, hbl: string) => {
          console.log(dispatch_id, hbl, "dispatch_id and hbl on remove parcel");
          const response = await axiosInstance.delete(`/dispatches/${dispatch_id}/remove-parcel/${hbl}`);
@@ -572,7 +576,7 @@ const api = {
          dispatch_id: number,
          page: number = 1,
          limit: number = 20,
-         status?: ParcelStatus,
+         status?: ParcelStatus
       ) => {
          const params: Record<string, string | number> = {
             page,
@@ -682,7 +686,7 @@ const api = {
             method?: string;
             startDate?: Date;
             endDate?: Date;
-         },
+         }
       ) => {
          // Convert 0-indexed (from TanStack Table) to 1-indexed (for API)
          const params: Record<string, string | number> = {
@@ -736,7 +740,7 @@ const api = {
             order_id?: string;
             parcel_id?: string;
             assigned_to_id?: string;
-         },
+         }
       ) => {
          // Convert 0-indexed (from TanStack Table) to 1-indexed (for API)
          const params: Record<string, string | number> = {
@@ -895,7 +899,7 @@ const api = {
             parcel_id?: string;
             assigned_to_id?: string;
             issue_id?: string;
-         },
+         }
       ) => {
          // Convert 0-indexed (from TanStack Table) to 1-indexed (for API)
          const params: Record<string, string | number> = {

@@ -9,7 +9,7 @@ export const useDispatches = {
       status?: string,
       payment_status?: string,
       dispatch_id?: number,
-      agency_id?: number,
+      agency_id?: number
    ) => {
       return useQuery({
          queryKey: ["dispatches", page, limit, status, payment_status, dispatch_id, agency_id],
@@ -42,9 +42,7 @@ export const useDispatches = {
                if (!data?.pages?.length) return data;
                const [firstPage, ...restPages] = data.pages;
                const rows = firstPage?.rows ?? [];
-               const exists = rows.some(
-                  (row: any) => (row?.tracking_number ?? row?.hbl)?.toUpperCase() === tracking
-               );
+               const exists = rows.some((row: any) => (row?.tracking_number ?? row?.hbl)?.toUpperCase() === tracking);
                if (exists) return data;
 
                const optimisticParcel = {
@@ -102,6 +100,17 @@ export const useDispatches = {
             await Promise.all([
                queryClient.invalidateQueries({ queryKey: ["ready-for-dispatch", agency_id] }),
                queryClient.invalidateQueries({ queryKey: ["parcels-in-dispatch", dispatch_id] }),
+            ]);
+         },
+      });
+   },
+   addParcelsByOrderId: (dispatch_id: number, agency_id: number) => {
+      return useMutation({
+         mutationFn: ({ orderId }: { orderId: number }) => api.dispatch.addParcelsByOrderId(dispatch_id, orderId),
+         onSuccess: async () => {
+            await Promise.all([
+               queryClient.invalidateQueries({ queryKey: ["parcels-in-dispatch", dispatch_id] }),
+               queryClient.invalidateQueries({ queryKey: ["ready-for-dispatch", agency_id] }),
             ]);
          },
       });

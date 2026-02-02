@@ -147,6 +147,7 @@ export const customsRatesSchema = z.object({
    fee_in_cents: z.number().min(0, "Fee must be greater than 0"),
    insurance_fee_in_cents: z.number().min(0, "Insurance fee must be greater than 0").optional().default(0),
    custom_value: z.number().min(0, "Custom value must be greater than 0").optional().default(0),
+   price_in_cup: z.number().min(0, "Price in cup must be greater than 0").optional().default(0),
    min_weight: z.number().optional().default(0),
    max_weight: z.number().optional().default(0),
    max_quantity: z.number().optional().default(0),
@@ -163,7 +164,6 @@ export const agencySchema = z
       contact: z.string(),
       email: z.string().optional(),
       website: z.string().optional(),
-      logo: z.string().url().optional(),
       agency_type: z.enum(["FORWARDER", "AGENCY", "RESELLER"]).optional(),
       parent_agency_id: z.number().optional().nullable(),
    })
