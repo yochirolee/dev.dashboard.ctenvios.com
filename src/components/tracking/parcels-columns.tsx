@@ -51,10 +51,10 @@ export const parcelColumns: ColumnDef<Parcel>[] = [
                <Link
                   className="flex items-center gap-2"
                   target="_blank"
-                  to={`${baseUrl}/orders/${row.original?.id}/pdf`}
+                  to={`${baseUrl}/orders/${row.original?.order_id}/pdf`}
                >
                   <FileBoxIcon size={16} className="shrink-0" />
-                  <span className="font-mono text-xs text-muted-foreground ">{row.original?.id}</span>
+                  <span className="font-mono text-xs text-muted-foreground ">{row.original?.order_id}</span>
                </Link>
                <Badge
                   variant="secondary"
