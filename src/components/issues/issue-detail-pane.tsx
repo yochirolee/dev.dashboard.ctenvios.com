@@ -1,12 +1,12 @@
 import { useIssues } from "@/hooks/use-issues";
-import { CheckCircle2, Edit2, Lock, Paperclip, FileWarning, MoreVertical, Mic, Check } from "lucide-react";
+import { CheckCircle2, Edit2, Paperclip, FileWarning, Mic } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
 import { Textarea } from "@/components/ui/textarea";
 import { useState } from "react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
-import { issueStatus, issuePriority, issueType, type IssueComment } from "@/data/types";
+import { issueStatus, issuePriority, issueType } from "@/data/types";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
    Dialog,
@@ -27,18 +27,17 @@ import {
    AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@/components/ui/empty";
-import { CogIcon, FileText } from "lucide-react";
+import { CogIcon } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { useAppStore } from "@/stores/app-store";
 import { IssueOrderDetails } from "./issue-order-details";
 import { Loader2 } from "lucide-react";
+import { IssuesComments } from "./issues-comments";
 
 interface IssueDetailPaneProps {
    issueId: number;
 }
 
 export function IssueDetailPane({ issueId }: IssueDetailPaneProps) {
-   const currentUser = useAppStore((state) => state.user);
    const [commentText, setCommentText] = useState("");
    const [isInternal, setIsInternal] = useState(false);
    const [editDialogOpen, setEditDialogOpen] = useState(false);
@@ -48,9 +47,6 @@ export function IssueDetailPane({ issueId }: IssueDetailPaneProps) {
    const [commentToDelete, setCommentToDelete] = useState<{ id: number; issueId: number } | null>(null);
 
    const { data: issue, isLoading, error } = useIssues.getById(issueId);
-   const { data: comments } = useIssues.getComments(issueId);
-
-   console.log(issue, "issue");
 
    const addCommentMutation = useIssues.addComment({
       onSuccess: () => {
@@ -152,15 +148,6 @@ export function IssueDetailPane({ issueId }: IssueDetailPaneProps) {
          </Empty>
       );
 
-   // Ensure we always have an array for comments
-   const issueComments = (() => {
-      if (Array.isArray(comments)) return comments;
-      if (comments && Array.isArray(comments.rows)) return comments.rows;
-      if (Array.isArray(issue?.comments)) return issue.comments;
-      if (issue?.comments && Array.isArray(issue.comments.rows)) return issue.comments.rows;
-      return [];
-   })();
-
    const creatorName = issue.created_by?.name || "Unknown";
    const creatorInitials = creatorName
       .split(" ")
@@ -198,9 +185,7 @@ export function IssueDetailPane({ issueId }: IssueDetailPaneProps) {
                         <CheckCircle2 className="w-4 h-4" />
                      </Button>
                   )}
-                  <Button variant="ghost" size="icon" className="h-9 w-9">
-                     <MoreVertical className="w-4 h-4" />
-                  </Button>
+                 
                </div>
             </div>
             {/* Issue Metadata */}
@@ -231,111 +216,7 @@ export function IssueDetailPane({ issueId }: IssueDetailPaneProps) {
 
                {/* Comments Section - Chat History (Scrollable) */}
                <div className="flex-1 min-h-0  overflow-y-auto p-4 bg-background">
-                  <div className="space-y-3">
-                     {issueComments.map((comment: IssueComment, index: number) => {
-                        const isCurrentUser = currentUser?.id === comment.user.id;
-                        const showAvatar = !isCurrentUser;
-                        const showName = !isCurrentUser && issueComments.length > 1;
-                        const prevComment = index > 0 ? issueComments[index - 1] : null;
-                        const showDateSeparator =
-                           !prevComment ||
-                           format(new Date(comment.created_at), "dd/MM/yyyy") !==
-                              format(new Date(prevComment.created_at), "dd/MM/yyyy");
-
-                        return (
-                           <div key={comment.id}>
-                              {/* Date Separator */}
-                              {showDateSeparator && (
-                                 <div className="flex justify-center my-4">
-                                    <div className="bg-muted/50 px-3 py-1 rounded-full text-xs text-muted-foreground">
-                                       {comment.created_at ? format(new Date(comment.created_at), "dd MMMM yyyy") : ""}
-                                    </div>
-                                 </div>
-                              )}
-
-                              {/* Message */}
-                              <div
-                                 className={cn(
-                                    "flex gap-2 group",
-                                    isCurrentUser ? "flex-row-reverse" : "flex-row",
-                                    comment.is_internal && "opacity-75"
-                                 )}
-                              >
-                                 {/* Avatar - Only show for received messages */}
-                                 {showAvatar && (
-                                    <Avatar className="w-6 h-6 shrink-0">
-                                       <AvatarFallback className="text-xs bg-muted">
-                                          {comment.user.name.charAt(0).toUpperCase()}
-                                       </AvatarFallback>
-                                    </Avatar>
-                                 )}
-                                 {!showAvatar && <div className="w-8 shrink-0" />}
-
-                                 {/* Message Bubble */}
-                                 <div
-                                    className={cn(
-                                       "flex flex-col max-w-[75%] md:max-w-[60%]",
-                                       isCurrentUser ? "items-end" : "items-start"
-                                    )}
-                                 >
-                                    {/* Sender Name - Only for received messages */}
-                                    {showName && (
-                                       <span className="text-xs text-muted-foreground mb-1 px-1">
-                                          {comment.user.name}
-                                       </span>
-                                    )}
-
-                                    {/* Message Content */}
-                                    <div
-                                       className={cn(
-                                          "rounded-lg px-3 py-2 relative",
-                                          isCurrentUser
-                                             ? "bg-primary text-primary-foreground"
-                                             : "bg-muted/80 text-foreground",
-                                          comment.is_internal && "border border-dashed border-muted-foreground/30"
-                                       )}
-                                    >
-                                       {/* Internal Badge */}
-                                       {comment.is_internal && (
-                                          <div className="flex items-center gap-1 mb-1">
-                                             <Lock className="w-3 h-3 opacity-60" />
-                                             <span className="text-xs opacity-60">Internal</span>
-                                          </div>
-                                       )}
-
-                                       {/* Message Text */}
-                                       <p className="text-sm whitespace-pre-wrap break-words leading-relaxed">
-                                          {comment.content}
-                                       </p>
-                                    </div>
-
-                                    {/* Timestamp and Status - Below bubble */}
-                                    <div
-                                       className={cn(
-                                          "flex items-center gap-1 mt-1 px-1",
-                                          isCurrentUser ? "justify-end" : "justify-start"
-                                       )}
-                                    >
-                                       <span className="text-[10px] text-muted-foreground">
-                                          {comment.created_at ? format(new Date(comment.created_at), "hh:mm a") : "N/A"}
-                                       </span>
-                                       {isCurrentUser && <Check className="w-3 h-3 text-green-500" />}
-                                    </div>
-                                 </div>
-                              </div>
-                           </div>
-                        );
-                     })}
-                     {issueComments.length === 0 && (
-                        <div className="text-center py-16 text-muted-foreground">
-                           <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-muted/50 flex items-center justify-center">
-                              <FileText className="w-8 h-8 opacity-50" />
-                           </div>
-                           <p className="text-sm font-medium">No comments yet</p>
-                           <p className="text-xs mt-1">Start the conversation!</p>
-                        </div>
-                     )}
-                  </div>
+                  <IssuesComments issueId={issueId} />
                </div>
 
                {/* Comment Input - Chat Style */}

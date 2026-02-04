@@ -881,8 +881,8 @@ const api = {
    parcels: {
       get: async () => {
          const response = await axiosInstance.get("/parcels");
-         console.log(response.data);
-         return response.data;
+         console.log(response.data.rows, "parcelsresponse.data");
+         return response.data.rows ?? [];
       },
    },
    // Legacy Issues API (used for legacy invoices) will be removed in the future

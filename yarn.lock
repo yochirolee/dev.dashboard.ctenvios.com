@@ -279,6 +279,19 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@electric-sql/client@npm:^1.3.1":
+  version: 1.5.1
+  resolution: "@electric-sql/client@npm:1.5.1"
+  dependencies:
+    "@microsoft/fetch-event-source": "npm:^2.0.1"
+    "@rollup/rollup-darwin-arm64": "npm:^4.18.1"
+  dependenciesMeta:
+    "@rollup/rollup-darwin-arm64":
+      optional: true
+  checksum: 10c0/04942ae1d46fb75e075cf0a13c62552fee52f251ba9a63f3ddcc1a0400c6fe8c8c79b3ae137abc8c8473f7d71bd94df4e3ef3ed2dff95ae64f84a011a34d0fef
+  languageName: node
+  linkType: hard
+
 "@electric-sql/react@npm:^1.0.22":
   version: 1.0.22
   resolution: "@electric-sql/react@npm:1.0.22"
@@ -2138,6 +2151,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@standard-schema/spec@npm:^1.1.0":
+  version: 1.1.0
+  resolution: "@standard-schema/spec@npm:1.1.0"
+  checksum: 10c0/d90f55acde4b2deb983529c87e8025fa693de1a5e8b49ecc6eb84d1fd96328add0e03d7d551442156c7432fd78165b2c26ff561b970a9a881f046abb78d6a526
+  languageName: node
+  linkType: hard
+
 "@standard-schema/utils@npm:^0.3.0":
   version: 0.3.0
   resolution: "@standard-schema/utils@npm:0.3.0"
@@ -2323,6 +2343,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@tanstack/db-ivm@npm:0.1.17":
+  version: 0.1.17
+  resolution: "@tanstack/db-ivm@npm:0.1.17"
+  dependencies:
+    fractional-indexing: "npm:^3.2.0"
+    sorted-btree: "npm:^1.8.1"
+  peerDependencies:
+    typescript: ">=4.7"
+  checksum: 10c0/c06c87edc52746ef14de7a4fb28a5fc7546e74a4d3bf6fde0c1a5ef21120f68e3e960cfabb05cb65dea7549c6c0695e3d86dcf5a356b5ab27f8f6b45a09ebfa4
+  languageName: node
+  linkType: hard
+
 "@tanstack/db@npm:0.5.15":
   version: 0.5.15
   resolution: "@tanstack/db@npm:0.5.15"
@@ -2336,10 +2368,36 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@tanstack/db@npm:0.5.25, @tanstack/db@npm:^0.5.25":
+  version: 0.5.25
+  resolution: "@tanstack/db@npm:0.5.25"
+  dependencies:
+    "@standard-schema/spec": "npm:^1.1.0"
+    "@tanstack/db-ivm": "npm:0.1.17"
+    "@tanstack/pacer-lite": "npm:^0.2.0"
+  peerDependencies:
+    typescript: ">=4.7"
+  checksum: 10c0/3346b1df5ca8e6422362c848c69cfe98f8c0c2fbc0840473f9532dd0d9dae8fcfcb26d3bb134a1351ab8c646523769845b62c76bb7bf09026cf803bcac1d166d
+  languageName: node
+  linkType: hard
+
 "@tanstack/devtools-event-client@npm:^0.3.2":
   version: 0.3.3
   resolution: "@tanstack/devtools-event-client@npm:0.3.3"
   checksum: 10c0/4e67709be4152fdee6d32045860f0b626b930bbcab388add1c7166063fea4f332b14d7822df71f7bdd3b9f5b69f99bd0a0d78004954798149f148c18a8ee07fd
+  languageName: node
+  linkType: hard
+
+"@tanstack/electric-db-collection@npm:^0.2.31":
+  version: 0.2.31
+  resolution: "@tanstack/electric-db-collection@npm:0.2.31"
+  dependencies:
+    "@electric-sql/client": "npm:^1.3.1"
+    "@standard-schema/spec": "npm:^1.1.0"
+    "@tanstack/db": "npm:0.5.25"
+    "@tanstack/store": "npm:^0.8.0"
+    debug: "npm:^4.4.3"
+  checksum: 10c0/16467261b398e7bf0aea036ceb6f6460a2d723b5651f7b18f9a3d1fcb1bae66aac0503b2a7f15d3bbacfcbb3f76aef70aaf0a87cb4e4cfda22fd0f8a61219fc8
   languageName: node
   linkType: hard
 
@@ -2357,6 +2415,13 @@ __metadata:
   version: 0.1.1
   resolution: "@tanstack/pacer-lite@npm:0.1.1"
   checksum: 10c0/c74c2e67dba3a14cd14134c27cff4856977c9019cf4dbe6a545a06960f4c9c8edad846e526595206aa01c42cc5cd5ee217761547ab6d2a3edec6fb3d69864686
+  languageName: node
+  linkType: hard
+
+"@tanstack/pacer-lite@npm:^0.2.0":
+  version: 0.2.1
+  resolution: "@tanstack/pacer-lite@npm:0.2.1"
+  checksum: 10c0/373f289e5a0ab890d41befcef7842103cc8f3ccdc1521379ab08cb4c96ae236fe59581b9ad7d88212003bde5aa9d8318b550123004ef6d550c6e12cdb36b4588
   languageName: node
   linkType: hard
 
@@ -2481,6 +2546,13 @@ __metadata:
   version: 0.7.7
   resolution: "@tanstack/store@npm:0.7.7"
   checksum: 10c0/bf90fa957bd97336d7dbc0d7b87379b5fe4baea030efef8a93fe4e49ac1c8bc929247d1a9f84b16a1642e386b67fe53be14df8d5415efdf85f83733ccdf8877a
+  languageName: node
+  linkType: hard
+
+"@tanstack/store@npm:^0.8.0":
+  version: 0.8.0
+  resolution: "@tanstack/store@npm:0.8.0"
+  checksum: 10c0/71841a7a7653f744bdea457d2c41768b8d5e5aed1d5ff22bd068e28ced9bf658208c730963809c2223b26b753e19da987c0d98acb7c543abd97de14e0d58991f
   languageName: node
   linkType: hard
 
@@ -3328,7 +3400,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"debug@npm:4, debug@npm:^4.1.0, debug@npm:^4.3.1, debug@npm:^4.3.2, debug@npm:^4.3.4":
+"debug@npm:4, debug@npm:^4.1.0, debug@npm:^4.3.1, debug@npm:^4.3.2, debug@npm:^4.3.4, debug@npm:^4.4.3":
   version: 4.4.3
   resolution: "debug@npm:4.4.3"
   dependencies:
@@ -3950,6 +4022,8 @@ __metadata:
     "@radix-ui/react-toggle-group": "npm:^1.1.11"
     "@radix-ui/react-tooltip": "npm:^1.2.8"
     "@tailwindcss/vite": "npm:^4.1.7"
+    "@tanstack/db": "npm:^0.5.25"
+    "@tanstack/electric-db-collection": "npm:^0.2.31"
     "@tanstack/query-db-collection": "npm:^1.0.11"
     "@tanstack/react-db": "npm:^0.1.59"
     "@tanstack/react-form": "npm:^1.12.2"
