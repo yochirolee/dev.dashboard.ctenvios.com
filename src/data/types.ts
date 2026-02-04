@@ -164,6 +164,7 @@ export const agencySchema = z
       contact: z.string(),
       email: z.string().optional(),
       website: z.string().optional(),
+      logo: z.string().url().optional(),
       agency_type: z.enum(["FORWARDER", "AGENCY", "RESELLER"]).optional(),
       parent_agency_id: z.number().optional().nullable(),
    })

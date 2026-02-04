@@ -15,8 +15,7 @@ import { AgencyLogoUpload } from "./agency-logo-upload";
 export const AgencyDetails = ({ selectedAgency }: { selectedAgency: Agency }) => {
 	const [isOpen, setIsOpen] = useState(false);
 	
-	console.log(selectedAgency,"selectedAgency");
-
+	
    if (!selectedAgency) return <Skeleton className="h-[200px] w-full" />;
    return (
       <Card>

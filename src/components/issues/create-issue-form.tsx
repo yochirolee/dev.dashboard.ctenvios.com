@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import { Field, FieldContent, FieldDescription, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { issueType, issuePriority } from "@/data/types";
 import { useIssues } from "@/hooks/use-issues";
 import { useOrders } from "@/hooks/use-orders";
 import { Loader2 } from "lucide-react";
