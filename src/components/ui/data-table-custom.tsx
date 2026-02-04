@@ -18,7 +18,7 @@ interface DataTableProps<TData, TValue> {
    isLoading?: boolean;
 }
 
-export function DataTable<TData, TValue>({
+export function DataTableCustom<TData, TValue>({
    columns,
    data,
    pagination,
@@ -89,3 +89,5 @@ export function DataTable<TData, TValue>({
       </div>
    );
 }
+
+export const DataTable = DataTableCustom;

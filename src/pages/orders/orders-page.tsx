@@ -1,6 +1,6 @@
 import { FilePlus2, Printer, Search, X } from "lucide-react";
 import { useState } from "react";
-import { DataTable } from "@/components/ui/data-table";
+import { DataTableCustom } from "@/components/ui/data-table-custom";
 import { orderColumns } from "@/components/orders/order/order-columns";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -134,7 +134,7 @@ export default function OrdersPage() {
                </div>
             </div>
 
-            <DataTable
+            <DataTableCustom
                columns={orderColumns}
                data={data}
                pagination={pagination}

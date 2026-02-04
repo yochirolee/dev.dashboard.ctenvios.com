@@ -1,6 +1,6 @@
 import React from "react";
 import { receiversColumns } from "@/components/orders/receiver/receiver-columns";
-import { DataTable } from "@/components/ui/data-table";
+import { DataTable } from "@/components/ui/data-table-custom";
 import { useReceivers } from "@/hooks/use-receivers";
 import { useDebounce } from "use-debounce";
 import { Loader2, Search } from "lucide-react";

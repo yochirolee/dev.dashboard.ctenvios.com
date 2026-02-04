@@ -1,4 +1,4 @@
-import { createCollection } from "@tanstack/react-db";
+import { createCollection, eq, and, or, ilike } from "@tanstack/react-db";
 import { electricCollectionOptions } from "@tanstack/electric-db-collection";
 import { useLiveQuery } from "@tanstack/react-db";
 import { useAppStore } from "@/stores/app-store";
@@ -22,7 +22,64 @@ export const parcelsCollection = createCollection(
    }) as unknown as Parameters<typeof createCollection>[0]
 );
 
-export const useParcels = () => {
-   const { data: parcels } = useLiveQuery((q) => q.from({ parcel: parcelsCollection }));
+export const useParcelsInContainer = (containerId: number) => {
+   const { data: parcels } = useLiveQuery((q) =>
+      q
+         .from({ parcel: parcelsCollection })
+         .where(({ parcel }) => eq((parcel as { container_id: number }).container_id, containerId))
+   );
+   return parcels;
+};
+
+export const useParcelsInPallet = (palletId: number) => {
+   const { data: parcels } = useLiveQuery((q) =>
+      q
+         .from({ parcel: parcelsCollection })
+         .where(({ parcel }) => eq((parcel as { pallet_id: number }).pallet_id, palletId))
+   );
+   return parcels;
+};
+
+export interface ParcelFilters {
+   status?: string;
+   search?: string;
+}
+
+export const useLiveParcels = (filters?: ParcelFilters) => {
+   const status = filters?.status;
+   const search = filters?.search?.toLowerCase().trim() || "";
+
+   const { data: parcels } = useLiveQuery(
+      (q) => {
+         let query = q.from({ parcel: parcelsCollection });
+
+         if (status || search) {
+            const searchPattern = `%${search}%`;
+            const orderIdNum = parseInt(search, 10);
+            const searchIsOrderId = search && String(orderIdNum) === search;
+
+            query = query.where(({ parcel }) => {
+               const p = parcel as {
+                  status: string;
+                  tracking_number: string;
+                  description: string;
+                  order_id: number;
+               };
+               const statusCond = status ? eq(p.status, status) : null;
+               const searchCond = search
+                  ? searchIsOrderId
+                     ? or(ilike(p.tracking_number, searchPattern), ilike(p.description, searchPattern), eq(p.order_id, orderIdNum))
+                     : or(ilike(p.tracking_number, searchPattern), ilike(p.description, searchPattern))
+                  : null;
+               if (statusCond && searchCond) return and(statusCond, searchCond);
+               return (statusCond ?? searchCond)!;
+            });
+         }
+
+         return query.orderBy(({ parcel }) => (parcel as { updated_at: string }).updated_at, "desc");
+      },
+      [status, search]
+   );
+
    return parcels;
 };

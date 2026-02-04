@@ -1,4 +1,4 @@
-import { DataTable } from "@/components/ui/data-table";
+import { DataTable } from "@/components/ui/data-table-custom";
 import { Loader2, Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { userColumns } from "@/components/users/users-columns";

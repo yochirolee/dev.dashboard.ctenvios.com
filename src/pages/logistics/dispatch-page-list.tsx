@@ -1,5 +1,5 @@
 import { useDispatches } from "@/hooks/use-dispatches";
-import { DataTable } from "@/components/ui/data-table";
+import { DataTable } from "@/components/ui/data-table-custom";
 import { dispatchColumns } from "../../components/dispatch/dispatch-columns";
 import { useState, useMemo, useCallback } from "react";
 import { ButtonGroup } from "@/components/ui/button-group";
@@ -101,10 +101,10 @@ export const DispatchPageLists = () => {
                <EmptyTitle>No hay despachos</EmptyTitle>
                <EmptyDescription>Crea un despacho para empezar</EmptyDescription>
             </EmptyHeader>
-            <EmptyContent >
+            <EmptyContent>
                <div className="flex flex-row gap-2">
-               <Button variant="outline" onClick={handleCreateDispatch}>
-                  <PackagePlus size={16} />
+                  <Button variant="outline" onClick={handleCreateDispatch}>
+                     <PackagePlus size={16} />
                      <span className="hidden md:block">Crear</span>
                   </Button>
                   <Button variant="outline" onClick={() => navigate("/logistics/dispatch/receive")}>

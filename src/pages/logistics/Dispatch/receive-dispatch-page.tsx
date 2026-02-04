@@ -546,6 +546,7 @@ export const ReceiveDispatchPage = (): React.ReactElement => {
                            showDate={false}
                            emptyMessage="Escanea paquetes para agregarlos"
                         />
+                        
                      </div>
                   </div>
                </div>
@@ -748,6 +749,14 @@ export const ReceiveDispatchPage = (): React.ReactElement => {
                </div>
             </div>
          </main>
+      </div>
+   );
+};
+
+export const ParcelsInDispatchPage = (): React.ReactElement => {
+   return (
+      <div>
+         <h1>Parcels in Dispatch</h1>
       </div>
    );
 };

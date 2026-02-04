@@ -2,6 +2,7 @@ import { createCollection } from "@tanstack/react-db";
 import { electricCollectionOptions } from "@tanstack/electric-db-collection";
 import { useLiveQuery, eq } from "@tanstack/react-db";
 import { useAppStore } from "@/stores/app-store";
+import api from "@/api/api";
 
 const apiBaseUrl = import.meta.env.VITE_API_URL || "http://localhost:3000/api/v1";
 
@@ -68,6 +69,27 @@ export const issueCommentsCollection = createCollection(
          headers: {
             authorization: () => `Bearer ${useAppStore.getState().session?.token ?? ""}`,
          },
+      },
+      onInsert: async ({ transaction }) => {
+         const mutation = transaction.mutations[0] as unknown as {
+            modified: { issue_id: number; content: string; is_internal?: boolean };
+         };
+         const { modified } = mutation;
+         await api.issues.addComment(modified.issue_id, {
+            content: modified.content,
+            is_internal: modified.is_internal ?? false,
+         });
+      },
+      onUpdate: async () => {
+         // Backend has no PATCH for comments
+         throw new Error("Comment updates are not supported");
+      },
+      onDelete: async ({ transaction }) => {
+         const mutation = transaction.mutations[0] as unknown as {
+            original: { id: number; issue_id: number };
+         };
+         const { original } = mutation;
+         await api.issues.deleteComment(original.issue_id, original.id);
       },
    }) as unknown as Parameters<typeof createCollection>[0]
 );

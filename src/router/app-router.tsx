@@ -33,6 +33,7 @@ import TrackingHmPage from "@/pages/hm-paquetes/tracking-hm-page";
 import { AgenciesIntegrationsPage } from "@/pages/settings/agencies/agencies-integrations-page";
 import { ResetPasswordPage } from "@/pages/reset-password-page";
 import DailyClosurePage from "@/pages/finances/daily-closure-page";
+import { ParcelsTrackingPage } from "@/pages/tracking/parcels-tracking-page";
 
 export const AppRouter = () => {
    return (
@@ -56,6 +57,7 @@ export const AppRouter = () => {
                <Route element={<ProtectedRoute allowedRoles={canAccess.logistics} />}>
                   <Route path="logistics">
                      <Route index element={<Navigate to="dispatch" replace />} />
+                     <Route path="parcels" element={<ParcelsTrackingPage />} />
                      <Route path="dispatch">
                         <Route index element={<Navigate to="list" replace />} />
                         <Route path="list" element={<DispatchPageLists />} />
@@ -106,6 +108,7 @@ export const AppRouter = () => {
                   <Route path="new" element={<NewIssuePage />} />
                   <Route path=":issueId" element={<IssuesPage />} />
                </Route>
+              
                {/*    <Route path="legacy-issues">
                   <Route index element={<LegacyIssuesPage />} />
                   <Route path="new" element={<LegacyNewIssuePage />} />

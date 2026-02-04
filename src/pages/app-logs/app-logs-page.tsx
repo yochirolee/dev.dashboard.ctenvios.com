@@ -1,4 +1,4 @@
-import { DataTable } from "@/components/ui/data-table";
+import { DataTable } from "@/components/ui/data-table-custom";
 import { appLogsColumns } from "./components/app-logs-columns";
 import usePagination from "@/hooks/use-pagination";
 import { useMutation, useQuery } from "@tanstack/react-query";

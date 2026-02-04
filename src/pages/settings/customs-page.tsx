@@ -1,5 +1,5 @@
 import React from "react";
-import { DataTable } from "@/components/ui/data-table";
+import { DataTable } from "@/components/ui/data-table-custom";
 import { Loader2, Search } from "lucide-react";
 import { customsColumns } from "@/components/customs/customs-columns";
 import { useCustoms } from "@/hooks/use-customs";
@@ -17,7 +17,6 @@ export const CustomsPage = () => {
    const { pagination, setPagination } = usePagination();
    const { data, isLoading } = useCustoms.search(debouncedSearchQuery, pagination.pageIndex, pagination.pageSize);
 
-   
    const [customsRate, setCustomsRate] = useState<Customs | undefined>(undefined);
    const [open, setOpen] = useState(false);
    const [openDeleteDialog, setOpenDeleteDialog] = useState(false);

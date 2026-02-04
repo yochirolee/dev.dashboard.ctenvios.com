@@ -1,6 +1,6 @@
 import React from "react";
 import { columns } from "@/components/orders/customer/columns";
-import { DataTable } from "@/components/ui/data-table";
+import { DataTable } from "@/components/ui/data-table-custom";
 import { useCustomers } from "@/hooks/use-customers";
 import { useDebounce } from "use-debounce";
 import { Loader2, Search } from "lucide-react";

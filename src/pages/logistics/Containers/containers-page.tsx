@@ -1,5 +1,5 @@
 import { useContainers } from "@/hooks/use-containers";
-import { DataTable } from "@/components/ui/data-table";
+import { DataTable } from "@/components/ui/data-table-custom";
 import { containersColumns } from "@/components/containers/containers-columns";
 import { NewContainerForm } from "@/components/containers/new-container-form";
 import { UpdateStatusContainerForm } from "@/components/containers/update-status-container-form";
@@ -67,7 +67,7 @@ export const ContainersPage = () => {
 
    const columns = useMemo(
       () => containersColumns({ onDelete: handleDeleteContainer, onUpdateStatus: handleUpdateStatus }),
-      [handleDeleteContainer, handleUpdateStatus],
+      [handleDeleteContainer, handleUpdateStatus]
    );
 
    if (containers?.length === 0 && !searchQuery && !isLoading) {

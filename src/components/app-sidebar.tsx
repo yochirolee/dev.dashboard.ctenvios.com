@@ -56,6 +56,11 @@ const navMainItems: SidebarItem[] = [
       allowedRoles: canAccess.logistics,
       items: [
          {
+            title: "Paquetes",
+            url: "/logistics/parcels",
+            allowedRoles: canAccess.logistics,
+         },
+         {
             title: "Pallets",
             url: "/logistics/pallets",
             allowedRoles: canAccess.logistics,
@@ -209,7 +214,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                         role as Role,
                         agencyType,
                         subItem.allowedRoles,
-                        subItem.allowedAgencyTypes,
+                        subItem.allowedAgencyTypes
                      );
                   }
                   return hasRole(role as Role, subItem.allowedRoles);
@@ -225,7 +230,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                }
                return item.items.length > 0;
             }),
-      [role, agencyType],
+      [role, agencyType]
    );
 
    const filteredNavMain = React.useMemo(() => filterByRole(navMainItems), [filterByRole]);

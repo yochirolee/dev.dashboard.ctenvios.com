@@ -1,5 +1,5 @@
 import { useShape } from "@electric-sql/react";
-import { DataTable } from "@/components/ui/data-table";
+import { DataTable } from "@/components/ui/data-table-custom";
 import { partnersLogColumns } from "@/pages/app-logs/components/partners-log-columns";
 import usePagination from "@/hooks/use-pagination";
 import type { PartnerLog } from "@/pages/app-logs/components/partners-log-columns";

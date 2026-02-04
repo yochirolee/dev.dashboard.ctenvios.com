@@ -1,5 +1,5 @@
 import { usePallets } from "@/hooks/use-pallets";
-import { DataTable } from "@/components/ui/data-table";
+import { DataTable } from "@/components/ui/data-table-custom";
 import { palletsColumns } from "@/components/palllets/pallets-columns";
 import { useState, useMemo, useCallback } from "react";
 import { ButtonGroup } from "@/components/ui/button-group";
