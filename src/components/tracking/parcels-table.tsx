@@ -8,7 +8,6 @@ import {
 
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { DataTablePagination } from "../ui/data-table-pagination";
-import { Spinner } from "../ui/spinner";
 import { AlertTriangleIcon } from "lucide-react";
 
 interface DataTableProps<TData, TValue> {
@@ -25,8 +24,6 @@ export function ParcelsTable<TData, TValue>({ columns, data, isLoading, isError 
       getCoreRowModel: getCoreRowModel(),
       getPaginationRowModel: getPaginationRowModel(),
    });
-
- 
 
    if (isError) {
       return (
@@ -85,7 +82,7 @@ export function ParcelsTable<TData, TValue>({ columns, data, isLoading, isError 
                   ) : (
                      <TableRow>
                         <TableCell colSpan={columns.length} className="h-24 text-center">
-                          {isLoading ? "Cargando paquetes..." : "No se encontraron paquetes."}
+                           {isLoading ? "Cargando paquetes..." : "No se encontraron paquetes."}
                         </TableCell>
                      </TableRow>
                   )}
