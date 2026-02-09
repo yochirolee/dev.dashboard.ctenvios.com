@@ -349,20 +349,7 @@ const ReceiverForm = ({
                      )}
                   />
                </Field>
-               <Field orientation="vertical">
-                  <Controller
-                     control={form.control}
-                     name="email"
-                     render={({ field, fieldState }) => (
-                        <Field data-invalid={fieldState.invalid}>
-                           <FieldLabel htmlFor="email">Correo Electrónico</FieldLabel>
-
-                           <Input {...field} value={field.value || ""} />
-                           {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-                        </Field>
-                     )}
-                  />
-               </Field>
+               
                <Separator />
                <Field orientation="horizontal">
                   <Controller
