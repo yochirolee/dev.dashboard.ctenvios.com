@@ -23,7 +23,7 @@ import { Spinner } from "../ui/spinner";
 
 type FormValues = z.infer<typeof orderSchema>;
 
-const MAX_ITEMS = 100;
+const MAX_ITEMS = 99;
 
 export function ItemsInOrder() {
    const navigate = useNavigate();

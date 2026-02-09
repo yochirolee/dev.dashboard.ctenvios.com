@@ -55,7 +55,7 @@ axiosInstance.interceptors.request.use(
 
    (error) => {
       return Promise.reject(error);
-   }
+   },
 );
 
 // Add response interceptor for better error handling with React Query
@@ -72,7 +72,7 @@ axiosInstance.interceptors.response.use(
 
       // Let React Query handle the error
       return Promise.reject(error);
-   }
+   },
 );
 
 const api = {
@@ -188,7 +188,7 @@ const api = {
          startDate: string,
          endDate: string,
          payment_status?: string,
-         agency_id?: number
+         agency_id?: number,
       ) => {
          // Convert 0-indexed (from TanStack Table) to 1-indexed (for API)
          const params: Record<string, string | number> = {
@@ -387,7 +387,7 @@ const api = {
       },
       createApiKey: async (
          partnerId: number,
-         data?: { name?: string; environment?: string; expires_in_days?: number }
+         data?: { name?: string; environment?: string; expires_in_days?: number },
       ) => {
          const response = await axiosInstance.post(`/partners/admin/${partnerId}/api-keys`, data ?? {});
          return response.data;
@@ -515,7 +515,7 @@ const api = {
          status?: string,
          payment_status?: string,
          dispatch_id?: number,
-         agency_id?: number
+         agency_id?: number,
       ) => {
          const params: Record<string, string | number> = {
             page: page + 1,
@@ -576,7 +576,7 @@ const api = {
          dispatch_id: number,
          page: number = 1,
          limit: number = 20,
-         status?: ParcelStatus
+         status?: ParcelStatus,
       ) => {
          const params: Record<string, string | number> = {
             page,
@@ -686,7 +686,7 @@ const api = {
             method?: string;
             startDate?: Date;
             endDate?: Date;
-         }
+         },
       ) => {
          // Convert 0-indexed (from TanStack Table) to 1-indexed (for API)
          const params: Record<string, string | number> = {
@@ -740,7 +740,7 @@ const api = {
             order_id?: string;
             parcel_id?: string;
             assigned_to_id?: string;
-         }
+         },
       ) => {
          // Convert 0-indexed (from TanStack Table) to 1-indexed (for API)
          const params: Record<string, string | number> = {
@@ -883,92 +883,6 @@ const api = {
          const response = await axiosInstance.get("/parcels");
          console.log(response.data.rows, "parcelsresponse.data");
          return response.data.rows ?? [];
-      },
-   },
-   // Legacy Issues API (used for legacy invoices) will be removed in the future
-
-   legacyIssues: {
-      getAll: async (
-         page: number = 1,
-         limit: number = 20,
-         filters?: {
-            status?: string;
-            priority?: string;
-            type?: string;
-            order_id?: string;
-            parcel_id?: string;
-            assigned_to_id?: string;
-            issue_id?: string;
-         }
-      ) => {
-         // Convert 0-indexed (from TanStack Table) to 1-indexed (for API)
-         const params: Record<string, string | number> = {
-            page: page + 1,
-            limit,
-         };
-
-         if (filters) {
-            if (filters.status) params.status = filters.status;
-            if (filters.priority) params.priority = filters.priority;
-            if (filters.type) params.type = filters.type;
-            if (filters.order_id) params.order_id = filters.order_id;
-            if (filters.parcel_id) params.parcel_id = filters.parcel_id;
-            if (filters.assigned_to_id) params.assigned_to_id = filters.assigned_to_id;
-            if (filters.issue_id) params.issue_id = filters.issue_id;
-         }
-
-         const response = await axiosInstance.get(`/legacy-issues`, {
-            params,
-         });
-         return response.data;
-      },
-      getById: async (id: number) => {
-         const response = await axiosInstance.get(`/legacy-issues/${id}`);
-         return response.data;
-      },
-      create: async (data: any) => {
-         const response = await axiosInstance.post(`/legacy-issues`, data);
-         return response.data;
-      },
-      update: async (id: number, data: any) => {
-         const response = await axiosInstance.patch(`/legacy-issues/${id}`, data);
-         return response.data;
-      },
-      resolve: async (id: number, data?: { resolution_notes?: string }) => {
-         const response = await axiosInstance.post(`/legacy-issues/${id}/resolve`, data || {});
-         return response.data;
-      },
-      delete: async (id: number) => {
-         const response = await axiosInstance.delete(`/legacy-issues/${id}`);
-         return response.data;
-      },
-      getComments: async (id: number) => {
-         const response = await axiosInstance.get(`/legacy-issues/${id}/comments`);
-         return response.data;
-      },
-      addComment: async (id: number, data: { content: string; is_internal?: boolean }) => {
-         const response = await axiosInstance.post(`/legacy-issues/${id}/comments`, data);
-         return response.data;
-      },
-      deleteComment: async (id: number, commentId: number) => {
-         const response = await axiosInstance.delete(`/legacy-issues/${id}/comments/${commentId}`);
-         return response.data;
-      },
-      getAttachments: async (id: number) => {
-         const response = await axiosInstance.get(`/legacy-issues/${id}/attachments`);
-         return response.data;
-      },
-      addAttachment: async (id: number, data: any) => {
-         const response = await axiosInstance.post(`/legacy-issues/${id}/attachments`, data);
-         return response.data;
-      },
-      deleteAttachment: async (id: number, attachmentId: number) => {
-         const response = await axiosInstance.delete(`/legacy-issues/${id}/attachments/${attachmentId}`);
-         return response.data;
-      },
-      getParcelsByOrderId: async (order_id: number) => {
-         const response = await axiosInstance.get(`/legacy/orders/${order_id}/parcels`);
-         return response.data;
       },
    },
 };

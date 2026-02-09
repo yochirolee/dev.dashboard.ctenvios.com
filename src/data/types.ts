@@ -179,7 +179,7 @@ export const agencySchema = z
       {
          message: "La agencia padre es requerida para tipos AGENCY y RESELLER",
          path: ["parent_agency_id"],
-      }
+      },
    );
 
 export const providerSchema = z.object({
@@ -431,7 +431,7 @@ export const createIssueSchema = z
    })
    .refine(
       (data) => data.order_id || data.parcel_id || (data.affected_parcel_ids && data.affected_parcel_ids.length > 0),
-      { message: "Either order_id, parcel_id, or affected_parcel_ids must be provided" }
+      { message: "Either order_id, parcel_id, or affected_parcel_ids must be provided" },
    )
    .refine((data) => !data.affected_parcel_ids || data.order_id, {
       message: "affected_parcel_ids requires order_id",
@@ -452,7 +452,7 @@ export const createLegacyIssueSchema = z
    .refine(
       (data) =>
          data.legacy_order_id || data.parcel_id || (data.affected_parcel_ids && data.affected_parcel_ids.length > 0),
-      { message: "Either legacy_order_id, parcel_id, or affected_parcel_ids must be provided" }
+      { message: "Either legacy_order_id, parcel_id, or affected_parcel_ids must be provided" },
    )
    .refine((data) => !data.affected_parcel_ids || data.legacy_order_id, {
       message: "affected_parcel_ids requires legacy_order_id",

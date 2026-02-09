@@ -78,7 +78,7 @@ export const parcelColumns: ColumnDef<Parcel>[] = [
       accessorKey: "tracking_number",
       header: "Tracking",
       cell: ({ row }) => (
-         <span className="text-sm font-medium truncate max-w-[100px]">{row.original.tracking_number ?? "-"}</span>
+         <span className="text-sm font-mono ">{row.original.tracking_number ?? "-"}</span>
       ),
       size: 100,
    },
@@ -100,14 +100,14 @@ export const parcelColumns: ColumnDef<Parcel>[] = [
       cell: ({ row }) => {
          const w = row.original.weight;
          const n = typeof w === "number" ? w : parseFloat(String(w ?? ""));
-         return <span className="text-sm">{isNaN(n) ? "-" : n.toFixed(2)} lb</span>;
+         return <span className="text-xs font-mono text-muted-foreground ">{isNaN(n) ? "-" : n.toFixed(2)} lb</span>;
       },
    },
    {
       accessorKey: "updated_at",
       header: "Actualizado",
       cell: ({ row }) => (
-         <span className="text-sm text-muted-foreground">
+         <span className="text-xs font-mono text-muted-foreground ">
             {row.original.updated_at ? format(new Date(row.original.updated_at), "dd/MM/yyyy HH:mm") : "-"}
          </span>
       ),

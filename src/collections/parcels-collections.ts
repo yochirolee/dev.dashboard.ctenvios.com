@@ -12,21 +12,22 @@ export const parcelsCollection = createCollection(
       getKey: (item: { id: number }) => item.id,
       shapeOptions: {
          url: `${apiBaseUrl}/electric/shape`,
+         log: "changes_only",
          params: {
             table: `"Parcel"`,
-         },
+         } as any,
          headers: {
             authorization: () => `Bearer ${useAppStore.getState().session?.token ?? ""}`,
          },
       },
-   }) as unknown as Parameters<typeof createCollection>[0]
+   }) as unknown as Parameters<typeof createCollection>[0],
 );
 
 export const useParcelsInContainer = (containerId: number) => {
    const { data: parcels } = useLiveQuery((q) =>
       q
          .from({ parcel: parcelsCollection })
-         .where(({ parcel }) => eq((parcel as { container_id: number }).container_id, containerId))
+         .where(({ parcel }) => eq((parcel as { container_id: number }).container_id, containerId)),
    );
    return parcels;
 };
@@ -35,7 +36,7 @@ export const useParcelsInPallet = (palletId: number) => {
    const { data: parcels } = useLiveQuery((q) =>
       q
          .from({ parcel: parcelsCollection })
-         .where(({ parcel }) => eq((parcel as { pallet_id: number }).pallet_id, palletId))
+         .where(({ parcel }) => eq((parcel as { pallet_id: number }).pallet_id, palletId)),
    );
    return parcels;
 };
@@ -43,13 +44,19 @@ export const useParcelsInPallet = (palletId: number) => {
 export interface ParcelFilters {
    status?: string;
    search?: string;
+   limit?: number;
+   offset?: number;
 }
 
 export const useLiveParcels = (filters?: ParcelFilters) => {
    const status = filters?.status;
    const search = filters?.search?.toLowerCase().trim() || "";
 
-   const { data: parcels } = useLiveQuery(
+   const {
+      data: parcels,
+      isLoading,
+      isError,
+   } = useLiveQuery(
       (q) => {
          let query = q.from({ parcel: parcelsCollection });
 
@@ -64,11 +71,18 @@ export const useLiveParcels = (filters?: ParcelFilters) => {
                   tracking_number: string;
                   description: string;
                   order_id: number;
+                  limit: number;
+                  offset: number;
+                  total: number;
                };
                const statusCond = status ? eq(p.status, status) : null;
                const searchCond = search
                   ? searchIsOrderId
-                     ? or(ilike(p.tracking_number, searchPattern), ilike(p.description, searchPattern), eq(p.order_id, orderIdNum))
+                     ? or(
+                          ilike(p.tracking_number, searchPattern),
+                          ilike(p.description, searchPattern),
+                          eq(p.order_id, orderIdNum),
+                       )
                      : or(ilike(p.tracking_number, searchPattern), ilike(p.description, searchPattern))
                   : null;
                if (statusCond && searchCond) return and(statusCond, searchCond);
@@ -78,8 +92,8 @@ export const useLiveParcels = (filters?: ParcelFilters) => {
 
          return query.orderBy(({ parcel }) => (parcel as { updated_at: string }).updated_at, "desc");
       },
-      [status, search]
+      [status, search],
    );
-
-   return parcels;
+   console.log(parcels, "parcels");
+   return { parcels, isLoading, isError };
 };

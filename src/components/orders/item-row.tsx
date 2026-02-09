@@ -42,7 +42,7 @@ function ItemRow({
          item?.customs_fee_in_cents,
          item?.charge_fee_in_cents || 0,
          item?.insurance_fee_in_cents || 0,
-         item?.unit
+         item?.unit,
       );
 
       form.setValue(`items.${index}.subtotal`, subtotal);
@@ -66,7 +66,7 @@ function ItemRow({
    const { shipping_rates } = useOrderStore(
       useShallow((state) => ({
          shipping_rates: state.shipping_rates,
-      }))
+      })),
    );
 
    const activeWeightRate = shipping_rates?.filter((rate) => rate.unit === "PER_LB")?.[0];
@@ -85,8 +85,6 @@ function ItemRow({
       // Use index for removal - React Hook Form's remove function expects the index
       remove(index);
    };
-
-   console.log(item, "item-row");
 
    return (
       <TableRow key={index}>

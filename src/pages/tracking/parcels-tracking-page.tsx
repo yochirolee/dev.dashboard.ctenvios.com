@@ -1,13 +1,14 @@
 import { useState } from "react";
 import { Search, X } from "lucide-react";
 import { useLiveParcels } from "@/collections/parcels-collections";
-import { parcelColumns, type Parcel } from "@/components/tracking/parcels-columns";
+import { parcelColumns } from "@/components/tracking/parcels-columns";
 import { ParcelsTable } from "@/components/tracking/parcels-table";
 import { DataTableFacetedFilter } from "@/components/ui/data-table-faceted-filter";
 import { STATUS_CONFIG } from "@/lib/parcel-status";
 import { useDebounce } from "use-debounce";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import type { ColumnDef } from "@tanstack/react-table";
 
 const statusOptions = Object.entries(STATUS_CONFIG).map(([value, config]) => ({
    value,
@@ -20,10 +21,14 @@ export const ParcelsTrackingPage = (): React.ReactElement => {
    const [debouncedSearchQuery] = useDebounce(searchQuery, 500);
    const [selectedStatus, setSelectedStatus] = useState<string | undefined>(undefined);
 
-   const parcels = useLiveParcels({
+   const { parcels, isLoading, isError } = useLiveParcels({
       status: selectedStatus,
       search: debouncedSearchQuery,
+      limit: 20,
+      offset: 1
    });
+
+   console.log(parcels, "parcels");
 
    const hasActiveFilters = !!searchQuery || !!selectedStatus;
 
@@ -71,7 +76,12 @@ export const ParcelsTrackingPage = (): React.ReactElement => {
                </div>
             </div>
 
-            <ParcelsTable columns={parcelColumns} data={parcels as Parcel[]} />
+            <ParcelsTable
+               columns={parcelColumns as ColumnDef<object, unknown>[]}
+               data={parcels ?? []}
+               isLoading={isLoading}
+               isError={isError}
+            />
          </div>
       </div>
    );
