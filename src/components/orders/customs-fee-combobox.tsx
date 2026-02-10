@@ -2,7 +2,15 @@ import * as React from "react";
 import { Check, ChevronsUpDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
+import {
+   Command,
+   CommandEmpty,
+   CommandGroup,
+   CommandInput,
+   CommandItem,
+   CommandList,
+   CommandShortcut,
+} from "@/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { FormField } from "../ui/form";
 import { useCustoms } from "@/hooks/use-customs";
@@ -21,7 +29,9 @@ const CustomsFeeCombobox = React.memo(function CustomsFeeCombobox({
 }) {
    const [open, setOpen] = React.useState(false);
    const [searchQuery, setSearchQuery] = React.useState("");
-   const { data, isLoading } = useCustoms.get(0, 300);
+   const { data, isLoading } = useCustoms.get(0, 500);
+
+   console.log(data, "data");
 
    // Use form prop if provided, otherwise use form context
    const formContext = form || useFormContext();
@@ -61,7 +71,7 @@ const CustomsFeeCombobox = React.memo(function CustomsFeeCombobox({
                      role="combobox"
                      aria-expanded={open}
                      aria-controls={`customs-fee-combobox-${index}`}
-                     className={cn("w-[200px] justify-between", !field.value && "text-muted-foreground")}
+                     className={cn("w-[250px] justify-between", !field.value && "text-muted-foreground")}
                   >
                      {isLoading ? (
                         <Skeleton className="w-full h-4" />
@@ -69,8 +79,8 @@ const CustomsFeeCombobox = React.memo(function CustomsFeeCombobox({
                         (() => {
                            const selectedCustom = data?.rows?.find((custom: Customs) => custom.id === field.value);
                            return selectedCustom?.name
-                              ? selectedCustom.name.length > 20
-                                 ? `${selectedCustom.name.substring(0, 20)}...`
+                              ? selectedCustom.name.length > 28
+                                 ? `${selectedCustom.name.substring(0, 28)}...`
                                  : selectedCustom.name
                               : "Seleccionar Arancel";
                         })()
@@ -78,18 +88,18 @@ const CustomsFeeCombobox = React.memo(function CustomsFeeCombobox({
                      <ChevronsUpDown className="opacity-50" />
                   </Button>
                </PopoverTrigger>
-               <PopoverContent className="w-[200px] p-0">
+               <PopoverContent className="w-[250px] p-0">
                   <Command shouldFilter={false}>
                      <CommandInput placeholder="Buscar Arancel..." onValueChange={handleSearchChange} />
                      <CommandList>
                         <CommandEmpty>No se encontraron Aranceles.</CommandEmpty>
-                        <CommandGroup>
+                        <CommandGroup heading="Aranceles">
                            {filteredCustoms?.map((custom: Customs) => (
                               <CommandItem
                                  key={custom?.id}
                                  value={custom?.name}
                                  onSelect={() => {
-                                     // Always update field to keep FormField in sync
+                                    // Always update field to keep FormField in sync
                                     field.onChange(custom.id);
 
                                     // If onSelect callback is provided, use it
@@ -110,10 +120,14 @@ const CustomsFeeCombobox = React.memo(function CustomsFeeCombobox({
                                     setOpen(false);
                                  }}
                               >
-                                 {custom.name}
                                  <Check
                                     className={cn("ml-auto", field?.value === custom?.id ? "opacity-100" : "opacity-0")}
                                  />
+                                 <span className="flex-1"> {custom.name}</span>
+
+                                 <CommandShortcut className="text-xs font-mono text-muted-foreground justify-end">
+                                    {custom.custom_value}p
+                                 </CommandShortcut>
                               </CommandItem>
                            ))}
                         </CommandGroup>
