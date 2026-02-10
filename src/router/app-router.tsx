@@ -31,7 +31,6 @@ import TrackingHmPage from "@/pages/hm-paquetes/tracking-hm-page";
 import { AgenciesIntegrationsPage } from "@/pages/settings/agencies/agencies-integrations-page";
 import { ResetPasswordPage } from "@/pages/reset-password-page";
 import DailyClosurePage from "@/pages/finances/daily-closure-page";
-import { ParcelsTrackingPage } from "@/pages/tracking/parcels-tracking-page";
 import { ParcelsPage } from "@/pages/logistics/Parcels/parcels-page";
 export const AppRouter = () => {
    return (
