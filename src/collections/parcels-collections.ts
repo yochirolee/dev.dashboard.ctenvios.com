@@ -15,6 +15,11 @@ export const parcelsCollection = createCollection(
          log: "changes_only",
          params: {
             table: `"Parcel"`,
+            columns: ["id", "tracking_number", "description", "order_id", "status", "created_at", "updated_at"],
+            orderBy: `"id"`,
+            orderDirection: `"desc"`,
+            limit: 100,
+            offset: 0,
          } as any,
          headers: {
             authorization: () => `Bearer ${useAppStore.getState().session?.token ?? ""}`,

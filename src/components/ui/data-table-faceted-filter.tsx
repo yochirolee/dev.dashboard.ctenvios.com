@@ -21,7 +21,10 @@ interface DataTableFacetedFilterProps {
       label: string;
       value: string;
       icon?: React.ComponentType<{ className?: string }>;
+      /** Tailwind class (e.g. bg-blue-500). May be purged if dynamic; prefer colorStyle for reliability. */
       color?: string;
+      /** Inline background color for the dot (e.g. #3b82f6). Used when present so all options show a color. */
+      colorStyle?: string;
    }[];
    selectedValue?: string;
    onSelect: (value: string | undefined) => void;
@@ -46,8 +49,11 @@ export function DataTableFacetedFilter({
                      <Separator orientation="vertical" className="mx-2 h-4" />
                      <Badge variant="secondary" className="rounded-sm px-1 font-normal">
                         {selectedOption.icon && <selectedOption.icon className="mr-1 h-3 w-3" />}
-                        {selectedOption.color && (
-                           <span className={`mr-1 h-2 w-2 rounded-full ${selectedOption.color}`} />
+                        {(selectedOption.colorStyle || selectedOption.color) && (
+                           <span
+                              className={selectedOption.colorStyle ? "mr-1 h-2 w-2 rounded-full shrink-0" : `mr-1 h-2 w-2 rounded-full ${selectedOption.color}`}
+                              style={selectedOption.colorStyle ? { backgroundColor: selectedOption.colorStyle } : undefined}
+                           />
                         )}
                         {selectedOption.label}
                      </Badge>
@@ -83,7 +89,12 @@ export function DataTableFacetedFilter({
                                  <CheckIcon className="h-4 w-4" />
                               </div>
                               {option.icon && <option.icon className="mr-2 h-4 w-4 text-muted-foreground" />}
-                              {option.color && <span className={`mr-2 h-2 w-2 rounded-full ${option.color}`} />}
+                              {(option.colorStyle || option.color) && (
+                                 <span
+                                    className={option.colorStyle ? "mr-2 h-2 w-2 rounded-full shrink-0" : `mr-2 h-2 w-2 rounded-full ${option.color}`}
+                                    style={option.colorStyle ? { backgroundColor: option.colorStyle } : undefined}
+                                 />
+                              )}
                               <span>{option.label}</span>
                            </CommandItem>
                         );
