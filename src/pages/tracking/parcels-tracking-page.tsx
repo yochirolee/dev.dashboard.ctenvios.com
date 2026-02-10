@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { Search, X } from "lucide-react";
 import { useLiveParcels } from "@/collections/parcels-collections";
-import { parcelColumns } from "@/components/tracking/parcels-columns";
-import { ParcelsTable } from "@/components/tracking/parcels-table";
+import { parcelColumns } from "@/components/parcels/parcels-columns";
+import { ParcelsTable } from "@/components/live-tracking/parcels-table";
 import { DataTableFacetedFilter } from "@/components/ui/data-table-faceted-filter";
 import { STATUS_CONFIG } from "@/lib/parcel-status";
 import { useDebounce } from "use-debounce";
@@ -25,7 +25,7 @@ export const ParcelsTrackingPage = (): React.ReactElement => {
       status: selectedStatus,
       search: debouncedSearchQuery,
       limit: 20,
-      offset: 1
+      offset: 1,
    });
 
    console.log(parcels, "parcels");

@@ -879,10 +879,39 @@ const api = {
       },
    },
    parcels: {
-      get: async () => {
-         const response = await axiosInstance.get("/parcels");
-         console.log(response.data.rows, "parcelsresponse.data");
-         return response.data.rows ?? [];
+      /**
+       * Same pattern as orders.search: positional args, 0-based page converted to 1-based for API.
+       * GET /parcels?page=&limit=&status=&description|customer|receiver|order_id|hbl=
+       */
+      search: async (
+         searchQuery: string,
+         page: number,
+         limit: number,
+         status?: string,
+         searchIn?: "description" | "customer" | "receiver" | "order_id" | "hbl",
+      ): Promise<{ rows: unknown[]; total?: number }> => {
+         const params: Record<string, string | number> = {
+            page: page + 1,
+            limit,
+         };
+         if (status && status !== "") params.status = status;
+         const trimmed = (searchQuery ?? "").toString().trim();
+         if (trimmed && searchIn) {
+            if (searchIn === "order_id" && Number.isFinite(Number(trimmed))) {
+               params.order_id = Number(trimmed);
+            } else if (searchIn === "description") {
+               params.description = trimmed;
+            } else if (searchIn === "customer") {
+               params.customer = trimmed;
+            } else if (searchIn === "receiver") {
+               params.receiver = trimmed;
+            } else if (searchIn === "hbl") {
+               params.hbl = trimmed;
+            }
+         }
+         const response = await axiosInstance.get("/parcels", { params });
+         const data = response.data as { rows?: unknown[]; total?: number };
+         return { rows: data.rows ?? [], total: data.total };
       },
    },
 };
