@@ -89,7 +89,7 @@ const CustomsFeeCombobox = React.memo(function CustomsFeeCombobox({
                                  key={custom?.id}
                                  value={custom?.name}
                                  onSelect={() => {
-                                     // Always update field to keep FormField in sync
+                                    // Always update field to keep FormField in sync
                                     field.onChange(custom.id);
 
                                     // If onSelect callback is provided, use it
