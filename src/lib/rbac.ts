@@ -128,7 +128,7 @@ export const canAccess = {
    systemSettings: ROLE_GROUPS.SYSTEM_ADMINS,
 
    // Logística (admins de agencias y sistema)
-   logistics: ROLE_GROUPS.AGENCY_ADMINS,
+   logistics: ROLE_GROUPS.AGENCY_STAFF,
 
    // Configuración de agencias
    agencySettings: ROLE_GROUPS.AGENCY_ADMINS,
