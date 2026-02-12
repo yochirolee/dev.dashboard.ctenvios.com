@@ -14,7 +14,7 @@ const formNewProviderSchema = z.object({
    address: z.string().min(1, { message: "La dirección es requerida" }),
    phone: z.string().min(10, { message: "El teléfono debe tener al menos 10 dígitos" }),
    contact: z.string().min(1),
-   email: z.string().email({ message: "El email no es válido" }),
+   email: z.email({ message: "El email no es válido" }),
    website: z.string().url({ message: "La URL no es válida" }).optional(),
    forwarder_id: z.number().optional(),
 });

@@ -32,7 +32,7 @@ const customerFormSchema = z.object({
       .min(10, { message: "El movil debe tener 10 dígitos" })
       .max(10, { message: "El movil debe tener 10 dígitos" }),
    identity_document: z.string().optional(),
-   email: z.string().email({ message: "El correo electrónico no es válido" }).optional(),
+   email: z.email({ message: "El correo electrónico no es válido" }).optional(),
    address: z.string().optional(),
 });
 
@@ -43,7 +43,7 @@ export const CustomerFormDialog = React.memo(function CustomerFormDialog() {
    const { selectedCustomer } = useOrderStore(
       useShallow((state) => ({
          selectedCustomer: state.selectedCustomer,
-      }))
+      })),
    );
 
    return (
@@ -110,7 +110,7 @@ const CustomerForm = ({
             mobile: selectedCustomer.mobile ? selectedCustomer?.mobile : undefined,
             middle_name: selectedCustomer.middle_name ? selectedCustomer?.middle_name : undefined,
             last_name: selectedCustomer.last_name ? selectedCustomer.last_name : undefined,
-            second_last_name: selectedCustomer?.second_last_name,
+            second_last_name: selectedCustomer.second_last_name ? selectedCustomer?.second_last_name : undefined,
             identity_document: selectedCustomer?.identity_document ? selectedCustomer?.identity_document : undefined,
             address: selectedCustomer?.address ? selectedCustomer?.address : undefined,
          });
@@ -139,11 +139,9 @@ const CustomerForm = ({
    });
 
    const onSubmit = (data: FormData) => {
-      if (selectedCustomer !== null) {
-         updateCustomer({ id: selectedCustomer.id, data: data as Customer });
-      } else {
-         createCustomer(data as Customer);
-      }
+      selectedCustomer !== null
+         ? updateCustomer({ id: selectedCustomer.id, data: data as Customer })
+         : createCustomer(data as Customer);
    };
 
    const onError = (errors: any) => {

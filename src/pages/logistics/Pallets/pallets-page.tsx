@@ -45,27 +45,25 @@ export const PalletsPage = () => {
 
    const columns = useMemo(() => palletsColumns(handleDeletePallet), [handleDeletePallet]);
 
-   if (pallets.length === 0 && !isLoading) {
-      return (
-         <Empty>
-            <EmptyHeader>
-               <EmptyMedia variant="icon">
-                  <Layers />
-               </EmptyMedia>
-               <EmptyTitle>No hay pallets</EmptyTitle>
-               <EmptyDescription>Crea un pallet para empezar</EmptyDescription>
-            </EmptyHeader>
+   return isLoading ? (
+      <div className="flex justify-center items-center h-full"></div>
+   ) : pallets.length === 0 ? (
+      <Empty>
+         <EmptyHeader>
+            <EmptyMedia variant="icon">
+               <Layers />
+            </EmptyMedia>
+            <EmptyTitle>No hay pallets</EmptyTitle>
+            <EmptyDescription>Crea un pallet para empezar</EmptyDescription>
             <EmptyContent>
                <Button variant="outline" onClick={handleCreatePallet}>
                   <PackagePlus size={16} />
                   <span className="hidden md:block">Crear</span>
                </Button>
             </EmptyContent>
-         </Empty>
-      );
-   }
-
-   return (
+         </EmptyHeader>
+      </Empty>
+   ) : (
       <div className="flex flex-col gap-4 w-full p-2 md:p-4">
          <div className="flex w-full flex-row justify-between items-center">
             <div className="flex flex-col">

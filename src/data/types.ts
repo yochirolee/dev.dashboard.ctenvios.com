@@ -7,7 +7,7 @@ export const customerSchema = z.object({
    middle_name: z.string().optional(),
    last_name: z.string().min(2, { message: "Full name must be at least 2 characters long" }),
    second_last_name: z.string().optional(),
-   email: z.string().email().optional().or(z.literal("")),
+   email: z.email().optional().or(z.literal("")),
    identity_document: z.string().optional().or(z.literal("")),
    mobile: z
       .string()
@@ -31,7 +31,7 @@ export const receiverSchema = z
          .string()
          .min(2, { message: "El apellido debe tener al menos 2 caracteres" })
          .regex(/^[a-zA-Z]+$/, "Solo se permiten letras"),
-      email: z.string().email().or(z.literal("")).optional().nullable(),
+      email: z.email().or(z.literal("")).optional().nullable(),
       phone: z
          .string()
          .regex(/^(\+53)?[5-9]\d{7}$/, "Formato inválido. Use +53 seguido de 8 dígitos")
@@ -111,7 +111,7 @@ export const productSchema = z.object({
 
 export const orderItemSchema = z.object({
    description: z.string().min(1, "La descripción es requerida"),
-   weight: z.number().min(0, "El peso es requerido"),
+   weight: z.number().min(0.01, "El peso es requerido"),
    customs_id: z.number().min(0),
    customs_fee_in_cents: z.number().min(0).optional(),
    insurance_fee_in_cents: z.number().min(0).optional(),
@@ -188,7 +188,7 @@ export const providerSchema = z.object({
    contact: z.string().optional(),
    address: z.string().min(1, "La dirección es requerida"),
    phone: z.string().min(10, "El teléfono debe tener al menos 10 dígitos"),
-   email: z.string().email().optional(),
+   email: z.email().optional(),
    website: z.string().url().optional(),
    logo: z.string().url().optional(),
 });
@@ -205,7 +205,7 @@ export const serviceSchema = z.object({
 export const userSchema = z
    .object({
       id: z.string().optional(),
-      email: z.string().email({ message: "Email inválido" }),
+      email: z.email({ message: "Email inválido" }),
       image: z.string().url().optional(),
       password: z.string().min(8, "La contraseña debe tener al menos 8 caracteres"),
       repeat_password: z.string().min(8, "La contraseña debe tener al menos 8 caracteres"),

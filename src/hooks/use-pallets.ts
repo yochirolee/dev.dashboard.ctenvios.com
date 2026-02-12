@@ -7,6 +7,8 @@ export const usePallets = {
       return useQuery({
          queryKey: ["pallets", page, limit],
          queryFn: () => api.pallets.get(page, limit),
+         refetchOnWindowFocus: true,
+         refetchOnMount: true,
       });
    },
    create: () => {

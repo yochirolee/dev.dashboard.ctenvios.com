@@ -1,5 +1,5 @@
-import { useForm, useFieldArray } from "react-hook-form";
-import { useEffect, useState, useRef } from "react";
+import { useForm, useFieldArray, type UseFormReturn } from "react-hook-form";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { useOrderStore } from "@/stores/order-store";
 import { useShallow } from "zustand/react/shallow";
 import { Table, TableRow, TableHeader, TableCaption, TableHead, TableBody } from "../ui/table";
@@ -21,7 +21,8 @@ import { formatCents } from "@/lib/cents-utils";
 import { useDeliveryFee } from "@/hooks/use-delivery-fee";
 import { Spinner } from "../ui/spinner";
 
-type FormValues = z.infer<typeof orderSchema>;
+type FormValues = z.input<typeof orderSchema>;
+type FormOutput = z.output<typeof orderSchema>;
 
 const MAX_ITEMS = 99;
 
@@ -35,7 +36,7 @@ export function ItemsInOrder() {
    });
 
    // Registry to store dispatch functions for each item row
-   const dispatchRegistry = useRef<Map<number, React.Dispatch<any>>>(new Map());
+   const dispatchRegistry = useRef<Map<number, React.Dispatch<unknown>>>(new Map());
 
    const {
       selectedCustomer,
@@ -52,10 +53,10 @@ export function ItemsInOrder() {
          setSelectedReceiver: state.setSelectedReceiver,
          setSelectedService: state.setSelectedService,
          selectedService: state.selectedService,
-      }))
+      })),
    );
-   const form = useForm<FormValues>({
-      resolver: zodResolver(orderSchema) as any,
+   const form = useForm<FormValues, unknown, FormOutput>({
+      resolver: zodResolver(orderSchema),
       defaultValues: {
          customer_id: selectedCustomer?.id || 0,
          receiver_id: selectedReceiver?.id || 0,
@@ -65,7 +66,7 @@ export function ItemsInOrder() {
          order_items: [
             {
                description: "",
-               weight: undefined,
+               weight: 0,
                price_in_cents: 0,
                rate_id: 0,
                unit: "PER_LB",
@@ -112,7 +113,7 @@ export function ItemsInOrder() {
          setTimeout(() => {
             const newItemIndex = fields.length; // This will be the index of the first new item
             const input = document.querySelector<HTMLInputElement>(
-               `input[name="order_items.${newItemIndex}.description"]`
+               `input[name="order_items.${newItemIndex}.description"]`,
             );
             input?.focus();
          }, 0);
@@ -127,16 +128,14 @@ export function ItemsInOrder() {
       setItemsCount(1);
    };
 
-   
    const { mutate: createOrder, isPending: isCreatingOrder } = useOrders.create({
       onSuccess: (data) => {
-         console.log(data, "data in order creation");
          form.reset();
          setSelectedCustomer(null);
          setSelectedReceiver(null);
          setSelectedService(null);
          toast.success("Orden creada correctamente");
-         console.log(data, "data");
+
          navigate(`/orders/${data.id}`);
       },
       onError: (error) => {
@@ -145,28 +144,31 @@ export function ItemsInOrder() {
    });
    const total_delivery_fee = useDeliveryFee();
 
-   const handleSubmit = (data: FormValues) => {
-      data.service_id = selectedService?.id || 0;
-      data.agency_id = user?.agency_id || 0;
-      data.user_id = user?.id || "";
-      data.customer_id = selectedCustomer?.id || 0;
-      data.receiver_id = selectedReceiver?.id || 0;
-      data.total_delivery_fee_in_cents = total_delivery_fee;
+   const handleSubmit = (data: FormOutput) => {
+      const payload: FormOutput = {
+         ...data,
+         service_id: selectedService?.id || 0,
+         agency_id: user?.agency_id || 0,
+         user_id: user?.id || "",
+         customer_id: selectedCustomer?.id || 0,
+         receiver_id: selectedReceiver?.id || 0,
+         total_delivery_fee_in_cents: total_delivery_fee,
+      };
 
-      createOrder(data);
+      createOrder(payload);
    };
 
-   const handleOpenDialog = (type: "insurance" | "charge" | "rate", index: number) => {
+   const handleOpenDialog = useCallback((type: "insurance" | "charge" | "rate", index: number) => {
       setDialogState({ type, index });
-   };
+   }, []);
 
-   const registerDispatch = (index: number, dispatch: React.Dispatch<any>) => {
+   const registerDispatch = useCallback((index: number, dispatch: React.Dispatch<unknown>) => {
       dispatchRegistry.current.set(index, dispatch);
-   };
+   }, []);
 
    return (
       <Card className="mt-4">
-         <form onSubmit={form.handleSubmit(handleSubmit as any)}>
+         <form id="form-create-order" onSubmit={form.handleSubmit(handleSubmit)}>
             <CardHeader>
                <CardTitle className="flex justify-between items-center">
                   <h3>Items in Order</h3>
@@ -243,7 +245,7 @@ export function ItemsInOrder() {
             </CardContent>
             <InvoiceTotal form={form} />
             <div className="flex justify-end m-10">
-               <Button className="w-1/2 mt-4 mx-auto" type="submit" disabled={isCreatingOrder}>
+               <Button className="w-1/2 mt-4 mx-auto" type="submit" form="form-create-order" disabled={isCreatingOrder}>
                   {isCreatingOrder ? (
                      <div className="flex items-center gap-2">
                         <Spinner /> <span>Creando Orden...</span>
@@ -278,8 +280,9 @@ export function ItemsInOrder() {
    );
 }
 
-function InvoiceTotal({ form }: { form: any }) {
+function InvoiceTotal({ form }: { form: UseFormReturn<FormValues> }) {
    const [open, setOpen] = useState(false);
+   const subtotal = form.watch("total_in_cents") ?? 0;
    const total_weight = form
       .watch("order_items")
       .reduce((acc: number, item: OrderItem) => acc + Number(item?.weight) || 0, 0);
@@ -295,7 +298,7 @@ function InvoiceTotal({ form }: { form: any }) {
                <Separator />
                <li className="flex items-center justify-between">
                   <span className="text-muted-foreground">Subtotal</span>
-                  <span>{formatCents(form.getValues("total_in_cents"))}</span>
+                  <span>{formatCents(subtotal)}</span>
                </li>
 
                <li className="flex items-center justify-between">
@@ -305,7 +308,7 @@ function InvoiceTotal({ form }: { form: any }) {
 
                <li className="flex items-center justify-between font-semibold">
                   <span className="text-muted-foreground">Total</span>
-                  <span>{formatCents(form.getValues("total_in_cents") + total_delivery)}</span>
+                  <span>{formatCents(subtotal + total_delivery)}</span>
                </li>
             </ul>
          </div>

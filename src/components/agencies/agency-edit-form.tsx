@@ -17,7 +17,7 @@ const agencyEditSchema = z.object({
    address: z.string().min(1, "La dirección es requerida"),
    phone: z.string().min(10, "El teléfono debe tener al menos 10 dígitos"),
    contact: z.string(),
-   email: z.string().email().optional().or(z.literal("")),
+   email: z.email().optional().or(z.literal("")),
    website: z.string().url().optional().or(z.literal("")),
    agency_type: z.enum(["FORWARDER", "AGENCY", "RESELLER"]).optional(),
    parent_agency_id: z.number().optional().nullable(),

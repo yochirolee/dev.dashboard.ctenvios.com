@@ -15,6 +15,7 @@ import { InputGroup, InputGroupInput } from "../ui/input-group";
 import { InputGroupAddon } from "../ui/input-group";
 import { useItemReducer, type ItemState } from "@/hooks/use-item-reducer";
 import type { Customs, ShippingRate } from "@/data/types";
+import { Field } from "../ui/field";
 
 function ItemRowReducer({
    index,
@@ -36,7 +37,6 @@ function ItemRowReducer({
    );
 
    const activeWeightRate = shipping_rates?.filter((rate: ShippingRate) => rate.unit === "PER_LB")?.[0];
-
    // Initialize reducer with current form values
    const initialState: ItemState = {
       description: form.getValues(`order_items.${index}.description`) || "",
@@ -53,6 +53,9 @@ function ItemRowReducer({
    };
 
    const [itemState, dispatch] = useItemReducer(initialState);
+   const showValidation = form.formState.submitCount > 0;
+   const isDescriptionInvalid = showValidation && itemState.description.trim().length === 0;
+   const isWeightInvalid = showValidation && !(typeof itemState.weight === "number" && itemState.weight >= 0.01);
 
    // Register the dispatch function with the parent
    useEffect(() => {
@@ -142,30 +145,34 @@ function ItemRowReducer({
             )}
          </TableCell>
          <TableCell className="inline-flex min-w-[300px] items-center gap-2 w-full">
-            <InputGroup>
-               <InputGroupInput
-                  placeholder="Descripción..."
-                  value={itemState.description}
-                  onChange={(e) =>
-                     dispatch({
-                        type: "UPDATE_FIELD",
-                        payload: { field: "description", value: e.target.value },
-                     })
-                  }
-               />
-               <InputGroupAddon align="inline-end">
-                  {itemState.insurance_fee_in_cents > 0 && (
-                     <Badge variant="outline">
-                        Seguro: {centsToDollars(itemState.insurance_fee_in_cents).toFixed(2)}
-                     </Badge>
-                  )}
-                  {itemState.charge_fee_in_cents > 0 && (
-                     <Badge variant="outline" className="">
-                        Cargo: {centsToDollars(itemState.charge_fee_in_cents).toFixed(2)}
-                     </Badge>
-                  )}
-               </InputGroupAddon>
-            </InputGroup>
+            <Field data-invalid={isDescriptionInvalid} className="w-full">
+               <InputGroup>
+                  <InputGroupInput
+                     placeholder="Descripción..."
+                     aria-invalid={isDescriptionInvalid}
+                     value={itemState.description}
+                     onChange={(e) => {
+                        const nextValue = e.target.value;
+                        dispatch({
+                           type: "UPDATE_FIELD",
+                           payload: { field: "description", value: nextValue },
+                        });
+                     }}
+                  />
+                  <InputGroupAddon align="inline-end">
+                     {itemState.insurance_fee_in_cents > 0 && (
+                        <Badge variant="outline">
+                           Seguro: {centsToDollars(itemState.insurance_fee_in_cents).toFixed(2)}
+                        </Badge>
+                     )}
+                     {itemState.charge_fee_in_cents > 0 && (
+                        <Badge variant="outline" className="">
+                           Cargo: {centsToDollars(itemState.charge_fee_in_cents).toFixed(2)}
+                        </Badge>
+                     )}
+                  </InputGroupAddon>
+               </InputGroup>
+            </Field>
 
             <DropdownMenu>
                <DropdownMenuTrigger asChild>
@@ -193,46 +200,49 @@ function ItemRowReducer({
          <TableCell className="text-right">{centsToDollars(itemState.price_in_cents).toFixed(2)}</TableCell>
 
          <TableCell className="text-right">
-            <Input
-               name={`order_items.${index}.weight`}
-               className="[&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none [-moz-appearance:textfield] text-right"
-               value={itemState.weight || ""}
-               onChange={(e) => {
-                  const value = e.target.value === "" ? undefined : parseFloat(e.target.value);
-                  if (value !== undefined && !isNaN(value)) {
-                     handleWeightChange(value);
-                  } else if (value === undefined) {
-                     handleWeightChange(value);
-                  }
-               }}
-               placeholder="0.00"
-               type="number"
-               min={0.01}
-               step={0.01}
-               autoComplete="off"
-               onKeyDown={(e) => {
-                  if (e.key === "Enter") {
-                     e.preventDefault();
-                     // Focus on the next item's weight input
-                     const nextIndex = index + 1;
-                     const nextInput = document.querySelector<HTMLInputElement>(
-                        `input[name="order_items.${nextIndex}.weight"]`
-                     );
-                     if (nextInput) {
-                        nextInput.focus();
-                        nextInput.select();
+            <Field data-invalid={isWeightInvalid}>
+               <Input
+                  name={`order_items.${index}.weight`}
+                  aria-invalid={isWeightInvalid}
+                  className="[&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none [-moz-appearance:textfield] text-right"
+                  value={itemState.weight === 0 ? "" : (itemState.weight ?? "")}
+                  onChange={(e) => {
+                     const value = e.target.value === "" ? undefined : parseFloat(e.target.value);
+                     if (value !== undefined && !isNaN(value)) {
+                        handleWeightChange(value);
+                     } else if (value === undefined) {
+                        handleWeightChange(value);
                      }
-                  }
-               }}
-               onBlur={(e) => {
-                  const value = parseFloat(e.target.value);
-                  if (!isNaN(value)) {
-                     const rounded = Math.round(value * 100) / 100;
-                     handleWeightChange(rounded);
-                     e.target.value = rounded.toString();
-                  }
-               }}
-            />
+                  }}
+                  placeholder="0.00"
+                  type="number"
+                  min={0.01}
+                  step={0.01}
+                  autoComplete="off"
+                  onKeyDown={(e) => {
+                     if (e.key === "Enter") {
+                        e.preventDefault();
+                        // Focus on the next item's weight input
+                        const nextIndex = index + 1;
+                        const nextInput = document.querySelector<HTMLInputElement>(
+                           `input[name="order_items.${nextIndex}.weight"]`
+                        );
+                        if (nextInput) {
+                           nextInput.focus();
+                           nextInput.select();
+                        }
+                     }
+                  }}
+                  onBlur={(e) => {
+                     const value = parseFloat(e.target.value);
+                     if (!isNaN(value)) {
+                        const rounded = Math.round(value * 100) / 100;
+                        handleWeightChange(rounded);
+                        e.target.value = rounded.toString();
+                     }
+                  }}
+               />
+            </Field>
          </TableCell>
          <TableCell className="text-right">{centsToDollars(itemState.subtotal || 0).toFixed(2)}</TableCell>
 

@@ -140,7 +140,7 @@ export const canAccess = {
    issues: ROLE_GROUPS.ISSUES_VIEWERS,
 
    // Contenedores y vuelos (admins principales y forwarders)
-   containersAndFlights: [ROLES.ROOT, ROLES.ADMINISTRATOR, ROLES.FORWARDER_ADMIN, ROLES.FORWARDER_RESELLER],
+   containersAndFlights: [ROLES.ROOT, ROLES.ADMINISTRATOR, ROLES.FORWARDER_ADMIN, ROLES.FORWARDER_RESELLER, ROLES.AGENCY_ADMIN, ROLES.AGENCY_SUPERVISOR],
 
    // Órdenes (todos excepto carriers)
    orders: [

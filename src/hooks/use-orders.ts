@@ -10,12 +10,14 @@ export const useOrders = {
       startDate: string,
       endDate: string,
       payment_status?: string,
-      agency_id?: number
+      agency_id?: number,
    ) => {
       return useQuery({
          queryKey: ["get-orders", "search", searchQuery, page, limit, startDate, endDate, payment_status, agency_id],
          queryFn: () => api.orders.search(searchQuery, page, limit, startDate, endDate, payment_status, agency_id),
          staleTime: 1000 * 60 * 5,
+         refetchOnWindowFocus: true,
+         refetchOnMount: true,
       });
    },
    getById: (id: number) => {
@@ -87,10 +89,14 @@ export const useOrders = {
          },
       });
    },
-   delete: (options?: { onSuccess?: (order_id: number, reason: string) => void; onError?: (error: any, reason: string) => void }) => {
+   delete: (options?: {
+      onSuccess?: (order_id: number, reason: string) => void;
+      onError?: (error: any, reason: string) => void;
+   }) => {
       const queryClient = useQueryClient();
       return useMutation({
-         mutationFn: ({ order_id, reason }: { order_id: number; reason: string }) => api.orders.delete(order_id, reason),
+         mutationFn: ({ order_id, reason }: { order_id: number; reason: string }) =>
+            api.orders.delete(order_id, reason),
          onSuccess: async (_, variables) => {
             await queryClient.invalidateQueries({ queryKey: ["get-orders"] });
             options?.onSuccess?.(variables.order_id, variables.reason);

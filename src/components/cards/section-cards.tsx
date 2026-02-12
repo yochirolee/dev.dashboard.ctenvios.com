@@ -15,6 +15,8 @@ const formatCurrency = (cents: number): string => {
 export function SectionCards() {
    const { data, isLoading, isError } = useFinancialDashboard();
 
+   console.log(data)
+
    if (isLoading) {
       return (
          <div className="*:data-[slot=card]:shadow-xs @xl/main:grid-cols-2 @5xl/main:grid-cols-4 grid grid-cols-1 gap-4 px-4 lg:px-0">

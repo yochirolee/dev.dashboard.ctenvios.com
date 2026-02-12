@@ -34,7 +34,7 @@ export function ReceiverFormDialog() {
    const { selectedReceiver } = useOrderStore(
       useShallow((state) => ({
          selectedReceiver: state.selectedReceiver,
-      }))
+      })),
    );
 
    const [isOpen, setIsOpen] = useState(false);
@@ -44,9 +44,7 @@ export function ReceiverFormDialog() {
          <DialogTrigger asChild>
             <Button variant="outline">
                {selectedReceiver ? <UserRoundPenIcon /> : <UserRoundPlus />}
-               <span className="hidden xl:block">
-                  {selectedReceiver ? "Editar" : "Crear"}
-               </span>
+               <span className="hidden xl:block">{selectedReceiver ? "Editar" : "Crear"}</span>
             </Button>
          </DialogTrigger>
          <DialogContent className="sm:max-w-[550px]">
@@ -77,7 +75,7 @@ const ReceiverForm = ({
          selectedReceiver: state.selectedReceiver,
          setSelectedReceiver: state.setSelectedReceiver,
          selectedCustomer: state.selectedCustomer,
-      }))
+      })),
    );
    const [isProvinceOpen, setIsProvinceOpen] = useState(false);
    const [isCityOpen, setIsCityOpen] = useState(false);
@@ -112,37 +110,35 @@ const ReceiverForm = ({
    }, [receiverByCI]);
 
    useEffect(() => {
-      if (selectedReceiver == null) {
-         form.reset({
-            first_name: "",
-            middle_name: "",
-            last_name: "",
-            second_last_name: "",
-            ci: "",
-            email: undefined,
-            phone: "",
-            mobile: "",
-            address: "",
-            province_id: undefined,
-            city_id: undefined,
-            passport: undefined,
-         });
-      } else {
-         form.reset({
-            first_name: selectedReceiver.first_name,
-            middle_name: selectedReceiver.middle_name ?? "",
-            last_name: selectedReceiver.last_name,
-            second_last_name: selectedReceiver.second_last_name,
-            ci: selectedReceiver.ci,
-            email: selectedReceiver.email ? selectedReceiver.email : undefined,
-            phone: selectedReceiver.phone ? selectedReceiver.phone : undefined,
-            mobile: selectedReceiver.mobile ? selectedReceiver.mobile.slice(2) : undefined,
-            address: selectedReceiver.address ? selectedReceiver.address : undefined,
-            province_id: selectedReceiver.province_id ? selectedReceiver.province_id : undefined,
-            city_id: selectedReceiver.city_id ? selectedReceiver.city_id : undefined,
-         });
-      }
-   }, [selectedReceiver]);
+      selectedReceiver == null
+         ? form.reset({
+              first_name: "",
+              middle_name: "",
+              last_name: "",
+              second_last_name: "",
+              ci: "",
+              email: undefined,
+              phone: "",
+              mobile: "",
+              address: "",
+              province_id: undefined,
+              city_id: undefined,
+              passport: undefined,
+           })
+         : form.reset({
+              first_name: selectedReceiver.first_name,
+              middle_name: selectedReceiver.middle_name ?? "",
+              last_name: selectedReceiver.last_name,
+              second_last_name: selectedReceiver.second_last_name,
+              ci: selectedReceiver.ci,
+              email: selectedReceiver.email ? selectedReceiver.email : undefined,
+              phone: selectedReceiver.phone ? selectedReceiver.phone : undefined,
+              mobile: selectedReceiver.mobile ? selectedReceiver.mobile.slice(2) : undefined,
+              address: selectedReceiver.address ? selectedReceiver.address : undefined,
+              province_id: selectedReceiver.province_id ? selectedReceiver.province_id : undefined,
+              city_id: selectedReceiver.city_id ? selectedReceiver.city_id : undefined,
+           });
+   }, [selectedReceiver,form]);
 
    const provinceId = useWatch({ control: form.control, name: "province_id" });
    const cities = useMemo(() => {
@@ -349,7 +345,7 @@ const ReceiverForm = ({
                      )}
                   />
                </Field>
-               
+
                <Separator />
                <Field orientation="horizontal">
                   <Controller
@@ -365,7 +361,7 @@ const ReceiverForm = ({
                                     role="combobox"
                                     className={cn(
                                        "w-full lg:w-[200px] justify-between",
-                                       !field.value && "text-muted-foreground"
+                                       !field.value && "text-muted-foreground",
                                     )}
                                  >
                                     {field.value
@@ -393,7 +389,7 @@ const ReceiverForm = ({
                                                 <Check
                                                    className={cn(
                                                       "ml-auto",
-                                                      province.id === field.value ? "opacity-100" : "opacity-0"
+                                                      province.id === field.value ? "opacity-100" : "opacity-0",
                                                    )}
                                                 />
                                              </CommandItem>
@@ -421,7 +417,7 @@ const ReceiverForm = ({
                                     role="combobox"
                                     className={cn(
                                        "w-full lg:w-[200px] justify-between",
-                                       !field.value && "text-muted-foreground"
+                                       !field.value && "text-muted-foreground",
                                     )}
                                  >
                                     {field?.value
@@ -449,7 +445,7 @@ const ReceiverForm = ({
                                                 <Check
                                                    className={cn(
                                                       "ml-auto",
-                                                      city.id === field.value ? "opacity-100" : "opacity-0"
+                                                      city.id === field.value ? "opacity-100" : "opacity-0",
                                                    )}
                                                 />
                                              </CommandItem>

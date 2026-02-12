@@ -27,8 +27,8 @@ export const DispatchStats = ({
    showProgress = true,
 }: DispatchStatsProps): React.ReactElement => {
    return (
-      <>
-         <div className="flex flex-wrap items-center gap-4 ">
+      <div className="flex flex-col  my-2 border p-4 rounded-lg bg-muted">
+         <div className="flex flex-wrap items-center gap-4  ">
             {indicators.map((indicator, index) => (
                <div key={index} className="flex items-center gap-2">
                   <span className={`h-2 w-2 rounded-full ${colorMap[indicator.color]}`} />
@@ -47,6 +47,6 @@ export const DispatchStats = ({
                className="mt-3 h-2 [&>[data-slot=progress-indicator]]:bg-emerald-500"
             />
          )}
-      </>
+      </div>
    );
 };

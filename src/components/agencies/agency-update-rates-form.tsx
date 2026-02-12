@@ -32,10 +32,10 @@ export const AgencyUpdateRatesForm = ({
          price_in_cents: centsToDollars(rate?.price_in_cents || 0),
       },
    });
+
    const { mutate: updateRate, isPending } = useShippingRates.update(rate?.id as number);
 
    function onSubmit(data: z.infer<typeof formSchema>) {
-      console.log(data);
       updateRate(
          {
             ...rate,
@@ -55,23 +55,10 @@ export const AgencyUpdateRatesForm = ({
                   "Error al actualizar la tarifa";
                toast.error(errorMessage);
             },
-         }
+         },
       );
 
-      /*       toast("You submitted the following values:", {
-         description: (
-            <pre className="bg-code text-code-foreground mt-2 w-[320px] overflow-x-auto rounded-md p-4">
-               <code>{JSON.stringify(data, null, 2)}</code>
-            </pre>
-         ),
-         position: "bottom-right",
-         classNames: {
-            content: "flex flex-col gap-2",
-         },
-         style: {
-            "--border-radius": "calc(var(--radius)  + 4px)",
-         } as React.CSSProperties,
-      }); */
+     
    }
    return (
       <form id="form-update-rate" onSubmit={form.handleSubmit(onSubmit)}>
@@ -140,7 +127,8 @@ export const AgencyUpdateRatesForm = ({
             <Button type="submit" form="form-update-rate">
                {isPending ? (
                   <>
-                     <Spinner className="w-4 h-4 animate-spin" /> <span className="hidden md:block">Actualizando tarifa...</span>
+                     <Spinner className="w-4 h-4 animate-spin" />{" "}
+                     <span className="hidden md:block">Actualizando tarifa...</span>
                   </>
                ) : (
                   "Actualizar tarifa"

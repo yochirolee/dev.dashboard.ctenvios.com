@@ -52,7 +52,7 @@ const formatPaymentMethod = (method: string): string => {
    return methods[method] || method;
 };
 
-// Open daily closure PDF report in new tab
+// Open daily closure PDF report in new tab (fetch with auth, then open blob URL)
 interface SalesReportFilters {
    date: string;
    user_id?: string;
@@ -71,11 +71,11 @@ const openSalesReport = async (filters: SalesReportFilters): Promise<void> => {
       const blob = new Blob([response.data], { type: "application/pdf" });
       const url = URL.createObjectURL(blob);
       window.open(url, "_blank");
-
       toast.dismiss("sales-report");
    } catch (error) {
       console.error("Error opening sales report:", error);
-      toast.error("Error al generar el reporte", { id: "sales-report" });
+      toast.dismiss("sales-report");
+      toast.error("Error al generar el reporte");
    }
 };
 
