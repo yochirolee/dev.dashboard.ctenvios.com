@@ -14,7 +14,10 @@ import {
 } from "@/components/ui/dropdown-menu";
 import type { Dispatch } from "@/data/types";
 
-export const dispatchColumns = (handleDeleteDispatch: (dispatch_id: number) => void): ColumnDef<Dispatch>[] => [
+export const dispatchColumns = (
+   handleDeleteDispatch: (dispatch_id: number) => void,
+   isAdmin: boolean,
+): ColumnDef<Dispatch>[] => [
    {
       id: "select",
       header: ({ table }) => (
@@ -100,7 +103,7 @@ export const dispatchColumns = (handleDeleteDispatch: (dispatch_id: number) => v
          );
       },
    },
-  
+
    {
       accessorKey: "sender_agency.name",
       header: "Sender",
@@ -163,7 +166,7 @@ export const dispatchColumns = (handleDeleteDispatch: (dispatch_id: number) => v
          );
       },
    },
-    {
+   {
       accessorKey: "payment_status",
       header: "Pago",
       cell: ({ row }) => {
@@ -272,10 +275,7 @@ export const dispatchColumns = (handleDeleteDispatch: (dispatch_id: number) => v
                   <DropdownMenuContent>
                      <DropdownMenuItem
                         onClick={() => {
-                           window.open(
-                              `${import.meta.env.VITE_API_URL}/dispatches/${row.original?.id}/pdf`,
-                              "_blank"
-                           );
+                           window.open(`${import.meta.env.VITE_API_URL}/dispatches/${row.original?.id}/pdf`, "_blank");
                         }}
                      >
                         <Printer className="w-4 h-4 mr-2" />
@@ -290,13 +290,15 @@ export const dispatchColumns = (handleDeleteDispatch: (dispatch_id: number) => v
                            Editar
                         </Link>
                      </DropdownMenuItem>
-                     <DropdownMenuItem
-                        className="text-destructive"
-                        onClick={() => handleDeleteDispatch(row.original?.id)}
-                     >
-                        <Trash2Icon className="w-4 h-4 mr-2" />
-                        Eliminar
-                     </DropdownMenuItem>
+                     {isAdmin && (
+                        <DropdownMenuItem
+                           className="text-destructive"
+                           onClick={() => handleDeleteDispatch(row.original?.id)}
+                        >
+                           <Trash2Icon className="w-4 h-4 mr-2" />
+                           Eliminar
+                        </DropdownMenuItem>
+                     )}
                   </DropdownMenuContent>
                </DropdownMenu>
             </div>

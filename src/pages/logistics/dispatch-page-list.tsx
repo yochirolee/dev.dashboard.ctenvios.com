@@ -12,6 +12,8 @@ import { AlertDeleteDispatch } from "@/components/dispatch/alert-delete-dispatch
 import usePagination from "@/hooks/use-pagination";
 import { DataTableFacetedFilter } from "@/components/ui/data-table-faceted-filter";
 import { Input } from "@/components/ui/input";
+import { useAppStore } from "@/stores/app-store";
+import { hasRole, ROLE_GROUPS } from "@/lib/rbac";
 
 // Status options with colors
 const statusOptions = [
@@ -39,6 +41,10 @@ export const DispatchPageLists = () => {
    const [selectedStatus, setSelectedStatus] = useState<string | undefined>(undefined);
    const [selectedPaymentStatus, setSelectedPaymentStatus] = useState<string | undefined>(undefined);
    const [searchDispatchId, setSearchDispatchId] = useState<string>("");
+
+   const user = useAppStore((state: any) => state.user);
+   const userRole = (user as any)?.role as string;
+   const isAdmin = hasRole(userRole as any, ROLE_GROUPS.SYSTEM_ADMINS);
 
    // Parse dispatch_id as number if valid
    const dispatchIdNumber = searchDispatchId ? parseInt(searchDispatchId, 10) : undefined;
@@ -88,7 +94,7 @@ export const DispatchPageLists = () => {
    }, [createDispatchMutation, navigate]);
 
    // Memoize columns to prevent recreation on every render
-   const columns = useMemo(() => dispatchColumns(handleDeleteDispatch), [handleDeleteDispatch]);
+   const columns = useMemo(() => dispatchColumns(handleDeleteDispatch, isAdmin), [handleDeleteDispatch, isAdmin]);
 
    // Only show empty component if no filters are active
    if (dispatches.length === 0 && !hasActiveFilters && !isLoading)
