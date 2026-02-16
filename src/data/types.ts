@@ -508,6 +508,7 @@ export interface Dispatch {
    weight: number;
    declared_cost_in_cents: number;
    cost_in_cents: number;
+   paid_in_cents: number;
    payment_status: PaymentStatus;
 
    created_at: string;
@@ -527,6 +528,29 @@ export interface Dispatch {
    _count: {
       order_items: number;
    };
+}
+
+/** Dispatch payment (GET /dispatches/:id/payments or POST response) */
+export interface DispatchPayment {
+   id: number;
+   amount_in_cents: number;
+   charge_in_cents?: number;
+   method: string;
+   reference?: string;
+   date?: string;
+   created_at?: string;
+   notes?: string;
+   paid_by?: { id: number; name: string };
+}
+
+/** Body for POST /dispatches/:id/payments (same shape as order payments) */
+export interface DispatchPaymentCreate {
+   amount_in_cents: number;
+   method: string;
+   reference?: string;
+   notes?: string;
+   charge_in_cents?: number;
+   date?: string;
 }
 
 /// PALLETS

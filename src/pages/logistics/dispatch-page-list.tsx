@@ -14,6 +14,7 @@ import { DataTableFacetedFilter } from "@/components/ui/data-table-faceted-filte
 import { Input } from "@/components/ui/input";
 import { useAppStore } from "@/stores/app-store";
 import { hasRole, ROLE_GROUPS } from "@/lib/rbac";
+import { useAgencies } from "@/hooks/use-agencies";
 
 // Status options with colors
 const statusOptions = [
@@ -40,11 +41,14 @@ export const DispatchPageLists = () => {
    const { pagination, setPagination } = usePagination();
    const [selectedStatus, setSelectedStatus] = useState<string | undefined>(undefined);
    const [selectedPaymentStatus, setSelectedPaymentStatus] = useState<string | undefined>(undefined);
+   const [selectedAgencyId, setSelectedAgencyId] = useState<number | undefined>(undefined);
    const [searchDispatchId, setSearchDispatchId] = useState<string>("");
 
    const user = useAppStore((state: any) => state.user);
    const userRole = (user as any)?.role as string;
    const isAdmin = hasRole(userRole as any, ROLE_GROUPS.SYSTEM_ADMINS);
+
+   const { data: agencies } = useAgencies.get();
 
    // Parse dispatch_id as number if valid
    const dispatchIdNumber = searchDispatchId ? parseInt(searchDispatchId, 10) : undefined;
@@ -55,7 +59,8 @@ export const DispatchPageLists = () => {
       pagination.pageSize,
       selectedStatus,
       selectedPaymentStatus,
-      validDispatchId
+      validDispatchId,
+      selectedAgencyId,
    );
    const navigate = useNavigate();
    const dispatches = data?.rows ?? [];
@@ -69,11 +74,12 @@ export const DispatchPageLists = () => {
    const clearFilters = useCallback((): void => {
       setSelectedStatus(undefined);
       setSelectedPaymentStatus(undefined);
+      setSelectedAgencyId(undefined);
       setSearchDispatchId("");
       setPagination((prev) => ({ ...prev, pageIndex: 0 }));
    }, [setPagination]);
 
-   const hasActiveFilters = !!selectedStatus || !!selectedPaymentStatus || !!searchDispatchId;
+   const hasActiveFilters = !!selectedStatus || !!selectedPaymentStatus || !!selectedAgencyId || !!searchDispatchId;
 
    const handleDeleteDispatch = useCallback((dispatch_id: number) => {
       setDispatchId(dispatch_id);
@@ -156,15 +162,21 @@ export const DispatchPageLists = () => {
                   className="h-8 w-full md:w-[150px] lg:w-[200px]"
                />
                <div className="flex flex-wrap items-center gap-2">
-                  <DataTableFacetedFilter
-                     title="Status"
-                     options={statusOptions}
-                     selectedValue={selectedStatus}
-                     onSelect={(value) => {
-                        setSelectedStatus(value);
-                        setPagination((prev) => ({ ...prev, pageIndex: 0 }));
-                     }}
-                  />
+                  {isAdmin && agencies && (
+                     <DataTableFacetedFilter
+                        title="Agencia"
+                        options={agencies.map((agency: { id: number; name: string }) => ({
+                           value: agency.id.toString(),
+                           label: agency.name,
+                        }))}
+                        selectedValue={selectedAgencyId?.toString()}
+                        onSelect={(value) => {
+                           setSelectedAgencyId(value ? parseInt(value, 10) : undefined);
+                           setPagination((prev) => ({ ...prev, pageIndex: 0 }));
+                        }}
+                     />
+                  )}
+
                   <DataTableFacetedFilter
                      title="Pago"
                      options={paymentStatusOptions}
@@ -174,6 +186,16 @@ export const DispatchPageLists = () => {
                         setPagination((prev) => ({ ...prev, pageIndex: 0 }));
                      }}
                   />
+                  <DataTableFacetedFilter
+                     title="Status"
+                     options={statusOptions}
+                     selectedValue={selectedStatus}
+                     onSelect={(value) => {
+                        setSelectedStatus(value);
+                        setPagination((prev) => ({ ...prev, pageIndex: 0 }));
+                     }}
+                  />
+
                   {hasActiveFilters && (
                      <Button variant="ghost" onClick={clearFilters} className="h-8 px-2 lg:px-3">
                         Reset

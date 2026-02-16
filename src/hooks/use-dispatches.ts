@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useInfiniteQuery } from "@tanstack/react-query";
 import api from "@/api/api";
 import { queryClient } from "@/lib/query-client";
+import type { DispatchPaymentCreate } from "@/data/types";
 
 export const useDispatches = {
    get: (
@@ -218,6 +219,40 @@ export const useDispatches = {
          queryFn: () => api.dispatch.getById(dispatch_id),
          enabled: !!dispatch_id && dispatch_id > 0,
          retry: false,
+      });
+   },
+
+   getPayments: (dispatch_id: number) => {
+      return useQuery({
+         queryKey: ["dispatch-payments", dispatch_id],
+         queryFn: () => api.dispatch.getPayments(dispatch_id),
+         enabled: !!dispatch_id && dispatch_id > 0,
+      });
+   },
+
+   addPayment: (dispatch_id: number) => {
+      return useMutation({
+         mutationFn: (data: DispatchPaymentCreate) => api.dispatch.addPayment(dispatch_id, data),
+         onSuccess: async () => {
+            await Promise.all([
+               queryClient.invalidateQueries({ queryKey: ["dispatch-by-id", dispatch_id] }),
+               queryClient.invalidateQueries({ queryKey: ["dispatch-payments", dispatch_id] }),
+               queryClient.invalidateQueries({ queryKey: ["dispatches"] }),
+            ]);
+         },
+      });
+   },
+
+   deletePayment: (dispatch_id: number) => {
+      return useMutation({
+         mutationFn: (payment_id: number) => api.dispatch.deletePayment(dispatch_id, payment_id),
+         onSuccess: async () => {
+            await Promise.all([
+               queryClient.invalidateQueries({ queryKey: ["dispatch-by-id", dispatch_id] }),
+               queryClient.invalidateQueries({ queryKey: ["dispatch-payments", dispatch_id] }),
+               queryClient.invalidateQueries({ queryKey: ["dispatches"] }),
+            ]);
+         },
       });
    },
 

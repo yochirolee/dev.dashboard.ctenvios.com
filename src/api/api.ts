@@ -17,6 +17,7 @@ import {
    type ParcelStatus,
    type FinancialDashboard,
    type DailyClosing,
+   type DispatchPaymentCreate,
 } from "@/data/types";
 import { useAppStore } from "@/stores/app-store";
 import { toast } from "sonner";
@@ -618,6 +619,18 @@ const api = {
       },
       smartReceive: async (tracking_numbers: string[]) => {
          const response = await axiosInstance.post(`/dispatches/smart-receive`, { tracking_numbers });
+         return response.data;
+      },
+      getPayments: async (dispatch_id: number) => {
+         const response = await axiosInstance.get(`/dispatches/${dispatch_id}/payments`);
+         return response.data;
+      },
+      addPayment: async (dispatch_id: number, data: DispatchPaymentCreate) => {
+         const response = await axiosInstance.post(`/dispatches/${dispatch_id}/payments`, data);
+         return response.data;
+      },
+      deletePayment: async (dispatch_id: number, payment_id: number) => {
+         const response = await axiosInstance.delete(`/dispatches/${dispatch_id}/payments/${payment_id}`);
          return response.data;
       },
    },

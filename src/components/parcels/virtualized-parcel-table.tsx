@@ -5,13 +5,7 @@ import { CheckCircle2, Trash2Icon, type LucideIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import { format } from "date-fns";
-import {
-   useReactTable,
-   getCoreRowModel,
-   flexRender,
-   createColumnHelper,
-   type ColumnDef,
-} from "@tanstack/react-table";
+import { useReactTable, getCoreRowModel, flexRender, createColumnHelper, type ColumnDef } from "@tanstack/react-table";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { getStatusBadge } from "@/lib/parcel-status";
 import QRCode from "react-qr-code";
@@ -80,12 +74,7 @@ const DeleteButton = ({
    onRemove: (tn: string) => void;
    isRemoving: boolean;
 }): React.ReactElement => (
-   <Button
-      variant="ghost"
-      size="icon"
-      onClick={() => onRemove(trackingNumber)}
-      disabled={isRemoving}
-   >
+   <Button variant="ghost" size="icon" onClick={() => onRemove(trackingNumber)} disabled={isRemoving}>
       {isRemoving ? <Spinner className="h-4 w-4" /> : <Trash2Icon className="h-4 w-4" />}
    </Button>
 );
@@ -127,7 +116,7 @@ export function VirtualizedParcelTable<T extends Parcel>({
          }
          onDelete(trackingNumber);
       },
-      [onDelete, externalRemovingTrackingNumber]
+      [onDelete, externalRemovingTrackingNumber],
    );
 
    // Reset internal removing state when data changes (deletion complete)
@@ -147,7 +136,7 @@ export function VirtualizedParcelTable<T extends Parcel>({
          }
          return canDelete;
       },
-      [canDelete]
+      [canDelete],
    );
 
    const columns = useMemo<ColumnDef<Parcel, any>[]>(() => {
@@ -159,7 +148,7 @@ export function VirtualizedParcelTable<T extends Parcel>({
                id: "icon",
                cell: () => <CheckCircle2 className="h-4 w-4 text-green-500 shrink-0" />,
                meta: { flex: "none", width: "32px" },
-            })
+            }),
          );
       }
 
@@ -176,7 +165,7 @@ export function VirtualizedParcelTable<T extends Parcel>({
                   ) : null;
                },
                meta: { flex: "none", width: "56px" },
-            })
+            }),
          );
       }
 
@@ -185,23 +174,29 @@ export function VirtualizedParcelTable<T extends Parcel>({
             id: "tracking",
             header: "Tracking",
             cell: (info) => (
-               <span className="text-sm font-medium truncate">{info.getValue()}</span>
+               <div className="flex flex-col gap-0.5 min-w-0">
+                  <span className="text-sm font-medium truncate">{info.getValue()}</span>
+                  <span className="text-xs text-muted-foreground truncate" title={info.row.original.description ?? ""}>
+                     {info.row.original.description ?? "-"}
+                  </span>
+               </div>
             ),
-            meta: { flex: "none", width: "180px" },
-         })
+            meta: { flex: "1", minWidth: "80px" },
+         }),
       );
 
       if (showOrder) {
          cols.push(
             columnHelper.accessor("order_id", {
+               id: "order_id",
                header: "Orden",
                cell: (info) => (
-                  <Badge variant="outline" className="w-fit text-xs">
-                     {info.getValue() || "-"}
+                  <Badge variant="outline" className="text-xs text-muted-foreground truncate block">
+                     Orden: {info.row.original.order_id}
                   </Badge>
                ),
-               meta: { flex: "none", width: "80px" },
-            })
+               meta: { flex: "1", minWidth: "80px" },
+            }),
          );
       }
 
@@ -215,8 +210,8 @@ export function VirtualizedParcelTable<T extends Parcel>({
                      {info.getValue() || "-"}
                   </Badge>
                ),
-               meta: { flex: "none", width: "140px" },
-            })
+               meta: { flex: "1", minWidth: "80px" },
+            }),
          );
       }
 
@@ -224,24 +219,22 @@ export function VirtualizedParcelTable<T extends Parcel>({
          cols.push(
             columnHelper.accessor("status", {
                header: "Estado",
-               cell: (info) => getStatusBadge(info.getValue() || ""),
-               meta: { flex: "none", width: "140px" },
-            })
+               cell: (info) => (
+                  <div className="flex flex-col gap-0.5 min-w-0">
+                     <span className="text-xs text-muted-foreground truncate block">
+                        {getStatusBadge(info.getValue() || "")}
+                     </span>
+                     <span className="text-xs text-muted-foreground truncate block">
+                        {info.row.original.updated_at
+                           ? format(new Date(info.row.original.updated_at), "dd/MM/yy HH:mm")
+                           : "-"}
+                     </span>
+                  </div>
+               ),
+               meta: { flex: "1", minWidth: "90px" },
+            }),
          );
       }
-
-      // Description column - grows to fill space
-      cols.push(
-         columnHelper.accessor("description", {
-            header: "Descripción",
-            cell: (info) => (
-               <span className="block max-w-full truncate text-xs text-muted-foreground">
-                  {info.getValue() || "-"}
-               </span>
-            ),
-            meta: { flex: "1", minWidth: "100px" },
-         })
-      );
 
       if (showWeight) {
          cols.push(
@@ -250,27 +243,13 @@ export function VirtualizedParcelTable<T extends Parcel>({
                cell: (info) => {
                   const weight = info.getValue();
                   return (
-                     <span className="text-xs text-muted-foreground">
+                     <span className="text-xs text-muted-foreground truncate block">
                         {weight ? `${Number(weight).toFixed(2)} lbs` : "-"}
                      </span>
                   );
                },
-               meta: { flex: "none", width: "70px" },
-            })
-         );
-      }
-
-      if (showDate) {
-         cols.push(
-            columnHelper.accessor("updated_at", {
-               header: "Fecha",
-               cell: (info) => (
-                  <span className="text-xs text-muted-foreground">
-                     {info.getValue() ? format(new Date(info.getValue()), "dd/MM/yy HH:mm") : "-"}
-                  </span>
-               ),
-               meta: { flex: "none", width: "100px" },
-            })
+               meta: { flex: "1", minWidth: "64px" },
+            }),
          );
       }
 
@@ -282,18 +261,20 @@ export function VirtualizedParcelTable<T extends Parcel>({
                id: "actions",
                cell: ({ row, table }) => {
                   const trackingNumber = row.original.tracking_number || row.original.hbl || "";
-                  const tableMeta = table.options.meta as {
-                     removingTrackingNumber: string | null;
-                     onRemove: (tn: string) => void;
-                     canDeleteRow: (row: Parcel) => boolean;
-                  } | undefined;
-                  
+                  const tableMeta = table.options.meta as
+                     | {
+                          removingTrackingNumber: string | null;
+                          onRemove: (tn: string) => void;
+                          canDeleteRow: (row: Parcel) => boolean;
+                       }
+                     | undefined;
+
                   // Check if this specific row can be deleted
                   const rowCanDelete = tableMeta?.canDeleteRow?.(row.original) ?? true;
                   if (!rowCanDelete) {
                      return <div className="w-8" />; // Empty placeholder for alignment
                   }
-                  
+
                   const isRemoving = tableMeta?.removingTrackingNumber === trackingNumber;
                   return (
                      <DeleteButton
@@ -304,7 +285,7 @@ export function VirtualizedParcelTable<T extends Parcel>({
                   );
                },
                meta: { flex: "none", width: "48px" },
-            })
+            }),
          );
       }
 
@@ -394,11 +375,13 @@ export function VirtualizedParcelTable<T extends Parcel>({
                               className="flex items-center px-4 py-2 border-b border-border hover:bg-muted/50 transition-colors"
                            >
                               {row.getVisibleCells().map((cell) => {
-                                 const meta = cell.column.columnDef.meta as {
-                                    flex?: string;
-                                    width?: string;
-                                    minWidth?: string;
-                                 } | undefined;
+                                 const meta = cell.column.columnDef.meta as
+                                    | {
+                                         flex?: string;
+                                         width?: string;
+                                         minWidth?: string;
+                                      }
+                                    | undefined;
                                  return (
                                     <div
                                        key={cell.id}
@@ -407,7 +390,7 @@ export function VirtualizedParcelTable<T extends Parcel>({
                                           width: meta?.width,
                                           minWidth: meta?.minWidth,
                                        }}
-                                       className="px-1 overflow-hidden"
+                                       className={`px-1 overflow-hidden ${meta?.flex === "1" ? "min-w-0" : ""}`}
                                     >
                                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
                                     </div>

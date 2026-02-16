@@ -32,7 +32,7 @@ export const CreateDispatchPage = (): React.ReactElement => {
    const { mutate: addItem, isPending: isAddingItem } = useDispatches.addParcel(dispatchIdNumber, agency_id ?? 0);
    const { mutate: addParcelsByOrderId, isPending: isAddingByOrder } = useDispatches.addParcelsByOrderId(
       dispatchIdNumber,
-      agency_id ?? 0
+      agency_id ?? 0,
    );
 
    // Use infinite queries for parcels
@@ -88,7 +88,7 @@ export const CreateDispatchPage = (): React.ReactElement => {
                      errorMessage,
                   });
                },
-            }
+            },
          );
       } else if (scanMode === "order_id") {
          const orderId = Number(inputValue);
@@ -116,7 +116,7 @@ export const CreateDispatchPage = (): React.ReactElement => {
                      errorMessage,
                   });
                },
-            }
+            },
          );
       } else {
          toast.error("Agregar por despacho no está disponible al crear despacho");
@@ -155,22 +155,22 @@ export const CreateDispatchPage = (): React.ReactElement => {
                onSettled: () => {
                   setRemovingTrackingNumber(null);
                },
-            }
+            },
          );
       },
-      [removeParcelMutation]
+      [removeParcelMutation],
    );
 
    // Flatten pages from infinite queries
    const agencyPackages = useMemo(
       () => agencyPackagesData?.pages?.flatMap((page) => page?.rows ?? []) ?? [],
-      [agencyPackagesData]
+      [agencyPackagesData],
    );
 
    console.log(agencyPackages, "agencyPackages");
    const dispatchParcels = useMemo(
       () => dispatchParcelsData?.pages?.flatMap((page) => page?.rows ?? []) ?? [],
-      [dispatchParcelsData]
+      [dispatchParcelsData],
    );
 
    const dispatchTrackingSet = useMemo(() => {
@@ -192,7 +192,7 @@ export const CreateDispatchPage = (): React.ReactElement => {
          (pkg: { tracking_number: string; description?: string; order_id?: number }) =>
             pkg.tracking_number?.toLowerCase().includes(normalized) ||
             pkg.description?.toLowerCase().includes(normalized) ||
-            String(pkg.order_id ?? "").includes(normalized)
+            String(pkg.order_id ?? "").includes(normalized),
       );
    }, [dispatchParcels, searchTerm]);
 
@@ -204,7 +204,7 @@ export const CreateDispatchPage = (): React.ReactElement => {
          (pkg: { tracking_number: string; description?: string; order_id?: number }) =>
             pkg.tracking_number?.toLowerCase().includes(normalized) ||
             pkg.description?.toLowerCase().includes(normalized) ||
-            String(pkg.order_id ?? "").includes(normalized)
+            String(pkg.order_id ?? "").includes(normalized),
       );
    }, [pendingPackages, searchTerm]);
 
@@ -296,9 +296,9 @@ export const CreateDispatchPage = (): React.ReactElement => {
                            onDelete={handleRemoveParcel}
                            canDelete={true}
                            removingTrackingNumber={removingTrackingNumber}
-                           showQR={true}
+                           showQR={false}
                            showStatus={true}
-                           showAgency={false}
+                           showAgency={true}
                            showWeight={true}
                            showDate={true}
                            emptyMessage="Escanea paquetes para agregarlos"
@@ -323,10 +323,12 @@ export const CreateDispatchPage = (): React.ReactElement => {
                      }
                      showIcon={false}
                      showQR={true}
-                     showStatus={false}
+                     showStatus={true}
                      showAgency={false}
-                     showWeight={true}
-                     showDate={false}
+                     showWeight={false}
+                     showDate={true}
+                     showOrder={true}
+                     canDelete={false}
                      emptyMessage="Todos los paquetes han sido agregados"
                   />
                </div>

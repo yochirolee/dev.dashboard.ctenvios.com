@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { formatCents } from "@/lib/cents-utils";
 import { format } from "date-fns";
 import { Button } from "@/components/ui/button";
-import { EllipsisVertical, Pencil, Printer, Trash2Icon } from "lucide-react";
+import { PackagePlusIcon, DollarSign, EllipsisVertical, Printer, Trash2Icon } from "lucide-react";
 import {
    DropdownMenu,
    DropdownMenuContent,
@@ -61,6 +61,8 @@ export const dispatchColumns = (
                   return "bg-gray-400";
                case "LOADING":
                   return "bg-blue-400";
+               case "PARTIAL_RECEIVED":
+                  return "bg-orange-400";
                case "DISPATCHED":
                   return "bg-yellow-400";
                case "RECEIVING":
@@ -81,6 +83,8 @@ export const dispatchColumns = (
                   return "Creado";
                case "LOADING":
                   return "Cargando";
+               case "PARTIAL_RECEIVED":
+                  return "Parcial";
                case "DISPATCHED":
                   return "Despachado";
                case "RECEIVING":
@@ -106,24 +110,26 @@ export const dispatchColumns = (
 
    {
       accessorKey: "sender_agency.name",
-      header: "Sender",
+      header: "Created",
       cell: ({ row }) => {
          return (
             <div className="flex flex-col items-start gap-2 min-w-0" title={row.original?.sender_agency?.name}>
                <Badge variant="outline">{row.original?.sender_agency?.name}</Badge>
+               <span className="text-xs pl-1 text-muted-foreground">{row.original?.created_by?.name}</span>
             </div>
          );
       },
    },
    {
       accessorKey: "receiver_agency.name",
-      header: "Receiver",
+      header: "Received",
       cell: ({ row }) => {
          return (
             <div className="flex flex-col items-start gap-2 min-w-0" title={row.original?.receiver_agency?.name}>
                {row.original?.status === "RECEIVED" ? (
                   <Badge variant="outline">{row.original?.receiver_agency?.name}</Badge>
                ) : null}
+               <span className="text-xs pl-1 text-muted-foreground">{row.original?.received_by?.name}</span>
             </div>
          );
       },
@@ -149,26 +155,39 @@ export const dispatchColumns = (
          return (
             <div className="flex items-center gap-2 min-w-0">
                <span className="text-sm">
-                  {row.original?.received_parcels_count ?? 0} / {row.original?.received_parcels_count ?? 0} lbs
+                  {row.original?.received_parcels_count ?? 0} / {row.original?.weight ?? 0} lbs
                </span>
             </div>
          );
       },
    },
+
    {
-      accessorKey: "declared_cost_in_cents",
-      header: "Declared Cost",
+      accessorKey: "created_at",
+      header: "Created At",
       cell: ({ row }) => {
          return (
-            <div className="flex items-center gap-2 min-w-0">
-               <span className="text-sm">{formatCents(row.original?.declared_cost_in_cents)}</span>
+            <div className="flex items-center gap-2 min-w-0 font-mono text-xs text-muted-foreground">
+               <span className="whitespace-nowrap">{format(row.original?.created_at, "dd/MM/yyyy HH:mm")}</span>
             </div>
          );
       },
    },
    {
+      accessorKey: "updated_at",
+      header: "Updated At",
+      cell: ({ row }) => {
+         return (
+            <div className="flex items-center gap-2 min-w-0 font-mono text-xs text-muted-foreground   ">
+               <span className="whitespace-nowrap">{format(row.original?.updated_at, "dd/MM/yyyy HH:mm")}</span>
+            </div>
+         );
+      },
+   },
+
+   {
       accessorKey: "payment_status",
-      header: "Pago",
+      header: "Payment",
       cell: ({ row }) => {
          const paymentStatus = row.original?.payment_status;
          const getPaymentColor = (s: string): string => {
@@ -215,47 +234,17 @@ export const dispatchColumns = (
          );
       },
    },
-
    {
-      accessorKey: "created_at",
-      header: "Created At",
+      accessorKey: "paid_in_cents",
+      header: "Total",
       cell: ({ row }) => {
          return (
-            <div className="flex items-center gap-2 min-w-0">
-               <span className="text-sm">{format(row.original?.created_at, "dd/MM/yyyy HH:mm")}</span>
-            </div>
-         );
-      },
-   },
-   {
-      accessorKey: "updated_at",
-      header: "Updated At",
-      cell: ({ row }) => {
-         return (
-            <div className="flex items-center gap-2 min-w-0">
-               <span className="text-sm">{format(row.original?.updated_at, "dd/MM/yyyy HH:mm")}</span>
-            </div>
-         );
-      },
-   },
-   {
-      accessorKey: "created_by.name",
-      header: "Created By",
-      cell: ({ row }) => {
-         return (
-            <div className="flex items-center gap-2 min-w-0">
-               <span className="text-sm">{row.original?.created_by?.name}</span>
-            </div>
-         );
-      },
-   },
-   {
-      accessorKey: "received_by.name",
-      header: "Received By",
-      cell: ({ row }) => {
-         return (
-            <div className="flex items-center gap-2 min-w-0">
-               <span className="text-sm">{row.original?.received_by?.name}</span>
+            <div className="text-right font-mono text-sm text-mute whitespace-nowrap flex flex-col items-end">
+               {formatCents(row.original?.cost_in_cents ?? 0)}
+               <span className="font-mono text-xs text-muted-foreground">
+                  {(row.original?.cost_in_cents - row.original?.paid_in_cents) / 100 !== 0 &&
+                     ` ${formatCents(row.original?.cost_in_cents - row.original?.paid_in_cents)}`}
+               </span>
             </div>
          );
       },
@@ -286,8 +275,17 @@ export const dispatchColumns = (
                            className="inline-flex items-center gap-2"
                            to={`/logistics/dispatch/create/${row.original?.id}`}
                         >
-                           <Pencil className="w-4 h-4 mr-2" />
-                           Editar
+                           <PackagePlusIcon className="w-4 h-4 mr-2" />
+                           Cargar Paquetes
+                        </Link>
+                     </DropdownMenuItem>
+                     <DropdownMenuItem asChild>
+                        <Link
+                           className="inline-flex items-center gap-2 w-full"
+                           to={`/logistics/dispatch/${row.original?.id}`}
+                        >
+                           <DollarSign className="w-4 h-4 mr-2" />
+                           Pagos
                         </Link>
                      </DropdownMenuItem>
                      {isAdmin && (

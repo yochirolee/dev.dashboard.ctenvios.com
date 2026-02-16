@@ -15,7 +15,7 @@ export const useOrders = {
       return useQuery({
          queryKey: ["get-orders", "search", searchQuery, page, limit, startDate, endDate, payment_status, agency_id],
          queryFn: () => api.orders.search(searchQuery, page, limit, startDate, endDate, payment_status, agency_id),
-         staleTime: 1000 * 60 * 5,
+         staleTime: 1000 * 60 * 1,
          refetchOnWindowFocus: true,
          refetchOnMount: true,
       });
