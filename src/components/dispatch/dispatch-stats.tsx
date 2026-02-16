@@ -1,4 +1,5 @@
 import { Progress } from "@/components/ui/progress";
+import { Card, CardContent } from "../ui/card";
 
 interface StatIndicator {
    label: string;
@@ -13,39 +14,30 @@ interface DispatchStatsProps {
    showProgress?: boolean;
 }
 
-const colorMap = {
-   emerald: "bg-emerald-600",
-   blue: "bg-blue-500",
-   orange: "bg-orange-500",
-   red: "bg-red-500",
-   gray: "bg-gray-500",
-};
-
 export const DispatchStats = ({
    indicators,
    progressValue = 0,
    showProgress = true,
 }: DispatchStatsProps): React.ReactElement => {
    return (
-      <div className="flex flex-col  my-2 border p-4 rounded-lg bg-muted">
-         <div className="flex flex-wrap items-center gap-4  ">
+      <div className="flex flex-col ">
+         <div className="grid grid-cols-3 gap-4 mx-2 ">
             {indicators.map((indicator, index) => (
-               <div key={index} className="flex items-center gap-2">
-                  <span className={`h-2 w-2 rounded-full ${colorMap[indicator.color]}`} />
-                  <span className="text-sm text-muted-foreground">
-                     {indicator.total !== undefined
-                        ? `${indicator.value} de ${indicator.total} ${indicator.label}`
-                        : `${indicator.value} ${indicator.label}`}
-                  </span>
-               </div>
+               <Card key={index}>
+                  <CardContent className=" flex flex-col items-center justify-center text-center">
+                     <div className="flex items-center gap-2">
+                        <span className={`text-4xl font-bold text-${indicator.color}-500`}>{indicator.value}</span>
+                        <span className="text-sm text-muted-foreground">{indicator.label}</span>
+                     </div>
+                  </CardContent>
+               </Card>
             ))}
          </div>
 
          {showProgress && (
-            <Progress
-               value={progressValue}
-               className="mt-3 h-2 [&>[data-slot=progress-indicator]]:bg-emerald-500"
-            />
+            <div className="mx-2">
+               <Progress value={progressValue} className="my-3 h-2 [&>[data-slot=progress-indicator]]:bg-emerald-500" />
+            </div>
          )}
       </div>
    );

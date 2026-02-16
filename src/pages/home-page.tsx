@@ -4,6 +4,7 @@ import { DashboardAreaChart } from "@/components/charts/area-chart";
 import { DashboardPieChart } from "@/components/charts/pie-chart";
 import { DashboardBarChart } from "@/components/charts/bar-chart";
 import { AgenciesSalesChart } from "@/components/charts/agencies-sales-chart";
+import { AgenciesParcelsWeightChart } from "@/components/charts/agencies-parcels-weight";
 export function HomePage() {
    return (
       <div className="@container/main p-2 md:p-4">
@@ -24,6 +25,7 @@ export function HomePage() {
                   <InteractiveChart />
                </div>
                <AgenciesSalesChart />
+               <AgenciesParcelsWeightChart />
                <DashboardAreaChart />
                <DashboardPieChart />
                <DashboardBarChart />

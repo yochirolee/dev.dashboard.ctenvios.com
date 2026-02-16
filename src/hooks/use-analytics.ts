@@ -14,4 +14,10 @@ export const useAnalytics = {
 			queryFn: () => api.analytics.getDailySalesByAgency(),
 		});
 	},
+	getPackagesWeightByAgency: () => {
+		return useQuery({
+			queryKey: ["analytics", "packages-weight-by-agency"],
+			queryFn: () => api.analytics.getPackagesWeightByAgency(),
+		});
+	},
 };

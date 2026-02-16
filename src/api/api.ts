@@ -460,6 +460,10 @@ const api = {
       },
    },
    analytics: {
+      getPackagesWeightByAgency: async () => {
+         const response = await axiosInstance.get("/analytics/packages-weight-in-agencies");
+         return response.data;
+      },
       getSales: async () => {
          const response = await axiosInstance.get("/analytics/sales");
 

@@ -1,18 +1,9 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Field, FieldLabel } from "@/components/ui/field";
 import { ButtonGroup } from "@/components/ui/button-group";
-import {
-   Package,
-   ArrowLeft,
-   Send,
-   X,
-   Plus,
-   Search,
-   PackageCheck,
-   Box,
-} from "lucide-react";
+import { Package, ArrowLeft, Send, X, Plus, Search, PackageCheck, Box } from "lucide-react";
 
 import { useDispatches } from "@/hooks/use-dispatches";
 import { toast } from "sonner";
@@ -25,6 +16,7 @@ import { DispatchStats } from "@/components/dispatch/dispatch-stats";
 import { Badge } from "@/components/ui/badge";
 import { Item, ItemActions, ItemContent, ItemMedia, ItemTitle } from "@/components/ui/item";
 import { VirtualizedParcelTable } from "@/components/parcels/virtualized-parcel-table";
+import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/input-group";
 
 interface ScannedParcel {
    tracking_number: string;
@@ -46,18 +38,53 @@ interface LoadedDispatch {
    }>;
 }
 
+const RECEIVE_DISPATCH_SESSION_KEY = "receive-dispatch-session";
+
+interface PersistedSession {
+   scannedParcels: ScannedParcel[];
+   loadedDispatchIds: number[];
+}
+
+function loadSession(): PersistedSession | null {
+   if (typeof window === "undefined") return null;
+   const raw = sessionStorage.getItem(RECEIVE_DISPATCH_SESSION_KEY);
+   if (!raw) return null;
+   const parsed = JSON.parse(raw) as unknown;
+   if (!parsed || typeof parsed !== "object") return null;
+   const sp = (parsed as PersistedSession).scannedParcels;
+   const ids = (parsed as PersistedSession).loadedDispatchIds;
+   return {
+      scannedParcels: Array.isArray(sp) ? sp : [],
+      loadedDispatchIds: Array.isArray(ids) ? ids : [],
+   };
+}
+
+function saveSession(session: PersistedSession): void {
+   if (typeof window === "undefined") return;
+   sessionStorage.setItem(RECEIVE_DISPATCH_SESSION_KEY, JSON.stringify(session));
+}
+
+function clearSession(): void {
+   if (typeof window === "undefined") return;
+   sessionStorage.removeItem(RECEIVE_DISPATCH_SESSION_KEY);
+}
+
 export const ReceiveDispatchPage = (): React.ReactElement => {
    const navigate = useNavigate();
 
-   // Scanner state
+   // Scanner state — restore scanned parcels from session so refresh keeps them
+   const [scannedParcels, setScannedParcels] = useState<ScannedParcel[]>(() => {
+      const session = loadSession();
+      return session?.scannedParcels ?? [];
+   });
    const [currentInput, setCurrentInput] = useState("");
-   const [scannedParcels, setScannedParcels] = useState<ScannedParcel[]>([]);
    const [lastScanStatus, setLastScanStatus] = useState<ScanFeedback | null>(null);
 
    // Dispatch loading state
    const [dispatchIdInput, setDispatchIdInput] = useState("");
    const [loadedDispatches, setLoadedDispatches] = useState<LoadedDispatch[]>([]);
    const [isLoadingDispatch, setIsLoadingDispatch] = useState(false);
+   const hasRestoredDispatches = useRef(false);
 
    // Filters
    const [searchTerm, setSearchTerm] = useState("");
@@ -65,9 +92,58 @@ export const ReceiveDispatchPage = (): React.ReactElement => {
    // Mutations
    const smartReceiveMutation = useDispatches.smartReceive();
 
+   // Restore loaded dispatches from session on mount (re-fetch each by id)
+   useEffect(() => {
+      if (hasRestoredDispatches.current) return;
+      const session = loadSession();
+      const ids = session?.loadedDispatchIds ?? [];
+      if (ids.length === 0) {
+         hasRestoredDispatches.current = true;
+         return;
+      }
+      hasRestoredDispatches.current = true;
+      const loadOne = async (id: number): Promise<LoadedDispatch | null> => {
+         const response = await axiosInstance.get(`/dispatches/${id}/parcels`, {
+            params: { page: 1, limit: 500 },
+         });
+         const data = response.data;
+         const dispatchInfo = data.dispatch ?? {};
+         const parcels = data.rows ?? [];
+         return {
+            id,
+            sender_agency: dispatchInfo.sender_agency,
+            status: dispatchInfo.status,
+            parcels: parcels.map(
+               (p: { tracking_number: string; description?: string; status: string; order_id?: number }) => ({
+                  tracking_number: p.tracking_number,
+                  description: p.description,
+                  status: p.status,
+                  order_id: p.order_id,
+               }),
+            ),
+         };
+      };
+      setIsLoadingDispatch(true);
+      Promise.all(ids.map((id) => loadOne(id).catch(() => null)))
+         .then((results) => {
+            const loaded = results.filter((d): d is LoadedDispatch => d != null);
+            if (loaded.length > 0) setLoadedDispatches(loaded);
+         })
+         .finally(() => setIsLoadingDispatch(false));
+   }, []);
+
+   // Persist session when scanned parcels or loaded dispatches change
+   useEffect(() => {
+      saveSession({
+         scannedParcels,
+         loadedDispatchIds: loadedDispatches.map((d) => d.id),
+      });
+   }, [scannedParcels, loadedDispatches]);
+
    // Get all expected parcels from all loaded dispatches (non-received ones)
    const allExpectedParcels = useMemo(() => {
-      const parcels: Array<{ tracking_number: string; dispatch_id: number; description?: string; order_id?: number }> = [];
+      const parcels: Array<{ tracking_number: string; dispatch_id: number; description?: string; order_id?: number }> =
+         [];
       loadedDispatches.forEach((dispatch) => {
          dispatch.parcels
             .filter((p) => p.status !== parcelStatus.RECEIVED_IN_DISPATCH)
@@ -101,9 +177,7 @@ export const ReceiveDispatchPage = (): React.ReactElement => {
 
    // Missing parcels (expected but not scanned)
    const missingParcels = useMemo(() => {
-      return allExpectedParcels.filter(
-         (p) => !scannedParcels.some((s) => s.tracking_number === p.tracking_number)
-      );
+      return allExpectedParcels.filter((p) => !scannedParcels.some((s) => s.tracking_number === p.tracking_number));
    }, [allExpectedParcels, scannedParcels]);
 
    // Counts
@@ -132,7 +206,7 @@ export const ReceiveDispatchPage = (): React.ReactElement => {
          (p) =>
             p.tracking_number.toLowerCase().includes(normalized) ||
             p.description?.toLowerCase().includes(normalized) ||
-            String(p.order_id ?? "").includes(normalized)
+            String(p.order_id ?? "").includes(normalized),
       );
    }, [scannedParcels, searchTerm]);
 
@@ -144,7 +218,7 @@ export const ReceiveDispatchPage = (): React.ReactElement => {
          (p) =>
             p.tracking_number.toLowerCase().includes(normalized) ||
             p.description?.toLowerCase().includes(normalized) ||
-            String(p.order_id ?? "").includes(normalized)
+            String(p.order_id ?? "").includes(normalized),
       );
    }, [missingParcels, searchTerm]);
 
@@ -213,12 +287,14 @@ export const ReceiveDispatchPage = (): React.ReactElement => {
                id,
                sender_agency: dispatchInfo.sender_agency,
                status: dispatchInfo.status,
-               parcels: parcels.map((p: { tracking_number: string; description?: string; status: string; order_id?: number }) => ({
-                  tracking_number: p.tracking_number,
-                  description: p.description,
-                  status: p.status,
-                  order_id: p.order_id,
-               })),
+               parcels: parcels.map(
+                  (p: { tracking_number: string; description?: string; status: string; order_id?: number }) => ({
+                     tracking_number: p.tracking_number,
+                     description: p.description,
+                     status: p.status,
+                     order_id: p.order_id,
+                  }),
+               ),
             },
          ]);
 
@@ -248,7 +324,7 @@ export const ReceiveDispatchPage = (): React.ReactElement => {
                return { ...p, status: "surplus" as ScanStatus, dispatch_id: undefined };
             }
             return p;
-         })
+         }),
       );
    };
 
@@ -304,7 +380,7 @@ export const ReceiveDispatchPage = (): React.ReactElement => {
          setCurrentInput("");
       } else {
          // Not in any loaded dispatch manifest
-         
+
          // If no dispatches loaded, just add as surplus without verification
          // (smartReceive will validate when submitting)
          if (loadedDispatches.length === 0) {
@@ -323,13 +399,13 @@ export const ReceiveDispatchPage = (): React.ReactElement => {
             setCurrentInput("");
             return;
          }
-         
+
          // Dispatches are loaded but parcel not in any manifest - verify it exists
          setIsScanning(true);
          try {
             const response = await axiosInstance.get(`/dispatches/verify-parcel/${trackingNumber}`);
             const parcelData = response.data;
-            
+
             // Parcel exists - add as surplus
             setScannedParcels((prev) => [
                ...prev,
@@ -425,12 +501,14 @@ export const ReceiveDispatchPage = (): React.ReactElement => {
                });
             }
 
+            clearSession();
+
             if (summary.total_skipped > 0) {
                const skippedDetails = details
                   ?.filter((d: { status: string }) => d.status === "skipped")
                   .map(
                      (d: { tracking_number: string; reason?: string }) =>
-                        `${d.tracking_number}: ${d.reason || "No encontrado"}`
+                        `${d.tracking_number}: ${d.reason || "No encontrado"}`,
                   )
                   .join("\n");
 
@@ -450,7 +528,8 @@ export const ReceiveDispatchPage = (): React.ReactElement => {
    };
 
    const hasDispatches = loadedDispatches.length > 0;
-   const progressValue = stats.declared > 0 ? Math.round(((stats.matched + stats.alreadyReceived) / stats.declared) * 100) : 0;
+   const progressValue =
+      stats.declared > 0 ? Math.round(((stats.matched + stats.alreadyReceived) / stats.declared) * 100) : 0;
 
    return (
       <div className="flex flex-col p-2 md:p-4 mx-auto w-full h-full">
@@ -471,7 +550,7 @@ export const ReceiveDispatchPage = (): React.ReactElement => {
             </div>
 
             {/* ==================== DESKTOP LAYOUT (>= lg) ==================== */}
-            <div className="hidden lg:grid lg:grid-cols-5 gap-6 mt-6 flex-1 min-h-0">
+            <div className=" lg:grid lg:grid-cols-5 gap-6 mt-6 flex-1 min-h-0">
                {/* Left Column: Scanner + Scanned Parcels */}
                <div className="flex flex-col gap-4 col-span-3 min-h-0">
                   <ScannerCard
@@ -509,26 +588,36 @@ export const ReceiveDispatchPage = (): React.ReactElement => {
                            </ButtonGroup>
                         )}
                      </div>
-                     <div className="relative px-4 pb-2">
-                        <Search className="absolute left-6 top-2 h-4 w-4 text-muted-foreground" />
-                        <Input
-                           placeholder="Buscar..."
-                           className="pl-8 h-8 text-sm"
-                           value={searchTerm}
-                           onChange={(e) => setSearchTerm(e.target.value)}
-                        />
+                     <div className="relative lg:max-w-md lg:self-end  w-full  px-4 pb-2">
+                        <InputGroup className="w-full">
+                           <InputGroupAddon align="inline-start">
+                              <Search className="h-4 w-4 mr-1" />
+                           </InputGroupAddon>
+                           <InputGroupInput
+                              placeholder="Buscar..."
+                              value={searchTerm}
+                              onChange={(e) => setSearchTerm(e.target.value)}
+                              className="w-full"
+                           />
+                           <InputGroupAddon align="inline-end">
+                              {searchTerm && <X className="h-4 w-4 mr-1" onClick={() => setSearchTerm("")} />}
+                           </InputGroupAddon>
+                        </InputGroup>
                      </div>
                      {hasDispatches && (
-                        <div className="px-4 max-w-md self-end">
-                           <DispatchStats
-                              indicators={[
-                                 { label: "recibidos", value: stats.matched + stats.alreadyReceived, total: stats.declared, color: "emerald" },
-                                 { label: "surplus", value: stats.surplus, color: "orange" },
-                                 { label: "faltantes", value: stats.missing, color: "red" },
-                              ]}
-                              progressValue={progressValue}
-                           />
-                        </div>
+                        <DispatchStats
+                           indicators={[
+                              {
+                                 label: "recibidos",
+                                 value: stats.matched + stats.alreadyReceived,
+                                 total: stats.declared,
+                                 color: "emerald",
+                              },
+                              { label: "surplus", value: stats.surplus, color: "orange" },
+                              { label: "faltantes", value: stats.missing, color: "red" },
+                           ]}
+                           progressValue={progressValue}
+                        />
                      )}
                      <div className="flex-1 min-h-0">
                         <VirtualizedParcelTable
@@ -546,7 +635,6 @@ export const ReceiveDispatchPage = (): React.ReactElement => {
                            showDate={false}
                            emptyMessage="Escanea paquetes para agregarlos"
                         />
-                        
                      </div>
                   </div>
                </div>
@@ -575,7 +663,11 @@ export const ReceiveDispatchPage = (): React.ReactElement => {
                                  type="number"
                                  className="w-full"
                               />
-                              <Button type="submit" variant="outline" disabled={isLoadingDispatch || !dispatchIdInput.trim()}>
+                              <Button
+                                 type="submit"
+                                 variant="outline"
+                                 disabled={isLoadingDispatch || !dispatchIdInput.trim()}
+                              >
                                  {isLoadingDispatch ? <Spinner className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
                               </Button>
                            </ButtonGroup>
@@ -583,7 +675,7 @@ export const ReceiveDispatchPage = (): React.ReactElement => {
                      </Field>
                      <div className="flex flex-wrap gap-1">
                         {loadedDispatches.map((dispatch) => (
-                           <Item key={dispatch.id}>
+                           <Item key={dispatch.id} className="border-border/60 bg-card/60 px-2 py-0">
                               <ItemMedia>
                                  <Package className="size-3.5" />
                               </ItemMedia>
@@ -616,11 +708,7 @@ export const ReceiveDispatchPage = (): React.ReactElement => {
                            fetchNextPage={() => {}}
                            title="Faltantes"
                            icon={Box}
-                           headerRight={
-                              <Badge variant="outline">
-                                 {totalMissing} paquetes
-                              </Badge>
-                           }
+                           headerRight={<Badge variant="outline">{totalMissing} paquetes</Badge>}
                            showIcon={false}
                            showQR={true}
                            showStatus={false}
@@ -634,129 +722,16 @@ export const ReceiveDispatchPage = (): React.ReactElement => {
                      <div className="rounded-xl flex-1 border border-dashed border-border/60 bg-muted/20 p-8 flex flex-col items-center justify-center text-center">
                         <Package className="h-12 w-12 text-muted-foreground/50 mb-4" />
                         <p className="text-muted-foreground text-sm">
-                           Carga despachos para comparar paquetes.<br />
-                           Sin despachos, todos los paquetes serán <span className="text-orange-500 font-medium">surplus</span>.
+                           Carga despachos para comparar paquetes.
+                           <br />
+                           Sin despachos, todos los paquetes serán{" "}
+                           <span className="text-orange-500 font-medium">surplus</span>.
                         </p>
                      </div>
                   )}
                </div>
             </div>
-
-            {/* ==================== MOBILE LAYOUT (< lg) ==================== */}
-            <div className="lg:hidden flex-1 flex flex-col min-h-0">
-               {/* Scanner */}
-               <div className="mt-6">
-                  <ScannerCard
-                     value={currentInput}
-                     onChange={setCurrentInput}
-                     onScan={handleScan}
-                     lastScanStatus={lastScanStatus}
-                     isLoading={isScanning}
-                  />
-               </div>
-
-               {/* Stats and actions for mobile */}
-               <div className="mt-4 flex items-center justify-between gap-4">
-                  {hasDispatches && (
-                     <DispatchStats
-                        indicators={[
-                           { label: "recibidos", value: stats.matched + stats.alreadyReceived, total: stats.declared, color: "emerald" },
-                           { label: "surplus", value: stats.surplus, color: "orange" },
-                           { label: "faltantes", value: stats.missing, color: "red" },
-                        ]}
-                        progressValue={progressValue}
-                     />
-                  )}
-                  {scannedParcels.length > 0 && (
-                     <ButtonGroup>
-                        <Button variant="outline" size="sm" onClick={handleClearAll}>
-                           <X className="h-4 w-4" />
-                        </Button>
-                        <Button size="sm" onClick={handleSmartReceive} disabled={smartReceiveMutation.isPending}>
-                           {smartReceiveMutation.isPending ? (
-                              <Spinner className="h-4 w-4 mr-1" />
-                           ) : (
-                              <Send className="h-4 w-4 mr-1" />
-                           )}
-                           Recibir ({totalScanned})
-                        </Button>
-                     </ButtonGroup>
-                  )}
-               </div>
-
-               {/* Dispatch loader for mobile */}
-               <div className="mt-4">
-                  <Field>
-                     <FieldLabel htmlFor="dispatch-id-mobile" className="flex items-center gap-1.5 text-xs">
-                        <Package className="size-3.5" />
-                        Cargar Despacho
-                     </FieldLabel>
-                     <form
-                        onSubmit={(e) => {
-                           e.preventDefault();
-                           handleLoadDispatch();
-                        }}
-                     >
-                        <ButtonGroup>
-                           <Input
-                              id="dispatch-id-mobile"
-                              value={dispatchIdInput}
-                              onChange={(e) => setDispatchIdInput(e.target.value)}
-                              placeholder="ID del despacho"
-                              type="number"
-                              className="w-full"
-                           />
-                           <Button type="submit" variant="outline" disabled={isLoadingDispatch || !dispatchIdInput.trim()}>
-                              {isLoadingDispatch ? <Spinner className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
-                           </Button>
-                        </ButtonGroup>
-                     </form>
-                  </Field>
-                  {loadedDispatches.length > 0 && (
-                     <div className="flex flex-wrap gap-1 mt-2">
-                        {loadedDispatches.map((dispatch) => (
-                           <Badge key={dispatch.id} variant="outline" className="gap-1">
-                              #{dispatch.id} ({dispatch.parcels.length})
-                              <button onClick={() => handleRemoveDispatch(dispatch.id)}>
-                                 <X className="h-3 w-3" />
-                              </button>
-                           </Badge>
-                        ))}
-                     </div>
-                  )}
-               </div>
-
-               {/* Single list for mobile */}
-               <div className="flex-1 min-h-0 mt-4 border rounded-lg">
-                  <VirtualizedParcelTable
-                     data={[...scannedForTable, ...missingForTable]}
-                     isLoading={false}
-                     isFetchingNextPage={false}
-                     hasNextPage={false}
-                     fetchNextPage={() => {}}
-                     onDelete={(tracking) => {
-                        const isScanned = scannedParcels.some((p) => p.tracking_number === tracking);
-                        if (isScanned) handleRemoveParcel(tracking);
-                     }}
-                     canDelete={(row) => scannedParcels.some((p) => p.tracking_number === row.tracking_number)}
-                     showQR={false}
-                     showStatus={true}
-                     showAgency={false}
-                     showWeight={false}
-                     showDate={false}
-                     emptyMessage="Escanea paquetes para agregarlos"
-                  />
-               </div>
-            </div>
          </main>
-      </div>
-   );
-};
-
-export const ParcelsInDispatchPage = (): React.ReactElement => {
-   return (
-      <div>
-         <h1>Parcels in Dispatch</h1>
       </div>
    );
 };
