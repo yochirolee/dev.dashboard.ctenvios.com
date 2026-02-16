@@ -604,6 +604,7 @@ export const ReceiveDispatchPage = (): React.ReactElement => {
                            </InputGroupAddon>
                         </InputGroup>
                      </div>
+
                      {hasDispatches && (
                         <DispatchStats
                            indicators={[
