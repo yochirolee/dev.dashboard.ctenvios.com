@@ -38,7 +38,7 @@ export const ROLE_GROUPS = {
    // Administradores del sistema
    SYSTEM_ADMINS: [ROLES.ROOT, ROLES.ADMINISTRATOR],
 
-   // Administradores de agencias
+   // Administradores de agencias (o agencia es Forwarder; usar isAgencyAdminOrForwarder cuando aplique)
    AGENCY_ADMINS: [ROLES.ROOT, ROLES.ADMINISTRATOR, ROLES.AGENCY_ADMIN, ROLES.AGENCY_SUPERVISOR],
 
    // Personal de agencias (ventas y admin)
@@ -99,12 +99,30 @@ export const AGENCY_TYPES = {
 
 export type AgencyType = (typeof AGENCY_TYPES)[keyof typeof AGENCY_TYPES];
 
+/** True if user is system admin (ROOT/ADMINISTRATOR) or their agency type is FORWARDER */
+export const isSystemAdminOrForwarder = (
+   userRole: Role | null | undefined,
+   agencyType: AgencyType | null | undefined,
+): boolean => {
+   if (hasRole(userRole, ROLE_GROUPS.SYSTEM_ADMINS)) return true;
+   return agencyType === AGENCY_TYPES.FORWARDER;
+};
+
+/** True if user is agency admin (ROLE_GROUPS.AGENCY_ADMINS) or their agency type is FORWARDER */
+export const isAgencyAdminOrForwarder = (
+   userRole: Role | null | undefined,
+   agencyType: AgencyType | null | undefined,
+): boolean => {
+   if (hasRole(userRole, ROLE_GROUPS.AGENCY_ADMINS)) return true;
+   return agencyType === AGENCY_TYPES.FORWARDER;
+};
+
 // Check access based on role AND agency type
 export const canAccessByAgencyType = (
    userRole: Role | null | undefined,
    agencyType: AgencyType | null | undefined,
    allowedRoles: readonly Role[],
-   allowedAgencyTypes?: readonly AgencyType[]
+   allowedAgencyTypes?: readonly AgencyType[],
 ): boolean => {
    // First check if user has one of the allowed roles
    if (hasRole(userRole, allowedRoles)) {
@@ -140,7 +158,14 @@ export const canAccess = {
    issues: ROLE_GROUPS.ISSUES_VIEWERS,
 
    // Contenedores y vuelos (admins principales y forwarders)
-   containersAndFlights: [ROLES.ROOT, ROLES.ADMINISTRATOR, ROLES.FORWARDER_ADMIN, ROLES.FORWARDER_RESELLER, ROLES.AGENCY_ADMIN, ROLES.AGENCY_SUPERVISOR],
+   containersAndFlights: [
+      ROLES.ROOT,
+      ROLES.ADMINISTRATOR,
+      ROLES.FORWARDER_ADMIN,
+      ROLES.FORWARDER_RESELLER,
+      ROLES.AGENCY_ADMIN,
+      ROLES.AGENCY_SUPERVISOR,
+   ],
 
    // Órdenes (todos excepto carriers)
    orders: [
