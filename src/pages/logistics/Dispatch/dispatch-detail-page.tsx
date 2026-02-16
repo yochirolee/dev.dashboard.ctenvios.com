@@ -5,7 +5,6 @@ import { ArrowLeft, TrendingUpIcon } from "lucide-react";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { formatCents } from "@/lib/cents-utils";
-import { format } from "date-fns";
 import { Spinner } from "@/components/ui/spinner";
 import { DispatchPaymentForm } from "@/components/dispatch/dispatch-payment-form";
 import { DispatchPaymentsTable } from "@/components/dispatch/dispatch-payments-table";
