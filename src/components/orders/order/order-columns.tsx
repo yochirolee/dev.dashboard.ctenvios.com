@@ -65,6 +65,7 @@ export type Order = {
    };
    payment_status: string;
    status: string;
+   status_details: string;
    created_at: string;
    updated_at: string;
    total_in_cents: number;
@@ -217,7 +218,12 @@ export const orderColumns: ColumnDef<Order>[] = [
       accessorKey: "status",
       header: "Status",
       cell: ({ row }) => {
-         return getOrderStatusBadge(row.original?.status);
+         return (
+            <div className="flex flex-col  gap-2">
+               {getOrderStatusBadge(row.original?.status)}
+               <span className="text-xs text-muted-foreground">{row.original?.status_details}</span>
+            </div>
+         );
       },
       size: 150,
    },

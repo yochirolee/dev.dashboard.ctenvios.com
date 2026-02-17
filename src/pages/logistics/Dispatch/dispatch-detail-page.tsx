@@ -1,7 +1,7 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useDispatches } from "@/hooks/use-dispatches";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, TrendingUpIcon } from "lucide-react";
+import { ArrowLeft, ReceiptText, TrendingUpIcon } from "lucide-react";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { formatCents } from "@/lib/cents-utils";
@@ -10,7 +10,8 @@ import { DispatchPaymentForm } from "@/components/dispatch/dispatch-payment-form
 import { DispatchPaymentsTable } from "@/components/dispatch/dispatch-payments-table";
 import { dispatchStatus } from "@/data/types";
 import type { Dispatch, DispatchPayment } from "@/data/types";
-
+import { ButtonGroup } from "@/components/ui/button-group";
+const baseUrl = import.meta.env.VITE_API_URL;
 export function DispatchDetailPage(): React.ReactElement {
    const { dispatchId } = useParams<{ dispatchId: string }>();
    const navigate = useNavigate();
@@ -44,6 +45,9 @@ export function DispatchDetailPage(): React.ReactElement {
          </div>
       );
    }
+   const handlePrintReceipt = () => {
+      window.open(`${baseUrl}/dispatches/${dispatch.id}/payment-receipt`, "_blank");
+   };
 
    return (
       <div className="flex flex-col gap-4 p-2 md:p-4 container  max-w-screen-xl mx-auto">
@@ -113,9 +117,19 @@ export function DispatchDetailPage(): React.ReactElement {
          </div>
          <Card>
             <CardHeader>
-               <CardTitle className="text-lg">Pagos registrados</CardTitle>
-               <CardDescription>Registra un pago para este despacho</CardDescription>
-               {canAddPayment && <DispatchPaymentForm dispatch={dispatch as Dispatch} />}
+               <div className="flex items-center justify-between">
+                  <div className="flex flex-col">
+                     <CardTitle className="text-lg">Pagos registrados</CardTitle>
+                     <CardDescription>Registra un pago para este despacho</CardDescription>
+                  </div>
+                  <ButtonGroup>
+                     {canAddPayment && <DispatchPaymentForm dispatch={dispatch as Dispatch} />}
+                     <Button variant="outline" onClick={handlePrintReceipt}>
+                        <ReceiptText className="w-4 h-4" />
+                        Imprimir Recibo
+                     </Button>
+                  </ButtonGroup>
+               </div>
             </CardHeader>
             <CardContent>
                <DispatchPaymentsTable dispatchId={dispatch.id} payments={payments} />

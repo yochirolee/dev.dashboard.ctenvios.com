@@ -16,8 +16,6 @@ import { EllipsisVertical } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { formatFullName } from "@/lib/cents-utils";
 
-const baseUrl = import.meta.env.VITE_API_URL;
-
 interface ParcelPerson {
    id?: number;
    first_name?: string;
@@ -40,6 +38,7 @@ export interface Parcel {
    order_id?: number;
    description?: string;
    status?: string;
+   status_details?: string;
    weight?: number | string;
    external_reference?: string;
    agency_id?: number;
@@ -58,6 +57,10 @@ export interface Parcel {
    updated_at?: string;
    container_id?: number | null;
    pallet_id?: number | null;
+   user?: {
+      id: number;
+      name: string;
+   };
 }
 
 export const parcelColumns: ColumnDef<Parcel>[] = [
@@ -81,48 +84,15 @@ export const parcelColumns: ColumnDef<Parcel>[] = [
       enableHiding: false,
       size: 50,
    },
-   {
-      accessorKey: "order_id",
-      header: "Orden",
-      cell: ({ row }) => {
-         const orderId = row.original?.order_id ?? row.original?.order?.id;
-         return (
-            <div className="flex items-center gap-2">
-               <Link
-                  className="flex items-center gap-2"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  to={`${baseUrl}/orders/${orderId}/pdf`}
-               >
-                  <FileBoxIcon size={16} className="shrink-0" />
-                  <span className="font-mono text-xs text-muted-foreground">{orderId ?? "-"}</span>
-               </Link>
-               <Badge
-                  variant="secondary"
-                  className="flex items-center gap-2 w-fit font-mono text-xs text-muted-foreground "
-               >
-                  <Link
-                     className="flex items-center gap-2"
-                     target="_blank"
-                     rel="noopener noreferrer"
-                     to={`${baseUrl}/orders/${orderId}/labels-pdf`}
-                  >
-                     <TagIcon size={16} />
-                  </Link>
-               </Badge>
-            </div>
-         );
-      },
-   },
 
    {
       accessorKey: "Tracking",
       header: "Tracking",
       cell: ({ row }) => (
-         <div className="max-w-[180px] truncate" title={row.original.tracking_number ?? ""}>
+         <div className="max-w-[220px] truncate" title={row.original.tracking_number ?? ""}>
             <span className="text-sm font-mono font-medium">{row.original.tracking_number ?? "-"}</span>
             <div className="max-w-[400px]  flex flex-col" title={row.original.description ?? ""}>
-               <span className="text-xs text-muted-foreground ">{row.original.description ?? "-"}</span>
+               <span className="text-xs text-muted-foreground truncate ">{row.original.description ?? "-"}</span>
             </div>
          </div>
       ),
@@ -139,14 +109,20 @@ export const parcelColumns: ColumnDef<Parcel>[] = [
             )}
          </div>
       ),
-      size: 150,
    },
 
    {
       accessorKey: "status",
       header: "Estado",
-      cell: ({ row }) => getStatusBadge(row.original.status ?? "IN_AGENCY"),
-      size: 150,
+      cell: ({ row }) => {
+         return (
+            <div className="flex flex-col  gap-2">
+               {getStatusBadge(row.original.status ?? "IN_AGENCY")}
+               <span className="text-xs text-muted-foreground">{row.original.status_details ?? "-"}</span>
+            </div>
+         );
+      },
+    
    },
 
    {
@@ -180,7 +156,7 @@ export const parcelColumns: ColumnDef<Parcel>[] = [
             </div>
          );
       },
-      size: 200,
+     
    },
    {
       accessorKey: "receiver",
@@ -213,7 +189,7 @@ export const parcelColumns: ColumnDef<Parcel>[] = [
             </div>
          );
       },
-      size: 200,
+     
    },
    {
       accessorKey: "province",
@@ -228,7 +204,7 @@ export const parcelColumns: ColumnDef<Parcel>[] = [
             </div>
          );
       },
-      size: 120,
+     
    },
    {
       accessorKey: "weight",
@@ -242,7 +218,7 @@ export const parcelColumns: ColumnDef<Parcel>[] = [
             </span>
          );
       },
-      size: 80,
+      
    },
    {
       accessorKey: "updated_at",
@@ -252,9 +228,10 @@ export const parcelColumns: ColumnDef<Parcel>[] = [
             <span className="font-mono text-xs text-muted-foreground">
                {row.original.updated_at ? format(new Date(row.original.updated_at), "dd/MM/yyyy HH:mm") : "-"}
             </span>
+            <span className=" text-xs text-muted-foreground ">{row.original?.user?.name ?? "-"}</span>
          </div>
       ),
-      size: 150,
+      
    },
    {
       header: "Actions",

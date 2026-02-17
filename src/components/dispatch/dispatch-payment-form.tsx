@@ -103,7 +103,7 @@ export function DispatchPaymentForm({ dispatch }: { dispatch: Dispatch }): React
    return (
       <Dialog open={open} onOpenChange={setOpen}>
          <DialogTrigger asChild>
-            <Button variant="default" className="print:hidden w-full">
+            <Button variant="outline" className="print:hidden ">
                <DollarSign className="w-4 h-4" />
                <span className="md:block">Agregar pago</span>
             </Button>

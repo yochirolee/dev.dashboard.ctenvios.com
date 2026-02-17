@@ -48,7 +48,7 @@ export default function OrdersPage() {
       date?.toISOString() || "",
       date?.toISOString() || "",
       selectedPaymentStatus,
-      selectedAgencyId
+      selectedAgencyId,
    );
 
    const hasActiveFilters = !!searchQuery || !!date || !!selectedPaymentStatus || !!selectedAgencyId;
@@ -97,18 +97,6 @@ export default function OrdersPage() {
                </div>
 
                <div className="flex flex-wrap items-center gap-2">
-                  <DatePickerWithRange date={date} setDate={setDate} />
-
-                  <DataTableFacetedFilter
-                     title="Pago"
-                     options={paymentStatusOptions}
-                     selectedValue={selectedPaymentStatus}
-                     onSelect={(value) => {
-                        setSelectedPaymentStatus(value);
-                        setPagination((prev) => ({ ...prev, pageIndex: 0 }));
-                     }}
-                  />
-
                   {/* Agency Filter (Admin only) */}
                   {isAdmin && agencies && (
                      <DataTableFacetedFilter
@@ -124,6 +112,16 @@ export default function OrdersPage() {
                         }}
                      />
                   )}
+                  <DataTableFacetedFilter
+                     title="Pago"
+                     options={paymentStatusOptions}
+                     selectedValue={selectedPaymentStatus}
+                     onSelect={(value) => {
+                        setSelectedPaymentStatus(value);
+                        setPagination((prev) => ({ ...prev, pageIndex: 0 }));
+                     }}
+                  />
+                  <DatePickerWithRange date={date} setDate={setDate} />
 
                   {hasActiveFilters && (
                      <Button variant="ghost" onClick={handleClearFilters} className="h-8 px-2 lg:px-3">

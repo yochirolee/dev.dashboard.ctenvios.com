@@ -4,14 +4,7 @@ import { formatCents } from "@/lib/cents-utils";
 import { format } from "date-fns";
 import { useDispatches } from "@/hooks/use-dispatches";
 import { toast } from "sonner";
-import {
-   Table,
-   TableBody,
-   TableCell,
-   TableHead,
-   TableHeader,
-   TableRow,
-} from "@/components/ui/table";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import { Trash2 } from "lucide-react";
@@ -64,9 +57,7 @@ export function DispatchPaymentsTable({
    };
 
    if (payments.length === 0) {
-      return (
-         <p className="text-sm text-muted-foreground py-4">No hay pagos registrados.</p>
-      );
+      return <p className="text-sm text-muted-foreground py-4">No hay pagos registrados.</p>;
    }
 
    return (
@@ -77,27 +68,24 @@ export function DispatchPaymentsTable({
                <TableHead>Método</TableHead>
                <TableHead>Fecha</TableHead>
                <TableHead>Referencia</TableHead>
+               <TableHead>Notas</TableHead>
+               <TableHead>Usuario</TableHead>
                <TableHead className="w-[80px]" />
             </TableRow>
          </TableHeader>
          <TableBody>
             {payments.map((payment) => (
                <TableRow key={payment.id}>
-                  <TableCell>
+                  <TableCell className="font-mono text-sm text-muted-foreground">
                      {formatCents(payment.amount_in_cents + (payment.charge_in_cents ?? 0))}
                   </TableCell>
-                  <TableCell>
-                     {PAYMENT_METHOD_LABELS[payment.method] ?? payment.method}
+                  <TableCell>{PAYMENT_METHOD_LABELS[payment.method] ?? payment.method}</TableCell>
+                  <TableCell className="font-mono text-xs text-muted-foreground">
+                     {format(new Date(payment.date ?? payment.created_at ?? ""), "dd/MM/yyyy HH:mm")}
                   </TableCell>
-                  <TableCell>
-                     {format(
-                        new Date(payment.date ?? payment.created_at ?? ""),
-                        "dd/MM/yyyy HH:mm"
-                     )}
-                  </TableCell>
-                  <TableCell className="text-muted-foreground">
-                     {payment.reference ?? "—"}
-                  </TableCell>
+                  <TableCell className="text-muted-foreground">{payment.reference ?? "—"}</TableCell>
+                  <TableCell className="text-muted-foreground">{payment.notes ?? "—"}</TableCell>
+                  <TableCell className="text-muted-foreground">{payment.paid_by?.name ?? "—"}</TableCell>
                   <TableCell>
                      <AlertDialog>
                         <AlertDialogTrigger asChild>
@@ -113,8 +101,7 @@ export function DispatchPaymentsTable({
                            <AlertDialogHeader>
                               <AlertDialogTitle>Eliminar pago</AlertDialogTitle>
                               <AlertDialogDescription>
-                                 ¿Seguro que deseas eliminar este pago de{" "}
-                                 {formatCents(payment.amount_in_cents)}?
+                                 ¿Seguro que deseas eliminar este pago de {formatCents(payment.amount_in_cents)}?
                               </AlertDialogDescription>
                            </AlertDialogHeader>
                            <AlertDialogFooter>
