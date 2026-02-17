@@ -25,9 +25,9 @@ export const DispatchStats = ({
             {indicators.map((indicator, index) => (
                <Card key={index}>
                   <CardContent className=" flex flex-col items-center justify-center text-center">
-                     <div className="flex items-center gap-2">
+                     <div className="flex flex-col items-center gap-2">
                         <span className={`text-4xl font-bold text-${indicator.color}-500`}>{indicator.value}</span>
-                        <span className="text-sm text-muted-foreground">{indicator.label}</span>
+                        <span className="text-xs text-muted-foreground">{indicator.label}</span>
                      </div>
                   </CardContent>
                </Card>
