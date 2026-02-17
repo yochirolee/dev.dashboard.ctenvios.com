@@ -15,7 +15,7 @@ import { Button } from "@/components/ui/button";
 import { EllipsisVertical } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { formatFullName } from "@/lib/cents-utils";
-
+const baseUrl = import.meta.env.VITE_API_URL;
 interface ParcelPerson {
    id?: number;
    first_name?: string;
@@ -84,6 +84,37 @@ export const parcelColumns: ColumnDef<Parcel>[] = [
       enableHiding: false,
       size: 50,
    },
+   {
+      accessorKey: "id",
+      header: "Orden",
+      cell: ({ row }) => {
+         return (
+            <div className="flex items-center gap-2">
+               <Link
+                  className="flex items-center gap-2"
+                  target="_blank"
+                  to={`${baseUrl}/orders/${row.original?.order_id}/pdf`}
+               >
+                  <FileBoxIcon size={16} className="shrink-0" />
+                  <span className="font-mono text-xs text-muted-foreground ">{row.original?.id}</span>
+               </Link>
+               <Badge
+                  variant="secondary"
+                  className="flex items-center gap-2 w-fit font-mono text-xs text-muted-foreground "
+               >
+                  <Link
+                     className="flex items-center gap-2"
+                     target="_blank"
+                     to={`${baseUrl}/orders/${row.original?.order_id}/labels-pdf`}
+                  >
+                     <TagIcon size={16} />
+                  </Link>
+               </Badge>
+            </div>
+         );
+      },
+      size: 100,
+   },
 
    {
       accessorKey: "Tracking",
@@ -122,7 +153,6 @@ export const parcelColumns: ColumnDef<Parcel>[] = [
             </div>
          );
       },
-    
    },
 
    {
@@ -156,7 +186,6 @@ export const parcelColumns: ColumnDef<Parcel>[] = [
             </div>
          );
       },
-     
    },
    {
       accessorKey: "receiver",
@@ -189,7 +218,6 @@ export const parcelColumns: ColumnDef<Parcel>[] = [
             </div>
          );
       },
-     
    },
    {
       accessorKey: "province",
@@ -204,7 +232,6 @@ export const parcelColumns: ColumnDef<Parcel>[] = [
             </div>
          );
       },
-     
    },
    {
       accessorKey: "weight",
@@ -218,7 +245,6 @@ export const parcelColumns: ColumnDef<Parcel>[] = [
             </span>
          );
       },
-      
    },
    {
       accessorKey: "updated_at",
@@ -231,7 +257,6 @@ export const parcelColumns: ColumnDef<Parcel>[] = [
             <span className=" text-xs text-muted-foreground ">{row.original?.user?.name ?? "-"}</span>
          </div>
       ),
-      
    },
    {
       header: "Actions",
