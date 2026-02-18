@@ -221,7 +221,9 @@ export const orderColumns: ColumnDef<Order>[] = [
          return (
             <div className="flex flex-col  gap-2">
                {getOrderStatusBadge(row.original?.status)}
-               <span className="text-xs text-muted-foreground">{row.original?.status_details}</span>
+               {row.original?.status_details && (
+                  <span className="text-xs text-muted-foreground">{row.original?.status_details}</span>
+               )}
             </div>
          );
       },

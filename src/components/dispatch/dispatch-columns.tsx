@@ -13,6 +13,7 @@ import {
    DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import type { Dispatch } from "@/data/types";
+import { dispatchStatus } from "@/data/types";
 
 export const dispatchColumns = (
    handleDeleteDispatch: (dispatch_id: number) => void,
@@ -57,21 +58,21 @@ export const dispatchColumns = (
          const status = row.original?.status;
          const getStatusColor = (s: string): string => {
             switch (s) {
-               case "DRAFT":
+               case dispatchStatus.DRAFT:
                   return "bg-gray-400";
-               case "LOADING":
+               case dispatchStatus.LOADING:
                   return "bg-blue-400";
-               case "PARTIAL_RECEIVED":
+               case dispatchStatus.PARTIAL_RECEIVED:
                   return "bg-orange-400";
-               case "DISPATCHED":
+               case dispatchStatus.DISPATCHED:
                   return "bg-yellow-400";
-               case "RECEIVING":
+               case dispatchStatus.RECEIVING:
                   return "bg-orange-400";
-               case "RECEIVED":
+               case dispatchStatus.RECEIVED:
                   return "bg-green-400";
-               case "DISCREPANCY":
+               case dispatchStatus.DISCREPANCY:
                   return "bg-red-400";
-               case "CANCELLED":
+               case dispatchStatus.CANCELLED:
                   return "bg-red-600";
                default:
                   return "bg-gray-400";
@@ -79,21 +80,21 @@ export const dispatchColumns = (
          };
          const getStatusLabel = (s: string): string => {
             switch (s) {
-               case "DRAFT":
+               case dispatchStatus.DRAFT:
                   return "Creado";
-               case "LOADING":
+               case dispatchStatus.LOADING:
                   return "Cargando";
-               case "PARTIAL_RECEIVED":
+               case dispatchStatus.PARTIAL_RECEIVED:
                   return "Parcial";
-               case "DISPATCHED":
+               case dispatchStatus.DISPATCHED:
                   return "Despachado";
-               case "RECEIVING":
+               case dispatchStatus.RECEIVING:
                   return "Recibiendo";
-               case "RECEIVED":
+               case dispatchStatus.RECEIVED:
                   return "Recibido";
-               case "DISCREPANCY":
+               case dispatchStatus.DISCREPANCY:
                   return "Discrepancia";
-               case "CANCELLED":
+               case dispatchStatus.CANCELLED:
                   return "Cancelado";
                default:
                   return s;
@@ -142,7 +143,7 @@ export const dispatchColumns = (
          return (
             <div className="flex items-center gap-2 min-w-0">
                <span className="text-sm">
-                  {row.original?.declared_parcels_count ?? 0} / {row.original?.declared_weight.toString()} lbs
+                  {row.original?.declared_parcels_count ?? 0} / {Number(row.original?.declared_weight ?? 0).toFixed(2)} lbs
                </span>
             </div>
          );
@@ -155,7 +156,7 @@ export const dispatchColumns = (
          return (
             <div className="flex items-center gap-2 min-w-0">
                <span className="text-sm">
-                  {row.original?.received_parcels_count ?? 0} / {row.original?.weight ?? 0} lbs
+                  {row.original?.received_parcels_count ?? 0} / {Number(row.original?.weight ?? 0).toFixed(2)} lbs
                </span>
             </div>
          );
@@ -270,6 +271,8 @@ export const dispatchColumns = (
                         <Printer className="w-4 h-4 mr-2" />
                         Imprimir
                      </DropdownMenuItem>
+                     {row.original?.status !== dispatchStatus.RECEIVED &&
+                        row.original?.status !== dispatchStatus.PARTIAL_RECEIVED && (
                      <DropdownMenuItem>
                         <Link
                            className="inline-flex items-center gap-2"
@@ -277,8 +280,9 @@ export const dispatchColumns = (
                         >
                            <PackagePlusIcon className="w-4 h-4 mr-2" />
                            Cargar Paquetes
-                        </Link>
-                     </DropdownMenuItem>
+                                 </Link>
+                           </DropdownMenuItem>
+                        )}
                      <DropdownMenuItem asChild>
                         <Link
                            className="inline-flex items-center gap-2 w-full"

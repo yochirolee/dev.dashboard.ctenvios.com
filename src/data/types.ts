@@ -292,6 +292,7 @@ export interface OrderItems {
 /// DISPATCH
 export const dispatchStatus = {
    DRAFT: "DRAFT", // Empty dispatch, no parcels
+   PARTIAL_RECEIVED: "PARTIAL_RECEIVED", // At least one parcel has been received at destination
    LOADING: "LOADING", // Dispatch has parcels being added
    DISPATCHED: "DISPATCHED", // Ready for dispatch / in transit to receiver
    RECEIVING: "RECEIVING", // At least one parcel has been received at destination
