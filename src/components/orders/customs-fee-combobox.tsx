@@ -31,7 +31,6 @@ const CustomsFeeCombobox = React.memo(function CustomsFeeCombobox({
    const [searchQuery, setSearchQuery] = React.useState("");
    const { data, isLoading } = useCustoms.get(0, 500);
 
-   console.log(data, "data");
 
    // Use form prop if provided, otherwise use form context
    const formContext = form || useFormContext();

@@ -12,6 +12,7 @@ import { dispatchStatus } from "@/data/types";
 import type { Dispatch, DispatchPayment } from "@/data/types";
 import { ButtonGroup } from "@/components/ui/button-group";
 const baseUrl = import.meta.env.VITE_API_URL;
+
 export function DispatchDetailPage(): React.ReactElement {
    const { dispatchId } = useParams<{ dispatchId: string }>();
    const navigate = useNavigate();

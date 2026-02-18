@@ -91,7 +91,6 @@ const CustomAgencyLabel = ({ x, y, height, value }: CustomLabelProps): React.Rea
 export function AgenciesSalesChart(): React.ReactElement {
    const { data, isLoading } = useAnalytics.getDailySalesByAgency();
 
-   console.log("data", data);
    if (isLoading) return <div>Loading...</div>;
    if (!data) return <div>No data found</div>;
 

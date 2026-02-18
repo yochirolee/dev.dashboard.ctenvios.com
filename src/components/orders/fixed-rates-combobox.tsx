@@ -79,7 +79,7 @@ const FixedRatesCombobox = React.memo(function FixedRatesCombobox({
                role="combobox"
                aria-expanded={open}
                aria-controls={`fixed-rates-combobox`}
-               className={cn("w-[200px] justify-between", !selectedRate?.name && "text-muted-foreground")}
+               className={cn("w-[250px]  justify-between", !selectedRate?.name && "text-muted-foreground")}
             >
                {selectedRate?.name
                   ? selectedRate.name.length > 20
@@ -89,7 +89,7 @@ const FixedRatesCombobox = React.memo(function FixedRatesCombobox({
                <ChevronsUpDown className="opacity-50" />
             </Button>
          </PopoverTrigger>
-         <PopoverContent className="w-[200px] p-0">
+         <PopoverContent className="w-[250px] p-0">
             <Command>
                <CommandInput placeholder="Buscar Tarifa..." />
                <CommandList>
@@ -109,7 +109,7 @@ const FixedRatesCombobox = React.memo(function FixedRatesCombobox({
                               <Check
                                  className={cn(
                                     "ml-auto",
-                                    selectedRate?.name === rate.name ? "opacity-100" : "opacity-0"
+                                    selectedRate?.name === rate.name ? "opacity-100" : "opacity-0",
                                  )}
                               />
                            </CommandItem>

@@ -66,13 +66,7 @@ export function AgenciesParcelsWeightChart(): React.ReactElement {
          </Card>
       );
    }
-   if (chartData.length === 0) {
-      return (
-         <Card>
-            <CardContent className="pt-6">No data</CardContent>
-         </Card>
-      );
-   }
+   
 
    return (
       <Card>
