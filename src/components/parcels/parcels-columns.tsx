@@ -149,7 +149,9 @@ export const parcelColumns: ColumnDef<Parcel>[] = [
          return (
             <div className="flex flex-col  gap-2">
                {getStatusBadge(row.original.status ?? "IN_AGENCY")}
-               <span className="text-xs text-muted-foreground">{row.original.status_details ?? "-"}</span>
+               {row.original.status_details && (
+                  <span className="text-xs text-muted-foreground">{row.original.status_details}</span>
+               )}
             </div>
          );
       },
