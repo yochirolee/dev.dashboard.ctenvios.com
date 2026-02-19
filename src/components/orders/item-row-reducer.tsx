@@ -3,7 +3,7 @@ import { Input } from "../ui/input";
 import { TableCell, TableRow } from "../ui/table";
 import CustomsFeeCombobox from "./customs-fee-combobox";
 import { Button } from "../ui/button";
-import { DollarSign, PencilIcon, PlusCircle, ShieldCheck, Trash2 } from "lucide-react";
+import { DollarSign, PlusCircle, ShieldCheck, Trash2 } from "lucide-react";
 import { DropdownMenu, DropdownMenuItem, DropdownMenuContent, DropdownMenuTrigger } from "../ui/dropdown-menu";
 import { Badge } from "../ui/badge";
 import { Switch } from "../ui/switch";
@@ -27,7 +27,7 @@ function ItemRowReducer({
    index: number;
    form: any;
    remove: any;
-   openDialog: (type: "insurance" | "charge" | "rate", index: number) => void;
+   openDialog: (type: "insurance" | "charge", index: number) => void;
    registerDispatch?: (index: number, dispatch: React.Dispatch<any>) => void;
 }) {
    const { shipping_rates } = useOrderStore(
@@ -189,10 +189,7 @@ function ItemRowReducer({
                      <ShieldCheck />
                      <span>Seguro</span>
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => openDialog("rate", index)} className="flex items-center gap-2">
-                     <PencilIcon />
-                     <span>Cambiar Tarifa</span>
-                  </DropdownMenuItem>
+                 
                </DropdownMenuContent>
             </DropdownMenu>
          </TableCell>

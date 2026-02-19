@@ -16,7 +16,7 @@ import { useOrders } from "@/hooks/use-orders";
 import { Input } from "../ui/input";
 import { useAppStore } from "@/stores/app-store";
 import { Separator } from "../ui/separator";
-import { ChangeRateDialog, ChargeDialog, DiscountDialog, InsuranceFeeDialog } from "./order-dialogs";
+import {  ChargeDialog, DiscountDialog, InsuranceFeeDialog } from "./order-dialogs";
 import { formatCents } from "@/lib/cents-utils";
 import { useDeliveryFee } from "@/hooks/use-delivery-fee";
 import { Spinner } from "../ui/spinner";
@@ -270,12 +270,7 @@ export function ItemsInOrder() {
             index={dialogState.index || 0}
             dispatch={dispatchRegistry.current.get(dialogState.index)}
          />
-         <ChangeRateDialog
-            open={dialogState.type === "rate"}
-            setOpen={() => setDialogState({ type: "", index: 0 })}
-            form={form}
-            index={dialogState.index || 0}
-         />
+        
       </Card>
    );
 }

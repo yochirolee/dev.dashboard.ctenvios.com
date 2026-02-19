@@ -66,15 +66,14 @@ export function AppLogsPage() {
    const [filters, setFilters] = useState<AppLogsFilters>({});
 
    const { data, isLoading, error } = useAppLogs(pagination.pageIndex, pagination.pageSize, filters);
+   const { data: logStatus, isLoading: isLoadingLogStatus } = useLogStatus();
+   const { mutate: toggleAppLogs } = useToggleAppLogs();
+
+   const logsEnabled = logStatus?.status;
 
    if (error) {
       return <div>Error: {error.message}</div>;
    }
-
-   const { data: logStatus, isLoading: isLoadingLogStatus } = useLogStatus();
-
-   const logsEnabled = logStatus?.status;
-   const { mutate: toggleAppLogs } = useToggleAppLogs();
 
    const handleClearFilters = () => {
       setFilters({});
