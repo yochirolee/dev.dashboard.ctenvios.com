@@ -133,17 +133,17 @@ const ReceiverForm = ({
               ci: selectedReceiver.ci,
               email: selectedReceiver.email ? selectedReceiver.email : undefined,
               phone: selectedReceiver.phone ? selectedReceiver.phone : undefined,
-              mobile: selectedReceiver.mobile ? selectedReceiver.mobile.slice(2) : undefined,
+              mobile: selectedReceiver.mobile ? selectedReceiver.mobile : undefined,
               address: selectedReceiver.address ? selectedReceiver.address : undefined,
               province_id: selectedReceiver.province_id ? selectedReceiver.province_id : undefined,
               city_id: selectedReceiver.city_id ? selectedReceiver.city_id : undefined,
            });
-   }, [selectedReceiver,form]);
+   }, [selectedReceiver, form]);
 
    const provinceId = useWatch({ control: form.control, name: "province_id" });
    const cities = useMemo(() => {
       return provinces?.find((province: Province) => province.id === provinceId)?.cities;
-   }, [provinceId]);
+   }, [provinceId, form]);
 
    const { mutate: createReceiver, isPending } = useReceivers.create(selectedCustomer?.id || 0, {
       onSuccess: (data: Receiver) => {
@@ -179,6 +179,8 @@ const ReceiverForm = ({
          createReceiver(data as Receiver);
       }
    };
+
+   console.log("re-render");
 
    return (
       <form id="receiver-form" onSubmit={form.handleSubmit(onSubmit)}>
