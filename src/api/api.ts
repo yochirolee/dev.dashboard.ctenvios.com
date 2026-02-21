@@ -843,7 +843,9 @@ const api = {
          return response.data;
       },
       update: async (id: number, data: any) => {
-         const response = await axiosInstance.patch(`/containers/${id}`, data);
+
+         console.log(data, "data on update container");
+         const response = await axiosInstance.put(`/containers/${id}`, data);
          return response.data;
       },
       updateStatus: async (id: number, data: { status: string; location?: string; description?: string }) => {

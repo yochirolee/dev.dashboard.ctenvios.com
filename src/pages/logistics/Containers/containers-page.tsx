@@ -35,6 +35,7 @@ export const ContainersPage = () => {
 
    const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
    const [openCreateDialog, setOpenCreateDialog] = useState(false);
+   const [openEditDialog, setOpenEditDialog] = useState(false);
    const [openStatusDialog, setOpenStatusDialog] = useState(false);
    const [containerId, setContainerId] = useState<number | undefined>(undefined);
    const [selectedContainer, setSelectedContainer] = useState<Container | null>(null);
@@ -48,6 +49,11 @@ export const ContainersPage = () => {
    const handleUpdateStatus = useCallback((container: Container) => {
       setSelectedContainer(container);
       setOpenStatusDialog(true);
+   }, []);
+
+   const handleEditContainer = useCallback((containerId: number) => {
+      setContainerId(containerId);
+      setOpenEditDialog(true);
    }, []);
 
    const confirmDelete = useCallback(() => {
@@ -66,8 +72,13 @@ export const ContainersPage = () => {
    }, [containerId, deleteContainerMutation]);
 
    const columns = useMemo(
-      () => containersColumns({ onDelete: handleDeleteContainer, onUpdateStatus: handleUpdateStatus }),
-      [handleDeleteContainer, handleUpdateStatus]
+      () =>
+         containersColumns({
+            onDelete: handleDeleteContainer,
+            onUpdateStatus: handleUpdateStatus,
+            onEditContainer: handleEditContainer,
+         }),
+      [handleDeleteContainer, handleUpdateStatus, handleEditContainer],
    );
 
    if (containers?.length === 0 && !searchQuery && !isLoading) {
@@ -172,10 +183,9 @@ export const ContainersPage = () => {
             <DialogContent>
                <DialogHeader>
                   <DialogTitle>Cambiar Estado del Contenedor</DialogTitle>
-                  <DialogDescription>
-                     {selectedContainer?.container_name} - {selectedContainer?.container_number}
-                  </DialogDescription>
+                  <DialogDescription>Edita el estado del contenedor</DialogDescription>
                </DialogHeader>
+
                {selectedContainer && (
                   <UpdateStatusContainerForm
                      containerId={selectedContainer.id}
@@ -183,6 +193,17 @@ export const ContainersPage = () => {
                      setOpen={setOpenStatusDialog}
                   />
                )}
+            </DialogContent>
+         </Dialog>
+         {/* Edit Dialog */}
+         <Dialog open={openEditDialog} onOpenChange={setOpenEditDialog}>
+            <DialogContent className="sm:max-w-[550px] p-4">
+               <DialogHeader>
+                  <DialogTitle>Editar Contenedor</DialogTitle>
+                  <DialogDescription>Edita los datos del contenedor</DialogDescription>
+               </DialogHeader>
+
+               {containerId && <NewContainerForm containerId={containerId} setOpen={setOpenEditDialog} />}
             </DialogContent>
          </Dialog>
       </div>

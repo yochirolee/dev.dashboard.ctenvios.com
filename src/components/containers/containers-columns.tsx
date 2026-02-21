@@ -4,7 +4,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
 import { Button } from "@/components/ui/button";
-import { EllipsisVertical, Trash2Icon, Package, Ship, Anchor, RefreshCw, FileSpreadsheet } from "lucide-react";
+import { EllipsisVertical, Trash2Icon, Package, Ship, Anchor, RefreshCw, FileSpreadsheet, Pencil } from "lucide-react";
 import {
    DropdownMenu,
    DropdownMenuContent,
@@ -12,12 +12,13 @@ import {
    DropdownMenuSeparator,
    DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+
 import type { Container, ContainerStatus } from "@/data/types";
 import { axiosInstance } from "@/api/api";
 import { toast } from "sonner";
 
 const statusConfig: Record<ContainerStatus, { label: string; color: string }> = {
-   PENDING: { label: "Pendiente", color: "bg-gray-400/80 ring-gray-500/40" },
+   PENDING: { label: "Creado", color: "bg-gray-400/80 ring-gray-500/40" },
    LOADING: { label: "Cargando", color: "bg-yellow-400/80 ring-yellow-500/40" },
    SEALED: { label: "Sellado", color: "bg-blue-400/80 ring-blue-500/40" },
    DEPARTED: { label: "En Camino", color: "bg-indigo-400/80 ring-indigo-500/40" },
@@ -73,9 +74,14 @@ const downloadManifest = async (containerId: number, containerName: string): Pro
 interface ContainersColumnsProps {
    onDelete: (containerId: number) => void;
    onUpdateStatus: (container: Container) => void;
+   onEditContainer: (containerId: number) => void;
 }
 
-export const containersColumns = ({ onDelete, onUpdateStatus }: ContainersColumnsProps): ColumnDef<Container>[] => [
+export const containersColumns = ({
+   onDelete,
+   onUpdateStatus,
+   onEditContainer,
+}: ContainersColumnsProps): ColumnDef<Container>[] => [
    {
       id: "select",
       header: ({ table }) => (
@@ -115,10 +121,13 @@ export const containersColumns = ({ onDelete, onUpdateStatus }: ContainersColumn
          const status = row.original?.status;
          const config = statusConfig[status] || { label: status, color: "bg-gray-400/80 ring-gray-500/40" };
          return (
-            <Badge className="w-fit" variant="secondary">
-               <span className={`rounded-full h-1.5 w-1.5 ring-1 ${config.color}`} />
-               <span className="ml-1 text-nowrap font-extralight text-muted-foreground text-xs">{config.label}</span>
-            </Badge>
+            <div className="flex flex-col items-start gap-1 min-w-0">
+               <Badge className="w-fit" variant="secondary">
+                  <span className={`rounded-full h-1.5 w-1.5 ring-1 ${config.color}`} />
+                  <span className="ml-1 text-nowrap font-extralight text-muted-foreground text-xs">{config.label}</span>
+               </Badge>
+               <span className="text-xs mx-auto text-muted-foreground">{row.original?.seal_number}</span>
+            </div>
          );
       },
    },
@@ -197,7 +206,7 @@ export const containersColumns = ({ onDelete, onUpdateStatus }: ContainersColumn
          const maxWeight = row.original?.max_weight_kg;
          return (
             <div className="flex items-center gap-1 min-w-0">
-               <span className="text-sm">{ parseFloat(currentWeight).toFixed(2)}</span>
+               <span className="text-sm">{parseFloat(currentWeight).toFixed(2)}</span>
                {maxWeight && <span className="text-xs text-muted-foreground">/ {maxWeight}</span>}
             </div>
          );
@@ -210,6 +219,18 @@ export const containersColumns = ({ onDelete, onUpdateStatus }: ContainersColumn
          return (
             <div className="flex flex-col items-start gap-1 min-w-0">
                <span className="text-sm">{format(new Date(row.original?.created_at), "dd/MM/yyyy")}</span>
+               <span className="text-xs text-muted-foreground">{row.original?.created_by?.name}</span>
+            </div>
+         );
+      },
+   },
+   {
+      accessorKey: "updated_at",
+      header: "Actualizado",
+      cell: ({ row }) => {
+         return (
+            <div className="flex flex-col items-start gap-1 min-w-0">
+               <span className="text-sm">{format(new Date(row.original?.updated_at), "dd/MM/yyyy")}</span>
                <span className="text-xs text-muted-foreground">{row.original?.created_by?.name}</span>
             </div>
          );
@@ -240,11 +261,13 @@ export const containersColumns = ({ onDelete, onUpdateStatus }: ContainersColumn
                         <RefreshCw className="w-4 h-4 mr-2" />
                         Cambiar Estado
                      </DropdownMenuItem>
-                     <DropdownMenuItem
-                        onClick={() => downloadManifest(row.original?.id, row.original?.container_name)}
-                     >
+                     <DropdownMenuItem onClick={() => downloadManifest(row.original?.id, row.original?.container_name)}>
                         <FileSpreadsheet className="w-4 h-4 mr-2" />
                         Descargar Manifiesto
+                     </DropdownMenuItem>
+                     <DropdownMenuItem onClick={() => onEditContainer(row.original?.id)}>
+                        <Pencil className="w-4 h-4 mr-2" />
+                        Editar
                      </DropdownMenuItem>
                      <DropdownMenuSeparator />
                      <DropdownMenuItem className="text-destructive" onClick={() => onDelete(row.original?.id)}>

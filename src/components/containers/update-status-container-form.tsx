@@ -27,6 +27,7 @@ const statusLabels: Record<ContainerStatus, string> = {
 const updateStatusSchema = z.object({
    status: z.string().min(1, { message: "El estado es requerido" }),
    location: z.string().optional(),
+   seal_number: z.string().optional(),
    description: z.string().optional(),
 });
 
@@ -44,11 +45,12 @@ export const UpdateStatusContainerForm = ({ containerId, currentStatus, setOpen 
       defaultValues: {
          status: currentStatus,
          location: "",
+         seal_number: "",
          description: "",
       },
    });
 
-   const updateStatusMutation = useContainers.updateStatus();
+   const updateStatusMutation = useContainers.update();
 
    const onSubmit = (data: UpdateStatusSchema) => {
       updateStatusMutation.mutate(
@@ -56,6 +58,7 @@ export const UpdateStatusContainerForm = ({ containerId, currentStatus, setOpen 
             id: containerId,
             data: {
                status: data.status,
+               seal_number: data.seal_number || undefined,
                location: data.location || undefined,
                description: data.description || undefined,
             },
@@ -69,7 +72,7 @@ export const UpdateStatusContainerForm = ({ containerId, currentStatus, setOpen 
             onError: (error: any) => {
                toast.error(error.response?.data?.message || "Error al actualizar el estado");
             },
-         }
+         },
       );
    };
 
@@ -100,6 +103,16 @@ export const UpdateStatusContainerForm = ({ containerId, currentStatus, setOpen 
                         </SelectContent>
                      </Select>
                      {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                  </Field>
+               )}
+            />
+            <Controller
+               control={form.control}
+               name="seal_number"
+               render={({ field, fieldState }) => (
+                  <Field data-invalid={fieldState.invalid}>
+                     <FieldLabel>Número de sello (opcional)</FieldLabel>
+                     <Input {...field} placeholder="Ej: 1234567890" />
                   </Field>
                )}
             />

@@ -180,8 +180,7 @@ const ReceiverForm = ({
       }
    };
 
-   console.log("re-render");
-
+  
    return (
       <form id="receiver-form" onSubmit={form.handleSubmit(onSubmit)}>
          <ScrollArea className="h-[calc(100vh-200px)] p-4">
